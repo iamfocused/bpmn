@@ -1,0 +1,141 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
+  <process id="DPENTRYPROCESS" name="入职流程" isExecutable="true" activiti:candidateStarterGroups="admin">
+    <startEvent id="startevent1" name="Start" activiti:initiator="initiator">
+      <documentation>流程启动，填写入职信息 Start the process and fill in the entry
+				information</documentation>
+      <extensionElements>
+        <activiti:formProperty id="estimatedTimeOfEntry_预计入职时间 estimatedTimeOfEntry_1_string_t3_$$A" name="预计入职时间 Estimated time of entry" type="string" variable="estimatedTimeOfEntry" required="true"></activiti:formProperty>
+        <activiti:formProperty id="name_姓名 name_1_string_t1_$$B" name="姓名 Name" type="string" variable="name" required="true"></activiti:formProperty>
+        <activiti:formProperty id="corp_实体_2_string_tree_$$B" name="法律实体 Legal Corp" type="string" variable="legalCorp" required="true"></activiti:formProperty>
+        <activiti:formProperty id="idNumber_身份证件号码 idNumber_3_string_t1_$$B" name="身份证件号码 ID Number" type="string" variable="idNumber" required="true"></activiti:formProperty>
+        <activiti:formProperty id="employmentForms_用工形式 employmentForms_4_enum_sbs_$$B" name="用工形式 Employment Forms" type="enum" variable="employmentForms" required="true">
+          <activiti:value id="全职" name="全职 full time"></activiti:value>
+          <activiti:value id="兼职" name="兼职 part time"></activiti:value>
+          <activiti:value id="实习" name="实习 fieldwork"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="rank_职级 rank_5_enum_sbs_$$B" name="职级 Rank" type="enum" variable="rank" required="true">
+          <activiti:value id="A" name="A"></activiti:value>
+          <activiti:value id="B" name="B"></activiti:value>
+          <activiti:value id="C" name="C"></activiti:value>
+          <activiti:value id="D" name="D"></activiti:value>
+          <activiti:value id="E" name="E"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="reportTo_汇报对象 reportTo_1_string_psbn_$$C" name="汇报对象 Report To" type="string" variable="reportTo" required="true"></activiti:formProperty>
+        <activiti:formProperty id="inchargeOfTheApprover_分管审批人 inchargeOfTheApprover_2_string_psbn_$$C " name="分管审批人 In charge of the approver" type="string" variable="inchargeOfTheApprover" required="true"></activiti:formProperty>
+        <activiti:formProperty id="department_部门 department_3_string_t1_$$C" name="部门 Department" type="string" variable="department" required="true"></activiti:formProperty>
+        <activiti:formProperty id="position_职位 position_4_string_t1_$$C" name="职位 Position" type="string" variable="position" required="true"></activiti:formProperty>
+        <activiti:formProperty id="dutyStation_工作地 dutyStation_1_string_t1_$$D" name="工作地 Duty Station" type="string" variable="dutyStation" required="true"></activiti:formProperty>
+        <activiti:formProperty id="contactPhone_联系电话 contactPhone_2_string_t1_$$D" name="联系电话 Contact Phone" type="string" variable="contactPhone" required="true"></activiti:formProperty>
+        <activiti:formProperty id="companyEmail_公司邮箱 companyEmail_3_string_t1_$$D" name="公司邮箱 Company Email" type="string" variable="companyEmail" required="true"></activiti:formProperty>
+        <activiti:formProperty id="basicMonthlySalary_基本月薪 basicMonthlySalary_4_string_cny_$$D" name="基本月薪 Basic monthly salary" type="string" variable="basicMonthlySalary" required="true"></activiti:formProperty>
+        <activiti:formProperty id="mealSubsidy_餐费补贴 mealSubsidy_5_string_cny_$$D" name="餐费补贴 Meal Subsidy" type="string" variable="mealSubsidy" required="true"></activiti:formProperty>
+        <activiti:formProperty id="annualPerformance_年度绩效 annualPerformance_6_string_cny_$$D" name="年度绩效 Annual performance" type="string" variable="annualPerformance" required="true"></activiti:formProperty>
+        <activiti:formProperty id="others_其他补充 others_7_string_t2_$$D" name="其他补充 Others" type="string" variable="others" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdentryprocess_item" name="详细 Detail" type="string" variable="tbhdentryprocess_item" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdentryprocess_成本中心 Costcenter_costcenter_1_string_tree_$$A" name="成本中心 Costcenter" type="string" variable="tbhdentryprocess_costcenter_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdentryprocess_项目 Project_project_2_string_tree_$$A" name="项目 Project" type="string" variable="tbhdentryprocess_project_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdentryprocess_职能 Function_function_3_enum_sbs_$$A" name="职能 Function" type="enum" variable="tbhdentryprocess_fuction_t00">
+          <activiti:value id="中教" name="双语教师/中教"></activiti:value>
+          <activiti:value id="外教" name="外教"></activiti:value>
+          <activiti:value id="管理层" name="管理层、校长"></activiti:value>
+          <activiti:value id="咨询顾问" name="咨询顾问/升学指导"></activiti:value>
+          <activiti:value id="服务人员" name="服务人员"></activiti:value>
+          <activiti:value id="市场人员" name="市场人员"></activiti:value>
+          <activiti:value id="研发人员" name="研发人员"></activiti:value>
+          <activiti:value id="后勤运营人员" name="后勤运营人员"></activiti:value>
+          <activiti:value id="销售人员" name="销售人员"></activiti:value>
+          <activiti:value id="保育员" name="保育员"></activiti:value>
+          <activiti:value id="助教" name="助教/教辅"></activiti:value>
+          <activiti:value id="教务" name="教务"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="tbhdentryprocess_比例 Proportion_proportion_4_string_t1_$$A" name="比例 Proportion" type="string" variable="tbhdentryprocess_proportion_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdentryprocess_开始日期 StartDate_startdate_5_string_t3_$$A" name="开始日期 StartDate" type="string" variable="tbhdentryprocess_proportion_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdentryprocess_比例 EndDate_enddate_6_string_t3_$$A" name="结束日期 EndDate" type="string" variable="tbhdentryprocess_proportion_t00"></activiti:formProperty>
+      </extensionElements>
+    </startEvent>
+    <userTask id="usertask1" name="User Task" activiti:assignee="${initiator}">
+      <extensionElements>
+        <activiti:formProperty id="estimatedTimeOfEntry_预计入职时间 estimatedTimeOfEntry_1_string_t3_$$VA" name="预计入职时间 Estimated time of entry" type="string" variable="estimatedTimeOfEntry" required="true"></activiti:formProperty>
+        <activiti:formProperty id="name_姓名 name_1_string_t1_$$VB" name="姓名 Name" type="string" variable="name" required="true"></activiti:formProperty>
+        <activiti:formProperty id="corp_实体_2_string_tree_$$VB" name="法律实体 Legal Corp" type="string" variable="legalCorp" required="true"></activiti:formProperty>
+        <activiti:formProperty id="idNumber_身份证件号码 idNumber_3_string_t1_$$VB" name="身份证件号码 ID Number" type="string" variable="idNumber" required="true"></activiti:formProperty>
+        <activiti:formProperty id="employmentForms_用工形式 employmentForms_4_enum_sbs_$$VB" name="用工形式 Employment Forms" type="string" variable="employmentForms" required="true"></activiti:formProperty>
+        <activiti:formProperty id="rank_职级 rank_5_enum_sbs_$$VB" name="职级 Rank" type="string" variable="rank" required="true"></activiti:formProperty>
+        <activiti:formProperty id="reportTo_汇报对象 reportTo_1_string_psbn_$$VC" name="汇报对象 Report To" type="string" variable="reportTo" required="true"></activiti:formProperty>
+        <activiti:formProperty id="inchargeOfTheApprover_分管审批人 inchargeOfTheApprover_2_string_psbn_$$VC " name="分管审批人 In charge of the approver" type="string" variable="inchargeOfTheApprover" required="true"></activiti:formProperty>
+        <activiti:formProperty id="department_部门 department_3_string_t1_$$VC" name="部门 Department" type="string" variable="department" required="true"></activiti:formProperty>
+        <activiti:formProperty id="position_职位 position_4_string_t1_$$VC" name="职位 Position" type="string" variable="position" required="true"></activiti:formProperty>
+        <activiti:formProperty id="dutyStation_工作地 dutyStation_1_string_t1_$$VD" name="工作地 Duty Station" type="string" variable="dutyStation" required="true"></activiti:formProperty>
+        <activiti:formProperty id="contactPhone_联系电话 contactPhone_2_string_t1_$$VD" name="联系电话 Contact Phone" type="string" variable="contactPhone" required="true"></activiti:formProperty>
+        <activiti:formProperty id="companyEmail_公司邮箱 companyEmail_3_string_t1_$$VD" name="公司邮箱 Company Email" type="string" variable="companyEmail" required="true"></activiti:formProperty>
+        <activiti:formProperty id="basicMonthlySalary_基本月薪 basicMonthlySalary_4_string_cny_$$VD" name="基本月薪 Basic monthly salary" type="string" variable="basicMonthlySalary" required="true"></activiti:formProperty>
+        <activiti:formProperty id="mealSubsidy_餐费补贴 mealSubsidy_5_string_cny_$$VD" name="餐费补贴 Meal Subsidy" type="string" variable="mealSubsidy" required="true"></activiti:formProperty>
+        <activiti:formProperty id="annualPerformance_年度绩效 annualPerformance_6_string_cny_$$VD" name="年度绩效 Annual performance" type="string" variable="annualPerformance" required="true"></activiti:formProperty>
+        <activiti:formProperty id="others_其他补充 others_7_string_t2_$$VD" name="其他补充 Others" type="string" variable="others" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdentryprocess_item_$$VA" name="详细 Detail" type="string" variable="tbhdentryprocess_item"></activiti:formProperty>
+        <activiti:formProperty id="tbhdentryprocess_成本中心 Costcenter_costcenter_1_string_tree_$$VA" name="成本中心 Costcenter" type="string" variable="tbhdentryprocess_costcenter_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdentryprocess_项目 Project_project_2_string_tree_$$VA" name="项目 Project" type="string" variable="tbhdentryprocess_project_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdentryprocess_职能 Function_function_3_enum_sbs_$$VA" name="职能 Function" type="string" variable="tbhdentryprocess_fuction_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdentryprocess_比例 Proportion_proportion_4_string_t1_$$VA" name="比例 Proportion" type="string" variable="tbhdentryprocess_proportion_t00"></activiti:formProperty>
+        <activiti:formProperty id="actualEntryTime_实际入职时间 actualEntryTime_1_string_t3_$$A" name="实际入职时间 Actual Entry Time" type="string" variable="actualEntryTime" required="true"></activiti:formProperty>
+        <activiti:formProperty id="employeeId_员工工号 employeeId_2_string_t1_$$A" name="员工工号 Employee ID" type="string" variable="employeeId" required="true"></activiti:formProperty>
+        <activiti:formProperty id="idNumberValidityPeriod_身份证件有效期 idNumberValidityPeriod_3_string_t3_$$A" name="身份证件有效期 IdNumber Validity Period" type="string" variable="idNumberValidityPeriod" required="true"></activiti:formProperty>
+        <activiti:formProperty id="sex_性别 sex_4_enum_sbs_$$A" name="性别 Gender" type="enum" variable="sex" required="true">
+          <activiti:value id="男" name="男 Male"></activiti:value>
+          <activiti:value id="女" name="女 Female"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="birthday_出生日期 birthday_5_string_t3_$$A" name="生日 Birthday" type="string" variable="birthday" required="true"></activiti:formProperty>
+        <activiti:formProperty id="citizenship_国籍 citizenship_1_string_t1_$$B" name="国籍 Citizenship" type="string" variable="citizenship" required="true"></activiti:formProperty>
+        <activiti:formProperty id="comeTime_进入集团日期 comeTime_2_string_t3_$$B" name="进入集团日期" type="string" variable="comeTime" required="true"></activiti:formProperty>
+        <activiti:formProperty id="maritalStatus_婚姻情况 maritalStatus_3_enum_sbs_$$B" name="婚姻情况 Marital Status" type="enum" variable="maritalStatus" required="true">
+          <activiti:value id="未婚" name="未婚"></activiti:value>
+          <activiti:value id="已婚" name="已婚"></activiti:value>
+          <activiti:value id="离异" name="离异"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="fertilityStatus_生育情况 fertilityStatus_4_enum_sbs_$$B" name="生育情况 Fertility Status" type="enum" variable="fertilityStatus" required="true">
+          <activiti:value id="未育" name="未育"></activiti:value>
+          <activiti:value id="已育" name="已育"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="politicalStatus_政治面貌 politicalStatus_5_string_t1_$$B" name="政治面貌 Political Status" type="string" variable="politicalStatus" required="true"></activiti:formProperty>
+        <activiti:formProperty id="census_户籍 census_1_string_t1_$$C" name="户籍 Census" type="string" variable="census" required="true"></activiti:formProperty>
+        <activiti:formProperty id="socialSecurityPayment_社保缴纳地 socialSecurityPayment_2_string_t1_$$C" name="社保缴纳地" type="string" variable="socialSecurityPayment" required="true"></activiti:formProperty>
+        <activiti:formProperty id="residentialAddress_现居住地址 residentialAddress_3_string_t1_$$C" name="现居住地址" type="string" variable="residentialAddress" required="true"></activiti:formProperty>
+        <activiti:formProperty id="placeOfLegalDocuments_法律文书送达地 placeOfLegalDocuments_4_string_t1_$$C" name="法律文书送达地 Place of legal documents" variable="placeOfLegalDocuments" required="true"></activiti:formProperty>
+        <activiti:formProperty id="educationalBackground_最高学历 educationalBackground_5_string_t1_$$C" name="最高学历 Educational Background" type="string" variable="educationalBackground" required="true"></activiti:formProperty>
+        <activiti:formProperty id="bachelorOfScience_最高学位 bachelorOfScience_1_string_t1_$$D" name="最高学位 Bachelor Of Science" type="string" variable="bachelorOfScience" required="true"></activiti:formProperty>
+        <activiti:formProperty id="major_专业 major_2_string_t1_$$D" name="专业 Major" type="string" variable="major" required="true"></activiti:formProperty>
+        <activiti:formProperty id="studyAbroad_是否留学 studyAbroad_3_enum_sbs_$$D" name="是否有留学背景 Is Study Abroad" type="enum" variable="studyAbroad" required="true">
+          <activiti:value id="否" name="否 N"></activiti:value>
+          <activiti:value id="是" name="是 Y"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="salaryCardNumber_工资卡卡号 salaryCardNumber_4_string_t1_$$D" name="工资卡卡号 Salary Card Number" type="string" variable="salaryCardNumber" required="true"></activiti:formProperty>
+        <activiti:formProperty id="payrollBank_工资卡开户行名称 payrollBank_5_string_t1_$$D" name="工资卡开户行名称 Payroll Bank Name" type="string" variable="payrollBank" required="true"></activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="usertask1"></sequenceFlow>
+    <endEvent id="endevent1" name="End"></endEvent>
+    <sequenceFlow id="flow2" sourceRef="usertask1" targetRef="endevent1"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_DPENTRYPROCESS">
+    <bpmndi:BPMNPlane bpmnElement="DPENTRYPROCESS" id="BPMNPlane_DPENTRYPROCESS">
+      <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="40.0" y="180.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask1" id="BPMNShape_usertask1">
+        <omgdc:Bounds height="55.0" width="105.0" x="120.0" y="170.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="270.0" y="180.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="75.0" y="197.0"></omgdi:waypoint>
+        <omgdi:waypoint x="120.0" y="197.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="225.0" y="197.0"></omgdi:waypoint>
+        <omgdi:waypoint x="270.0" y="197.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

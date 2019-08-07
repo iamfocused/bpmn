@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/frm">
+  <process id="AttendanceImportProcess" name="考勤数据导入流程" isExecutable="true" activiti:candidateStarterGroups="admin,dptest">
+    <documentation>{ "description": "考勤数据导入流程", "documents": [{ "name": "考勤数据模版", "path": "https://bpms.eorionsolution.com/bpms-upload/download/100010/AttendanceImportProcess-1-160346/20190703174355/Attendance_Data.xlsx", "size": "xlsx" }] }</documentation>
+    <startEvent id="s1" name="s1" activiti:initiator="initiator">
+      <documentation>流程启动，请上传考勤数据附件</documentation>
+      <extensionElements>
+        <activiti:formProperty id="importmemo_备注_1_string_t1_$$A" name="导入备注" type="string" variable="importmemo"></activiti:formProperty>
+        <activiti:formProperty id="attachment_附件_1_string_t9_$$F" name="考勤数据附件" type="string" variable="attachment" required="true"></activiti:formProperty>
+        <activiti:executionListener event="end" class="org.activiti.engine.impl.bpmn.listener.ScriptExecutionListener">
+          <activiti:field name="language">
+            <activiti:string><![CDATA[groovy]]></activiti:string>
+          </activiti:field>
+          <activiti:field name="script">
+            <activiti:string><![CDATA[import groovy.json.JsonOutput
+				import groovy.json.JsonSlurper
+            	
+            	def jsonSlurper = new JsonSlurper()
+            	def prefixUrl = 'https://bpms.eorionsolution.com/bpms-upload/download'
+            	def attachments = jsonSlurper.parseText(execution.getVariable('attachment'))
+            	if(attachments.size() != 1) {
+            		throw new org.activiti.engine.ActivitiIllegalArgumentException("仅支持单个考勤附件导入");
+            	}
+            	def path = attachments.get(0).path
+            	def name = attachments.get(0).name
+            	def encodeName = URLEncoder.encode(name,'UTF-8')
+            	def realPath = path.replaceAll(name,encodeName)
+            	def urlPath = prefixUrl + realPath
+            	
+            	def body = JsonOutput.toJson(["urlPath":urlPath])
+            	execution.setVariable("_http_method", "POST")
+				def headerMap = new HashMap()
+				headerMap.put("Content-Type","application/json")
+				execution.setVariable("_http_headers", headerMap)
+				execution.setVariable("_http_body", body)
+				execution.setVariable("_http_url", 'https://bpms.eorionsolution.com/neo-hr-api/v1/attendance/import')
+				execution.setVariable("_http_response_body", '')
+				execution.setVariable("_http_response_status_code", '')]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </startEvent>
+    <scriptTask id="importResultST" name="导入结果解析" scriptFormat="groovy" activiti:autoStoreVariables="false">
+      <script>
+    		import groovy.json.JsonSlurper
+    			def jsonSlurper = new JsonSlurper()
+    			def responseCode = execution.getVariable("_http_response_status_code")
+    			if(responseCode != 200) {
+    				def responseBody = new groovy.json.JsonSlurper().parseText(execution.getVariable("_http_response_body"))
+    				throw new org.activiti.engine.ActivitiIllegalArgumentException(responseBody.description)
+    			}
+    		
+    	</script>
+    </scriptTask>
+    <sequenceFlow id="f1" sourceRef="s1" targetRef="ST1"></sequenceFlow>
+    <endEvent id="end" name="End"></endEvent>
+    <sequenceFlow id="f3" sourceRef="importResultST" targetRef="end"></sequenceFlow>
+    <serviceTask id="ST1" name="数据导入" activiti:class="com.eorionsolution.riying.bpms.javaservice.http.RestAPIService"></serviceTask>
+    <sequenceFlow id="f2" sourceRef="ST1" targetRef="importResultST"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_AttendanceImportProcess">
+    <bpmndi:BPMNPlane bpmnElement="AttendanceImportProcess" id="BPMNPlane_AttendanceImportProcess">
+      <bpmndi:BPMNShape bpmnElement="s1" id="BPMNShape_s1">
+        <omgdc:Bounds height="35.0" width="35.0" x="140.0" y="200.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="importResultST" id="BPMNShape_importResultST">
+        <omgdc:Bounds height="55.0" width="105.0" x="372.0" y="190.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="end" id="BPMNShape_end">
+        <omgdc:Bounds height="35.0" width="35.0" x="530.0" y="200.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="ST1" id="BPMNShape_ST1">
+        <omgdc:Bounds height="55.0" width="105.0" x="220.0" y="190.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="f1" id="BPMNEdge_f1">
+        <omgdi:waypoint x="175.0" y="217.0"></omgdi:waypoint>
+        <omgdi:waypoint x="220.0" y="217.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="f3" id="BPMNEdge_f3">
+        <omgdi:waypoint x="477.0" y="217.0"></omgdi:waypoint>
+        <omgdi:waypoint x="530.0" y="217.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="f2" id="BPMNEdge_f2">
+        <omgdi:waypoint x="325.0" y="217.0"></omgdi:waypoint>
+        <omgdi:waypoint x="372.0" y="217.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

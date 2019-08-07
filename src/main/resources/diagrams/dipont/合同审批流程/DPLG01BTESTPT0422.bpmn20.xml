@@ -1,0 +1,762 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/L">
+  <process id="DPLG01B_TEST4" name="测试用: 合同审批流程V4" isExecutable="true" activiti:candidateStarterGroups="_dpmsadmin">
+    <documentation>{ "description": "本流程适用与教育管理集团的格式与非格式合同审批", "documents": [{ "name": "集团合同审核与签订试行规定", "path": "https://bpm.dipont.com/bpms-upload/download/bpm@dipont.com/ITADM01-1-130050/20190312163108/%E7%8B%84%E9%82%A6%E6%95%99%E8%82%B2%E7%AE%A1%E7%90%86%E9%9B%86%E5%9B%A2%E5%90%88%E5%90%8C%E5%AE%A1%E6%A0%B8%E4%B8%8E%E7%AD%BE%E8%AE%A2%E8%AF%95%E8%A1%8C%E8%A7%84%E5%AE%9A.pdf", "size": "pdf" }, { "name": "BPMFLOWCHART", "path": "https://bpm.dipont.com/bpms-upload/download/bpm@dipont.com/ITADM01-1-130050/20190312163108/%E7%8B%84%E9%82%A6%E6%95%99%E8%82%B2%E7%AE%A1%E7%90%86%E9%9B%86%E5%9B%A2%E5%90%88%E5%90%8C%E5%AE%A1%E6%A0%B8%E4%B8%8E%E7%AD%BE%E8%AE%A2%E8%AF%95%E8%A1%8C%E8%A7%84%E5%AE%9A.pdf", "size": "pdf" }] }</documentation>
+    <startEvent id="S1" name="提交申请" activiti:initiator="initiator">
+      <extensionElements>
+        <activiti:formProperty id="实体_corp_1_string_tree_$$A" name="所属实体" type="string" variable="corp" required="true"/>
+        <activiti:formProperty id="costcenter_成本中心_1_string_tree_$$A" name="成本中心" type="string" variable="costcenter_t00" required="true"/>
+        <activiti:formProperty id="cttype_合同类型_1_enum_rbv_$$B" name="合同类型" type="enum" variable="cttype" required="true">
+          <activiti:value id="采购" name="采购"/>
+          <activiti:value id="销售" name="销售"/>
+          <activiti:value id="合作协议" name="合作协议"/>
+          <activiti:value id="服务协议" name="服务协议"/>
+          <activiti:value id="劳动合同" name="劳动合同"/>
+          <activiti:value id="集团并购,投资,战略合作" name="集团并购,投资,战略合作"/>
+          <activiti:value id="其它" name="其它"/>
+        </activiti:formProperty>
+        <activiti:formProperty id="ctamt_合同人民币金额_2_string_t11_$$B" name="合同人民币金额" type="string" variable="ctamt" required="true"/>
+        
+        <activiti:formProperty id="memo_合同描述_4_string_t2_$$D" name="合同描述" type="string" variable="memo" required="true"/>
+        <activiti:formProperty id="attachments_合同文件_1_string_t9_$$A" name="合同文件" type="string" variable="attachments" required="true"/>
+		
+<activiti:executionListener event="end" class="org.activiti.engine.impl.bpmn.listener.ScriptExecutionListener">
+<activiti:field name="language">
+<activiti:string>
+<![CDATA[ groovy ]]>
+</activiti:string>
+</activiti:field>
+<activiti:field name="script">
+<activiti:string>
+<![CDATA[
+ def user = identityService.createUserQuery().userId(initiator).singleResult();
+ def mail = user.getEmail();
+ def initiatorFirstName = user.getFirstName(); 
+ def initiatorLastName = user.getLastName();
+ execution.setVariable('initiator_email', mail); 
+ execution.setVariable('initiator_name', initiatorLastName + " " + initiatorFirstName);
+ 
+ def assigneeListo=new ArrayList(); 
+ assigneeListo.add("bpm@dipont.com");
+
+ execution.setVariable('assigneeListo', assigneeListo); 
+ 
+ 
+def assigneeList=new ArrayList(); 
+assigneeList.add("bpm@dipont.com"); 
+execution.setVariable('assigneeList', assigneeList); 
+def costCenterDrools = '[{"costcenter":"' + new groovy.json.JsonSlurper().parseText(execution.getVariable('costcenter_t00')).code + '","amount":' + execution.getVariable('ctamt') + '}]'; 
+execution.setVariable("_http_method", "POST"); 
+def headerMap = new java.util.HashMap<String,String>(); 
+headerMap.put("Content-Type","application/json");	
+execution.setVariable("_http_headers", headerMap); 
+execution.setVariable("_http_body",costCenterDrools); 
+execution.setVariable("_http_url", 'https://bpmcs.dipont.com/decisiontables/v1/fire/ccfn01a.xls'); 
+execution.setVariable("_http_response_body", ''); 
+execution.setVariable("_http_response_status_code", ''); 
+
+ def id = execution.getProcessInstanceId(); 
+ def bskey = execution.getBusinessKey(); 
+ execution.setVariable('instance_bskey', bskey); 
+ return id;
+]]>
+</activiti:string>
+</activiti:field>
+<activiti:field name="resultVariable">
+<activiti:string>
+<![CDATA[ process_instance_id ]]>
+</activiti:string>
+</activiti:field>
+</activiti:executionListener>			
+		
+      </extensionElements>
+    </startEvent>
+    <userTask id="T1" name="合同评审: 所属成本中心审核" activiti:assignee="${assignee}" activiti:dueDate="P1D" activiti:priority="8080">
+      <extensionElements>
+        <activiti:formProperty id="coreaction_审批结果_1_enum_rbv_$$A" name="审批结果" type="enum" variable="coreaction_t01" required="true">
+          <activiti:value id="Y" name="同意"/>
+          <activiti:value id="N" name="拒绝"/>
+        </activiti:formProperty>
+        <activiti:formProperty id="corecomments_审批意见_1_string_t2_$$B" name="审批意见" type="string" variable="corecomments_t01"/>
+        <activiti:formProperty id="实体_corp_1_string_tree_$$VA" name="所属实体" type="string" variable="corp"/>
+        <activiti:formProperty id="costcenter_所属部门_1_enum_tree_$$VA" name="成本中心" type="string" variable="costcenter_t00"/>
+        <activiti:formProperty id="cttype_合同类型_2_enum_rbv_$$VA" name="合同类型" type="string" variable="cttype"/>
+		<activiti:formProperty id="ctftype_合同格式类型_3_enum_sbs_$$VA" name="合同格式类型" type="string" variable="ctfttype"/>
+         
+        <activiti:formProperty id="ctamt_合同金额_2_string_t11_$$VB" name="合同人民币金额" type="string" variable="ctamt"/>
+        <activiti:formProperty id="memo_合同描述_3_string_t2_$$VB" name="合同描述" type="string" variable="memo"/>
+        <activiti:formProperty id="attachments_合同文件_1_string_t9_$$VA" name="合同文件" type="string" variable="attachmentsfinal"/>
+		
+		<activiti:formProperty id="corecomments_审批意见_1_string_t2_$$VC" name="财务最新审阅意见" type="string" variable="corecomments_t0a"/>
+        <activiti:formProperty id="attachments_更新文件_2_string_t9i_$$VC" name="财务最新反馈文件" type="string" variable="attachments_t0a"/>
+		<activiti:formProperty id="attachments_更新文件_3_string_t9i_$$VC" name="财务最新反馈更新文件" type="string" variable="attachments_t0a1"/>
+		<activiti:formProperty id="corecomments_审批意见_1_string_t2_$$VD" name="法务最新审阅意见" type="string" variable="corecomments_t0b"/>
+        <activiti:formProperty id="attachments_更新文件_2_string_t9i_$$VD" name="法务最新反馈文件" type="string" variable="attachments_t0b"/>
+		<activiti:formProperty id="attachments_更新文件_3_string_t9i_$$VD" name="法务最新反馈更新文件" type="string" variable="attachments_t0b1"/>
+		
+		
+      </extensionElements>
+      <multiInstanceLoopCharacteristics isSequential="true" activiti:collection="assigneeListo" activiti:elementVariable="assignee">
+        <completionCondition>${coreaction_t01 == "N"}</completionCondition>
+      </multiInstanceLoopCharacteristics>
+    </userTask>
+    <exclusiveGateway id="G1" name="部门结果"/>
+    <sequenceFlow id="sid-040CC8B2-3FCF-407D-A4A0-89B4E0737554" sourceRef="T1" targetRef="G1"/>
+    <endEvent id="EN1" name="拒绝结束"/>
+    <userTask id="T4" name="合同评审: 盖章归档执行" activiti:candidateGroups="_dpmsadmin," activiti:dueDate="P1D" activiti:priority="8080">
+      <extensionElements>
+        <activiti:formProperty id="coreaction_盖章执行结果_1_enum_rbv_$$A" name="盖章执行结果" type="enum" variable="coreaction_t04" required="true">
+          <activiti:value id="Y" name="正常"/>
+          <activiti:value id="N" name="异常拒绝"/>
+        </activiti:formProperty>
+        <activiti:formProperty id="attachments_合同电子扫描文件_1_string_t9_$$A" name="合同电子扫描文件" type="string" variable="attachments_t04" required="true"/>
+        <activiti:formProperty id="corecomments_盖章执行备注_1_string_t2_$$B" name="盖章执行备注" type="string" variable="corecomments_t04"/>
+        <activiti:formProperty id="实体_corp_1_string_tree_$$VA" name="所属实体" type="string" variable="corp"/>
+        <activiti:formProperty id="costcenter_所属部门_1_enum_tree_$$VA" name="成本中心" type="string" variable="costcenter_t00"/>
+        <activiti:formProperty id="cttype_合同类型_2_enum_rbv_$$VA" name="合同类型" type="string" variable="cttype"/>
+		<activiti:formProperty id="ctftype_合同格式类型_3_enum_sbs_$$VA" name="合同格式类型" type="string" variable="ctfttype"/>
+        
+        <activiti:formProperty id="ctamt_合同金额_2_string_t11_$$VB" name="合同人民币金额" type="string" variable="ctamt"/>
+        <activiti:formProperty id="memo_合同描述_3_string_t2_$$VB" name="合同描述" type="string" variable="memo"/>
+        <activiti:formProperty id="attachments_合同文件_1_string_t9_$$VA" name="合同文件" type="string" variable="attachmentsfinal"/>
+      </extensionElements>
+    </userTask>
+    <exclusiveGateway id="G4" name="执行结果"/>
+    <endEvent id="EN4" name="异常结束"/>
+    <endEvent id="ES" name="执行完毕"/>
+    <userTask id="T2A" name="合同评审: 集团财务审批" activiti:candidateGroups="_dpmsadmin," activiti:dueDate="P2D" activiti:priority="8080">
+      <extensionElements>
+        <activiti:formProperty id="coreaction_审批结果_1_enum_rbv_$$A" name="审批结果" type="enum" variable="coreaction_t02" required="true">
+          <activiti:value id="Y" name="同意"/>
+          <activiti:value id="N" name="拒绝"/>
+        </activiti:formProperty>
+        <activiti:formProperty id="corecomments_审批意见_1_string_t2_$$B" name="审批意见" type="string" variable="corecomments_t02"/>
+        <activiti:formProperty id="实体_corp_1_string_tree_$$VA" name="所属实体" type="string" variable="corp"/>
+        <activiti:formProperty id="costcenter_所属部门_1_enum_tree_$$VA" name="成本中心" type="string" variable="costcenter_t00"/>
+        <activiti:formProperty id="cttype_合同类型_2_enum_rbv_$$VA" name="合同类型" type="string" variable="cttype"/>
+        <activiti:formProperty id="ctftype_合同格式类型_3_enum_sbs_$$VA" name="合同格式类型" type="string" variable="ctfttype"/>
+        <activiti:formProperty id="ctamt_合同金额_2_string_t11_$$VB" name="合同人民币金额" type="string" variable="ctamt"/>
+        <activiti:formProperty id="memo_合同描述_3_string_t2_$$VB" name="合同描述" type="string" variable="memo"/>
+        <activiti:formProperty id="attachments_合同文件_1_string_t9_$$VA" name="合同文件" type="string" variable="attachmentsfinal"/>
+		
+		<activiti:formProperty id="corecomments_审批意见_1_string_t2_$$VC" name="财务最新审阅意见" type="string" variable="corecomments_t0a"/>
+        <activiti:formProperty id="attachments_更新文件_2_string_t9i_$$VC" name="财务最新反馈文件" type="string" variable="attachments_t0a"/>
+		<activiti:formProperty id="attachments_更新文件_3_string_t9i_$$VC" name="财务最新反馈更新文件" type="string" variable="attachments_t0a1"/>
+		<activiti:formProperty id="corecomments_审批意见_1_string_t2_$$VD" name="法务最新审阅意见" type="string" variable="corecomments_t0b"/>
+        <activiti:formProperty id="attachments_更新文件_2_string_t9i_$$VD" name="法务最新反馈文件" type="string" variable="attachments_t0b"/>
+		<activiti:formProperty id="attachments_更新文件_3_string_t9i_$$VD" name="法务最新反馈更新文件" type="string" variable="attachments_t0b1"/>
+      </extensionElements>
+    </userTask>
+    <sequenceFlow id="G1Y" name="通过" sourceRef="G1" targetRef="T2A">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${coreaction_t01=="Y"}]]></conditionExpression>
+    </sequenceFlow>
+    <exclusiveGateway id="G2A"/>
+    <sequenceFlow id="sid-508E6890-C6A6-4F4D-95CF-DDB9B8CED702" sourceRef="T2A" targetRef="G2A"/>
+    <endEvent id="EN2A" name="拒绝结束"/>
+    <sequenceFlow id="G1N" name="拒绝" sourceRef="G1" targetRef="EN1">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${coreaction_t01=="N"}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="sid-09B5E101-B896-416A-ABD9-11290BFA0F53" sourceRef="T4" targetRef="G4"/>
+    <serviceTask id="ST1" name="成本中心矩阵" activiti:class="com.eorionsolution.riying.bpms.javaservice.http.RestAPIService"/>
+    <scriptTask id="ST2" name="结果处理" scriptFormat="groovy" activiti:autoStoreVariables="false">
+      <script><![CDATA[
+					//设置成本中心审批人
+				def costCenterDrools = new groovy.json.JsonSlurper().parseText(execution.getVariable("_http_response_body"));
+				def localcostCenterDrools = costCenterDrools.find { elem -> elem.costcenter == new groovy.json.JsonSlurper().parseText(execution.getVariable('costcenter_t00')).code}
+				def localVerifiers =[];
+				//设置一级二级三级审批人
+				localVerifiers << localcostCenterDrools.verifierfirst;
+				localVerifiers << localcostCenterDrools.verifiersecond;
+				localVerifiers << localcostCenterDrools.verifierthird;
+				//当一级审批人为报销人时，审批人替换成reverifierfirst，reverifierfirst配置成a,b,....  a为一级审批人，b为二级审批人,目前最多支持三级
+				if(localVerifiers[0] == initiator){
+					try{
+						if(localcostCenterDrools.reverifierfirst)
+							localVerifiers = localcostCenterDrools.reverifierfirst.split(",").toList();
+					}catch(Exception e) {
+						throw new org.activiti.engine.ActivitiIllegalArgumentException("成本中心审批人设置错误，请联系管理员");
+					}
+				}
+				if(localVerifiers[1] == initiator){
+					try{
+						if(localcostCenterDrools.reverifiersecond)
+							localVerifiers = localcostCenterDrools.reverifiersecond.split(",").toList();
+					}catch(Exception e) {
+						throw new org.activiti.engine.ActivitiIllegalArgumentException("成本中心审批人设置错误，请联系管理员");
+					}
+				}
+				if(localVerifiers[2] == initiator){
+					try{
+						if(localcostCenterDrools.reverifierthird)
+							localVerifiers = localcostCenterDrools.reverifierthird.split(",").toList();
+					}catch(Exception e) {
+						throw new org.activiti.engine.ActivitiIllegalArgumentException("成本中心审批人设置错误，请联系管理员");
+					}
+				}
+				localVerifiers.removeAll([null, ""]);
+				localVerifiers.clear();
+				localVerifiers << initiator;
+				execution.setVariable("assigneeList",localVerifiers);
+					]]></script>
+    </scriptTask>
+    <sequenceFlow id="sid-1EA365C6-2AA0-4AB3-9824-6693C38915F8" sourceRef="S1" targetRef="ST1"/>
+    <sequenceFlow id="sid-F2A868BA-46FA-43EB-B2AB-544C9E6B2DF8" sourceRef="ST1" targetRef="ST2"/>
+    <userTask id="T5" name="合同评审通过签收" activiti:assignee="${initiator}" activiti:dueDate="P1D" activiti:priority="8080">
+      <extensionElements>
+        <activiti:formProperty id="coreaction_签收_1_enum_rbv_$$A" name="签收" type="enum" variable="coreaction_t05" required="true">
+          <activiti:value id="Y" name="OK"/>
+        </activiti:formProperty>
+        <activiti:formProperty id="attachments_合同电子扫描文件_1_string_t9_$$VC" name="合同电子扫描文件" type="string" variable="attachments_t04"/>
+        <activiti:formProperty id="实体_corp_1_string_tree_$$VA" name="所属实体" type="string" variable="corp"/>
+        <activiti:formProperty id="costcenter_所属部门_1_enum_tree_$$VA" name="成本中心" type="string" variable="costcenter_t00"/>
+        <activiti:formProperty id="cttype_合同类型_2_enum_rbv_$$VA" name="合同类型" type="string" variable="cttype"/>
+        <activiti:formProperty id="ctftype_合同格式类型_3_enum_sbs_$$VA" name="合同格式类型" type="string" variable="ctfttype"/>
+        <activiti:formProperty id="ctamt_合同金额_2_string_t11_$$VB" name="合同人民币金额" type="string" variable="ctamt"/>
+        <activiti:formProperty id="memo_合同描述_3_string_t2_$$VB" name="合同描述" type="string" variable="memo"/>
+        <activiti:formProperty id="attachments_合同文件_1_string_t9_$$VA" name="合同文件" type="string" variable="attachmentsfinal"/>
+		
+		<activiti:formProperty id="tbhdcontno_item_$$VA" name="合同编号" type="string" variable="tbhdcontno_item" writable="true"/>
+		<activiti:formProperty id="tbhdcontno_contno_合同编号_2_string_t1_$$VA" name="合同编号" type="string" variable="tbhdcontno_contno" />
+		<activiti:formProperty id="tbhdcontno_contname_合同名称_3_string_t1_$$VA" name="合同名称" type="string" variable="tbhdcontno_contname" />
+		
+
+		
+      </extensionElements>
+    </userTask>
+    <sequenceFlow id="G4Y" name="正常" sourceRef="G4" targetRef="T5">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${coreaction_t04=="Y"}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="sid-DA528D7B-0C85-4705-AEE0-AAF8E0A61D9A" sourceRef="T5" targetRef="ES"/>
+    <userTask id="T4B" name="合同评审: 集团法务审批" activiti:candidateGroups="_dpmsadmin," activiti:dueDate="P2D" activiti:priority="8080">
+      <extensionElements>
+        <activiti:formProperty id="coreaction_审批结果_1_enum_rbv_$$A" name="审批结果" type="enum" variable="coreaction_t02b" required="true">
+          <activiti:value id="Y" name="同意"/>
+          <activiti:value id="N" name="拒绝"/>
+        </activiti:formProperty>
+        <activiti:formProperty id="corecomments_审批意见_1_string_t2_$$B" name="审批意见" type="string" variable="corecomments_t02b"/>
+		
+		<activiti:formProperty id="tbhdcontno_item" name="合同编号" type="string" variable="tbhdcontno_item" writable="true"/>
+		<activiti:formProperty id="tbhdcontno_contno_合同编号_2_string_t1_$$A" name="合同编号" type="string" variable="tbhdcontno_contno" writable="true" required="true"/>
+		<activiti:formProperty id="tbhdcontno_contname_合同名称_3_string_t1_$$A" name="合同名称" type="string" variable="tbhdcontno_contname" writable="true" required="true"/>
+		
+		
+        <activiti:formProperty id="实体_corp_1_string_tree_$$VA" name="所属实体" type="string" variable="corp"/>
+        <activiti:formProperty id="costcenter_所属部门_1_enum_tree_$$VA" name="成本中心" type="string" variable="costcenter_t00"/>
+        <activiti:formProperty id="cttype_合同类型_2_enum_rbv_$$VA" name="合同类型" type="string" variable="cttype"/>
+        <activiti:formProperty id="ctftype_合同格式类型_3_enum_sbs_$$VA" name="合同格式类型" type="string" variable="ctfttype"/> 
+        <activiti:formProperty id="ctamt_合同金额_2_string_t11_$$VB" name="合同人民币金额" type="string" variable="ctamt"/>
+        <activiti:formProperty id="memo_合同描述_3_string_t2_$$VB" name="合同描述" type="string" variable="memo"/>
+        <activiti:formProperty id="attachments_合同文件_1_string_t9_$$VA" name="合同文件" type="string" variable="attachmentsfinal"/>
+        <activiti:formProperty id="ctnum_合同编号_3_string_t1_$$A" name="合同编号" type="string" variable="contractnom" required="true"/>
+		
+		<activiti:formProperty id="corecomments_审批意见_1_string_t2_$$VC" name="财务最新审阅意见" type="string" variable="corecomments_t0a"/>
+        <activiti:formProperty id="attachments_更新文件_2_string_t9i_$$VC" name="财务最新反馈文件" type="string" variable="attachments_t0a"/>
+		<activiti:formProperty id="attachments_更新文件_3_string_t9i_$$VC" name="财务最新反馈更新文件" type="string" variable="attachments_t0a1"/>
+		<activiti:formProperty id="corecomments_审批意见_1_string_t2_$$VD" name="法务最新审阅意见" type="string" variable="corecomments_t0b"/>
+        <activiti:formProperty id="attachments_更新文件_2_string_t9i_$$VD" name="法务最新反馈文件" type="string" variable="attachments_t0b"/>
+		<activiti:formProperty id="attachments_更新文件_3_string_t9i_$$VD" name="法务最新反馈更新文件" type="string" variable="attachments_t0b1"/>
+		
+		
+      </extensionElements>
+    </userTask>
+    <exclusiveGateway id="G2B"/>
+    <sequenceFlow id="sid-E2C9DF13-A831-4E39-9A23-05C735012FDE" sourceRef="T4B" targetRef="G2B"/>
+    <endEvent id="EN2B" name="拒绝结束"/>
+    <userTask id="T4C" name="合同评审: 用章管理审批" activiti:candidateGroups="_dpmsadmin," activiti:dueDate="P2D" activiti:priority="8080">
+      <extensionElements>
+        <activiti:formProperty id="coreaction_审批结果_1_enum_rbv_$$A" name="审批结果" type="enum" variable="coreaction_t02c" required="true">
+          <activiti:value id="Y" name="同意"/>
+          <activiti:value id="N" name="拒绝"/>
+        </activiti:formProperty>
+        <activiti:formProperty id="corecomments_审批意见_1_string_t2_$$B" name="审批意见" type="string" variable="corecomments_t02c"/>
+        <activiti:formProperty id="实体_corp_1_string_tree_$$VA" name="所属实体" type="string" variable="corp"/>
+        <activiti:formProperty id="costcenter_所属部门_1_enum_tree_$$VA" name="成本中心" type="string" variable="costcenter_t00"/>
+        <activiti:formProperty id="cttype_合同类型_2_enum_rbv_$$VA" name="合同类型" type="string" variable="cttype"/>
+        <activiti:formProperty id="ctftype_合同格式类型_3_enum_sbs_$$VA" name="合同格式类型" type="string" variable="ctfttype"/>
+        <activiti:formProperty id="ctamt_合同金额_2_string_t11_$$VB" name="合同人民币金额" type="string" variable="ctamt"/>
+        <activiti:formProperty id="memo_合同描述_3_string_t2_$$VB" name="合同描述" type="string" variable="memo"/>
+        <activiti:formProperty id="attachments_合同文件_1_string_t9_$$VA" name="合同文件" type="string" variable="attachmentsfinal"/>
+		
+		<activiti:formProperty id="tbhdcontno_item_$$VA" name="合同编号" type="string" variable="tbhdcontno_item" writable="true"/>
+		<activiti:formProperty id="tbhdcontno_contno_合同编号_2_string_t1_$$VA" name="合同编号" type="string" variable="tbhdcontno_contno" />
+		<activiti:formProperty id="tbhdcontno_contname_合同名称_3_string_t1_$$VA" name="合同名称" type="string" variable="tbhdcontno_contname" />
+		
+		
+      </extensionElements>
+    </userTask>
+    <exclusiveGateway id="G2C"/>
+    <sequenceFlow id="sid-39A90882-8F42-4D42-9278-2F5C8970F8DC" sourceRef="T4C" targetRef="G2C"/>
+    <endEvent id="EN2C" name="拒绝结束"/>
+    <sequenceFlow id="G4N" name="异常" sourceRef="G4" targetRef="EN4">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${coreaction_t04=="N"}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="G2N" name="拒绝" sourceRef="G2A" targetRef="EN2A">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${coreaction_t02=="N"}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="G2CN" name="拒绝" sourceRef="G2C" targetRef="EN2C">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${coreaction_t02c=="N"}]]></conditionExpression>
+    </sequenceFlow>
+    <parallelGateway id="sid-90095B30-F32A-43A7-A31C-24D24AAA1776"/>
+    <sequenceFlow id="sid-82FDDED6-9732-49E7-B983-0696E2EBC212" sourceRef="ST2" targetRef="sid-90095B30-F32A-43A7-A31C-24D24AAA1776"/>
+    <userTask id="T0A" name="合同评审: 总部财务审阅" activiti:candidateGroups="_dpmsadmin," activiti:dueDate="P1D" activiti:priority="8080">
+      <extensionElements>
+	  
+
+        <activiti:formProperty id="实体_corp_1_string_tree_$$VA" name="所属实体" type="string" variable="corp"/>
+        <activiti:formProperty id="costcenter_所属部门_1_enum_tree_$$VA" name="成本中心" type="string" variable="costcenter_t00"/>
+        <activiti:formProperty id="cttype_合同类型_2_enum_rbv_$$VA" name="合同类型" type="string" variable="cttype"/>
+		<activiti:formProperty id="ctftype_合同格式类型_3_enum_sbs_$$VA" name="合同格式类型" type="string" variable="ctfttype"/>
+        <activiti:formProperty id="ctamt_合同金额_2_string_t11_$$VB" name="合同人民币金额" type="string" variable="ctamt"/>
+        <activiti:formProperty id="memo_合同描述_3_string_t2_$$VB" name="合同描述" type="string" variable="memo"/>
+        <activiti:formProperty id="attachments_合同文件_1_string_t9_$$VA" name="合同文件" type="string" variable="attachments"/>
+		
+		<activiti:formProperty id="corecomments_审批意见_1_string_t2_$$VC" name="法务最新审阅意见" type="string" variable="corecomments_t0b"/>
+        <activiti:formProperty id="attachments_更新文件_2_string_t9i_$$VC" name="法务最新反馈文件" type="string" variable="attachments_t0b"/>
+		<activiti:formProperty id="attachments_更新文件_3_string_t9i_$$VC" name="法务最新反馈更新文件" type="string" variable="attachments_t0b1"/>
+		<activiti:formProperty id="attachments_更新文件_1_string_t9i_$$VD" name="财务最新反馈更新文件" type="string" variable="attachments_t0a1"/>
+		
+		
+		<activiti:formProperty id="coreaction_审批结果_1_enum_rbv_$$A" name="审批结果" type="enum" variable="coreaction_t0a" required="true">
+          <activiti:value id="N" name="修订"/>
+		  <activiti:value id="Y" name="通过"/>
+        </activiti:formProperty>
+        <activiti:formProperty id="corecomments_审批意见_1_string_t2_$$B" name="审批意见" type="string" variable="corecomments_t0a" required="true"/>
+		
+        <activiti:formProperty id="attachments_更新文件_1_string_t9_$$A" name="反馈更新文件" type="string" variable="attachments_t0a"/>
+		
+		
+      </extensionElements>
+    </userTask>
+    <sequenceFlow id="sid-F09441DF-7241-40FB-BDEF-AE91D2857552" sourceRef="sid-90095B30-F32A-43A7-A31C-24D24AAA1776" targetRef="T0A"/>
+    <userTask id="T0B" name="合同评审: 集团法务审阅" activiti:candidateGroups="_dpmsadmin," activiti:dueDate="P1D" activiti:priority="8080">
+      <extensionElements>
+
+        <activiti:formProperty id="实体_corp_1_string_tree_$$VA" name="所属实体" type="string" variable="corp"/>
+        <activiti:formProperty id="costcenter_所属部门_1_enum_tree_$$VA" name="成本中心" type="string" variable="costcenter_t00"/>
+        <activiti:formProperty id="cttype_合同类型_2_enum_rbv_$$VA" name="合同类型" type="string" variable="cttype"/>
+        
+        <activiti:formProperty id="ctamt_合同金额_2_string_t11_$$VB" name="合同人民币金额" type="string" variable="ctamt"/>
+        <activiti:formProperty id="memo_合同描述_3_string_t2_$$VB" name="合同描述" type="string" variable="memo"/>
+        <activiti:formProperty id="attachments_合同文件_1_string_t9_$$VA" name="合同文件" type="string" variable="attachments"/>
+        
+		
+		<activiti:formProperty id="corecomments_审批意见_1_string_t2_$$VC" name="财务最新审阅意见" type="string" variable="corecomments_t0a"/>
+        <activiti:formProperty id="attachments_更新文件_2_string_t9i_$$VC" name="财务最新反馈文件" type="string" variable="attachments_t0a"/>
+		<activiti:formProperty id="attachments_更新文件_3_string_t9i_$$VC" name="财务最新反馈更新文件" type="string" variable="attachments_t0a1"/>
+		<activiti:formProperty id="attachments_更新文件_1_string_t9i_$$VD" name="法务最新反馈更新文件" type="string" variable="attachments_t0b1"/>
+		
+		<activiti:formProperty id="coreaction_审批结果_1_enum_rbv_$$A" name="审批结果" type="enum" variable="coreaction_t0b" required="true">
+          <activiti:value id="N" name="修订"/>
+		  <activiti:value id="Y" name="通过"/>
+        </activiti:formProperty>
+        <activiti:formProperty id="corecomments_审批意见_1_string_t2_$$B" name="审批意见" type="string" variable="corecomments_t0b" required="true"/>
+		
+		<activiti:formProperty id="ctftype_合同格式类型_2_enum_rbv_$$A" name="合同格式类型" type="enum" variable="ctfttype" required="true">
+          <activiti:value id="非格式" name="非格式"/>
+          <activiti:value id="格式" name="格式"/>
+          
+        </activiti:formProperty>
+		
+        <activiti:formProperty id="attachments_更新文件_1_string_t9_$$A" name="反馈更新文件" type="string" variable="attachments_t0b"/>
+		
+      </extensionElements>
+    </userTask>
+    <sequenceFlow id="sid-1EDF5581-D4A0-4C0E-9385-01AB22024FAA" sourceRef="sid-90095B30-F32A-43A7-A31C-24D24AAA1776" targetRef="T0B"/>
+    <parallelGateway id="sid-34F29AEF-4714-4D19-BFA7-92E6D95492CF"/>
+    <userTask id="T4D" name="合同评审: 集团总裁办审核" activiti:candidateGroups="_dpmsadmin," activiti:dueDate="P2D" activiti:priority="8080">
+      <extensionElements>
+        <activiti:formProperty id="coreaction_审批结果_1_enum_rbv_$$A" name="审批结果" type="enum" variable="coreaction_t02d" required="true">
+          <activiti:value id="Y" name="同意"/>
+          <activiti:value id="N" name="拒绝"/>
+        </activiti:formProperty>
+        <activiti:formProperty id="corecomments_审批意见_1_string_t2_$$B" name="审批意见" type="string" variable="corecomments_t02d"/>
+        <activiti:formProperty id="实体_corp_1_string_tree_$$VA" name="所属实体" type="string" variable="corp"/>
+        <activiti:formProperty id="costcenter_所属部门_1_enum_tree_$$VA" name="成本中心" type="string" variable="costcenter_t00"/>
+        <activiti:formProperty id="cttype_合同类型_2_enum_rbv_$$VA" name="合同类型" type="string" variable="cttype"/>
+        <activiti:formProperty id="ctftype_合同格式类型_3_enum_sbs_$$VA" name="合同格式类型" type="string" variable="ctfttype"/>
+        <activiti:formProperty id="ctamt_合同金额_2_string_t11_$$VB" name="合同人民币金额" type="string" variable="ctamt"/>
+        <activiti:formProperty id="memo_合同描述_3_string_t2_$$VB" name="合同描述" type="string" variable="memo"/>
+        <activiti:formProperty id="attachments_合同文件_1_string_t9_$$VA" name="合同文件" type="string" variable="attachmentsfinal"/>
+		
+		<activiti:formProperty id="corecomments_审批意见_1_string_t2_$$VC" name="财务最新审阅意见" type="string" variable="corecomments_t0a"/>
+        <activiti:formProperty id="attachments_更新文件_2_string_t9i_$$VC" name="财务最新反馈文件" type="string" variable="attachments_t0a"/>
+		<activiti:formProperty id="attachments_更新文件_3_string_t9i_$$VC" name="财务最新反馈更新文件" type="string" variable="attachments_t0a1"/>
+		<activiti:formProperty id="corecomments_审批意见_1_string_t2_$$VD" name="法务最新审阅意见" type="string" variable="corecomments_t0b"/>
+        <activiti:formProperty id="attachments_更新文件_2_string_t9i_$$VD" name="法务最新反馈文件" type="string" variable="attachments_t0b"/>
+		<activiti:formProperty id="attachments_更新文件_3_string_t9i_$$VD" name="法务最新反馈更新文件" type="string" variable="attachments_t0b1"/>
+		
+		<activiti:formProperty id="tbhdcontno_item_$$VA" name="合同编号" type="string" variable="tbhdcontno_item" writable="true"/>
+		<activiti:formProperty id="tbhdcontno_contno_合同编号_2_string_t1_$$VA" name="合同编号" type="string" variable="tbhdcontno_contno" />
+		<activiti:formProperty id="tbhdcontno_contname_合同名称_3_string_t1_$$VA" name="合同名称" type="string" variable="tbhdcontno_contname" />
+		
+      </extensionElements>
+    </userTask>
+    <exclusiveGateway id="G2D"/>
+    <sequenceFlow id="sid-475086C0-9DA2-487E-9808-9491ADA6F966" sourceRef="T4D" targetRef="G2D"/>
+    <endEvent id="EN2D" name="拒绝结束"/>
+    <sequenceFlow id="G2ND" name="拒绝" sourceRef="G2D" targetRef="EN2D">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${coreaction_t02d=="N"}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="G2BY" name="通过" sourceRef="G2B" targetRef="T4D">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${coreaction_t02b=="Y"}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="G2Y" name="通过" sourceRef="G2A" targetRef="T4B">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${coreaction_t02=="Y"}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="G2YD" name="通过" sourceRef="G2D" targetRef="T4C">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${coreaction_t02d=="Y"}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="G2CY" name="通过" sourceRef="G2C" targetRef="T4">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${coreaction_t02c=="Y"}]]></conditionExpression>
+    </sequenceFlow>
+    <userTask id="T0C" name="合同评审: 更新定稿" activiti:assignee="${initiator}" activiti:dueDate="P1D" activiti:priority="9090">
+      <extensionElements>
+        <activiti:formProperty id="corecomments_定稿说明_1_string_t2_$$B" name="定稿说明" type="string" variable="corecomments_t0c" required="true"/>
+        <activiti:formProperty id="attachments_合同文件_1_string_t9_$$A" name="定稿合同文件" type="string" variable="attachmentsfinal" required="true"/>
+        <activiti:formProperty id="实体_corp_1_string_tree_$$VA" name="所属实体" type="string" variable="corp"/>
+        <activiti:formProperty id="costcenter_所属部门_1_enum_tree_$$VA" name="成本中心" type="string" variable="costcenter_t00"/>
+        <activiti:formProperty id="cttype_合同类型_2_enum_rbv_$$VA" name="合同类型" type="string" variable="cttype"/>
+        <activiti:formProperty id="ctftype_合同格式类型_3_enum_sbs_$$VA" name="合同格式类型" type="string" variable="ctfttype"/>
+        <activiti:formProperty id="ctamt_合同金额_2_string_t11_$$VB" name="合同人民币金额" type="string" variable="ctamt"/>
+        <activiti:formProperty id="memo_合同描述_3_string_t2_$$VB" name="合同描述" type="string" variable="memo"/>
+        <activiti:formProperty id="attachments_合同文件_1_string_t9_$$VA" name="合同文件" type="string" variable="attachments"/>
+         
+		
+		
+		<activiti:formProperty id="corecomments_审批意见_1_string_t2_$$VC" name="财务最新审阅意见" type="string" variable="corecomments_t0a"/>
+        <activiti:formProperty id="attachments_更新文件_2_string_t9i_$$VC" name="财务最新反馈文件" type="string" variable="attachments_t0a"/>
+		<activiti:formProperty id="attachments_更新文件_3_string_t9i_$$VC" name="财务最新反馈更新文件" type="string" variable="attachments_t0a1"/>
+		<activiti:formProperty id="corecomments_审批意见_1_string_t2_$$VD" name="法务最新审阅意见" type="string" variable="corecomments_t0b"/>
+        <activiti:formProperty id="attachments_更新文件_2_string_t9i_$$VD" name="法务最新反馈文件" type="string" variable="attachments_t0b"/>
+		<activiti:formProperty id="attachments_更新文件_3_string_t9i_$$VD" name="法务最新反馈更新文件" type="string" variable="attachments_t0b1"/>
+		
+		
+      </extensionElements>
+    </userTask>
+    <sequenceFlow id="sid-A3648951-F29B-49E6-93CA-7754B939D38F" sourceRef="sid-34F29AEF-4714-4D19-BFA7-92E6D95492CF" targetRef="T0C"/>
+    <sequenceFlow id="sid-2E0E1208-6DEE-4C45-BE27-857CBB58A8F1" sourceRef="T0C" targetRef="T1"/>
+    <userTask id="T0AU" name="合同评审: 财务反馈更新" activiti:assignee="${initiator}" activiti:dueDate="P1D" activiti:priority="8080">
+      <extensionElements>
+        
+        <activiti:formProperty id="实体_corp_1_string_tree_$$VA" name="所属实体" type="string" variable="corp"/>
+        <activiti:formProperty id="costcenter_所属部门_1_enum_tree_$$VA" name="成本中心" type="string" variable="costcenter_t00"/>
+        <activiti:formProperty id="cttype_合同类型_2_enum_rbv_$$VA" name="合同类型" type="string" variable="cttype"/>
+        <activiti:formProperty id="ctftype_合同格式类型_3_enum_sbs_$$VA" name="合同格式类型" type="string" variable="ctfttype"/>
+        <activiti:formProperty id="ctamt_合同金额_2_string_t11_$$VB" name="合同人民币金额" type="string" variable="ctamt"/>
+        <activiti:formProperty id="memo_合同描述_3_string_t2_$$VB" name="合同描述" type="string" variable="memo"/>
+        <activiti:formProperty id="attachments_合同文件_1_string_t9_$$VA" name="合同文件" type="string" variable="attachments"/>
+		 
+		
+		
+		<activiti:formProperty id="corecomments_审批意见_1_string_t2_$$VC" name="财务最新审阅意见" type="string" variable="corecomments_t0a"/>
+        <activiti:formProperty id="attachments_更新文件_2_string_t9i_$$VC" name="财务最新反馈文件" type="string" variable="attachments_t0a"/>
+		<activiti:formProperty id="attachments_更新文件_3_string_t9i_$$VC" name="财务最新反馈更新文件" type="string" variable="attachments_t0a1"/>
+		<activiti:formProperty id="corecomments_审批意见_1_string_t2_$$VD" name="法务最新审阅意见" type="string" variable="corecomments_t0b"/>
+        <activiti:formProperty id="attachments_更新文件_2_string_t9i_$$VD" name="法务最新反馈文件" type="string" variable="attachments_t0b"/>
+		<activiti:formProperty id="attachments_更新文件_3_string_t9i_$$VD" name="法务最新反馈更新文件" type="string" variable="attachments_t0b1"/>
+		
+		<activiti:formProperty id="corecomments_审批意见_1_string_t2_$$A" name="审批意见" type="string" variable="corecomments_t0au" required="true"/>
+        <activiti:formProperty id="attachments_更新文件_1_string_t9_$$A" name="财务反馈更新文件" type="string" variable="attachments_t0a1"/>
+		
+		
+      </extensionElements>
+    </userTask>
+    <exclusiveGateway id="G0A"/>
+    <sequenceFlow id="sid-274C32EA-E9C5-418A-BC14-607D66A13C22" sourceRef="T0A" targetRef="G0A"/>
+    <sequenceFlow id="sid-23DAEE4B-0A8A-476A-9576-B1C71D44067C" sourceRef="T0AU" targetRef="T0A"/>
+    <sequenceFlow id="G2BN" name="拒绝" sourceRef="G2B" targetRef="EN2B">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${coreaction_t02b=="N"}]]></conditionExpression>
+    </sequenceFlow>
+    <exclusiveGateway id="G0B"/>
+    <sequenceFlow id="sid-98D27473-3336-4B6B-8C64-8DF8653C0640" sourceRef="T0B" targetRef="G0B"/>
+    <userTask id="T0BU" name="合同评审: 法务反馈更新" activiti:assignee="${initiator}" activiti:dueDate="P1D" activiti:priority="8080">
+      <extensionElements>
+        
+        <activiti:formProperty id="实体_corp_1_string_tree_$$VA" name="所属实体" type="string" variable="corp"/>
+        <activiti:formProperty id="costcenter_所属部门_1_enum_tree_$$VA" name="成本中心" type="string" variable="costcenter_t00"/>
+        <activiti:formProperty id="cttype_合同类型_2_enum_rbv_$$VA" name="合同类型" type="string" variable="cttype"/>
+        <activiti:formProperty id="ctftype_合同格式类型_3_enum_sbs_$$VA" name="合同格式类型" type="string" variable="ctfttype"/>
+        <activiti:formProperty id="ctamt_合同金额_2_string_t11_$$VB" name="合同人民币金额" type="string" variable="ctamt"/>
+        <activiti:formProperty id="memo_合同描述_3_string_t2_$$VB" name="合同描述" type="string" variable="memo"/>
+        <activiti:formProperty id="attachments_合同文件_1_string_t9_$$VA" name="合同文件" type="string" variable="attachments"/>
+		
+		<activiti:formProperty id="corecomments_审批意见_1_string_t2_$$VC" name="财务最新审阅意见" type="string" variable="corecomments_t0a"/>
+        <activiti:formProperty id="attachments_更新文件_2_string_t9i_$$VC" name="财务最新反馈文件" type="string" variable="attachments_t0a"/>
+		<activiti:formProperty id="attachments_更新文件_3_string_t9i_$$VC" name="财务最新反馈更新文件" type="string" variable="attachments_t0a1"/>
+		<activiti:formProperty id="corecomments_审批意见_1_string_t2_$$VD" name="法务最新审阅意见" type="string" variable="corecomments_t0b"/>
+        <activiti:formProperty id="attachments_更新文件_2_string_t9i_$$VD" name="法务最新反馈文件" type="string" variable="attachments_t0b"/>
+		<activiti:formProperty id="attachments_更新文件_3_string_t9i_$$VD" name="法务最新反馈更新文件" type="string" variable="attachments_t0b1"/>
+		
+		<activiti:formProperty id="corecomments_审批意见_1_string_t2_$$A" name="审批意见" type="string" variable="corecomments_t0bu" required="true"/>
+        <activiti:formProperty id="attachments_更新文件_1_string_t9_$$A" name="法务反馈更新文件" type="string" variable="attachments_t0b1"/>
+		
+		
+      </extensionElements>
+    </userTask>
+    <sequenceFlow id="sid-8EAFFB18-3612-4B2C-B5F7-4DE33D17235C" sourceRef="T0BU" targetRef="T0B"/>
+    <sequenceFlow id="G0BY" sourceRef="G0B" targetRef="sid-34F29AEF-4714-4D19-BFA7-92E6D95492CF">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${coreaction_t0b=="Y"}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="G0BN" name="需更新" sourceRef="G0B" targetRef="T0BU">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${coreaction_t0b=="N"}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="G0AN" name="需更新" sourceRef="G0A" targetRef="T0AU">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${coreaction_t0a=="N"}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="G0AY" sourceRef="G0A" targetRef="sid-34F29AEF-4714-4D19-BFA7-92E6D95492CF">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${coreaction_t0a=="Y"}]]></conditionExpression>
+    </sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_DPLG01B">
+    <bpmndi:BPMNPlane bpmnElement="DPLG01B" id="BPMNPlane_DPLG01B">
+      <bpmndi:BPMNShape bpmnElement="S1" id="BPMNShape_S1">
+        <omgdc:Bounds height="30.0" width="30.0" x="267.5" y="52.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="T1" id="BPMNShape_T1">
+        <omgdc:Bounds height="80.0" width="100.0" x="655.0" y="7.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="G1" id="BPMNShape_G1">
+        <omgdc:Bounds height="40.0" width="40.0" x="851.8447075482354" y="27.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="EN1" id="BPMNShape_EN1">
+        <omgdc:Bounds height="28.0" width="28.0" x="1010.2604866829067" y="33.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="T4" id="BPMNShape_T4">
+        <omgdc:Bounds height="80.0" width="100.0" x="822.5860941685753" y="712.5860941685753"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="G4" id="BPMNShape_G4">
+        <omgdc:Bounds height="40.0" width="40.0" x="852.5860941685753" y="857.3324914243755"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="EN4" id="BPMNShape_EN4">
+        <omgdc:Bounds height="28.0" width="28.0" x="972.5860941685753" y="863.3324914243755"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="ES" id="BPMNShape_ES">
+        <omgdc:Bounds height="28.0" width="28.0" x="858.5860941685753" y="1095.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="T2A" id="BPMNShape_T2A">
+        <omgdc:Bounds height="80.0" width="100.0" x="822.5860941685753" y="128.62366870200697"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="G2A" id="BPMNShape_G2A">
+        <omgdc:Bounds height="40.0" width="40.0" x="984.5029553280021" y="148.62366870200697"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="EN2A" id="BPMNShape_EN2A">
+        <omgdc:Bounds height="28.0" width="28.0" x="1131.2736359617995" y="154.62366870200697"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="ST1" id="BPMNShape_ST1">
+        <omgdc:Bounds height="40.0" width="105.0" x="230.0" y="130.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="ST2" id="BPMNShape_ST2">
+        <omgdc:Bounds height="40.0" width="100.0" x="232.5" y="205.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="T5" id="BPMNShape_T5">
+        <omgdc:Bounds height="80.0" width="100.0" x="822.5860941685753" y="960.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="T4B" id="BPMNShape_T4B">
+        <omgdc:Bounds height="80.0" width="100.0" x="822.5860941685753" y="269.1766068693541"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="G2B" id="BPMNShape_G2B">
+        <omgdc:Bounds height="40.0" width="40.0" x="984.5029553280021" y="289.1766068693541"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="EN2B" id="BPMNShape_EN2B">
+        <omgdc:Bounds height="28.0" width="28.0" x="1131.2736359617995" y="295.1766068693541"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="T4C" id="BPMNShape_T4C">
+        <omgdc:Bounds height="80.0" width="100.0" x="822.5860941685753" y="556.277807561602"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="G2C" id="BPMNShape_G2C">
+        <omgdc:Bounds height="40.0" width="40.0" x="984.5029553280021" y="576.277807561602"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="EN2C" id="BPMNShape_EN2C">
+        <omgdc:Bounds height="28.0" width="28.0" x="1131.2736359617995" y="582.277807561602"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="sid-90095B30-F32A-43A7-A31C-24D24AAA1776" id="BPMNShape_sid-90095B30-F32A-43A7-A31C-24D24AAA1776">
+        <omgdc:Bounds height="40.0" width="40.0" x="262.5" y="279.4289284135641"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="T0A" id="BPMNShape_T0A">
+        <omgdc:Bounds height="80.00000000000006" width="100.00000000000003" x="45.0" y="360.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="T0B" id="BPMNShape_T0B">
+        <omgdc:Bounds height="80.00000000000006" width="100.00000000000006" x="310.0" y="360.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="sid-34F29AEF-4714-4D19-BFA7-92E6D95492CF" id="BPMNShape_sid-34F29AEF-4714-4D19-BFA7-92E6D95492CF">
+        <omgdc:Bounds height="40.0" width="40.0" x="262.5" y="585.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="T4D" id="BPMNShape_T4D">
+        <omgdc:Bounds height="80.0" width="100.0" x="820.2356688907237" y="403.7649103040311"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="G2D" id="BPMNShape_G2D">
+        <omgdc:Bounds height="40.0" width="40.0" x="984.5029553280021" y="426.44207769245696"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="EN2D" id="BPMNShape_EN2D">
+        <omgdc:Bounds height="28.0" width="28.0" x="1131.2736359617995" y="432.44207769245696"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="T0C" id="BPMNShape_T0C">
+        <omgdc:Bounds height="80.0" width="100.0" x="232.5" y="712.5860941685753"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="T0AU" id="BPMNShape_T0AU">
+        <omgdc:Bounds height="80.0" width="100.0" x="195.0" y="460.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="G0A" id="BPMNShape_G0A">
+        <omgdc:Bounds height="40.0" width="40.0" x="75.0" y="480.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="G0B" id="BPMNShape_G0B">
+        <omgdc:Bounds height="40.0" width="40.0" x="340.0" y="480.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="T0BU" id="BPMNShape_T0BU">
+        <omgdc:Bounds height="80.0" width="100.0" x="465.0" y="460.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="sid-2E0E1208-6DEE-4C45-BE27-857CBB58A8F1" id="BPMNEdge_sid-2E0E1208-6DEE-4C45-BE27-857CBB58A8F1">
+        <omgdi:waypoint x="332.5" y="752.5860941685753"/>
+        <omgdi:waypoint x="611.96875" y="752.5860941685753"/>
+        <omgdi:waypoint x="611.96875" y="47.0"/>
+        <omgdi:waypoint x="655.0" y="47.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="G0BY" id="BPMNEdge_G0BY">
+        <omgdi:waypoint x="360.5" y="519.5"/>
+        <omgdi:waypoint x="360.5" y="605.0"/>
+        <omgdi:waypoint x="302.5" y="605.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-508E6890-C6A6-4F4D-95CF-DDB9B8CED702" id="BPMNEdge_sid-508E6890-C6A6-4F4D-95CF-DDB9B8CED702">
+        <omgdi:waypoint x="922.5860941685753" y="168.62366870200697"/>
+        <omgdi:waypoint x="984.5029553280021" y="168.62366870200697"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="G2BY" id="BPMNEdge_G2BY">
+        <omgdi:waypoint x="1004.3489729488032" y="329.0226244901551"/>
+        <omgdi:waypoint x="1004.0" y="374.0"/>
+        <omgdi:waypoint x="870.0" y="374.0"/>
+        <omgdi:waypoint x="870.1005471570633" y="403.7649103040311"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-23DAEE4B-0A8A-476A-9576-B1C71D44067C" id="BPMNEdge_sid-23DAEE4B-0A8A-476A-9576-B1C71D44067C">
+        <omgdi:waypoint x="245.0" y="460.0"/>
+        <omgdi:waypoint x="245.0" y="400.0"/>
+        <omgdi:waypoint x="145.00000000000003" y="400.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-040CC8B2-3FCF-407D-A4A0-89B4E0737554" id="BPMNEdge_sid-040CC8B2-3FCF-407D-A4A0-89B4E0737554">
+        <omgdi:waypoint x="755.0" y="47.0"/>
+        <omgdi:waypoint x="851.8447075482354" y="47.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="G1N" id="BPMNEdge_G1N">
+        <omgdi:waypoint x="891.8447075482354" y="47.0"/>
+        <omgdi:waypoint x="1010.2604866829067" y="47.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-8EAFFB18-3612-4B2C-B5F7-4DE33D17235C" id="BPMNEdge_sid-8EAFFB18-3612-4B2C-B5F7-4DE33D17235C">
+        <omgdi:waypoint x="515.0" y="460.0"/>
+        <omgdi:waypoint x="515.0" y="400.0"/>
+        <omgdi:waypoint x="410.00000000000006" y="400.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-475086C0-9DA2-487E-9808-9491ADA6F966" id="BPMNEdge_sid-475086C0-9DA2-487E-9808-9491ADA6F966">
+        <omgdi:waypoint x="920.2356688907237" y="444.76186475938033"/>
+        <omgdi:waypoint x="984.8939412078441" y="446.051091812615"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-09B5E101-B896-416A-ABD9-11290BFA0F53" id="BPMNEdge_sid-09B5E101-B896-416A-ABD9-11290BFA0F53">
+        <omgdi:waypoint x="872.5860941685753" y="792.5860941685753"/>
+        <omgdi:waypoint x="872.5860941685753" y="857.3324914243755"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="G1Y" id="BPMNEdge_G1Y">
+        <omgdi:waypoint x="871.965883748154" y="66.87882380008135"/>
+        <omgdi:waypoint x="872.3422644508066" y="128.62366870200697"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-39A90882-8F42-4D42-9278-2F5C8970F8DC" id="BPMNEdge_sid-39A90882-8F42-4D42-9278-2F5C8970F8DC">
+        <omgdi:waypoint x="922.5860941685753" y="596.277807561602"/>
+        <omgdi:waypoint x="984.5029553280021" y="596.277807561602"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-A3648951-F29B-49E6-93CA-7754B939D38F" id="BPMNEdge_sid-A3648951-F29B-49E6-93CA-7754B939D38F">
+        <omgdi:waypoint x="282.5" y="625.0"/>
+        <omgdi:waypoint x="282.5" y="712.5860941685753"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-1EDF5581-D4A0-4C0E-9385-01AB22024FAA" id="BPMNEdge_sid-1EDF5581-D4A0-4C0E-9385-01AB22024FAA">
+        <omgdi:waypoint x="302.3899180516668" y="299.31884646523093"/>
+        <omgdi:waypoint x="360.00000000000006" y="299.0"/>
+        <omgdi:waypoint x="360.00000000000006" y="360.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="G2CN" id="BPMNEdge_G2CN">
+        <omgdi:waypoint x="1024.5029553280021" y="596.277807561602"/>
+        <omgdi:waypoint x="1131.2736359617995" y="596.277807561602"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="G0AN" id="BPMNEdge_G0AN">
+        <omgdi:waypoint x="114.56375838926175" y="500.43624161073825"/>
+        <omgdi:waypoint x="195.0" y="500.16722408026754"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-DA528D7B-0C85-4705-AEE0-AAF8E0A61D9A" id="BPMNEdge_sid-DA528D7B-0C85-4705-AEE0-AAF8E0A61D9A">
+        <omgdi:waypoint x="872.5860941685753" y="1040.0"/>
+        <omgdi:waypoint x="872.5860941685753" y="1095.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="G4N" id="BPMNEdge_G4N">
+        <omgdi:waypoint x="892.5860941685753" y="877.3324914243755"/>
+        <omgdi:waypoint x="972.5860941685753" y="877.3324914243755"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="G2ND" id="BPMNEdge_G2ND">
+        <omgdi:waypoint x="1024.5029553280021" y="446.44207769245696"/>
+        <omgdi:waypoint x="1131.2736359617995" y="446.44207769245696"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="G2CY" id="BPMNEdge_G2CY">
+        <omgdi:waypoint x="1004.6387242028536" y="616.1420386867505"/>
+        <omgdi:waypoint x="1005.0" y="669.0"/>
+        <omgdi:waypoint x="872.0" y="669.0"/>
+        <omgdi:waypoint x="872.3056196832413" y="712.5860941685753"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="G0AY" id="BPMNEdge_G0AY">
+        <omgdi:waypoint x="95.5" y="519.5"/>
+        <omgdi:waypoint x="95.5" y="605.0"/>
+        <omgdi:waypoint x="262.5" y="605.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="G2N" id="BPMNEdge_G2N">
+        <omgdi:waypoint x="1024.5029553280021" y="168.62366870200697"/>
+        <omgdi:waypoint x="1131.2736359617995" y="168.62366870200697"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-F09441DF-7241-40FB-BDEF-AE91D2857552" id="BPMNEdge_sid-F09441DF-7241-40FB-BDEF-AE91D2857552">
+        <omgdi:waypoint x="262.5" y="299.4289284135641"/>
+        <omgdi:waypoint x="95.00000000000001" y="299.4289284135641"/>
+        <omgdi:waypoint x="95.00000000000001" y="360.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-E2C9DF13-A831-4E39-9A23-05C735012FDE" id="BPMNEdge_sid-E2C9DF13-A831-4E39-9A23-05C735012FDE">
+        <omgdi:waypoint x="922.5860941685753" y="309.1766068693541"/>
+        <omgdi:waypoint x="984.5029553280021" y="309.1766068693541"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="G4Y" id="BPMNEdge_G4Y">
+        <omgdi:waypoint x="872.5860941685753" y="897.3324914243755"/>
+        <omgdi:waypoint x="872.5860941685753" y="960.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="G2Y" id="BPMNEdge_G2Y">
+        <omgdi:waypoint x="1004.5029553280021" y="188.62366870200697"/>
+        <omgdi:waypoint x="1004.5029553280021" y="221.81183435100348"/>
+        <omgdi:waypoint x="872.5860941685753" y="221.81183435100348"/>
+        <omgdi:waypoint x="872.5860941685753" y="269.1766068693541"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-82FDDED6-9732-49E7-B983-0696E2EBC212" id="BPMNEdge_sid-82FDDED6-9732-49E7-B983-0696E2EBC212">
+        <omgdi:waypoint x="282.5" y="245.0"/>
+        <omgdi:waypoint x="282.5" y="279.4289284135641"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-1EA365C6-2AA0-4AB3-9824-6693C38915F8" id="BPMNEdge_sid-1EA365C6-2AA0-4AB3-9824-6693C38915F8">
+        <omgdi:waypoint x="282.5" y="82.0"/>
+        <omgdi:waypoint x="282.5" y="130.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="G0BN" id="BPMNEdge_G0BN">
+        <omgdi:waypoint x="379.56168831168833" y="500.43831168831167"/>
+        <omgdi:waypoint x="465.0" y="500.1618122977346"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-274C32EA-E9C5-418A-BC14-607D66A13C22" id="BPMNEdge_sid-274C32EA-E9C5-418A-BC14-607D66A13C22">
+        <omgdi:waypoint x="95.0" y="440.00000000000006"/>
+        <omgdi:waypoint x="95.0" y="480.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-F2A868BA-46FA-43EB-B2AB-544C9E6B2DF8" id="BPMNEdge_sid-F2A868BA-46FA-43EB-B2AB-544C9E6B2DF8">
+        <omgdi:waypoint x="282.5" y="170.0"/>
+        <omgdi:waypoint x="282.5" y="205.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="G2BN" id="BPMNEdge_G2BN">
+        <omgdi:waypoint x="1024.5029553280021" y="309.1766068693541"/>
+        <omgdi:waypoint x="1131.2736359617995" y="309.1766068693541"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="G2YD" id="BPMNEdge_G2YD">
+        <omgdi:waypoint x="1004.6835183904349" y="466.26151463002424"/>
+        <omgdi:waypoint x="1005.0" y="501.0"/>
+        <omgdi:waypoint x="872.0" y="501.0"/>
+        <omgdi:waypoint x="872.3400372184524" y="556.277807561602"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-98D27473-3336-4B6B-8C64-8DF8653C0640" id="BPMNEdge_sid-98D27473-3336-4B6B-8C64-8DF8653C0640">
+        <omgdi:waypoint x="360.0" y="440.00000000000006"/>
+        <omgdi:waypoint x="360.0" y="480.0"/>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/frm">
+  <process id="myProcess" name="SUBPROCESS" isExecutable="true" activiti:candidateStarterGroups="admin">
+    <startEvent id="startevent1" name="Start" activiti:initiator="initiator">
+    	<extensionElements>
+    	  <activiti:executionListener event="end" class="org.activiti.engine.impl.bpmn.listener.ScriptExecutionListener">
+	          <activiti:field name="language">
+	            <activiti:string><![CDATA[groovy]]></activiti:string>
+	          </activiti:field>
+	          <activiti:field name="script">
+	            <activiti:string><![CDATA[
+					def lists = []
+					def task1 = []
+					task1<<'100011'
+					task1<<'100010'
+					task1<<'100011'
+					
+					def task2 = []
+					task2<<'100011'
+					
+					lists<<task1
+					lists<<task2
+					execution.setVariable('lists',lists)
+					]]></activiti:string>
+	          </activiti:field>
+        </activiti:executionListener>
+    	</extensionElements>
+    </startEvent>
+    <subProcess id="subprocess1" name="Sub Process">
+      <multiInstanceLoopCharacteristics isSequential="false" activiti:collection="lists" activiti:elementVariable="list">
+      	<completionCondition>${result=="N"}</completionCondition>
+      </multiInstanceLoopCharacteristics>
+      <startEvent id="startevent2" name="Start">
+      	<extensionElements>
+      		<activiti:executionListener event="start" class="org.activiti.engine.impl.bpmn.listener.ScriptExecutionListener">
+	          <activiti:field name="language">
+	            <activiti:string><![CDATA[groovy]]></activiti:string>
+	          </activiti:field>
+	          <activiti:field name="script">
+	            <activiti:string><![CDATA[
+						def lists = execution.getVariable('lists')
+						list = lists[execution.getVariable('loopCounter')]
+						def newList = [];
+						list.each{newList << it};
+
+						execution.setVariableLocal('users',newList)
+						execution.setVariableLocal('usersStr',newList.toString())
+					]]></activiti:string>
+	          </activiti:field>
+        	</activiti:executionListener>
+      	</extensionElements>
+      </startEvent>
+      <userTask id="usertask1" name="User Task" activiti:assignee="${user}">
+      	<extensionElements>
+      		<activiti:formProperty id="result_审批结果_1_enum_rbv_$$A" name="审批结果" type="enum" variable="result" required="true">
+	          <activiti:value id="Y" name="同意"/>
+	          <activiti:value id="N" name="拒绝"/>
+        	</activiti:formProperty>
+        	<activiti:formProperty id="claimname_实际报销人 Claim to_2_string_t1_$$A" name="实际报销人 Claim to" type="string" variable="claimname"></activiti:formProperty>
+        	
+        	<activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+          <activiti:field name="language">
+            <activiti:string><![CDATA[groovy]]></activiti:string>
+          </activiti:field>
+          <activiti:field name="script">
+            <activiti:string><![CDATA[
+            	
+            ]]></activiti:string>
+          </activiti:field>
+        </activiti:taskListener>
+      	</extensionElements>
+      	<multiInstanceLoopCharacteristics isSequential="true" activiti:collection="users" activiti:elementVariable="user">
+      		<completionCondition>${result=='N'}</completionCondition>
+      	</multiInstanceLoopCharacteristics>
+      </userTask>
+      <sequenceFlow id="flow3" sourceRef="startevent2" targetRef="usertask1"></sequenceFlow>
+      <endEvent id="endevent2" name="End"></endEvent>
+      <sequenceFlow id="flow4" sourceRef="usertask1" targetRef="endevent2"></sequenceFlow>
+    </subProcess>
+    <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="subprocess1"></sequenceFlow>
+    <endEvent id="endevent1" name="End"></endEvent>
+    <sequenceFlow id="flow2" sourceRef="subprocess1" targetRef="endevent1"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_myProcess">
+    <bpmndi:BPMNPlane bpmnElement="myProcess" id="BPMNPlane_myProcess">
+      <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="100.0" y="175.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="subprocess1" id="BPMNShape_subprocess1">
+        <omgdc:Bounds height="205.0" width="281.0" x="210.0" y="90.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="startevent2" id="BPMNShape_startevent2">
+        <omgdc:Bounds height="35.0" width="35.0" x="220.0" y="177.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask1" id="BPMNShape_usertask1">
+        <omgdc:Bounds height="55.0" width="105.0" x="290.0" y="167.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent2" id="BPMNShape_endevent2">
+        <omgdc:Bounds height="35.0" width="35.0" x="440.0" y="177.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="550.0" y="175.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3">
+        <omgdi:waypoint x="255.0" y="194.0"></omgdi:waypoint>
+        <omgdi:waypoint x="290.0" y="194.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow4" id="BPMNEdge_flow4">
+        <omgdi:waypoint x="395.0" y="194.0"></omgdi:waypoint>
+        <omgdi:waypoint x="440.0" y="194.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="135.0" y="192.0"></omgdi:waypoint>
+        <omgdi:waypoint x="210.0" y="192.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="491.0" y="192.0"></omgdi:waypoint>
+        <omgdi:waypoint x="550.0" y="192.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

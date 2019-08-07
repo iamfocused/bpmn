@@ -1,0 +1,944 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/pur">
+  <process id="TEST_DPPU001" name="TEST_DPPU001 员工采购流程测试 Employee procurement process" isExecutable="true" activiti:candidateStarterGroups="admin">
+    <startEvent id="startevent1" name="启动采购流程 Start the procurement process" activiti:initiator="initiator">
+      <extensionElements>
+        <activiti:formProperty id="costcenter_成本中心 Costcenter_1_string_tree_$$A" name="成本中心 CostCenter" variable="puCostCenter" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchasepu001_item" name="采购明细 Details" type="string" variable="tbhdpurchasepu001_item" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchasepu001_采购类别 Purchase Type_type_0_enum_sbs_$$VA" name="采购类别 Purchase Type" type="enum" variable="tbhdpurchasepu001_type_t00">
+          <activiti:value id="固定资产 Fixed Assets" name="固定资产 Fixed Assets"></activiti:value>
+          <activiti:value id="文具及生活用品 Stationery And Necessary" name="文具及生活用品 Stationery And Necessary"></activiti:value>
+          <activiti:value id="低值耐耗品 Low Value Consumables" name="低值耐耗品 Low Value Consumables"></activiti:value>
+          <activiti:value id="其他 Others" name="其他 Others"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchasepu001_采购项(固定资产) Purchase Item(Fixed Assets)_assets_2_string_t1_$$A" name="采购项(固定资产) Purchase Item(Fixed Assets)" type="string" variable="tbhdpurchasepu001_assets_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchasepu001_采购项(文具及生活用品) Stationery And Necessary_stationeryItem_3_string_tree_$$A" name="采购项(文具及生活用品) Stationery And Necessary" type="string" variable="tbhdpurchasepu001_stationeryItem_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchasepu001_采购项(低值耐耗品) Low Value Consumables_consumablesItem_4_string_tree_$$A" name="采购项(低值耐耗品) Low Value Consumables" type="string" variable="tbhdpurchasepu001_consumablesItem_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchasepu001_采购项(其他) Purchase Item(other)_otherItem_5_string_t1_$$A" name="采购项(其他) Purchase Item(other)" type="string" variable="tbhdpurchasepu001_otherItem_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchasepu001_计量单位 Unit Of Measurement_unit_6_string_t1_$$A" name="计量单位 Unit Of Measurement" type="string" variable="tbhdpurchasepu001_unit_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchasepu001_数量 Quantity_quantity_7_string_t6_$$A" name="数量 Quantity" type="string" variable="tbhdpurchasepu001_quantity_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchasepu001_单价 Unit Price_price_8_string_t11_$$A" name="单价 Unit Price" type="string" variable="tbhdpurchasepu001_price_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchasepu001_备注 Remarks_remarks_9_string_t2_$$A" name="备注 Remarks" type="string" variable="tbhdpurchasepu001_remarks_t00"></activiti:formProperty>
+        <activiti:executionListener event="end" class="org.activiti.engine.impl.bpmn.listener.ScriptExecutionListener">
+          <activiti:field name="language">
+            <activiti:string><![CDATA[groovy]]></activiti:string>
+          </activiti:field>
+          <activiti:field name="script">
+            <activiti:string><![CDATA[//调用metaBase获取采购申请人的信息
+            	execution.setVariable("_http_method", "GET");
+				def headerMap = new java.util.HashMap();
+				execution.setVariable("_http_headers", headerMap);
+				execution.setVariable("_http_body", '');
+				def param=java.net.URLEncoder.encode('[{"type":"category","target":["variable",["template-tag","param"]],"value":\"'+ initiator + '\"}]', "UTF-8");
+				execution.setVariable("_http_url", 'https://metabase.eorionsolution.com/public/question/2c5a9a8b-9bf4-4260-8060-0ee2cafb8b28.json?parameters='+param);
+				execution.setVariable("_http_response_body", '');
+				execution.setVariable("_http_response_status_code", '');]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </startEvent>
+    <serviceTask id="servicetask1" name="调用Metabase查询当前申请人信息" activiti:class="com.eorionsolution.riying.bpms.javaservice.http.RestAPIService"></serviceTask>
+    <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="servicetask1"></sequenceFlow>
+    <scriptTask id="scripttask1" name="保存申请人信息" scriptFormat="groovy" activiti:autoStoreVariables="false">
+      <script>
+    		
+    		import groovy.json.JsonOutput
+			import groovy.json.JsonSlurper
+			
+			def responseCode = execution.getVariable("_http_response_status_code")
+   			if (responseCode != 200) {
+				throw new org.activiti.engine.ActivitiIllegalArgumentException('METABASE调用失败 METABASE call failed');
+			}
+			
+			def jsonSlurper = new JsonSlurper()
+			
+			def responseBody = execution.getVariable('_http_response_body')
+			def employeeList = jsonSlurper.parseText(responseBody)
+			if(employeeList.size() != 1) {
+				throw new org.activiti.engine.ActivitiIllegalArgumentException('数据库数据异常，不能获取您的身份信息 The database data is abnormal and you cannot get your identity information.');
+			}
+			
+			def employee = employeeList[0]
+			
+			def puCorpCode = employee.CORP_SN_?:''
+			execution.setVariable('puCorpCode', puCorpCode)
+			
+			def puEmployeeName = employee.NAME_?:''
+			execution.setVariable('puEmployeeName', puEmployeeName)
+			
+			def puDeptName = employee.DEP_NAME_?:''
+			execution.setVariable('puDeptName', puDeptName)
+			
+			execution.setVariable('puEmployeeMail', initiator)
+    		
+    	</script>
+    </scriptTask>
+    <sequenceFlow id="flow2" sourceRef="servicetask1" targetRef="scripttask1"></sequenceFlow>
+    <scriptTask id="scripttask2" name="所属实体开票类型条件构造" scriptFormat="groovy" activiti:autoStoreVariables="false">
+      <script>
+    		
+    		import groovy.json.JsonOutput
+			import groovy.json.JsonSlurper
+   			def puCorpCode = execution.getVariable('puCorpCode')
+   			def conditionLi = [['entity': puCorpCode]]
+   			def requestBody = JsonOutput.toJson(conditionLi)
+   			
+   			execution.setVariable("_http_method", "POST");
+			def headerMap = new java.util.HashMap();
+			headerMap.put("Content-Type","application/json");				
+			execution.setVariable("_http_headers", headerMap);
+			
+			execution.setVariable("_http_body", requestBody);
+			//https://bpmcs.dipont.com/decisiontables/v1/fire/entity_billing_type.xls
+			execution.setVariable("_http_url", 'https://commonservices.eorionsolution.com/decisiontables/v1/fire/entity_billing_type.xls');
+			execution.setVariable("_http_response_body", '');
+			execution.setVariable("_http_response_status_code", '');
+    		
+    	</script>
+    </scriptTask>
+    <sequenceFlow id="flow3" sourceRef="scripttask1" targetRef="scripttask2"></sequenceFlow>
+    <serviceTask id="servicetask2" name="调用Drools实体开票规则" activiti:class="com.eorionsolution.riying.bpms.javaservice.http.RestAPIService"></serviceTask>
+    <sequenceFlow id="flow4" sourceRef="scripttask2" targetRef="servicetask2"></sequenceFlow>
+    <scriptTask id="scripttask3" name="保存开票类型" scriptFormat="groovy" activiti:autoStoreVariables="false">
+      <script>
+    		
+   			import groovy.json.JsonSlurper
+   		
+    		if (execution.getVariable("_http_response_status_code") != 200) {
+			    throw new org.activiti.engine.ActivitiIllegalArgumentException("开票类型Drools出错，请联系管理员 Invoice type Drools error, please contact administrator");
+			}
+			def jsonSlurper = new JsonSlurper()
+			def response = jsonSlurper.parseText(execution.getVariable('_http_response_body'))
+			execution.setVariable('puBillingType', response[0].type)
+    		
+    	</script>
+    </scriptTask>
+    <sequenceFlow id="flow5" sourceRef="servicetask2" targetRef="scripttask3"></sequenceFlow>
+    <scriptTask id="scripttask4" name="采购明细处理" scriptFormat="groovy" activiti:autoStoreVariables="false">
+      <script>
+	  
+			import groovy.json.JsonSlurper
+	    	import groovy.json.JsonOutput
+	    	import java.util.stream.Collectors
+	    	
+	    	def type_asset = '固定资产 Fixed Assets'
+	    	def type_stationery = '文具及生活用品 Stationery And Necessary'
+	    	def type_consumables = '低值耐耗品 Low Value Consumables'
+	    	def type_others='其他 Others'
+	    	
+	    	def jsonSlurper = new JsonSlurper()
+	    	def std = jsonSlurper.parseText(execution.getVariable('tbhdpurchasepu001_item_std'))
+	    	//需要审批
+	    	def needApproval = 'Y'
+	    	
+	    	/*将采购明细按照类型分组：key-采购类型、value-该类型的总价*/
+	    	def groupByType = std.groupBy({it.type})
+	    	groupByType.each{item -&gt;
+	    		//分类保存std
+	    		if(item.key == type_others) execution.setVariable('othersSTD', JsonOutput.toJson(item.value))
+	    		if(item.key == type_asset) execution.setVariable('assetSTD', JsonOutput.toJson(item.value))
+	    		if(item.key == type_stationery) execution.setVariable('stationerySTD', JsonOutput.toJson(item.value))
+	    		if(item.key == type_consumables) execution.setVariable('consumablesSTD', JsonOutput.toJson(item.value))
+	    		//计算
+	    		item.value = item.value.stream().collect(Collectors.summarizingDouble({a-&gt;Optional.ofNullable(a.price).orElse(0).toDouble() * Optional.ofNullable(a.quantity).orElse(0).toDouble()})).sum
+	    	}
+	    	
+	    	/*判断是否需要审批，只有文具采购且金额小于200不需要审批*/
+	    	def types = groupByType.keySet()
+	    	def stationeryPrice = Optional.ofNullable(groupByType.get(type_stationery)).orElse(0)
+	    	def haveStationery = types.contains(type_stationery)
+	    	if(types.size() == 1 &amp;&amp; haveStationery &amp;&amp; stationeryPrice &lt;= 200){
+			    needApproval = 'N'
+			}
+			//保存是否审批变量
+			execution.setVariable('needApproval', needApproval)
+			
+			//文具采购总价
+	    	execution.setVariable('stationeryPrice', stationeryPrice)
+	    	//固资总价
+	    	def assetPrice = Optional.ofNullable(groupByType.get(type_asset)).orElse(0)
+	    	execution.setVariable('assetPrice', assetPrice)
+	    	//低值耐耗品总价
+	    	def consumablesPrice = Optional.ofNullable(groupByType.get(type_consumables)).orElse(0)
+	    	execution.setVariable('consumablesPrice', consumablesPrice)
+	    	if(consumablesPrice &gt; 500) throw new org.activiti.engine.ActivitiIllegalArgumentException("低值耐耗品总金额不能超过500 The total amount of low-value consumables cannot exceed 500");	    	
+	    	//其他总价
+	    	def othersPrice = Optional.ofNullable(groupByType.get(type_others)).orElse(0)
+	    	execution.setVariable('othersPrice', othersPrice)
+	    	//所有总价
+	    	def totalPrice = groupByType.entrySet().stream().mapToDouble({it -&gt; it.value}).sum()
+	    	execution.setVariable('totalPrice', totalPrice)
+	    	
+	    	/*是否有对应类型采购，没有不分配任务*/
+			if(types.contains(type_others)){
+	    		execution.setVariable('isOthers','Y')
+	    	}else {
+	    		execution.setVariable('isOthers','N')
+	    	}
+	    	if(types.contains(type_asset)) {
+	    		execution.setVariable('isAsset', 'Y')
+	    	}else {
+	    		execution.setVariable('isAsset', 'N')
+	    	}
+	    	if(types.contains(type_stationery)){
+	    		execution.setVariable('isStationery', 'Y')
+	    	}else {
+	    		execution.setVariable('isStationery', 'N')
+	    	}
+	    	if(types.contains(type_consumables)) {
+	    		execution.setVariable('isConsumables','Y')
+	    	}else {
+	    		execution.setVariable('isConsumables','N')
+	    	}
+				    	
+	    	/*填写的明细拆分为  明细命名：其他-2，固资-3，文具-4，低值耐耗品-5*/
+	    	for(int j=0; j&lt;4; j++) {
+	    		def tbhdpurchasepu001_item = jsonSlurper.parseText(execution.getVariable('tbhdpurchasepu001_item'))
+	    		def save = false
+	    		if(j==0){
+		    		tbhdpurchasepu001_item.each{item -&gt;
+		    			if(item.key == 'rows'){ item.value = item.value.findAll{row -&gt; row[0] == type_asset};if(item.value &amp;&amp; item.value.size() &gt; 0) {save=true} }
+	    				if(item.key == 'tableName') item.value = 'tbhdpurchasepu002'
+	    				if(item.key == 'headers') {item.value.each{it.id = it.id.replaceAll('001', '002'); it.id = it.id.replaceAll('Purchase Type_type_0_enum_sbs','Purchase Type_type_1_enum_sbs')}}
+		    		}
+		    		if(save)
+		    			execution.setVariable('tbhdpurchasepu002_item', JsonOutput.toJson(tbhdpurchasepu001_item))
+	    		}
+	    		
+	    		if(j==1){
+		    		tbhdpurchasepu001_item.each{item -&gt;
+		    			if(item.key == 'rows'){ item.value = item.value.findAll{row -&gt; row[0] == type_stationery};if(item.value &amp;&amp; item.value.size() &gt; 0) {save=true} }
+	    				if(item.key == 'tableName') item.value = 'tbhdpurchasepu003'
+	    				if(item.key == 'headers'){ item.value.each{it.id = it.id.replaceAll('001', '003'); it.id = it.id.replaceAll('Purchase Type_type_0_enum_sbs','Purchase Type_type_1_enum_sbs')}}
+		    		}
+		    		if(save)
+		    			execution.setVariable('tbhdpurchasepu003_item', JsonOutput.toJson(tbhdpurchasepu001_item))			    		
+	    		}
+	    		
+	    		if(j==2){
+		    		tbhdpurchasepu001_item.each{item -&gt;
+		    			if(item.key == 'rows'){ item.value = item.value.findAll{row -&gt; row[0] == type_consumables};if(item.value &amp;&amp; item.value.size() &gt; 0) {save=true} }
+	    				if(item.key == 'tableName') item.value = 'tbhdpurchasepu004'
+	    				if(item.key == 'headers'){ item.value.each{it.id = it.id.replaceAll('001', '004'); it.id = it.id.replaceAll('Purchase Type_type_0_enum_sbs','Purchase Type_type_1_enum_sbs')}}
+		    		}
+		    		if(save)
+		    			execution.setVariable('tbhdpurchasepu004_item', JsonOutput.toJson(tbhdpurchasepu001_item))		    		
+	    		}
+	    		
+	    		if(j==3){
+		    		tbhdpurchasepu001_item.each{item -&gt;
+		    			if(item.key == 'rows'){ item.value = item.value.findAll{row -&gt; row[0] == type_others};if(item.value &amp;&amp; item.value.size() &gt; 0) {save=true} }
+	    				if(item.key == 'tableName') item.value = 'tbhdpurchasepu005'
+	    				if(item.key == 'headers') {item.value.each{it.id = it.id.replaceAll('001', '005'); it.id = it.id.replaceAll('Purchase Type_type_0_enum_sbs','Purchase Type_type_1_enum_sbs')}}
+		    		}
+		    		if(save)
+		    			execution.setVariable('tbhdpurchasepu005_item', JsonOutput.toJson(tbhdpurchasepu001_item))	    		
+	    		}
+	    	}
+		
+		</script>
+    </scriptTask>
+    <sequenceFlow id="flow7" sourceRef="scripttask4" targetRef="exclusivegateway2"></sequenceFlow>
+    <exclusiveGateway id="exclusivegateway2" name="Exclusive Gateway"></exclusiveGateway>
+    <exclusiveGateway id="exclusivegateway3" name="Exclusive Gateway"></exclusiveGateway>
+    <sequenceFlow id="flow8" name="不需要审批" sourceRef="exclusivegateway2" targetRef="exclusivegateway3">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('needApproval') == 'N'}]]></conditionExpression>
+    </sequenceFlow>
+    <scriptTask id="scripttask5" name="Drools审批条件构造" scriptFormat="groovy" activiti:autoStoreVariables="false">
+      <script>
+    	
+    		import groovy.json.JsonSlurper
+	    	import groovy.json.JsonOutput
+	    	
+    		def amount = execution.getVariable('totalPrice')
+    		
+    		def jsonSlurper = new JsonSlurper()
+    		def costcenter = jsonSlurper.parseText(execution.getVariable('puCostCenter'))
+   			def conditionLi = [['costcenter': costcenter.code, 'amount': amount]]
+   			def requestBody = groovy.json.JsonOutput.toJson(conditionLi)
+   			
+   			execution.setVariable("_http_method", "POST");
+			def headerMap = new java.util.HashMap();
+			headerMap.put("Content-Type","application/json");				
+			execution.setVariable("_http_headers", headerMap);
+			
+			execution.setVariable("_http_body", requestBody);
+			execution.setVariable("_http_url", 'https://commonservices.eorionsolution.com/decisiontables/v1/fire/dppu001_assignee.xls');
+			execution.setVariable("_http_response_body", '');
+			execution.setVariable("_http_response_status_code", '');
+    	
+    	</script>
+    </scriptTask>
+    <sequenceFlow id="flow9" name="需要审批" sourceRef="exclusivegateway2" targetRef="scripttask5">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('needApproval') == 'Y'}]]></conditionExpression>
+    </sequenceFlow>
+    <serviceTask id="servicetask3" name="Drools审批规则调用" activiti:class="com.eorionsolution.riying.bpms.javaservice.http.RestAPIService"></serviceTask>
+    <sequenceFlow id="flow10" sourceRef="scripttask5" targetRef="servicetask3"></sequenceFlow>
+    <scriptTask id="scripttask6" name="审批结果解析" scriptFormat="groovy" activiti:autoStoreVariables="false">
+      <script>
+    	
+    		import groovy.json.JsonSlurper
+    		
+    		if (execution.getVariable("_http_response_status_code") != 200) {
+			    throw new org.activiti.engine.ActivitiIllegalArgumentException("采购审批规则Drools出错，请联系管理员 Procurement approval rule Drools error, please contact the administrator");
+			}
+			
+			def jsonSlurper = new JsonSlurper()
+			def responseArr = jsonSlurper.parseText(execution.getVariable('_http_response_body'))
+			def response = responseArr[0]
+			
+			def buyerStr = response.buyer
+			if(buyerStr == null) {
+				throw new org.activiti.engine.ActivitiIllegalArgumentException("采购审批规则Drools出错，采购人不能为空 Purchase approval rule Drools error, purchaser can not be empty");
+			}
+			execution.setVariable('admins', buyerStr)
+			
+			//审批人
+			def assigneeListo = new ArrayList()
+			if(response.verifierfirst == null){
+				throw new org.activiti.engine.ActivitiIllegalArgumentException("一级审批人不能为空 Level 1 approver cannot be empty");
+			}
+			assigneeListo.add(response.verifierfirst)
+			if(response.verifiersecond) assigneeListo.add(response.verifiersecond)
+			if(response.verifierthird) assigneeListo.add(response.verifierthird)
+			execution.setVariable('assigneeListo',assigneeListo)
+    	
+    	</script>
+    </scriptTask>
+    <sequenceFlow id="flow11" sourceRef="servicetask3" targetRef="scripttask6"></sequenceFlow>
+    <sequenceFlow id="flow12" sourceRef="scripttask6" targetRef="usertask5"></sequenceFlow>
+    <exclusiveGateway id="exclusivegateway4" name="Exclusive Gateway"></exclusiveGateway>
+    <sequenceFlow id="flow14" sourceRef="usertask5" targetRef="exclusivegateway4"></sequenceFlow>
+    <sequenceFlow id="flow15" name="审批通过" sourceRef="exclusivegateway4" targetRef="exclusivegateway3">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('coreaction_approvalResult') == 'Y'}]]></conditionExpression>
+    </sequenceFlow>
+    <endEvent id="endevent1" name="End"></endEvent>
+    <sequenceFlow id="flow16" name="审批拒绝" sourceRef="exclusivegateway4" targetRef="endevent1">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('coreaction_approvalResult') == 'N'}]]></conditionExpression>
+    </sequenceFlow>
+    <parallelGateway id="parallelgateway1" name="Parallel Gateway"></parallelGateway>
+    <sequenceFlow id="flow17" sourceRef="exclusivegateway3" targetRef="scripttask7"></sequenceFlow>
+    <userTask id="usertask1" name="其他采购查看 Check others purchase" activiti:assignee="${initiator}">
+      <extensionElements>
+        <activiti:formProperty id="costcenter_成本中心 Costcenter_1_string_tree_$$VA" name="成本中心 CostCenter" variable="puCostCenter"></activiti:formProperty>
+        <activiti:formProperty id="departmentName_部门名称 Department Name_2_string_t1_$$VA" name="部门名称 Department Name" variable="puDeptName"/>
+        <activiti:formProperty id="puEmployeeName_采购申请人 Purchase applicant_3_string_t1_$$VA" name="采购申请人 Purchase applicant" variable="puEmployeeName"/>
+        <activiti:formProperty id="puEmployeeMail_申请人邮箱 Applicant's mailbox_4_string_t1_$$VA" name="申请人邮箱 Applicant's mailbox" variable="puEmployeeMail"/>
+        
+        <activiti:formProperty id="tbhdpurchasepu005_item" name="采购明细(其他采购项) Others Details" type="string" variable="tbhdpurchasepu005_item" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchasepu005_采购类别 Purchase Type_type_1_enum_sbs_$$VA" name="采购类别 Purchase Type" type="enum" variable="tbhdpurchasepu005_type_t00">
+          <activiti:value id="固定资产 Fixed Assets" name="固定资产 Fixed Assets"></activiti:value>
+          <activiti:value id="文具及生活用品 Stationery And Necessary" name="文具及生活用品 Stationery And Necessary"></activiti:value>
+          <activiti:value id="低值耐耗品 Low Value Consumables" name="低值耐耗品 Low Value Consumables"></activiti:value>
+          <activiti:value id="其他 Others" name="其他 Others"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchasepu005_采购项(其他) Purchase Item(other)_otherItem_5_string_t1_$$VA" name="采购项(其他) Purchase Item(other)" type="string" variable="tbhdpurchasepu005_otherItem_t00"></activiti:formProperty>        
+        <activiti:formProperty id="tbhdpurchasepu005_计量单位 Unit Of Measurement_unit_6_string_t1_$$VA" name="计量单位 Unit Of Measurement" type="string" variable="tbhdpurchasepu005_unit_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchasepu005_数量 Quantity_quantity_7_string_t6_$$VA" name="数量 Quantity" type="string" variable="tbhdpurchasepu005_quantity_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchasepu005_单价 Unit Price_price_8_string_t11_$$VA" name="单价 Unit Price" type="string" variable="tbhdpurchasepu005_price_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchasepu005_备注 Remarks_remarks_9_string_t2_$$VA" name="备注 Remarks" type="string" variable="tbhdpurchasepu005_remarks_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchasepu005_实际金额 Actual price_actualPrice_10_string_t11_$$A" name="实际金额 Actual Price" type="string" variable="tbhdpurchasepu005_actualPrice_t00" required="true"/>
+        <activiti:formProperty id="tbhdpurchasepu005_采购时间 Purchase Time_purchaseTime_11_string_t3_$$A" name="采购时间 Purchase Time" type="string" variable="tbhdpurchasepu005_purchaseTime_t00" required="true"/>
+      
+      	<activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+          <activiti:field name="language">
+            <activiti:string><![CDATA[groovy]]></activiti:string>
+          </activiti:field>
+          <activiti:field name="script">
+            <activiti:string><![CDATA[
+            	import groovy.json.JsonOutput
+				import groovy.json.JsonSlurper
+				
+				def jsonSlurper = new JsonSlurper()
+				def execution = task.getExecution()
+				def items = jsonSlurper.parseText(execution.getVariable('tbhdpurchasepu005_item_std'))
+				items.each{
+					if(it.actualPrice == null || it.purchaseTime == null) throw new org.activiti.engine.ActivitiIllegalArgumentException('请补充采购明细 Please supplement the purchase time and actual amount')
+				}
+            ]]></activiti:string>
+          </activiti:field>
+        </activiti:taskListener>
+      </extensionElements>
+    </userTask>
+    <userTask id="usertask2" name="固定资产采购查看 Check asset purchase" activiti:assignee="${initiator}">
+      <extensionElements>
+		<activiti:formProperty id="costcenter_成本中心 Costcenter_1_string_tree_$$VA" name="成本中心 CostCenter" variable="puCostCenter"></activiti:formProperty>
+        <activiti:formProperty id="departmentName_部门名称 Department Name_2_string_t1_$$VA" name="部门名称 Department Name" variable="puDeptName"/>
+        <activiti:formProperty id="puEmployeeName_采购申请人 Purchase applicant_3_string_t1_$$VA" name="采购申请人 Purchase applicant" variable="puEmployeeName"/>
+        <activiti:formProperty id="puEmployeeMail_申请人邮箱 Applicant's mailbox_4_string_t1_$$VA" name="申请人邮箱 Applicant's mailbox" variable="puEmployeeMail"/>
+        
+        <activiti:formProperty id="tbhdpurchasepu002_item" name="采购明细(固定资产采购项) Fixed Assets Details" type="string" variable="tbhdpurchasepu002_item" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchasepu002_采购类别 Purchase Type_type_1_enum_sbs_$$VA" name="采购类别 Purchase Type" type="enum" variable="tbhdpurchasepu002_type_t00">
+          <activiti:value id="固定资产 Fixed Assets" name="固定资产 Fixed Assets"></activiti:value>
+          <activiti:value id="文具及生活用品 Stationery And Necessary" name="文具及生活用品 Stationery And Necessary"></activiti:value>
+          <activiti:value id="低值耐耗品 Low Value Consumables" name="低值耐耗品 Low Value Consumables"></activiti:value>
+          <activiti:value id="其他 Others" name="其他 Others"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchasepu002_采购项(固定资产) Purchase Item(Fixed Assets)_assets_2_string_t1_$$VA" name="采购项(固定资产) Purchase Item(Fixed Assets)" type="string" variable="tbhdpurchasepu002_assets_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchasepu002_计量单位 Unit Of Measurement_unit_6_string_t1_$$VA" name="计量单位 Unit Of Measurement" type="string" variable="tbhdpurchasepu002_unit_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchasepu002_数量 Quantity_quantity_7_string_t6_$$VA" name="数量 Quantity" type="string" variable="tbhdpurchasepu002_quantity_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchasepu002_单价 Unit Price_price_8_string_t11_$$VA" name="单价 Unit Price" type="string" variable="tbhdpurchasepu002_price_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchasepu002_备注 Remarks_remarks_9_string_t2_$$VA" name="备注 Remarks" type="string" variable="tbhdpurchasepu002_remarks_t00"></activiti:formProperty>
+		<activiti:formProperty id="tbhdpurchasepu002_实际金额 Actual price_actualPrice_10_string_t11_$$A" name="实际金额 Actual Price" type="string" variable="tbhdpurchasepu002_actualPrice_t00" required="true"/>
+        <activiti:formProperty id="tbhdpurchasepu002_采购时间 Purchase Time_purchaseTime_11_string_t3_$$A" name="采购时间 Purchase Time" type="string" variable="tbhdpurchasepu002_purchaseTime_t00" required="true"/>
+      
+      	<activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+          <activiti:field name="language">
+            <activiti:string><![CDATA[groovy]]></activiti:string>
+          </activiti:field>
+          <activiti:field name="script">
+            <activiti:string><![CDATA[
+            	import groovy.json.JsonOutput
+				import groovy.json.JsonSlurper
+				
+				def jsonSlurper = new JsonSlurper()
+				def execution = task.getExecution()
+				def items = jsonSlurper.parseText(execution.getVariable('tbhdpurchasepu002_item_std'))
+				items.each{
+					if(it.actualPrice == null || it.purchaseTime == null) throw new org.activiti.engine.ActivitiIllegalArgumentException('请补充采购明细 Please supplement the purchase time and actual amount')
+				}
+            ]]></activiti:string>
+          </activiti:field>
+        </activiti:taskListener>
+       </extensionElements>
+    </userTask>
+    <userTask id="usertask3" name="文具采购查看 Check stationery purchase" activiti:assignee="${initiator}">
+      <extensionElements>
+		<activiti:formProperty id="costcenter_成本中心 Costcenter_1_string_tree_$$VA" name="成本中心 CostCenter" variable="puCostCenter"></activiti:formProperty>
+        <activiti:formProperty id="departmentName_部门名称 Department Name_2_string_t1_$$VA" name="部门名称 Department Name" variable="puDeptName"/>
+        <activiti:formProperty id="puEmployeeName_采购申请人 Purchase applicant_3_string_t1_$$VA" name="采购申请人 Purchase applicant" variable="puEmployeeName"/>
+        <activiti:formProperty id="puEmployeeMail_申请人邮箱 Applicant's mailbox_4_string_t1_$$VA" name="申请人邮箱 Applicant's mailbox" variable="puEmployeeMail"/>
+
+        <activiti:formProperty id="tbhdpurchasepu003_item" name="采购明细(文具及日用品采购项) Stationery And Necessary Details" type="string" variable="tbhdpurchasepu003_item" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchasepu003_采购类别 Purchase Type_type_1_enum_sbs_$$VA" name="采购类别 Purchase Type" type="enum" variable="tbhdpurchasepu003_type_t00">
+          <activiti:value id="固定资产 Fixed Assets" name="固定资产 Fixed Assets"></activiti:value>
+          <activiti:value id="文具及生活用品 Stationery And Necessary" name="文具及生活用品 Stationery And Necessary"></activiti:value>
+          <activiti:value id="低值耐耗品 Low Value Consumables" name="低值耐耗品 Low Value Consumables"></activiti:value>
+          <activiti:value id="其他 Others" name="其他 Others"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchasepu003_采购项(文具及生活用品) Stationery And Necessary_stationeryItem_3_string_tree_$$VA" name="采购项(文具及生活用品) Stationery And Necessary" type="string" variable="tbhdpurchasepu003_stationeryItem_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchasepu003_计量单位 Unit Of Measurement_unit_6_string_t1_$$VA" name="计量单位 Unit Of Measurement" type="string" variable="tbhdpurchasepu003_unit_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchasepu003_数量 Quantity_quantity_7_string_t6_$$VA" name="数量 Quantity" type="string" variable="tbhdpurchasepu003_quantity_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchasepu003_单价 Unit Price_price_8_string_t11_$$VA" name="单价 Unit Price" type="string" variable="tbhdpurchasepu003_price_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchasepu003_备注 Remarks_remarks_9_string_t2_$$VA" name="备注 Remarks" type="string" variable="tbhdpurchasepu003_remarks_t00"></activiti:formProperty>
+		<activiti:formProperty id="tbhdpurchasepu003_实际金额 Actual price_actualPrice_10_string_t11_$$A" name="实际金额 Actual Price" type="string" variable="tbhdpurchasepu003_actualPrice_t00" required="true"/>
+        <activiti:formProperty id="tbhdpurchasepu003_采购时间 Purchase Time_purchaseTime_11_string_t3_$$A" name="采购时间 Purchase Time" type="string" variable="tbhdpurchasepu003_purchaseTime_t00" required="true"/>      
+      
+      	<activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+          <activiti:field name="language">
+            <activiti:string><![CDATA[groovy]]></activiti:string>
+          </activiti:field>
+          <activiti:field name="script">
+            <activiti:string><![CDATA[
+            	import groovy.json.JsonOutput
+				import groovy.json.JsonSlurper
+				
+				def jsonSlurper = new JsonSlurper()
+				def execution = task.getExecution()
+				def items = jsonSlurper.parseText(execution.getVariable('tbhdpurchasepu003_item_std'))
+				items.each{
+					if(it.actualPrice == null || it.purchaseTime == null) throw new org.activiti.engine.ActivitiIllegalArgumentException('请补充采购明细 Please supplement the purchase time and actual amount')
+				}
+            ]]></activiti:string>
+          </activiti:field>
+        </activiti:taskListener>      
+       </extensionElements>
+    </userTask>
+    <userTask id="usertask4" name="低值耐耗品采购查看 Check Low value consumables purchase" activiti:assignee="${initiator}">
+      <extensionElements>
+		<activiti:formProperty id="costcenter_成本中心 Costcenter_1_string_tree_$$VA" name="成本中心 CostCenter" variable="puCostCenter"></activiti:formProperty>
+        <activiti:formProperty id="departmentName_部门名称 Department Name_2_string_t1_$$VA" name="部门名称 Department Name" variable="puDeptName"/>
+        <activiti:formProperty id="puEmployeeName_采购申请人 Purchase applicant_3_string_t1_$$VA" name="采购申请人 Purchase applicant" variable="puEmployeeName"/>
+        <activiti:formProperty id="puEmployeeMail_申请人邮箱 Applicant's mailbox_4_string_t1_$$VA" name="申请人邮箱 Applicant's mailbox" variable="puEmployeeMail"/>
+
+        <activiti:formProperty id="tbhdpurchasepu004_item" name="采购明细(低值耐耗品采购项) Low Value Consumables Details" type="string" variable="tbhdpurchasepu004_item" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchasepu004_采购类别 Purchase Type_type_1_enum_sbs_$$VA" name="采购类别 Purchase Type" type="enum" variable="tbhdpurchasepu004_type_t00">
+          <activiti:value id="固定资产 Fixed Assets" name="固定资产 Fixed Assets"></activiti:value>
+          <activiti:value id="文具及生活用品 Stationery And Necessary" name="文具及生活用品 Stationery And Necessary"></activiti:value>
+          <activiti:value id="低值耐耗品 Low Value Consumables" name="低值耐耗品 Low Value Consumables"></activiti:value>
+          <activiti:value id="其他 Others" name="其他 Others"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchasepu004_采购项(低值耐耗品) Low Value Consumables_consumablesItem_4_string_tree_$$VA" name="采购项(低值耐耗品) Low Value Consumables" type="string" variable="tbhdpurchasepu004_consumablesItem_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchasepu004_计量单位 Unit Of Measurement_unit_6_string_t1_$$VA" name="计量单位 Unit Of Measurement" type="string" variable="tbhdpurchasepu004_unit_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchasepu004_数量 Quantity_quantity_7_string_t6_$$VA" name="数量 Quantity" type="string" variable="tbhdpurchasepu004_quantity_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchasepu004_单价 Unit Price_price_8_string_t11_$$VA" name="单价 Unit Price" type="string" variable="tbhdpurchasepu004_price_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchasepu004_备注 Remarks_remarks_9_string_t2_$$VA" name="备注 Remarks" type="string" variable="tbhdpurchasepu004_remarks_t00"></activiti:formProperty>
+		<activiti:formProperty id="tbhdpurchasepu004_实际金额 Actual price_actualPrice_10_string_t11_$$A" name="实际金额 Actual Price" type="string" variable="tbhdpurchasepu004_actualPrice_t00" required="true"/>
+        <activiti:formProperty id="tbhdpurchasepu004_采购时间 Purchase Time_purchaseTime_11_string_t3_$$A" name="采购时间 Purchase Time" type="string" variable="tbhdpurchasepu004_purchaseTime_t00" required="true"/>      
+      
+      	<activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+          <activiti:field name="language">
+            <activiti:string><![CDATA[groovy]]></activiti:string>
+          </activiti:field>
+          <activiti:field name="script">
+            <activiti:string><![CDATA[
+            	import groovy.json.JsonOutput
+				import groovy.json.JsonSlurper
+				
+				def jsonSlurper = new JsonSlurper()
+				def execution = task.getExecution()
+				def items = jsonSlurper.parseText(execution.getVariable('tbhdpurchasepu004_item_std'))
+				items.each{
+					if(it.actualPrice == null || it.purchaseTime == null) throw new org.activiti.engine.ActivitiIllegalArgumentException('请补充采购明细 Please supplement the purchase time and actual amount')
+				}
+            ]]></activiti:string>
+          </activiti:field>
+        </activiti:taskListener>      
+       </extensionElements>
+    </userTask>
+    <exclusiveGateway id="exclusivegateway5" name="Exclusive Gateway"></exclusiveGateway>
+    <exclusiveGateway id="exclusivegateway6" name="Exclusive Gateway"></exclusiveGateway>
+    <sequenceFlow id="flow18" sourceRef="parallelgateway1" targetRef="exclusivegateway5"></sequenceFlow>
+    <sequenceFlow id="flow19" name="无其他采购" sourceRef="exclusivegateway5" targetRef="exclusivegateway6">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('isOthers') == 'N'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow20" name="有其他采购" sourceRef="exclusivegateway5" targetRef="usertask1">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('isOthers') == 'Y'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow21" sourceRef="usertask1" targetRef="exclusivegateway6"></sequenceFlow>
+    <exclusiveGateway id="exclusivegateway7" name="Exclusive Gateway"></exclusiveGateway>
+    <sequenceFlow id="flow22" sourceRef="parallelgateway1" targetRef="exclusivegateway7"></sequenceFlow>
+    <exclusiveGateway id="exclusivegateway8" name="Exclusive Gateway"></exclusiveGateway>
+    <sequenceFlow id="flow24" name="无固定资产采购" sourceRef="exclusivegateway7" targetRef="exclusivegateway8">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('isAsset') == 'N'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow25" name="有固定资产采购" sourceRef="exclusivegateway7" targetRef="usertask2">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('isAsset') == 'Y'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow26" sourceRef="usertask2" targetRef="exclusivegateway8"></sequenceFlow>
+    <exclusiveGateway id="exclusivegateway9" name="Exclusive Gateway"></exclusiveGateway>
+    <sequenceFlow id="flow27" sourceRef="parallelgateway1" targetRef="exclusivegateway9"></sequenceFlow>
+    <exclusiveGateway id="exclusivegateway10" name="Exclusive Gateway"></exclusiveGateway>
+    <sequenceFlow id="flow28" name="无文具采购" sourceRef="exclusivegateway9" targetRef="exclusivegateway10">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('isStationery') == 'N'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow29" name="有文具采购" sourceRef="exclusivegateway9" targetRef="usertask3">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('isStationery') == 'Y'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow30" sourceRef="usertask3" targetRef="exclusivegateway10"></sequenceFlow>
+    <exclusiveGateway id="exclusivegateway11" name="Exclusive Gateway"></exclusiveGateway>
+    <sequenceFlow id="flow31" sourceRef="parallelgateway1" targetRef="exclusivegateway11"></sequenceFlow>
+    <exclusiveGateway id="exclusivegateway12" name="Exclusive Gateway"></exclusiveGateway>
+    <sequenceFlow id="flow32" name="无低值耐耗品采购" sourceRef="exclusivegateway11" targetRef="exclusivegateway12">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('isConsumables') == 'N'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow33" name="有低值耐耗品采购" sourceRef="exclusivegateway11" targetRef="usertask4">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('isConsumables') == 'Y'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow34" sourceRef="usertask4" targetRef="exclusivegateway12"></sequenceFlow>
+    <parallelGateway id="parallelgateway2" name="Parallel Gateway"></parallelGateway>
+    <sequenceFlow id="flow35" sourceRef="exclusivegateway6" targetRef="parallelgateway2"></sequenceFlow>
+    <sequenceFlow id="flow36" sourceRef="exclusivegateway8" targetRef="parallelgateway2"></sequenceFlow>
+    <sequenceFlow id="flow37" sourceRef="exclusivegateway10" targetRef="parallelgateway2"></sequenceFlow>
+    <sequenceFlow id="flow38" sourceRef="exclusivegateway12" targetRef="parallelgateway2"></sequenceFlow>
+    <endEvent id="endevent3" name="End"></endEvent>
+    <sequenceFlow id="flow39" sourceRef="parallelgateway2" targetRef="endevent3"></sequenceFlow>
+    <sequenceFlow id="flow40" sourceRef="scripttask3" targetRef="scripttask4"></sequenceFlow>
+    <userTask id="usertask5" name="多级审批 Multi-level approval" activiti:assignee="${assignee}">
+      <extensionElements>
+        <activiti:formProperty id="coreaction_审批结果_1_enum_rbv_$$A" name="审批结果 Approval Results" type="enum" variable="coreaction_approvalResult" required="true">
+          <activiti:value id="Y" name="同意 Agree"></activiti:value>
+          <activiti:value id="N" name="拒绝 Refuse"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="corecomments_审批意见_2_string_t2_$$A" name="审批意见 Approval Comments" variable="corecomments_approvalComments"></activiti:formProperty>
+		<activiti:formProperty id="costcenter_成本中心 Costcenter_1_string_tree_$$VA" name="成本中心 CostCenter" variable="puCostCenter"></activiti:formProperty>
+        <activiti:formProperty id="departmentName_部门名称 Department Name_2_string_t1_$$VA" name="部门名称 Department Name" variable="puDeptName"/>
+        <activiti:formProperty id="puEmployeeName_采购申请人 Purchase applicant_3_string_t1_$$VA" name="采购申请人 Purchase applicant" variable="puEmployeeName"/>
+        <activiti:formProperty id="puEmployeeMail_申请人邮箱 Applicant's mailbox_4_string_t1_$$VA" name="申请人邮箱 Applicant's mailbox" variable="puEmployeeMail"/>
+
+        <activiti:formProperty id="totalPrice_总价 Total Price_1_string_t11_$$VB" name="总金额 Total Price" variable="totalPrice"/>
+        <activiti:formProperty id="assetPurchaseTotal_固定资产采购总价 Asset Total Price_2_string_t11_$$VB" name="固定资产采购总金额 Asset Total Price" variable="assetPrice"></activiti:formProperty>
+        <activiti:formProperty id="stationeryPurchaseTotal_文具类采购总价 Stationery And Necessary Total Price_3_string_t11_$$VB" name="文具及日用品采购总金额 Stationery And Necessary Total Price" variable="stationeryPrice"></activiti:formProperty>
+        <activiti:formProperty id="consumablesPurchaseTotal_低值耐耗品采购总价 Low Value Consumables Total Price_4_string_t11_$$VB" name="低值耐耗品采购总金额 Low Value Consumables Total Price" variable="consumablesPrice"></activiti:formProperty>
+        <activiti:formProperty id="otherPurchaseTotal_其他采购总价 Others Total Price_5_string_t11_$$VB" name="其他采购总金额 Others Total Price" variable="othersPrice"></activiti:formProperty>      
+        
+        <activiti:formProperty id="tbhdpurchasepu001_item_$$VA" name="采购明细 Details" type="string" variable="tbhdpurchasepu001_item" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchasepu001_采购类别 Purchase Type_type_0_enum_sbs_$$VA" name="采购类别 Purchase Type" type="enum" variable="tbhdpurchasepu001_type_t00">
+          <activiti:value id="固定资产 Fixed Assets" name="固定资产 Fixed Assets"></activiti:value>
+          <activiti:value id="文具及生活用品 Stationery And Necessary" name="文具及生活用品 Stationery And Necessary"></activiti:value>
+          <activiti:value id="低值耐耗品 Low Value Consumables" name="低值耐耗品 Low Value Consumables"></activiti:value>
+          <activiti:value id="其他 Others" name="其他 Others"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchasepu001_采购项(固定资产) Purchase Item(Fixed Assets)_assets_2_string_t1_$$VA" name="采购项(固定资产) Purchase Item(Fixed Assets)" type="string" variable="tbhdpurchasepu001_assets_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchasepu001_采购项(文具及生活用品) Stationery And Necessary_stationeryItem_3_string_tree_$$VA" name="采购项(文具及生活用品) Stationery And Necessary" type="string" variable="tbhdpurchasepu001_stationeryItem_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchasepu001_采购项(低值耐耗品) Low Value Consumables_consumablesItem_4_string_tree_$$VA" name="采购项(低值耐耗品) Low Value Consumables" type="string" variable="tbhdpurchasepu001_consumablesItem_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchasepu001_采购项(其他) Purchase Item(other)_otherItem_5_string_t1_$$VA" name="采购项(其他) Purchase Item(other)" type="string" variable="tbhdpurchasepu001_otherItem_t00"></activiti:formProperty>        
+        <activiti:formProperty id="tbhdpurchasepu001_计量单位 Unit Of Measurement_unit_6_string_t1_$$VA" name="计量单位 Unit Of Measurement" type="string" variable="tbhdpurchasepu001_unit_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchasepu001_数量 Quantity_quantity_7_string_t6_$$VA" name="数量 Quantity" type="string" variable="tbhdpurchasepu001_quantity_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchasepu001_单价 Unit Price_price_8_string_t11_$$VA" name="单价 Unit Price" type="string" variable="tbhdpurchasepu001_price_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchasepu001_备注 Remarks_remarks_9_string_t2_$$VA" name="备注 Remarks" type="string" variable="tbhdpurchasepu001_remarks_t00"></activiti:formProperty>
+      
+      	<activiti:taskListener event="create" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+          <activiti:field name="language">
+            <activiti:string><![CDATA[groovy]]></activiti:string>
+          </activiti:field>
+          <activiti:field name="script">
+            <activiti:string><![CDATA[
+				def execution = task.getExecution()
+				execution.setVariable('corecomments_approvalComments', '')
+            ]]></activiti:string>
+          </activiti:field>
+        </activiti:taskListener>
+      </extensionElements>
+      <multiInstanceLoopCharacteristics isSequential="true" activiti:collection="assigneeListo" activiti:elementVariable="assignee">
+        <completionCondition>${coreaction_approvalResult == "N"}</completionCondition>
+      </multiInstanceLoopCharacteristics>
+    </userTask>
+    <scriptTask id="scripttask7" name="构造采购邮件" activiti:autoStoreVariables="false" scriptFormat="groovy">
+    	<script>
+    	<![CDATA[
+    		import groovy.json.JsonOutput
+    		import groovy.json.JsonSlurper
+    		
+    		def jsonSlurper = new JsonSlurper()
+    		def bodyMap = new HashMap()
+    		def detailMap = new HashMap()
+    		def dataMap = new HashMap()
+    		
+    		def employeeName = execution.getVariable('puEmployeeName')?:''
+    		dataMap.put('employeeName', employeeName)
+    		def processInstanceId = execution.getProcessInstanceId()
+    		def baseUrl = 'https://commonservices.eorionsolution.com/activitihelper/v1/pdf/download/' //'https://bpmcs.dipont.com/activitihelper/v1/pdf/download/'
+    		
+    		def trimEmpName = employeeName.replace(" ", "")
+    		if(execution.getVariable('othersSTD')) dataMap.put('otherLink', baseUrl + processInstanceId + '/a.yml/' + trimEmpName + '-其他采购申请表')
+    		if(execution.getVariable('assetSTD')) dataMap.put('assetLink', baseUrl + processInstanceId + '/b.yml/' + trimEmpName + '-固资采购申请表')
+    		if(execution.getVariable('stationerySTD')) dataMap.put('stationeryLink', baseUrl + processInstanceId + '/c.yml/' + trimEmpName + '-文具及日用品采购申请表')
+    		if(execution.getVariable('consumablesSTD')) dataMap.put('consumablesLink', baseUrl + processInstanceId + '/d.yml/' + trimEmpName + '-低值耐耗品采购申请表')
+    		
+    		def to = ['baocaixue@eorionsolution.com']
+    		detailMap.put("from", "develop@eorionsolution.com")
+			detailMap.put("to", to)
+			detailMap.put("subject", "采购通知")
+			detailMap.put("templateName", "purchase-notification-template")
+			detailMap.put("templateData",dataMap)
+			bodyMap.put("mail", detailMap)
+			
+			def body = groovy.json.JsonOutput.toJson(bodyMap)
+			//send request
+			execution.setVariable("_http_method", "POST")
+			def headerMap = new HashMap()
+			headerMap.put("Content-Type","application/json")
+			execution.setVariable("_http_headers", headerMap)
+			execution.setVariable("_http_body", body)
+			execution.setVariable("purchaseBody", body)
+			execution.setVariable("_http_url", 'https://commonservices.eorionsolution.com/mailsender/mail/v2/mail')
+			execution.setVariable("_http_response_body", '')
+			execution.setVariable("_http_response_status_code", '')
+    	]]>
+    	</script>
+    </scriptTask>
+    <serviceTask id="servicetask4" name="采购邮件发送" activiti:class="com.eorionsolution.riying.bpms.javaservice.http.RestAPIService"></serviceTask>
+    <sequenceFlow id="flow41" sourceRef="scripttask7" targetRef="servicetask4"></sequenceFlow>
+    <sequenceFlow id="flow42" sourceRef="servicetask4" targetRef="parallelgateway1"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_TEST_DPPU001">
+    <bpmndi:BPMNPlane bpmnElement="TEST_DPPU001" id="BPMNPlane_TEST_DPPU001">
+      <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="410.0" y="100.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="servicetask1" id="BPMNShape_servicetask1">
+        <omgdc:Bounds height="61.0" width="111.0" x="372.0" y="210.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scripttask1" id="BPMNShape_scripttask1">
+        <omgdc:Bounds height="61.0" width="105.0" x="375.0" y="320.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scripttask2" id="BPMNShape_scripttask2">
+        <omgdc:Bounds height="61.0" width="105.0" x="375.0" y="450.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="servicetask2" id="BPMNShape_servicetask2">
+        <omgdc:Bounds height="61.0" width="105.0" x="375.0" y="560.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scripttask3" id="BPMNShape_scripttask3">
+        <omgdc:Bounds height="61.0" width="105.0" x="375.0" y="680.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scripttask4" id="BPMNShape_scripttask4">
+        <omgdc:Bounds height="61.0" width="105.0" x="375.0" y="800.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway2" id="BPMNShape_exclusivegateway2">
+        <omgdc:Bounds height="40.0" width="40.0" x="407.0" y="920.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway3" id="BPMNShape_exclusivegateway3">
+        <omgdc:Bounds height="40.0" width="40.0" x="408.0" y="1363.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scripttask5" id="BPMNShape_scripttask5">
+        <omgdc:Bounds height="61.0" width="105.0" x="620.0" y="980.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="servicetask3" id="BPMNShape_servicetask3">
+        <omgdc:Bounds height="58.0" width="105.0" x="620.0" y="1070.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scripttask6" id="BPMNShape_scripttask6">
+        <omgdc:Bounds height="61.0" width="105.0" x="620.0" y="1160.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway4" id="BPMNShape_exclusivegateway4">
+        <omgdc:Bounds height="40.0" width="40.0" x="652.0" y="1363.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="833.0" y="1366.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="parallelgateway1" id="BPMNShape_parallelgateway1">
+        <omgdc:Bounds height="40.0" width="40.0" x="407.0" y="1710.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask1" id="BPMNShape_usertask1">
+        <omgdc:Bounds height="61.0" width="105.0" x="90.0" y="1880.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask2" id="BPMNShape_usertask2">
+        <omgdc:Bounds height="61.0" width="105.0" x="271.0" y="1880.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask3" id="BPMNShape_usertask3">
+        <omgdc:Bounds height="61.0" width="105.0" x="495.0" y="1880.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask4" id="BPMNShape_usertask4">
+        <omgdc:Bounds height="61.0" width="105.0" x="707.0" y="1880.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway5" id="BPMNShape_exclusivegateway5">
+        <omgdc:Bounds height="40.0" width="40.0" x="210.0" y="1780.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway6" id="BPMNShape_exclusivegateway6">
+        <omgdc:Bounds height="40.0" width="40.0" x="210.0" y="1970.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway7" id="BPMNShape_exclusivegateway7">
+        <omgdc:Bounds height="40.0" width="40.0" x="407.0" y="1780.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway8" id="BPMNShape_exclusivegateway8">
+        <omgdc:Bounds height="40.0" width="40.0" x="408.0" y="1970.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway9" id="BPMNShape_exclusivegateway9">
+        <omgdc:Bounds height="40.0" width="40.0" x="620.0" y="1780.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway10" id="BPMNShape_exclusivegateway10">
+        <omgdc:Bounds height="40.0" width="40.0" x="620.0" y="1970.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway11" id="BPMNShape_exclusivegateway11">
+        <omgdc:Bounds height="40.0" width="40.0" x="830.0" y="1780.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway12" id="BPMNShape_exclusivegateway12">
+        <omgdc:Bounds height="40.0" width="40.0" x="830.0" y="1970.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="parallelgateway2" id="BPMNShape_parallelgateway2">
+        <omgdc:Bounds height="40.0" width="40.0" x="456.0" y="2150.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent3" id="BPMNShape_endevent3">
+        <omgdc:Bounds height="35.0" width="35.0" x="459.0" y="2250.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask5" id="BPMNShape_usertask5">
+        <omgdc:Bounds height="71.0" width="105.0" x="620.0" y="1260.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scripttask7" id="BPMNShape_scripttask7">
+        <omgdc:Bounds height="62.0" width="105.0" x="375.0" y="1460.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="servicetask4" id="BPMNShape_servicetask4">
+        <omgdc:Bounds height="62.0" width="105.0" x="375.0" y="1580.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="427.0" y="135.0"></omgdi:waypoint>
+        <omgdi:waypoint x="427.0" y="210.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="427.0" y="271.0"></omgdi:waypoint>
+        <omgdi:waypoint x="427.0" y="320.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3">
+        <omgdi:waypoint x="427.0" y="381.0"></omgdi:waypoint>
+        <omgdi:waypoint x="427.0" y="450.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow4" id="BPMNEdge_flow4">
+        <omgdi:waypoint x="427.0" y="511.0"></omgdi:waypoint>
+        <omgdi:waypoint x="427.0" y="560.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow5" id="BPMNEdge_flow5">
+        <omgdi:waypoint x="427.0" y="621.0"></omgdi:waypoint>
+        <omgdi:waypoint x="427.0" y="680.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow7" id="BPMNEdge_flow7">
+        <omgdi:waypoint x="427.0" y="861.0"></omgdi:waypoint>
+        <omgdi:waypoint x="427.0" y="920.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow8" id="BPMNEdge_flow8">
+        <omgdi:waypoint x="427.0" y="960.0"></omgdi:waypoint>
+        <omgdi:waypoint x="428.0" y="1363.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="55.0" x="427.0" y="960.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow9" id="BPMNEdge_flow9">
+        <omgdi:waypoint x="447.0" y="940.0"></omgdi:waypoint>
+        <omgdi:waypoint x="672.0" y="940.0"></omgdi:waypoint>
+        <omgdi:waypoint x="672.0" y="980.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="44.0" x="447.0" y="940.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow10" id="BPMNEdge_flow10">
+        <omgdi:waypoint x="672.0" y="1041.0"></omgdi:waypoint>
+        <omgdi:waypoint x="672.0" y="1070.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow11" id="BPMNEdge_flow11">
+        <omgdi:waypoint x="672.0" y="1128.0"></omgdi:waypoint>
+        <omgdi:waypoint x="672.0" y="1160.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow12" id="BPMNEdge_flow12">
+        <omgdi:waypoint x="672.0" y="1221.0"></omgdi:waypoint>
+        <omgdi:waypoint x="672.0" y="1260.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow14" id="BPMNEdge_flow14">
+        <omgdi:waypoint x="672.0" y="1331.0"></omgdi:waypoint>
+        <omgdi:waypoint x="672.0" y="1363.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow15" id="BPMNEdge_flow15">
+        <omgdi:waypoint x="652.0" y="1383.0"></omgdi:waypoint>
+        <omgdi:waypoint x="448.0" y="1383.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="44.0" x="501.0" y="1363.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow16" id="BPMNEdge_flow16">
+        <omgdi:waypoint x="692.0" y="1383.0"></omgdi:waypoint>
+        <omgdi:waypoint x="833.0" y="1383.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="44.0" x="709.0" y="1366.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow17" id="BPMNEdge_flow17">
+        <omgdi:waypoint x="428.0" y="1403.0"></omgdi:waypoint>
+        <omgdi:waypoint x="427.0" y="1460.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow18" id="BPMNEdge_flow18">
+        <omgdi:waypoint x="407.0" y="1730.0"></omgdi:waypoint>
+        <omgdi:waypoint x="230.0" y="1730.0"></omgdi:waypoint>
+        <omgdi:waypoint x="230.0" y="1780.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow19" id="BPMNEdge_flow19">
+        <omgdi:waypoint x="230.0" y="1820.0"></omgdi:waypoint>
+        <omgdi:waypoint x="230.0" y="1970.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="55.0" x="210.0" y="1872.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow20" id="BPMNEdge_flow20">
+        <omgdi:waypoint x="210.0" y="1800.0"></omgdi:waypoint>
+        <omgdi:waypoint x="142.0" y="1799.0"></omgdi:waypoint>
+        <omgdi:waypoint x="142.0" y="1880.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="55.0" x="112.0" y="1780.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow21" id="BPMNEdge_flow21">
+        <omgdi:waypoint x="195.0" y="1910.0"></omgdi:waypoint>
+        <omgdi:waypoint x="142.0" y="1939.0"></omgdi:waypoint>
+        <omgdi:waypoint x="142.0" y="1989.0"></omgdi:waypoint>
+        <omgdi:waypoint x="210.0" y="1990.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow22" id="BPMNEdge_flow22">
+        <omgdi:waypoint x="427.0" y="1750.0"></omgdi:waypoint>
+        <omgdi:waypoint x="427.0" y="1780.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow24" id="BPMNEdge_flow24">
+        <omgdi:waypoint x="427.0" y="1820.0"></omgdi:waypoint>
+        <omgdi:waypoint x="428.0" y="1970.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="77.0" x="405.0" y="1864.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow25" id="BPMNEdge_flow25">
+        <omgdi:waypoint x="407.0" y="1800.0"></omgdi:waypoint>
+        <omgdi:waypoint x="323.0" y="1800.0"></omgdi:waypoint>
+        <omgdi:waypoint x="323.0" y="1880.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="77.0" x="310.0" y="1779.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow26" id="BPMNEdge_flow26">
+        <omgdi:waypoint x="323.0" y="1941.0"></omgdi:waypoint>
+        <omgdi:waypoint x="324.0" y="1989.0"></omgdi:waypoint>
+        <omgdi:waypoint x="408.0" y="1990.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow27" id="BPMNEdge_flow27">
+        <omgdi:waypoint x="447.0" y="1730.0"></omgdi:waypoint>
+        <omgdi:waypoint x="640.0" y="1730.0"></omgdi:waypoint>
+        <omgdi:waypoint x="640.0" y="1780.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow28" id="BPMNEdge_flow28">
+        <omgdi:waypoint x="640.0" y="1820.0"></omgdi:waypoint>
+        <omgdi:waypoint x="640.0" y="1970.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="55.0" x="623.0" y="1864.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow29" id="BPMNEdge_flow29">
+        <omgdi:waypoint x="620.0" y="1800.0"></omgdi:waypoint>
+        <omgdi:waypoint x="547.0" y="1799.0"></omgdi:waypoint>
+        <omgdi:waypoint x="547.0" y="1880.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="55.0" x="522.0" y="1780.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow30" id="BPMNEdge_flow30">
+        <omgdi:waypoint x="547.0" y="1941.0"></omgdi:waypoint>
+        <omgdi:waypoint x="547.0" y="1989.0"></omgdi:waypoint>
+        <omgdi:waypoint x="620.0" y="1990.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow31" id="BPMNEdge_flow31">
+        <omgdi:waypoint x="447.0" y="1730.0"></omgdi:waypoint>
+        <omgdi:waypoint x="850.0" y="1730.0"></omgdi:waypoint>
+        <omgdi:waypoint x="850.0" y="1780.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow32" id="BPMNEdge_flow32">
+        <omgdi:waypoint x="850.0" y="1820.0"></omgdi:waypoint>
+        <omgdi:waypoint x="850.0" y="1970.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="88.0" x="830.0" y="1872.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow33" id="BPMNEdge_flow33">
+        <omgdi:waypoint x="830.0" y="1800.0"></omgdi:waypoint>
+        <omgdi:waypoint x="759.0" y="1800.0"></omgdi:waypoint>
+        <omgdi:waypoint x="759.0" y="1880.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="88.0" x="735.0" y="1779.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow34" id="BPMNEdge_flow34">
+        <omgdi:waypoint x="759.0" y="1941.0"></omgdi:waypoint>
+        <omgdi:waypoint x="762.0" y="1989.0"></omgdi:waypoint>
+        <omgdi:waypoint x="830.0" y="1990.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow35" id="BPMNEdge_flow35">
+        <omgdi:waypoint x="230.0" y="2010.0"></omgdi:waypoint>
+        <omgdi:waypoint x="230.0" y="2169.0"></omgdi:waypoint>
+        <omgdi:waypoint x="456.0" y="2170.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow36" id="BPMNEdge_flow36">
+        <omgdi:waypoint x="448.0" y="1990.0"></omgdi:waypoint>
+        <omgdi:waypoint x="476.0" y="1990.0"></omgdi:waypoint>
+        <omgdi:waypoint x="476.0" y="2150.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow37" id="BPMNEdge_flow37">
+        <omgdi:waypoint x="640.0" y="2010.0"></omgdi:waypoint>
+        <omgdi:waypoint x="640.0" y="2170.0"></omgdi:waypoint>
+        <omgdi:waypoint x="496.0" y="2170.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow38" id="BPMNEdge_flow38">
+        <omgdi:waypoint x="850.0" y="2010.0"></omgdi:waypoint>
+        <omgdi:waypoint x="851.0" y="2169.0"></omgdi:waypoint>
+        <omgdi:waypoint x="496.0" y="2170.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow39" id="BPMNEdge_flow39">
+        <omgdi:waypoint x="476.0" y="2190.0"></omgdi:waypoint>
+        <omgdi:waypoint x="476.0" y="2250.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow40" id="BPMNEdge_flow40">
+        <omgdi:waypoint x="427.0" y="741.0"></omgdi:waypoint>
+        <omgdi:waypoint x="427.0" y="800.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow41" id="BPMNEdge_flow41">
+        <omgdi:waypoint x="427.0" y="1522.0"></omgdi:waypoint>
+        <omgdi:waypoint x="427.0" y="1580.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow42" id="BPMNEdge_flow42">
+        <omgdi:waypoint x="427.0" y="1642.0"></omgdi:waypoint>
+        <omgdi:waypoint x="427.0" y="1710.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

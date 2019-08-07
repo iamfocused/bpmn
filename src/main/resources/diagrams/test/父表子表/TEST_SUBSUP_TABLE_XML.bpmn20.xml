@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/pur">
+  <process id="subSupProcess" name="多表流程测试" isExecutable="true" activiti:candidateStarterGroups="admin">
+    <startEvent id="STE" name="Start" activiti:initiator="initiator">
+      <extensionElements>
+        <activiti:formProperty id="tbhdsuptable_item" name="主表" type="string" variable="tbhdsuptable_item" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdsuptable_主表字段1_param1_1_string_t1_$$A" name="主表字段1" type="string" variable="tbhdsuptable_param1_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdsuptable_主表字段2_param2_2_string_t2_$$A" name="主表字段2" type="string" variable="tbhdsuptable_param2_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdsuptable_主表字段3_param3_3_string_t3_$$A" name="主表字段3" type="string" variable="tbhdsuptable_param3_t00" required="true"></activiti:formProperty>
+      	
+      	<activiti:formProperty id="tbhdsubtable_item" name="子表" type="string" variable="tbhdsubtable_item"></activiti:formProperty>
+        <activiti:formProperty id="tbhdsubtable_子表字段1_param1_1_string_t1_$$B" name="子表字段1" type="string" variable="tbhdsubtable_param1_t01"></activiti:formProperty>
+        <activiti:formProperty id="tbhdsubtable_子表字段2_param2_2_string_t2_$$B" name="子表字段2" type="string" variable="tbhdsubtable_param2_t01"></activiti:formProperty>
+        <activiti:formProperty id="tbhdsubtable_子表字段3_param3_3_string_t3_$$B" name="子表字段3" type="string" variable="tbhdsubtable_param3_t01"></activiti:formProperty>
+      </extensionElements>
+    </startEvent>
+    <endEvent id="END" name="End"></endEvent>
+    <sequenceFlow id="flow1" sourceRef="STE" targetRef="UT"></sequenceFlow>
+    <userTask id="UT" name="User Task" activiti:assignee="${initiator}">
+      <extensionElements>
+      <activiti:formProperty id="tbhdsuptable_item_$$VA" name="主表" type="string" variable="tbhdsuptable_item"></activiti:formProperty>
+        <activiti:formProperty id="tbhdsuptable_主表字段1_param1_1_string_t1_$$VA" name="主表字段1" type="string" variable="tbhdsuptable_param1_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdsuptable_主表字段2_param2_2_string_t2_$$VA" name="主表字段2" type="string" variable="tbhdsuptable_param2_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdsuptable_主表字段3_param3_3_string_t3_$$VA" name="主表字段3" type="string" variable="tbhdsuptable_param3_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdsubtable_item" name="子表" type="string" variable="tbhdsubtable_item" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdsubtable_子表字段1_param1_1_string_t1_$$B" name="子表字段1" type="string" variable="tbhdsubtable_param1_t01" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdsubtable_子表字段2_param2_2_string_t2_$$B" name="子表字段2" type="string" variable="tbhdsubtable_param2_t01" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdsubtable_子表字段3_param3_3_string_t3_$$B" name="子表字段3" type="string" variable="tbhdsubtable_param3_t01" required="true"></activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <sequenceFlow id="flow2" sourceRef="UT" targetRef="END"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_subSupProcess">
+    <bpmndi:BPMNPlane bpmnElement="subSupProcess" id="BPMNPlane_subSupProcess">
+      <bpmndi:BPMNShape bpmnElement="STE" id="BPMNShape_STE">
+        <omgdc:Bounds height="35.0" width="35.0" x="190.0" y="220.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="END" id="BPMNShape_END">
+        <omgdc:Bounds height="35.0" width="35.0" x="490.0" y="220.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="UT" id="BPMNShape_UT">
+        <omgdc:Bounds height="55.0" width="105.0" x="320.0" y="210.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="225.0" y="237.0"></omgdi:waypoint>
+        <omgdi:waypoint x="320.0" y="237.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="425.0" y="237.0"></omgdi:waypoint>
+        <omgdi:waypoint x="490.0" y="237.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

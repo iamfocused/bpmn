@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:camel="http://camel.apache.org/schema/spring"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+       http://camel.apache.org/schema/spring http://camel.apache.org/schema/spring/camel-spring.xsd">
+	<camel:camelContext trace="false" id="camelContext1">
+		<camel:route id="route1">
+			<camel:from
+				uri="activiti://myProcess:servicetask1?copyVariablesToProperties=true" />
+			<camel:setBody>
+				<camel:simple>${property.sql_string}</camel:simple>
+			</camel:setBody>
+			<camel:to
+				uri="file:/Users/eorionx/Downloads/camel-file/running?fileName=myProcess_${property.dealTime}.sql" />
+			<camel:recipientList>
+				<camel:simple>exec:/Users/eorionx/Downloads/camel-file/running/srm_sql.sh?args=myProcess_${property.dealTime}.sql</camel:simple>
+			</camel:recipientList>
+
+			<camel:log
+				message="myProcess_${property.dealTime} : ${body}" />
+			<camel:convertBodyTo type="java.lang.String" />
+		</camel:route>
+
+	</camel:camelContext>
+	<!-- <import resource="camel-Context.xml"/> -->
+	
+	<camel:camelContext trace="false" id="camelContext2">
+		<camel:route id="route1">
+			<camel:from
+				uri="activiti://myProcess:servicetask2?copyVariablesToProperties=true" />
+			<camel:setBody>
+				<camel:simple>${property.sql_string}</camel:simple>
+			</camel:setBody>
+			<camel:to
+				uri="file:/Users/eorionx/Downloads/camel-file/fail?fileName=myProcess_${property.dealTime}.sql" />
+			<camel:convertBodyTo type="java.lang.String" />
+		</camel:route>
+	</camel:camelContext>
+	
+	<camel:camelContext trace="false" id="camelContext3">
+		<camel:route id="route1">
+			<camel:from
+				uri="activiti://myProcess:servicetask3?copyVariablesToProperties=true" />
+			<camel:setBody>
+				<camel:simple>${property.sql_string}</camel:simple>
+			</camel:setBody>
+			<camel:to
+				uri="file:/Users/eorionx/Downloads/camel-file/success?fileName=myProcess_${property.dealTime}.sql" />
+			<camel:convertBodyTo type="java.lang.String" />
+		</camel:route>
+	</camel:camelContext>
+</beans>

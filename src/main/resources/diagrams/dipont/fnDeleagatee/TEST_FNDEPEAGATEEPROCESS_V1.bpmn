@@ -1,0 +1,187 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
+  <process id="REIMBURSEMENTCOMMISSIONPROCESS" name="报销委托流程 Reimbursement commission process" isExecutable="true" activiti:candidateStarterGroups="admin,dptest">
+    <documentation>报销委托流程启动后会分配到启动人task，此时委托关系已经建立，可以选择修改委托人或取消委托	After the reimbursement entrustment process is started, it will be assigned to the initiator task. At this time, the entrustment relationship has been established, and you can choose to modify the principal or cancel the entrustment.</documentation>
+    <startEvent id="startevent1" name="启动委托流程 start reimbursement entrustment process" activiti:initiator="initiator">
+      <documentation>Start the process and establish a delegation relationship</documentation>
+      <extensionElements>
+        <activiti:formProperty id="trustee_被委托人_1_string_psbi_$$A" name="被委托人 Trustee" type="string" variable="trustee" required="true"></activiti:formProperty>
+        <activiti:formProperty id="memo_备注_2_string_t2_$$A" name="备注 memo" type="string" variable="memo"></activiti:formProperty>
+      </extensionElements>
+    </startEvent>
+    <scriptTask id="scripttask1" name="build info" scriptFormat="groovy" activiti:autoStoreVariables="false">
+    	<script>
+    		<![CDATA[
+    			def fnDelegatorSn = initiator
+    			def fnDelegateeSn = execution.getVariable('trustee')
+    			def url = 'https://bpms.eorionsolution.com/neo-hr-api/v2/employee/withoutauth/' + fnDelegatorSn + '/fnDelegateTo/' + fnDelegateeSn
+    			
+    			execution.setVariable("_http_method", "PUT");
+				def headerMap = new HashMap<String,String>();
+				headerMap.put("Content-Type","application/json");
+				execution.setVariable("_http_headers", headerMap);
+				
+				execution.setVariable("_http_body", '');
+				execution.setVariable("_http_url", url);
+				execution.setVariable("_http_response_body", '');
+				execution.setVariable("_http_response_status_code", '');
+    		]]>
+    	</script>
+    </scriptTask>
+    <serviceTask id="servicetask1" name="send request" activiti:class="com.eorionsolution.riying.bpms.javaservice.http.RestAPIService"></serviceTask>
+    <userTask id="usertask1" name="更改委托人或取消委托 change trustee or cancel" activiti:assignee="${initiator}">
+      <documentation>已经成功委托，现在你可以更改被委托人、取消委托或者不处理 Has been successfully commissioned, now you can change the trustee, cancel the delegate or not process</documentation>
+      <extensionElements>
+        <activiti:formProperty id="trustee_被委托人_1_string_psbi_$$VA" name="被委托人 Trustee" type="string" variable="trustee" required="true"></activiti:formProperty>
+        <activiti:formProperty id="memo_备注_2_string_t2_$$VA" name="备注 memo" type="string" variable="memo"></activiti:formProperty>
+        <activiti:formProperty id="trustee_被委托人_1_string_psbi_$$A" name="被委托人 Trustee（you can select a new trustee）" type="string" variable="trustee" required="true"></activiti:formProperty>
+        <activiti:formProperty id="memo_备注_2_string_t2_$$A" name="备注 memo" type="string" variable="memo"></activiti:formProperty>
+        <activiti:formProperty id="option_选项_3_enum_rbv_$$B" name="处理选项 option" type="enum" variable="option" required="true">
+        	<activiti:value id="Y" name="更改被委托人 change the trustee"></activiti:value>
+        	<activiti:value id="N" name="取消委托 delete the trustee"></activiti:value>        	
+        </activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway"></exclusiveGateway>
+    <endEvent id="endevent1" name="End"></endEvent>
+    <sequenceFlow id="flow1" name="cancel" sourceRef="exclusivegateway1" targetRef="scripttask2">
+          <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('option') == 'N'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow2" name="change trustee" sourceRef="exclusivegateway1" targetRef="scripttask1">
+          <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('option') == 'Y'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow3" sourceRef="startevent1" targetRef="scripttask1"></sequenceFlow>
+    <sequenceFlow id="flow4" sourceRef="scripttask1" targetRef="servicetask1"></sequenceFlow>
+    <sequenceFlow id="flow5" sourceRef="servicetask1" targetRef="scripttask3"></sequenceFlow>
+    <sequenceFlow id="flow6" sourceRef="usertask1" targetRef="exclusivegateway1"></sequenceFlow>
+    <scriptTask id="scripttask2" name="build delete info" activiti:autoStoreVariables="false" scriptFormat="groovy">
+    	<script>
+    		<![CDATA[
+    			def fnDelegatorSn = initiator
+    			def url = 'https://bpms.eorionsolution.com/neo-hr-api/v2/employee/withoutauth/' + fnDelegatorSn + '/clearFnDelegate'
+    			
+    			execution.setVariable("_http_method", "DELETE");
+				def headerMap = new HashMap<String,String>();
+				headerMap.put("Content-Type","application/json");
+				execution.setVariable("_http_headers", headerMap);
+				
+				execution.setVariable("_http_body", '');
+				execution.setVariable("_http_url", url);
+				execution.setVariable("_http_response_body", '');
+				execution.setVariable("_http_response_status_code", '');
+    		]]>
+    	</script>
+    </scriptTask>
+    <serviceTask id="servicetask2" name="send delete request" activiti:class="com.eorionsolution.riying.bpms.javaservice.http.RestAPIService"></serviceTask>
+    <scriptTask id="scripttask3" name="result analysis" activiti:autoStoreVariables="false" scriptFormat="groovy">
+    	<script>
+    		<![CDATA[
+    			def responseCode = execution.getVariable("_http_response_status_code");
+    		
+				if (responseCode != 200) {
+					def responseBody = new groovy.json.JsonSlurper().parseText(execution.getVariable("_http_response_body"));
+					throw new org.activiti.engine.ActivitiIllegalArgumentException(responseBody.description);
+				}
+    		]]>
+    	</script>
+    </scriptTask>
+    <sequenceFlow id="flow7" sourceRef="scripttask3" targetRef="usertask1"></sequenceFlow>
+    <scriptTask id="scripttask4" name="result analysis" activiti:autoStoreVariables="false" scriptFormat="groovy">
+    	<script>
+    		<![CDATA[
+    			def responseCode = execution.getVariable("_http_response_status_code");
+    		
+				if (responseCode != 200) {
+					def responseBody = new groovy.json.JsonSlurper().parseText(execution.getVariable("_http_response_body"));
+					throw new org.activiti.engine.ActivitiIllegalArgumentException(responseBody.description);
+				}
+    		]]>
+    	</script>
+    </scriptTask>
+    <sequenceFlow id="flow8" sourceRef="scripttask2" targetRef="servicetask2"></sequenceFlow>
+    <sequenceFlow id="flow9" sourceRef="servicetask2" targetRef="scripttask4"></sequenceFlow>
+    <sequenceFlow id="flow10" sourceRef="scripttask4" targetRef="endevent1"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_myProcess">
+    <bpmndi:BPMNPlane bpmnElement="myProcess" id="BPMNPlane_myProcess">
+      <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="325.0" y="30.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scripttask1" id="BPMNShape_scripttask1">
+        <omgdc:Bounds height="61.0" width="116.0" x="285.0" y="120.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="servicetask1" id="BPMNShape_servicetask1">
+        <omgdc:Bounds height="61.0" width="116.0" x="285.0" y="260.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask1" id="BPMNShape_usertask1">
+        <omgdc:Bounds height="62.0" width="116.0" x="286.0" y="526.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway1" id="BPMNShape_exclusivegateway1">
+        <omgdc:Bounds height="40.0" width="40.0" x="323.0" y="650.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="326.0" y="1130.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scripttask2" id="BPMNShape_scripttask2">
+        <omgdc:Bounds height="61.0" width="111.0" x="288.0" y="770.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="servicetask2" id="BPMNShape_servicetask2">
+        <omgdc:Bounds height="65.0" width="111.0" x="288.0" y="889.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scripttask3" id="BPMNShape_scripttask3">
+        <omgdc:Bounds height="65.0" width="115.0" x="285.0" y="380.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scripttask4" id="BPMNShape_scripttask4">
+        <omgdc:Bounds height="61.0" width="111.0" x="288.0" y="1000.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="343.0" y="690.0"></omgdi:waypoint>
+        <omgdi:waypoint x="343.0" y="770.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="13.0" width="32.0" x="346.0" y="709.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="323.0" y="670.0"></omgdi:waypoint>
+        <omgdi:waypoint x="163.0" y="666.0"></omgdi:waypoint>
+        <omgdi:waypoint x="163.0" y="150.0"></omgdi:waypoint>
+        <omgdi:waypoint x="285.0" y="150.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="13.0" width="73.0" x="97.0" y="399.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3">
+        <omgdi:waypoint x="342.0" y="65.0"></omgdi:waypoint>
+        <omgdi:waypoint x="343.0" y="120.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow4" id="BPMNEdge_flow4">
+        <omgdi:waypoint x="343.0" y="181.0"></omgdi:waypoint>
+        <omgdi:waypoint x="343.0" y="260.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow5" id="BPMNEdge_flow5">
+        <omgdi:waypoint x="343.0" y="321.0"></omgdi:waypoint>
+        <omgdi:waypoint x="342.0" y="380.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow6" id="BPMNEdge_flow6">
+        <omgdi:waypoint x="344.0" y="588.0"></omgdi:waypoint>
+        <omgdi:waypoint x="343.0" y="650.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow7" id="BPMNEdge_flow7">
+        <omgdi:waypoint x="342.0" y="445.0"></omgdi:waypoint>
+        <omgdi:waypoint x="344.0" y="526.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow8" id="BPMNEdge_flow8">
+        <omgdi:waypoint x="343.0" y="831.0"></omgdi:waypoint>
+        <omgdi:waypoint x="343.0" y="889.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow9" id="BPMNEdge_flow9">
+        <omgdi:waypoint x="343.0" y="954.0"></omgdi:waypoint>
+        <omgdi:waypoint x="343.0" y="1000.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow10" id="BPMNEdge_flow10">
+        <omgdi:waypoint x="343.0" y="1061.0"></omgdi:waypoint>
+        <omgdi:waypoint x="343.0" y="1130.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

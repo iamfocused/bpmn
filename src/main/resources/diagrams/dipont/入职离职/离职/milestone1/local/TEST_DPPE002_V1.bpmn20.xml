@@ -1,0 +1,732 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/frm">
+  <process id="DPPE002" name="离职流程" isExecutable="true" activiti:candidateStarterGroups="admin">
+    <documentation>员工离职流程</documentation>
+    <startEvent id="STEVENT" name="流程启动事件" activiti:initiator="initiator">
+      <documentation>流程启动，填写离职信息</documentation>
+      <extensionElements>
+        <activiti:formProperty id="sn_域控账号_1_string_psbi_$$A" name="员工域控账号" type="string" variable="sn" required="true"></activiti:formProperty>
+        <activiti:formProperty id="leavetype_离职类型_2_enum_rbv_$$B" name="离职类型" type="enum" variable="leavetype" required="true">
+          <activiti:value id="员工主动" name="员工主动"></activiti:value>
+          <activiti:value id="公司主动" name="公司主动"></activiti:value>
+          <activiti:value id="协商一致" name="协商一致"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="cutofdate_截至日期_1_string_t3_$$C" name="截至日期" type="string" variable="cutofdate" required="true"></activiti:formProperty>
+        <activiti:formProperty id="overage_剩余年休假_2_string_t6_$$C" name="剩余年休假" type="string" variable="overage" required="true"></activiti:formProperty>
+        <activiti:formProperty id="vacation_剩余调休小时数_3_string_t6_$$C" name="剩余调休小时数" type="string" variable="vacation" required="true"></activiti:formProperty>
+        <activiti:formProperty id="joindate_入职日期_1_string_t3_$$D" name="入职日期" type="string" variable="joindate" required="true"></activiti:formProperty>
+        <activiti:formProperty id="lastworkingdate_最后工作日_2_string_t3_$$D" name="最后工作日" type="string" variable="lastworkingdate" required="true"></activiti:formProperty>
+        <activiti:formProperty id="lasthiredate_最后雇佣日_3_string_t3_$$D" name="最后雇佣日" type="string" variable="lasthiredate" required="true"></activiti:formProperty>
+        <activiti:formProperty id="mailRetentionTime_邮箱保留时间_1_string_t3_$$E" name="邮箱保留时间" type="string" variable="mailRetentionTime" required="true"></activiti:formProperty>
+        <activiti:formProperty id="bpmsRetentionTime_BPMS账号保留时间_2_string_t3_$$E" name="BPMS账号保留时间" type="string" variable="bpmsRetentionTime" required="true"></activiti:formProperty>
+        <activiti:formProperty id="computerRetentionTime_电脑保留时间_3_string_t3_$$E" name="电脑保留时间" type="string" variable="computerRetentionTime" required="true"></activiti:formProperty>
+        <activiti:formProperty id="cutofprovidentfund_社保公积金缴纳至_4_string_t3_$$E" name="社会保险及住房公积金将缴纳至" type="string" variable="cutofprovidentfund" required="true"></activiti:formProperty>
+        <activiti:formProperty id="financeSn_财务对接人_1_string_psbi_$$F" name="财务对接人" type="string" variable="financeSn" required="true"></activiti:formProperty>
+        <activiti:formProperty id="itSn_IT对接人_2_string_psbi_$$F" name="IT对接人" type="string" variable="itSn" required="true"></activiti:formProperty>
+        <activiti:formProperty id="adminSn_行政对接人_3_string_psbi_$$F" name="行政对接人" type="string" variable="adminSn" required="true"></activiti:formProperty>
+        <activiti:formProperty id="leavereason_离职原因_1_string_t2_$$G" name="离职原因" type="string" variable="leavereason"></activiti:formProperty>
+        <activiti:executionListener event="end" class="org.activiti.engine.impl.bpmn.listener.ScriptExecutionListener">
+          <activiti:field name="language">
+            <activiti:string><![CDATA[groovy]]></activiti:string>
+          </activiti:field>
+          <activiti:field name="script">
+            <activiti:string><![CDATA[import groovy.json.JsonOutput
+				import groovy.json.JsonSlurper
+				
+				def sn = execution.getVariable('sn')
+            	
+            	execution.setVariable("_http_method", "GET");
+				def headerMap = new java.util.HashMap<String,String>();			
+				execution.setVariable("_http_headers", headerMap);
+				execution.setVariable("_http_body", '');
+				def param=java.net.URLEncoder.encode('[{"type":"category","target":["variable",["template-tag","param"]],"value":\"'+ sn+ '\"}]', "UTF-8");
+				execution.setVariable("_http_url", 'https://metabase.eorionsolution.com/public/question/2c5a9a8b-9bf4-4260-8060-0ee2cafb8b28.json?parameters='+param);
+				execution.setVariable("_http_response_body", '');
+				execution.setVariable("_http_response_status_code", '');]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </startEvent>
+    <userTask id="DECIDE" name="线下交谈结果" activiti:assignee="${initiator}">
+      <extensionElements>
+        <activiti:formProperty id="leavetype_离职类型_1_enum_rbv_$$VA" name="离职类型" type="enum" variable="leavetype">
+          <activiti:value id="员工主动" name="员工主动"></activiti:value>
+          <activiti:value id="公司主动" name="公司主动"></activiti:value>
+          <activiti:value id="协商一致" name="协商一致"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="sn_域控账号_2_string_psbi_$$VA" name="域控账号" type="string" variable="sn"></activiti:formProperty>
+        <activiti:formProperty id="employeeName_员工姓名_1_string_t1_$$VB" name="员工姓名" type="string" variable="employeeName"></activiti:formProperty>
+        <activiti:formProperty id="department_部门_2_string_tree_$$VB" name="所属部门" type="string" variable="department"></activiti:formProperty>
+        <activiti:formProperty id="corp_实体_3_string_tree_$$VB" name="法律实体" type="string" variable="legalCorp"></activiti:formProperty>
+        <activiti:formProperty id="ncCode_员工工号_4_string_t1_$$VB" name="员工工号" type="string" variable="ncCode"></activiti:formProperty>
+        <activiti:formProperty id="position_职位_5_string_t1_$$VB" name="职位" type="string" variable="position"></activiti:formProperty>
+        <activiti:formProperty id="cutofdate_截至日期_1_string_t3_$$VC" name="截至日期" type="string" variable="cutofdate"></activiti:formProperty>
+        <activiti:formProperty id="overage_剩余年休假_2_string_t6_$$VC" name="剩余年休假" type="string" variable="overage"></activiti:formProperty>
+        <activiti:formProperty id="vacation_剩余调休小时数_3_string_t6_$$VC" name="剩余调休小时数" type="string" variable="vacation"></activiti:formProperty>
+        <activiti:formProperty id="joindate_入职日期_1_string_t3_$$VD" name="入职日期" type="string" variable="joindate"></activiti:formProperty>
+        <activiti:formProperty id="lastworkingdate_最后工作日_2_string_t3_$$VD" name="最后工作日" type="string" variable="lastworkingdate"></activiti:formProperty>
+        <activiti:formProperty id="lasthiredate_最后雇佣日_3_string_t3_$$VD" name="最后雇佣日" type="string" variable="lasthiredate"></activiti:formProperty>
+        <activiti:formProperty id="phone_联系电话_3_string_t1_$$VD" name="联系电话" type="string" variable="phone"></activiti:formProperty>
+        <activiti:formProperty id="place_现居住地_4_string_t2_$$VD" name="现居住地址/法律文书送达地" type="string" variable="place"></activiti:formProperty>
+        <activiti:formProperty id="mailRetentionTime_邮箱保留时间_1_string_t3_$$VE" name="邮箱保留时间" type="string" variable="mailRetentionTime"></activiti:formProperty>
+        <activiti:formProperty id="bpmsRetentionTime_BPMS账号保留时间_2_string_t3_$$VE" name="BPMS账号保留时间" type="string" variable="bpmsRetentionTime"></activiti:formProperty>
+        <activiti:formProperty id="computerRetentionTime_电脑保留时间_3_string_t3_$$VE" name="电脑保留时间" type="string" variable="computerRetentionTime"></activiti:formProperty>
+        <activiti:formProperty id="cutofprovidentfund_社保公积金缴纳至_4_string_t3_$$VE" name="社会保险及住房公积金将缴纳至" type="string" variable="cutofprovidentfund"></activiti:formProperty>
+        <activiti:formProperty id="financeSn_财务对接人_1_string_psbi_$$VF" name="财务对接人" type="string" variable="financeSn"></activiti:formProperty>
+        <activiti:formProperty id="itSn_IT对接人_2_string_psbi_$$VF" name="IT对接人" type="string" variable="itSn"></activiti:formProperty>
+        <activiti:formProperty id="adminSn_行政对接人_3_string_psbi_$$VF" name="行政对接人" type="string" variable="adminSn"></activiti:formProperty>
+        <activiti:formProperty id="leavereason_离职原因_1_string_t2_$$VG" name="离职原因" type="string" variable="leavereason"></activiti:formProperty>
+        <activiti:formProperty id="cancel_交谈结果_1_enum_rbv_$$A" name="交谈结果" type="enum" variable="cancel" required="true">
+          <activiti:value id="N" name="确认离职"></activiti:value>
+          <activiti:value id="Y" name="取消离职"></activiti:value>
+        </activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <scriptTask id="DEPARTMAIL" name="相关部门邮件构造" scriptFormat="groovy" activiti:autoStoreVariables="false">
+      <script>
+      		
+      		def employeeName = execution.getVariable('employeeName')?:'' 
+      		
+      		def jsonSlurper = new groovy.json.JsonSlurper()
+			def bodyMap = new HashMap()
+			def detailMap = new HashMap()
+			def dataMap = new HashMap()
+			
+			def to = ['baocaixue@eorionsolution.com']
+			
+			detailMap.put("from","develop@eorionsolution.com")
+			detailMap.put("to", to)
+			def subjectName = employeeName + "-离职通知"
+			detailMap.put("subject", subjectName)
+			detailMap.put("templateName", "leave-notification-all-template")
+			
+			dataMap.put("commitLeave", "1")//标记
+			dataMap.put("employeeName", execution.getVariable("employeeName"))
+			def department = jsonSlurper.parseText(execution.getVariable("department"))			
+			dataMap.put("department", department.name)
+			def corp = jsonSlurper.parseText(execution.getVariable("legalCorp"))
+			dataMap.put("legalCorp", corp.name)
+			dataMap.put("ncCode", execution.getVariable("ncCode"))
+			dataMap.put("position", execution.getVariable("position"))
+			def cutofdate = java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd").format(java.time.LocalDateTime.ofInstant(java.time.Instant.ofEpochMilli(execution.getVariable("cutofdate").toLong()), java.time.ZoneId.systemDefault()))			
+			dataMap.put("cutofdate", cutofdate)
+			dataMap.put("overage", execution.getVariable("overage"))
+			def joindate = java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd").format(java.time.LocalDateTime.ofInstant(java.time.Instant.ofEpochMilli(execution.getVariable("joindate").toLong()), java.time.ZoneId.systemDefault()))						
+			dataMap.put("joindate", joindate)
+			def lastworkingdate = java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd").format(java.time.LocalDateTime.ofInstant(java.time.Instant.ofEpochMilli(execution.getVariable("lastworkingdate").toLong()), java.time.ZoneId.systemDefault()))									
+			dataMap.put("lastworkingdate", lastworkingdate)
+			dataMap.put("phone", execution.getVariable("phone"))
+			dataMap.put("place", execution.getVariable("place"))
+			def mailRetentionTime = java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd").format(java.time.LocalDateTime.ofInstant(java.time.Instant.ofEpochMilli(execution.getVariable("mailRetentionTime").toLong()), java.time.ZoneId.systemDefault()))												
+			dataMap.put("mailRetentionTime", mailRetentionTime)
+			def computerRetentionTime = java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd").format(java.time.LocalDateTime.ofInstant(java.time.Instant.ofEpochMilli(execution.getVariable("computerRetentionTime").toLong()), java.time.ZoneId.systemDefault()))															
+			dataMap.put("computerRetentionTime", computerRetentionTime)
+			def cutofprovidentfund = java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd").format(java.time.LocalDateTime.ofInstant(java.time.Instant.ofEpochMilli(execution.getVariable("cutofprovidentfund").toLong()), java.time.ZoneId.systemDefault()))																		
+			dataMap.put("cutofprovidentfund", cutofprovidentfund)
+			
+			dataMap.put("vacation", execution.getVariable('vacation'))
+			def lasthiredate = java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd").format(java.time.LocalDateTime.ofInstant(java.time.Instant.ofEpochMilli(execution.getVariable("lasthiredate").toLong()), java.time.ZoneId.systemDefault()))
+			dataMap.put('lasthiredate', lasthiredate)
+			def bpmsRetentionTime = java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd").format(java.time.LocalDateTime.ofInstant(java.time.Instant.ofEpochMilli(execution.getVariable("bpmsRetentionTime").toLong()), java.time.ZoneId.systemDefault()))
+			dataMap.put('bpmsRetentionTime', bpmsRetentionTime)
+			
+			detailMap.put("templateData",dataMap)
+			bodyMap.put("mail", detailMap)
+			def body = groovy.json.JsonOutput.toJson(bodyMap)
+           	//send request
+			execution.setVariable("_http_method", "POST")
+			def headerMap = new HashMap()
+			headerMap.put("Content-Type","application/json")
+			execution.setVariable("_http_headers", headerMap)
+			execution.setVariable("_http_body", body)
+			execution.setVariable('deptsMailBody', body)
+			execution.setVariable("_http_url", 'https://commonservices.eorionsolution.com/mailsender/mail/v2/mail')
+			execution.setVariable("_http_response_body", '')
+			execution.setVariable("_http_response_status_code", '')
+			
+    	</script>
+    </scriptTask>
+    <serviceTask id="DEPARTMAILSEND" name="相关部门邮件发送" activiti:class="com.eorionsolution.riying.bpms.javaservice.http.RestAPIService"></serviceTask>
+    <sequenceFlow id="flow4" sourceRef="DEPARTMAIL" targetRef="DEPARTMAILSEND"></sequenceFlow>
+    <exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway"></exclusiveGateway>
+    <sequenceFlow id="flow9" sourceRef="DECIDE" targetRef="exclusivegateway1"></sequenceFlow>
+    <scriptTask id="CANCELMAIL" name="取消离职邮件构造" scriptFormat="groovy" activiti:autoStoreVariables="false">
+      <script>
+      		def employeeName = execution.getVariable('employeeName') 
+      		
+      		def jsonSlurper = new groovy.json.JsonSlurper()
+			
+			def bodyMap = new HashMap()
+			def detailMap = new HashMap()
+			def dataMap = new HashMap()
+			
+			def to = ['baocaixue@eorionsolution.com']
+			
+			detailMap.put("from","develop@eorionsolution.com")
+			detailMap.put("to", to)
+			detailMap.put("subject", employeeName?:'' + "-取消离职通知")
+			detailMap.put("templateName", "leave-notification-all-template")
+			
+			dataMap.put("cancelLeave", "1")//标记
+			dataMap.put("employeeName", execution.getVariable("employeeName"))
+			def department = jsonSlurper.parseText(execution.getVariable("department"))			
+			dataMap.put("department", department.name)
+			def corp = jsonSlurper.parseText(execution.getVariable("legalCorp"))
+			dataMap.put("legalCorp", corp.name)
+			
+			detailMap.put("templateData",dataMap)
+			bodyMap.put("mail", detailMap)
+			def body = groovy.json.JsonOutput.toJson(bodyMap)
+           	//send request
+			execution.setVariable("_http_method", "POST")
+			def headerMap = new HashMap()
+			headerMap.put("Content-Type","application/json")
+			execution.setVariable("_http_headers", headerMap)
+			execution.setVariable("_http_body", body)
+			execution.setVariable('cancelMailBody', body)
+			execution.setVariable("_http_url", 'https://commonservices.eorionsolution.com/mailsender/mail/v2/mail')
+			execution.setVariable("_http_response_body", '')
+			execution.setVariable("_http_response_status_code", '')
+		
+    	</script>
+    </scriptTask>
+    <serviceTask id="CANCELMAILSEND" name="取消离职邮件发送" activiti:class="com.eorionsolution.riying.bpms.javaservice.http.RestAPIService"></serviceTask>
+    <sequenceFlow id="flow11" name="取消离职" sourceRef="exclusivegateway1" targetRef="CANCELMAIL">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('cancel') == 'Y'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow12" sourceRef="CANCELMAIL" targetRef="CANCELMAILSEND"></sequenceFlow>
+    <userTask id="ITTASK" name="IT确认信息" activiti:assignee="${initiator}">
+      <extensionElements>
+        <activiti:formProperty id="leavetype_离职类型_1_enum_rbv_$$VA" name="离职类型" type="enum" variable="leavetype">
+          <activiti:value id="员工主动" name="员工主动"></activiti:value>
+          <activiti:value id="公司主动" name="公司主动"></activiti:value>
+          <activiti:value id="协商一致" name="协商一致"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="sn_域控账号_2_string_psbi_$$VA" name="域控账号" type="string" variable="sn"></activiti:formProperty>
+        <activiti:formProperty id="employeeName_员工姓名_1_string_t1_$$VB" name="员工姓名" type="string" variable="employeeName"></activiti:formProperty>
+        <activiti:formProperty id="department_部门_2_string_tree_$$VB" name="所属部门" type="string" variable="department"></activiti:formProperty>
+        <activiti:formProperty id="corp_实体_3_string_tree_$$VB" name="法律实体" type="string" variable="legalCorp"></activiti:formProperty>
+        <activiti:formProperty id="ncCode_员工工号_4_string_t1_$$VB" name="员工工号" type="string" variable="ncCode"></activiti:formProperty>
+        <activiti:formProperty id="position_职位_5_string_t1_$$VB" name="职位" type="string" variable="position"></activiti:formProperty>
+        <activiti:formProperty id="cutofdate_截至日期_1_string_t3_$$VC" name="截至日期" type="string" variable="cutofdate"></activiti:formProperty>
+        <activiti:formProperty id="overage_剩余年休假_2_string_t6_$$VC" name="剩余年休假" type="string" variable="overage"></activiti:formProperty>
+        <activiti:formProperty id="vacation_剩余调休小时数_3_string_t6_$$VC" name="剩余调休小时数" type="string" variable="vacation"></activiti:formProperty>
+        <activiti:formProperty id="joindate_入职日期_1_string_t3_$$VD" name="入职日期" type="string" variable="joindate"></activiti:formProperty>
+        <activiti:formProperty id="lastworkingdate_最后工作日_2_string_t3_$$VD" name="最后工作日" type="string" variable="lastworkingdate"></activiti:formProperty>
+        <activiti:formProperty id="lasthiredate_最后雇佣日_3_string_t3_$$VD" name="最后雇佣日" type="string" variable="lasthiredate"></activiti:formProperty>
+        <activiti:formProperty id="phone_联系电话_3_string_t1_$$VD" name="联系电话" type="string" variable="phone"></activiti:formProperty>
+        <activiti:formProperty id="place_现居住地_4_string_t2_$$VD" name="现居住地址/法律文书送达地" type="string" variable="place"></activiti:formProperty>
+        <activiti:formProperty id="mailRetentionTime_邮箱保留时间_1_string_t3_$$VE" name="邮箱保留时间" type="string" variable="mailRetentionTime"></activiti:formProperty>
+        <activiti:formProperty id="bpmsRetentionTime_BPMS账号保留时间_2_string_t3_$$VE" name="BPMS账号保留时间" type="string" variable="bpmsRetentionTime"></activiti:formProperty>
+        <activiti:formProperty id="computerRetentionTime_电脑保留时间_3_string_t3_$$VE" name="电脑保留时间" type="string" variable="computerRetentionTime"></activiti:formProperty>
+        <activiti:formProperty id="cutofprovidentfund_社保公积金缴纳至_4_string_t3_$$VE" name="社会保险及住房公积金将缴纳至" type="string" variable="cutofprovidentfund"></activiti:formProperty>
+        <activiti:formProperty id="financeSn_财务对接人_1_string_psbi_$$VF" name="财务对接人" type="string" variable="financeSn"></activiti:formProperty>
+        <activiti:formProperty id="itSn_IT对接人_2_string_psbi_$$VF" name="IT对接人" type="string" variable="itSn"></activiti:formProperty>
+        <activiti:formProperty id="adminSn_行政对接人_3_string_psbi_$$VF" name="行政对接人" type="string" variable="adminSn"></activiti:formProperty>
+        <activiti:formProperty id="leavereason_离职原因_1_string_t2_$$VG" name="离职原因" type="string" variable="leavereason"></activiti:formProperty>
+        <activiti:formProperty id="returncomputer_归还电子设备_1_enum_rbv_$$A" name="已归还电脑及相关物品" type="enum" variable="returncomputer" required="true">
+          <activiti:value id="是" name="是"></activiti:value>
+          <activiti:value id="否" name="否"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="logout_相关账号处理_2_enum_rbv_$$A" name="已处理公司邮箱、NC账号、相关密码等" type="enum" variable="logout" required="true">
+          <activiti:value id="是" name="是"></activiti:value>
+          <activiti:value id="否" name="否"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="itnote_it备注_3_string_t1_$$A" name="备注" type="string" variable="itnote"></activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <parallelGateway id="parallelgateway3" name="Parallel Gateway"></parallelGateway>
+    <userTask id="ADMINTASK" name="行政确认信息" activiti:assignee="${initiator}">
+      <extensionElements>
+        <activiti:formProperty id="leavetype_离职类型_1_enum_rbv_$$VA" name="离职类型" type="enum" variable="leavetype">
+          <activiti:value id="员工主动" name="员工主动"></activiti:value>
+          <activiti:value id="公司主动" name="公司主动"></activiti:value>
+          <activiti:value id="协商一致" name="协商一致"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="sn_域控账号_2_string_psbi_$$VA" name="域控账号" type="string" variable="sn"></activiti:formProperty>
+        <activiti:formProperty id="employeeName_员工姓名_1_string_t1_$$VB" name="员工姓名" type="string" variable="employeeName"></activiti:formProperty>
+        <activiti:formProperty id="department_部门_2_string_tree_$$VB" name="所属部门" type="string" variable="department"></activiti:formProperty>
+        <activiti:formProperty id="corp_实体_3_string_tree_$$VB" name="法律实体" type="string" variable="legalCorp"></activiti:formProperty>
+        <activiti:formProperty id="ncCode_员工工号_4_string_t1_$$VB" name="员工工号" type="string" variable="ncCode"></activiti:formProperty>
+        <activiti:formProperty id="position_职位_5_string_t1_$$VB" name="职位" type="string" variable="position"></activiti:formProperty>
+        <activiti:formProperty id="cutofdate_截至日期_1_string_t3_$$VC" name="截至日期" type="string" variable="cutofdate"></activiti:formProperty>
+        <activiti:formProperty id="overage_剩余年休假_2_string_t6_$$VC" name="剩余年休假" type="string" variable="overage"></activiti:formProperty>
+        <activiti:formProperty id="vacation_剩余调休小时数_3_string_t6_$$VC" name="剩余调休小时数" type="string" variable="vacation"></activiti:formProperty>
+        <activiti:formProperty id="joindate_入职日期_1_string_t3_$$VD" name="入职日期" type="string" variable="joindate"></activiti:formProperty>
+        <activiti:formProperty id="lastworkingdate_最后工作日_2_string_t3_$$VD" name="最后工作日" type="string" variable="lastworkingdate"></activiti:formProperty>
+        <activiti:formProperty id="lasthiredate_最后雇佣日_3_string_t3_$$VD" name="最后雇佣日" type="string" variable="lasthiredate"></activiti:formProperty>
+        <activiti:formProperty id="phone_联系电话_3_string_t1_$$VD" name="联系电话" type="string" variable="phone"></activiti:formProperty>
+        <activiti:formProperty id="place_现居住地_4_string_t2_$$VD" name="现居住地址/法律文书送达地" type="string" variable="place"></activiti:formProperty>
+        <activiti:formProperty id="mailRetentionTime_邮箱保留时间_1_string_t3_$$VE" name="邮箱保留时间" type="string" variable="mailRetentionTime"></activiti:formProperty>
+        <activiti:formProperty id="bpmsRetentionTime_BPMS账号保留时间_2_string_t3_$$VE" name="BPMS账号保留时间" type="string" variable="bpmsRetentionTime"></activiti:formProperty>
+        <activiti:formProperty id="computerRetentionTime_电脑保留时间_3_string_t3_$$VE" name="电脑保留时间" type="string" variable="computerRetentionTime"></activiti:formProperty>
+        <activiti:formProperty id="cutofprovidentfund_社保公积金缴纳至_4_string_t3_$$VE" name="社会保险及住房公积金将缴纳至" type="string" variable="cutofprovidentfund"></activiti:formProperty>
+        <activiti:formProperty id="financeSn_财务对接人_1_string_psbi_$$VF" name="财务对接人" type="string" variable="financeSn"></activiti:formProperty>
+        <activiti:formProperty id="itSn_IT对接人_2_string_psbi_$$VF" name="IT对接人" type="string" variable="itSn"></activiti:formProperty>
+        <activiti:formProperty id="adminSn_行政对接人_3_string_psbi_$$VF" name="行政对接人" type="string" variable="adminSn"></activiti:formProperty>
+        <activiti:formProperty id="leavereason_离职原因_1_string_t2_$$VG" name="离职原因" type="string" variable="leavereason"></activiti:formProperty>
+        <activiti:formProperty id="returntools_归还公司财产_1_enum_rbv_$$A" name="已归还公司财产（如手机、门卡、公章等）" type="enum" variable="returntools" required="true">
+          <activiti:value id="是" name="是"></activiti:value>
+          <activiti:value id="否" name="否"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="adminnote_行政备注_1_string_t1_$$A" name="备注" type="string" variable="adminnote"></activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <userTask id="FANACETASK" name="财务确认信息" activiti:assignee="${initiator}">
+      <extensionElements>
+        <activiti:formProperty id="leavetype_离职类型_1_enum_rbv_$$VA" name="离职类型" type="enum" variable="leavetype">
+          <activiti:value id="员工主动" name="员工主动"></activiti:value>
+          <activiti:value id="公司主动" name="公司主动"></activiti:value>
+          <activiti:value id="协商一致" name="协商一致"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="sn_域控账号_2_string_psbi_$$VA" name="域控账号" type="string" variable="sn"></activiti:formProperty>
+        <activiti:formProperty id="employeeName_员工姓名_1_string_t1_$$VB" name="员工姓名" type="string" variable="employeeName"></activiti:formProperty>
+        <activiti:formProperty id="department_部门_2_string_tree_$$VB" name="所属部门" type="string" variable="department"></activiti:formProperty>
+        <activiti:formProperty id="corp_实体_3_string_tree_$$VB" name="法律实体" type="string" variable="legalCorp"></activiti:formProperty>
+        <activiti:formProperty id="ncCode_员工工号_4_string_t1_$$VB" name="员工工号" type="string" variable="ncCode"></activiti:formProperty>
+        <activiti:formProperty id="position_职位_5_string_t1_$$VB" name="职位" type="string" variable="position"></activiti:formProperty>
+        <activiti:formProperty id="cutofdate_截至日期_1_string_t3_$$VC" name="截至日期" type="string" variable="cutofdate"></activiti:formProperty>
+        <activiti:formProperty id="overage_剩余年休假_2_string_t6_$$VC" name="剩余年休假" type="string" variable="overage"></activiti:formProperty>
+        <activiti:formProperty id="vacation_剩余调休小时数_3_string_t6_$$VC" name="剩余调休小时数" type="string" variable="vacation"></activiti:formProperty>
+        <activiti:formProperty id="joindate_入职日期_1_string_t3_$$VD" name="入职日期" type="string" variable="joindate"></activiti:formProperty>
+        <activiti:formProperty id="lastworkingdate_最后工作日_2_string_t3_$$VD" name="最后工作日" type="string" variable="lastworkingdate"></activiti:formProperty>
+        <activiti:formProperty id="lasthiredate_最后雇佣日_3_string_t3_$$VD" name="最后雇佣日" type="string" variable="lasthiredate"></activiti:formProperty>
+        <activiti:formProperty id="phone_联系电话_3_string_t1_$$VD" name="联系电话" type="string" variable="phone"></activiti:formProperty>
+        <activiti:formProperty id="place_现居住地_4_string_t2_$$VD" name="现居住地址/法律文书送达地" type="string" variable="place"></activiti:formProperty>
+        <activiti:formProperty id="mailRetentionTime_邮箱保留时间_1_string_t3_$$VE" name="邮箱保留时间" type="string" variable="mailRetentionTime"></activiti:formProperty>
+        <activiti:formProperty id="bpmsRetentionTime_BPMS账号保留时间_2_string_t3_$$VE" name="BPMS账号保留时间" type="string" variable="bpmsRetentionTime"></activiti:formProperty>
+        <activiti:formProperty id="computerRetentionTime_电脑保留时间_3_string_t3_$$VE" name="电脑保留时间" type="string" variable="computerRetentionTime"></activiti:formProperty>
+        <activiti:formProperty id="cutofprovidentfund_社保公积金缴纳至_4_string_t3_$$VE" name="社会保险及住房公积金将缴纳至" type="string" variable="cutofprovidentfund"></activiti:formProperty>
+        <activiti:formProperty id="financeSn_财务对接人_1_string_psbi_$$VF" name="财务对接人" type="string" variable="financeSn"></activiti:formProperty>
+        <activiti:formProperty id="itSn_IT对接人_2_string_psbi_$$VF" name="IT对接人" type="string" variable="itSn"></activiti:formProperty>
+        <activiti:formProperty id="adminSn_行政对接人_3_string_psbi_$$VF" name="行政对接人" type="string" variable="adminSn"></activiti:formProperty>
+        <activiti:formProperty id="leavereason_离职原因_1_string_t2_$$VG" name="离职原因" type="string" variable="leavereason"></activiti:formProperty>
+        <activiti:formProperty id="clearall_结算_1_enum_rbv_$$A" name="已结清所有财务事项" type="enum" variable="clearall" required="true">
+          <activiti:value id="是" name="是"></activiti:value>
+          <activiti:value id="否" name="否"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="financenote_财务备注_2_string_t1_$$A" name="备注" type="string" variable="financenote"></activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <sequenceFlow id="flow13" name="确认离职" sourceRef="exclusivegateway1" targetRef="parallelgateway3">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('cancel') == 'N'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow14" sourceRef="parallelgateway3" targetRef="ITTASK"></sequenceFlow>
+    <sequenceFlow id="flow15" sourceRef="parallelgateway3" targetRef="ADMINTASK"></sequenceFlow>
+    <sequenceFlow id="flow16" sourceRef="parallelgateway3" targetRef="FANACETASK"></sequenceFlow>
+    <parallelGateway id="parallelgateway4" name="Parallel Gateway"></parallelGateway>
+    <sequenceFlow id="flow17" sourceRef="ADMINTASK" targetRef="parallelgateway4"></sequenceFlow>
+    <sequenceFlow id="flow18" sourceRef="FANACETASK" targetRef="parallelgateway4"></sequenceFlow>
+    <sequenceFlow id="flow19" sourceRef="ITTASK" targetRef="parallelgateway4"></sequenceFlow>
+    <userTask id="HRTASK" name="HR部门离职流程确认" activiti:assignee="${initiator}">
+      <extensionElements>
+        <activiti:formProperty id="leavetype_离职类型_1_enum_rbv_$$VA" name="离职类型" type="enum" variable="leavetype">
+          <activiti:value id="员工主动" name="员工主动"></activiti:value>
+          <activiti:value id="公司主动" name="公司主动"></activiti:value>
+          <activiti:value id="协商一致" name="协商一致"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="sn_域控账号_2_string_psbi_$$VA" name="域控账号" type="string" variable="sn"></activiti:formProperty>
+        <activiti:formProperty id="employeeName_员工姓名_1_string_t1_$$VB" name="员工姓名" type="string" variable="employeeName"></activiti:formProperty>
+        <activiti:formProperty id="department_部门_2_string_tree_$$VB" name="所属部门" type="string" variable="department"></activiti:formProperty>
+        <activiti:formProperty id="corp_实体_3_string_tree_$$VB" name="法律实体" type="string" variable="legalCorp"></activiti:formProperty>
+        <activiti:formProperty id="ncCode_员工工号_4_string_t1_$$VB" name="员工工号" type="string" variable="ncCode"></activiti:formProperty>
+        <activiti:formProperty id="position_职位_5_string_t1_$$VB" name="职位" type="string" variable="position"></activiti:formProperty>
+        <activiti:formProperty id="cutofdate_截至日期_1_string_t3_$$VC" name="截至日期" type="string" variable="cutofdate"></activiti:formProperty>
+        <activiti:formProperty id="overage_剩余年休假_2_string_t6_$$VC" name="剩余年休假" type="string" variable="overage"></activiti:formProperty>
+        <activiti:formProperty id="vacation_剩余调休小时数_3_string_t6_$$VC" name="剩余调休小时数" type="string" variable="vacation"></activiti:formProperty>
+        <activiti:formProperty id="joindate_入职日期_1_string_t3_$$VD" name="入职日期" type="string" variable="joindate"></activiti:formProperty>
+        <activiti:formProperty id="lastworkingdate_最后工作日_2_string_t3_$$VD" name="最后工作日" type="string" variable="lastworkingdate"></activiti:formProperty>
+        <activiti:formProperty id="lasthiredate_最后雇佣日_3_string_t3_$$VD" name="最后雇佣日" type="string" variable="lasthiredate"></activiti:formProperty>
+        <activiti:formProperty id="phone_联系电话_3_string_t1_$$VD" name="联系电话" type="string" variable="phone"></activiti:formProperty>
+        <activiti:formProperty id="place_现居住地_4_string_t2_$$VD" name="现居住地址/法律文书送达地" type="string" variable="place"></activiti:formProperty>
+        <activiti:formProperty id="mailRetentionTime_邮箱保留时间_1_string_t3_$$VE" name="邮箱保留时间" type="string" variable="mailRetentionTime"></activiti:formProperty>
+        <activiti:formProperty id="bpmsRetentionTime_BPMS账号保留时间_2_string_t3_$$VE" name="BPMS账号保留时间" type="string" variable="bpmsRetentionTime"></activiti:formProperty>
+        <activiti:formProperty id="computerRetentionTime_电脑保留时间_3_string_t3_$$VE" name="电脑保留时间" type="string" variable="computerRetentionTime"></activiti:formProperty>
+        <activiti:formProperty id="cutofprovidentfund_社保公积金缴纳至_4_string_t3_$$VE" name="社会保险及住房公积金将缴纳至" type="string" variable="cutofprovidentfund"></activiti:formProperty>
+        <activiti:formProperty id="financeSn_财务对接人_1_string_psbi_$$VF" name="财务对接人" type="string" variable="financeSn"></activiti:formProperty>
+        <activiti:formProperty id="itSn_IT对接人_2_string_psbi_$$VF" name="IT对接人" type="string" variable="itSn"></activiti:formProperty>
+        <activiti:formProperty id="adminSn_行政对接人_3_string_psbi_$$VF" name="行政对接人" type="string" variable="adminSn"></activiti:formProperty>
+        <activiti:formProperty id="leavereason_离职原因_1_string_t2_$$VG" name="离职原因" type="string" variable="leavereason"></activiti:formProperty>
+        <activiti:formProperty id="returncomputer_归还电子设备_1_enum_rbv_$$VH" name="已归还电脑及相关物品" type="enum" variable="returncomputer" required="true">
+          <activiti:value id="是" name="是"></activiti:value>
+          <activiti:value id="否" name="否"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="logout_相关账号处理_2_enum_rbv_$$VH" name="已处理公司邮箱、NC账号、相关密码等" type="enum" variable="logout" required="true">
+          <activiti:value id="是" name="是"></activiti:value>
+          <activiti:value id="否" name="否"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="itnote_it备注_3_string_t1_$$VH" name="备注" type="string" variable="itnote"></activiti:formProperty>
+        <activiti:formProperty id="returntools_归还公司财产_1_enum_rbv_$$VI" name="已归还公司财产（如手机、门卡、公章等）" type="enum" variable="returntools" required="true">
+          <activiti:value id="是" name="是"></activiti:value>
+          <activiti:value id="否" name="否"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="adminnote_行政备注_1_string_t1_$$VI" name="备注" type="string" variable="adminnote"></activiti:formProperty>
+        <activiti:formProperty id="clearall_结算_1_enum_rbv_$$VJ" name="已结清所有财务事项" type="enum" variable="clearall" required="true">
+          <activiti:value id="是" name="是"></activiti:value>
+          <activiti:value id="否" name="否"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="financenote_财务备注_2_string_t1_$$VJ" name="备注" type="string" variable="financenote"></activiti:formProperty>
+        <activiti:formProperty id="leaveDate_离职日期_1_string_t3_$$A" name="离职日期" type="string" variable="leaveDate" required="true"></activiti:formProperty>
+        <activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+          <activiti:field name="language">
+            <activiti:string><![CDATA[groovy]]></activiti:string>
+          </activiti:field>
+          <activiti:field name="script">
+            <activiti:string><![CDATA[import groovy.json.JsonOutput
+			import groovy.json.JsonSlurper
+			
+			def execution = task.getExecution()
+			
+			def sn = execution.getVariable('sn')
+			def leaveDate = execution.getVariable('leaveDate') 
+			def bodyObj = new HashMap()
+			bodyObj.put('sn', sn)
+			bodyObj.put('dimissionTime',leaveDate)
+			
+			def body = JsonOutput.toJson(bodyObj)
+			//send request
+			execution.setVariable("_http_method", "PUT")
+			def headerMap = new HashMap()
+			headerMap.put("Content-Type","application/json")
+			execution.setVariable("_http_headers", headerMap)
+			execution.setVariable("_http_body", body)
+			execution.setVariable("_http_url", 'https://bpms.eorionsolution.com/neo-hr-api/v2/employee/withoutauth/leave')
+			execution.setVariable("_http_response_body", '')
+			execution.setVariable("_http_response_status_code", '')]]></activiti:string>
+          </activiti:field>
+        </activiti:taskListener>
+      </extensionElements>
+    </userTask>
+    <sequenceFlow id="flow20" sourceRef="parallelgateway4" targetRef="HRTASK"></sequenceFlow>
+    <serviceTask id="EIMCHANGE" name="更改在职状态" activiti:class="com.eorionsolution.riying.bpms.javaservice.http.RestAPIService"></serviceTask>
+    <sequenceFlow id="flow21" sourceRef="HRTASK" targetRef="EIMCHANGE"></sequenceFlow>
+    <scriptTask id="scripttask1" name="状态更新结果解析" scriptFormat="groovy" activiti:autoStoreVariables="false">
+      <script>
+      
+		if(execution.getVariable('_http_response_status_code') != 200) {
+			throw new org.activiti.engine.ActivitiIllegalArgumentException("调用离职接口异常");
+		}
+      
+	  </script>
+    </scriptTask>
+    <sequenceFlow id="flow22" sourceRef="EIMCHANGE" targetRef="scripttask1"></sequenceFlow>
+    <sequenceFlow id="flow23" sourceRef="scripttask1" targetRef="terminateendevent2"></sequenceFlow>
+    <sequenceFlow id="flow24" sourceRef="parallelgateway5" targetRef="DECIDE"></sequenceFlow>
+    <sequenceFlow id="flow25" sourceRef="DEPARTMAILSEND" targetRef="parallelgateway4"></sequenceFlow>
+    <parallelGateway id="parallelgateway5" name="Parallel Gateway"></parallelGateway>
+    <userTask id="CANCLE" name="取消离职流程" activiti:assignee="${initiator}">
+      <extensionElements>
+        <activiti:formProperty id="leavetype_离职类型_1_enum_rbv_$$VA" name="离职类型" type="enum" variable="leavetype">
+          <activiti:value id="员工主动" name="员工主动"></activiti:value>
+          <activiti:value id="公司主动" name="公司主动"></activiti:value>
+          <activiti:value id="协商一致" name="协商一致"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="sn_域控账号_2_string_psbi_$$VA" name="域控账号" type="string" variable="sn"></activiti:formProperty>
+        <activiti:formProperty id="employeeName_员工姓名_1_string_t1_$$VB" name="员工姓名" type="string" variable="employeeName"></activiti:formProperty>
+        <activiti:formProperty id="department_部门_2_string_tree_$$VB" name="所属部门" type="string" variable="department"></activiti:formProperty>
+        <activiti:formProperty id="corp_实体_3_string_tree_$$VB" name="法律实体" type="string" variable="legalCorp"></activiti:formProperty>
+        <activiti:formProperty id="ncCode_员工工号_4_string_t1_$$VB" name="员工工号" type="string" variable="ncCode"></activiti:formProperty>
+        <activiti:formProperty id="position_职位_5_string_t1_$$VB" name="职位" type="string" variable="position"></activiti:formProperty>
+        <activiti:formProperty id="cutofdate_截至日期_1_string_t3_$$VC" name="截至日期" type="string" variable="cutofdate"></activiti:formProperty>
+        <activiti:formProperty id="overage_剩余年休假_2_string_t6_$$VC" name="剩余年休假" type="string" variable="overage"></activiti:formProperty>
+        <activiti:formProperty id="vacation_剩余调休小时数_3_string_t6_$$VC" name="剩余调休小时数" type="string" variable="vacation"></activiti:formProperty>
+        <activiti:formProperty id="joindate_入职日期_1_string_t3_$$VD" name="入职日期" type="string" variable="joindate"></activiti:formProperty>
+        <activiti:formProperty id="lastworkingdate_最后工作日_2_string_t3_$$VD" name="最后工作日" type="string" variable="lastworkingdate"></activiti:formProperty>
+        <activiti:formProperty id="lasthiredate_最后雇佣日_3_string_t3_$$VD" name="最后雇佣日" type="string" variable="lasthiredate"></activiti:formProperty>
+        <activiti:formProperty id="phone_联系电话_3_string_t1_$$VD" name="联系电话" type="string" variable="phone"></activiti:formProperty>
+        <activiti:formProperty id="place_现居住地_4_string_t2_$$VD" name="现居住地址/法律文书送达地" type="string" variable="place"></activiti:formProperty>
+        <activiti:formProperty id="mailRetentionTime_邮箱保留时间_1_string_t3_$$VE" name="邮箱保留时间" type="string" variable="mailRetentionTime"></activiti:formProperty>
+        <activiti:formProperty id="bpmsRetentionTime_BPMS账号保留时间_2_string_t3_$$VE" name="BPMS账号保留时间" type="string" variable="bpmsRetentionTime"></activiti:formProperty>
+        <activiti:formProperty id="computerRetentionTime_电脑保留时间_3_string_t3_$$VE" name="电脑保留时间" type="string" variable="computerRetentionTime"></activiti:formProperty>
+        <activiti:formProperty id="cutofprovidentfund_社保公积金缴纳至_4_string_t3_$$VE" name="社会保险及住房公积金将缴纳至" type="string" variable="cutofprovidentfund"></activiti:formProperty>
+        <activiti:formProperty id="financeSn_财务对接人_1_string_psbi_$$VF" name="财务对接人" type="string" variable="financeSn"></activiti:formProperty>
+        <activiti:formProperty id="itSn_IT对接人_2_string_psbi_$$VF" name="IT对接人" type="string" variable="itSn"></activiti:formProperty>
+        <activiti:formProperty id="adminSn_行政对接人_3_string_psbi_$$VF" name="行政对接人" type="string" variable="adminSn"></activiti:formProperty>
+        <activiti:formProperty id="leavereason_离职原因_1_string_t2_$$VG" name="离职原因" type="string" variable="leavereason"></activiti:formProperty>
+        <activiti:formProperty id="cancelthisprocess_取消此次离职流程_1_enum_rbv_$$A" name="确认取消此次离职流程" type="enum" variable="cancelthisprocess" required="true">
+          <activiti:value id="Y" name="确认"></activiti:value>
+        </activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <endEvent id="terminateendevent1" name="TerminateEndEvent">
+      <terminateEventDefinition></terminateEventDefinition>
+    </endEvent>
+    <sequenceFlow id="flow27" sourceRef="CANCELMAILSEND" targetRef="terminateendevent1"></sequenceFlow>
+    <sequenceFlow id="flow28" sourceRef="parallelgateway5" targetRef="CANCLE"></sequenceFlow>
+    <sequenceFlow id="flow29" sourceRef="CANCLE" targetRef="CANCELMAIL"></sequenceFlow>
+    <scriptTask id="STAFFLEAVEMAIL" name="离职员工本人邮件" scriptFormat="groovy" activiti:autoStoreVariables="false">
+      <script>
+    		
+    		def jsonSlurper = new groovy.json.JsonSlurper()
+			
+			def bodyMap = new HashMap()
+			def detailMap = new HashMap()
+			def dataMap = new HashMap()
+			
+			def to = ['baocaixue@eorionsolution.com']
+			
+			detailMap.put("from","develop@eorionsolution.com")
+			detailMap.put("to", to)
+			detailMap.put("subject", "离职相关提醒")
+			detailMap.put("templateName", "leave-notification-all-template")
+			
+			dataMap.put("staff", "1")//标记
+			dataMap.put("employeeName", execution.getVariable("employeeName"))
+			
+			detailMap.put("templateData",dataMap)
+			bodyMap.put("mail", detailMap)
+			def body = groovy.json.JsonOutput.toJson(bodyMap)
+			execution.setVariable('staffBody', body)
+           	//send request
+			execution.setVariable("_http_method", "POST")
+			def headerMap = new HashMap()
+			headerMap.put("Content-Type","application/json")
+			execution.setVariable("_http_headers", headerMap)
+			execution.setVariable("_http_body", body)
+			execution.setVariable("_http_url", 'https://commonservices.eorionsolution.com/mailsender/mail/v2/mail')
+			execution.setVariable("_http_response_body", '')
+			execution.setVariable("_http_response_status_code", '')
+    		
+    	</script>
+    </scriptTask>
+    <sequenceFlow id="flow30" sourceRef="parallelgateway3" targetRef="STAFFLEAVEMAIL"></sequenceFlow>
+    <serviceTask id="SENDMAILTOSTAFF" name="发送邮件给离职员工" activiti:class="com.eorionsolution.riying.bpms.javaservice.http.RestAPIService"></serviceTask>
+    <sequenceFlow id="flow31" sourceRef="STAFFLEAVEMAIL" targetRef="SENDMAILTOSTAFF"></sequenceFlow>
+    <sequenceFlow id="flow32" sourceRef="SENDMAILTOSTAFF" targetRef="parallelgateway4"></sequenceFlow>
+    <scriptTask id="COMPELETEVAR" name="填充字段" scriptFormat="groovy" activiti:autoStoreVariables="false">
+      <script>
+    		import groovy.json.JsonOutput
+				import groovy.json.JsonSlurper
+				
+    			def responseCode = execution.getVariable("_http_response_status_code")
+    			if (responseCode != 200) {
+					throw new org.activiti.engine.ActivitiIllegalArgumentException('METABASE调用失败');
+				}
+				def jsonSlurper = new JsonSlurper()
+				def responseBody = execution.getVariable('_http_response_body')
+				def employeeList = jsonSlurper.parseText(responseBody)
+				if(employeeList.size() != 1) {
+					throw new org.activiti.engine.ActivitiIllegalArgumentException('数据库数据异常，不能填充员工字段');
+				}
+				def employee = employeeList[0]
+				execution.setVariable('employeeName', employee.NAME_?:"")
+				def department = ['code':employee.DEP_SN_?:"",'name':employee.DEP_NAME_?:""]
+				execution.setVariable('department', JsonOutput.toJson(department))
+				def corp = ['code': employee.CORP_SN_?:"", 'name':employee.CORP_NAME_?:""]
+				execution.setVariable('legalCorp', JsonOutput.toJson(corp))
+				execution.setVariable('ncCode', employee.NC_CODE_?:"")
+				execution.setVariable('position',employee.ROLE_?.replaceAll("[\\[\\]]","")?:"")
+				def homeAddr = employee.HOME_ADDRESS_?:""
+				def pold = employee.PLACE_OF_LEGAL_DOC?:""
+				execution.setVariable('place', homeAddr + "/" + pold)
+				execution.setVariable('phone', employee.MOBILE_PHONE_?:"")
+				
+    	</script>
+    </scriptTask>
+    <sequenceFlow id="flow34" sourceRef="COMPELETEVAR" targetRef="parallelgateway5"></sequenceFlow>
+    <serviceTask id="METABASEST" name="访问metabase" activiti:class="com.eorionsolution.riying.bpms.javaservice.http.RestAPIService"></serviceTask>
+    <sequenceFlow id="flow35" sourceRef="STEVENT" targetRef="METABASEST"></sequenceFlow>
+    <sequenceFlow id="flow36" sourceRef="METABASEST" targetRef="COMPELETEVAR"></sequenceFlow>
+    <endEvent id="terminateendevent2" name="TerminateEndEvent">
+      <terminateEventDefinition></terminateEventDefinition>
+    </endEvent>
+    <sequenceFlow id="flow37" sourceRef="parallelgateway3" targetRef="DEPARTMAIL"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_DPPE002">
+    <bpmndi:BPMNPlane bpmnElement="DPPE002" id="BPMNPlane_DPPE002">
+      <bpmndi:BPMNShape bpmnElement="STEVENT" id="BPMNShape_STEVENT">
+        <omgdc:Bounds height="35.0" width="35.0" x="588.0" y="1.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="DECIDE" id="BPMNShape_DECIDE">
+        <omgdc:Bounds height="61.0" width="111.0" x="403.0" y="522.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="DEPARTMAIL" id="BPMNShape_DEPARTMAIL">
+        <omgdc:Bounds height="55.0" width="121.0" x="1.0" y="810.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="DEPARTMAILSEND" id="BPMNShape_DEPARTMAILSEND">
+        <omgdc:Bounds height="61.0" width="121.0" x="1.0" y="912.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway1" id="BPMNShape_exclusivegateway1">
+        <omgdc:Bounds height="40.0" width="40.0" x="438.0" y="653.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="CANCELMAIL" id="BPMNShape_CANCELMAIL">
+        <omgdc:Bounds height="58.0" width="111.0" x="722.0" y="645.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="CANCELMAILSEND" id="BPMNShape_CANCELMAILSEND">
+        <omgdc:Bounds height="59.0" width="121.0" x="890.0" y="644.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="ITTASK" id="BPMNShape_ITTASK">
+        <omgdc:Bounds height="61.0" width="115.0" x="193.0" y="852.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="parallelgateway3" id="BPMNShape_parallelgateway3">
+        <omgdc:Bounds height="40.0" width="40.0" x="438.0" y="742.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="ADMINTASK" id="BPMNShape_ADMINTASK">
+        <omgdc:Bounds height="61.0" width="111.0" x="405.0" y="852.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="FANACETASK" id="BPMNShape_FANACETASK">
+        <omgdc:Bounds height="61.0" width="111.0" x="630.0" y="852.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="parallelgateway4" id="BPMNShape_parallelgateway4">
+        <omgdc:Bounds height="40.0" width="40.0" x="440.0" y="1022.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="HRTASK" id="BPMNShape_HRTASK">
+        <omgdc:Bounds height="65.0" width="115.0" x="403.0" y="1142.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="EIMCHANGE" id="BPMNShape_EIMCHANGE">
+        <omgdc:Bounds height="61.0" width="112.0" x="406.0" y="1272.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scripttask1" id="BPMNShape_scripttask1">
+        <omgdc:Bounds height="61.0" width="114.0" x="404.0" y="1412.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="parallelgateway5" id="BPMNShape_parallelgateway5">
+        <omgdc:Bounds height="40.0" width="40.0" x="585.0" y="278.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="CANCLE" id="BPMNShape_CANCLE">
+        <omgdc:Bounds height="61.0" width="115.0" x="720.0" y="420.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="terminateendevent1" id="BPMNShape_terminateendevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="1130.0" y="657.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="STAFFLEAVEMAIL" id="BPMNShape_STAFFLEAVEMAIL">
+        <omgdc:Bounds height="58.0" width="115.0" x="810.0" y="821.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="SENDMAILTOSTAFF" id="BPMNShape_SENDMAILTOSTAFF">
+        <omgdc:Bounds height="61.0" width="115.0" x="810.0" y="931.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="COMPELETEVAR" id="BPMNShape_COMPELETEVAR">
+        <omgdc:Bounds height="55.0" width="105.0" x="553.0" y="181.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="METABASEST" id="BPMNShape_METABASEST">
+        <omgdc:Bounds height="55.0" width="105.0" x="553.0" y="90.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="terminateendevent2" id="BPMNShape_terminateendevent2">
+        <omgdc:Bounds height="35.0" width="35.0" x="444.0" y="1520.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow4" id="BPMNEdge_flow4">
+        <omgdi:waypoint x="61.0" y="865.0"></omgdi:waypoint>
+        <omgdi:waypoint x="61.0" y="912.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow9" id="BPMNEdge_flow9">
+        <omgdi:waypoint x="458.0" y="583.0"></omgdi:waypoint>
+        <omgdi:waypoint x="458.0" y="653.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow11" id="BPMNEdge_flow11">
+        <omgdi:waypoint x="478.0" y="673.0"></omgdi:waypoint>
+        <omgdi:waypoint x="722.0" y="674.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="44.0" x="478.0" y="673.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow12" id="BPMNEdge_flow12">
+        <omgdi:waypoint x="833.0" y="674.0"></omgdi:waypoint>
+        <omgdi:waypoint x="890.0" y="673.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow13" id="BPMNEdge_flow13">
+        <omgdi:waypoint x="458.0" y="693.0"></omgdi:waypoint>
+        <omgdi:waypoint x="458.0" y="742.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="44.0" x="458.0" y="693.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow14" id="BPMNEdge_flow14">
+        <omgdi:waypoint x="438.0" y="762.0"></omgdi:waypoint>
+        <omgdi:waypoint x="250.0" y="762.0"></omgdi:waypoint>
+        <omgdi:waypoint x="250.0" y="852.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow15" id="BPMNEdge_flow15">
+        <omgdi:waypoint x="458.0" y="782.0"></omgdi:waypoint>
+        <omgdi:waypoint x="460.0" y="852.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow16" id="BPMNEdge_flow16">
+        <omgdi:waypoint x="478.0" y="762.0"></omgdi:waypoint>
+        <omgdi:waypoint x="685.0" y="762.0"></omgdi:waypoint>
+        <omgdi:waypoint x="685.0" y="852.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow17" id="BPMNEdge_flow17">
+        <omgdi:waypoint x="460.0" y="913.0"></omgdi:waypoint>
+        <omgdi:waypoint x="460.0" y="1022.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow18" id="BPMNEdge_flow18">
+        <omgdi:waypoint x="685.0" y="913.0"></omgdi:waypoint>
+        <omgdi:waypoint x="685.0" y="1042.0"></omgdi:waypoint>
+        <omgdi:waypoint x="480.0" y="1042.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow19" id="BPMNEdge_flow19">
+        <omgdi:waypoint x="250.0" y="913.0"></omgdi:waypoint>
+        <omgdi:waypoint x="250.0" y="1041.0"></omgdi:waypoint>
+        <omgdi:waypoint x="440.0" y="1042.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow20" id="BPMNEdge_flow20">
+        <omgdi:waypoint x="460.0" y="1062.0"></omgdi:waypoint>
+        <omgdi:waypoint x="460.0" y="1142.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow21" id="BPMNEdge_flow21">
+        <omgdi:waypoint x="460.0" y="1207.0"></omgdi:waypoint>
+        <omgdi:waypoint x="462.0" y="1272.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow22" id="BPMNEdge_flow22">
+        <omgdi:waypoint x="462.0" y="1333.0"></omgdi:waypoint>
+        <omgdi:waypoint x="461.0" y="1412.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow23" id="BPMNEdge_flow23">
+        <omgdi:waypoint x="461.0" y="1473.0"></omgdi:waypoint>
+        <omgdi:waypoint x="461.0" y="1520.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow24" id="BPMNEdge_flow24">
+        <omgdi:waypoint x="585.0" y="298.0"></omgdi:waypoint>
+        <omgdi:waypoint x="458.0" y="298.0"></omgdi:waypoint>
+        <omgdi:waypoint x="458.0" y="522.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow25" id="BPMNEdge_flow25">
+        <omgdi:waypoint x="61.0" y="973.0"></omgdi:waypoint>
+        <omgdi:waypoint x="61.0" y="1042.0"></omgdi:waypoint>
+        <omgdi:waypoint x="440.0" y="1042.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow27" id="BPMNEdge_flow27">
+        <omgdi:waypoint x="1011.0" y="673.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1130.0" y="674.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow28" id="BPMNEdge_flow28">
+        <omgdi:waypoint x="625.0" y="298.0"></omgdi:waypoint>
+        <omgdi:waypoint x="776.0" y="299.0"></omgdi:waypoint>
+        <omgdi:waypoint x="777.0" y="420.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow29" id="BPMNEdge_flow29">
+        <omgdi:waypoint x="777.0" y="481.0"></omgdi:waypoint>
+        <omgdi:waypoint x="777.0" y="645.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow30" id="BPMNEdge_flow30">
+        <omgdi:waypoint x="478.0" y="762.0"></omgdi:waypoint>
+        <omgdi:waypoint x="867.0" y="762.0"></omgdi:waypoint>
+        <omgdi:waypoint x="867.0" y="821.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow31" id="BPMNEdge_flow31">
+        <omgdi:waypoint x="867.0" y="879.0"></omgdi:waypoint>
+        <omgdi:waypoint x="867.0" y="931.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow32" id="BPMNEdge_flow32">
+        <omgdi:waypoint x="867.0" y="992.0"></omgdi:waypoint>
+        <omgdi:waypoint x="867.0" y="1042.0"></omgdi:waypoint>
+        <omgdi:waypoint x="480.0" y="1042.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow34" id="BPMNEdge_flow34">
+        <omgdi:waypoint x="605.0" y="236.0"></omgdi:waypoint>
+        <omgdi:waypoint x="605.0" y="278.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow35" id="BPMNEdge_flow35">
+        <omgdi:waypoint x="605.0" y="36.0"></omgdi:waypoint>
+        <omgdi:waypoint x="605.0" y="90.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow36" id="BPMNEdge_flow36">
+        <omgdi:waypoint x="605.0" y="145.0"></omgdi:waypoint>
+        <omgdi:waypoint x="605.0" y="181.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow37" id="BPMNEdge_flow37">
+        <omgdi:waypoint x="438.0" y="762.0"></omgdi:waypoint>
+        <omgdi:waypoint x="61.0" y="762.0"></omgdi:waypoint>
+        <omgdi:waypoint x="61.0" y="810.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

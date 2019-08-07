@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/frm">
+  <process id="changeCorpProcess" name="实体变更流程测试" isExecutable="true" activiti:candidateStarterGroups="_testdemo">
+    <startEvent id="S1" name="流程启动" activiti:initiator="initiator">
+      <extensionElements>
+        <activiti:formProperty id="employeeSn_域账号_1_string_psbi_$$A" name="员工域账号" type="string" variable="employeeSn" required="true"></activiti:formProperty>
+        <activiti:formProperty id="corp_实体_1_string_tree_$$B" name="变更实体" type="string" variable="corp" required="true"></activiti:formProperty>
+        <activiti:formProperty id="effectiveTime_生效时间_2_string_t3_$$B" name="变更生效时间" type="string" variable="effectiveTime" required="true"></activiti:formProperty>
+        <activiti:executionListener event="end" class="org.activiti.engine.impl.bpmn.listener.ScriptExecutionListener">
+          <activiti:field name="language">
+            <activiti:string><![CDATA[groovy]]></activiti:string>
+          </activiti:field>
+          <activiti:field name="script">
+            <activiti:string><![CDATA[import groovy.json.JsonSlurper
+            	import groovy.json.JsonOutput
+            	
+            	def jsonSlurper = new JsonSlurper()
+            	def corp = jsonSlurper.parseText(execution.getVariable('corp'))
+            	def employeeSn = execution.getVariable('employeeSn')
+            	def to = execution.getVariable('effectiveTime').toLong()
+            	def newEntityCode = corp.code
+				def newEntityName = corp.name            	
+            	def proInstId = execution.getProcessInstanceId()
+            	
+				def bodyMap = new HashMap()
+				bodyMap.put('sn', employeeSn)
+				bodyMap.put('to',to)
+				bodyMap.put('proInstId', proInstId)
+				bodyMap.put('newEntityCode', newEntityCode)
+				bodyMap.put('newEntityName', newEntityName)
+				
+				def body = JsonOutput.toJson(bodyMap)        	
+            	
+            	execution.setVariable("_http_method", "PUT")
+				def headerMap = new HashMap()
+				headerMap.put("Content-Type","application/json")
+				execution.setVariable("_http_headers", headerMap)
+				execution.setVariable("_http_body", body)
+				execution.setVariable("_http_url", 'https://bpm.dipont.com/hr-dp-api/v2/employee/withoutauth/changeEntity')
+				execution.setVariable("_http_response_body", '')
+				execution.setVariable("_http_response_status_code", '')]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </startEvent>
+    <serviceTask id="ST1" name="更改实体" activiti:class="com.eorionsolution.riying.bpms.javaservice.http.RestAPIService"></serviceTask>
+    <sequenceFlow id="f1" sourceRef="S1" targetRef="ST1"></sequenceFlow>
+    <scriptTask id="SCT1" name="更改结果解析" scriptFormat="groovy" activiti:autoStoreVariables="false">
+      <script>
+    		import groovy.json.JsonSlurper
+            	
+            	def jsonSlurper = new JsonSlurper()
+            	def responseCode = execution.getVariable("_http_response_status_code")
+    			if(responseCode != 200) {
+    				def responseBody = new groovy.json.JsonSlurper().parseText(execution.getVariable("_http_response_body"))
+    				throw new org.activiti.engine.ActivitiIllegalArgumentException(responseBody.description)
+    			}
+    			
+    		
+    	</script>
+    </scriptTask>
+    <sequenceFlow id="f2" sourceRef="ST1" targetRef="SCT1"></sequenceFlow>
+    <endEvent id="endevent1" name="End"></endEvent>
+    <sequenceFlow id="f3" sourceRef="SCT1" targetRef="endevent1"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_changeCorpProcess">
+    <bpmndi:BPMNPlane bpmnElement="changeCorpProcess" id="BPMNPlane_changeCorpProcess">
+      <bpmndi:BPMNShape bpmnElement="S1" id="BPMNShape_S1">
+        <omgdc:Bounds height="35.0" width="35.0" x="130.0" y="213.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="ST1" id="BPMNShape_ST1">
+        <omgdc:Bounds height="61.0" width="115.0" x="210.0" y="200.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="SCT1" id="BPMNShape_SCT1">
+        <omgdc:Bounds height="61.0" width="107.0" x="360.0" y="200.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="530.0" y="213.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="f1" id="BPMNEdge_f1">
+        <omgdi:waypoint x="165.0" y="230.0"></omgdi:waypoint>
+        <omgdi:waypoint x="210.0" y="230.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="f2" id="BPMNEdge_f2">
+        <omgdi:waypoint x="325.0" y="230.0"></omgdi:waypoint>
+        <omgdi:waypoint x="360.0" y="230.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="f3" id="BPMNEdge_f3">
+        <omgdi:waypoint x="467.0" y="230.0"></omgdi:waypoint>
+        <omgdi:waypoint x="530.0" y="230.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

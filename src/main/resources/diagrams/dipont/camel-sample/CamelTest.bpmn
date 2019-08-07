@@ -1,0 +1,192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions
+	xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns:xsd="http://www.w3.org/2001/XMLSchema"
+	xmlns:activiti="http://activiti.org/bpmn"
+	xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI"
+	xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC"
+	xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI"
+	typeLanguage="http://www.w3.org/2001/XMLSchema"
+	expressionLanguage="http://www.w3.org/1999/XPath"
+	targetNamespace="http://www.activiti.org/test">
+	<process id="myProcess" name="My process" isExecutable="true"
+		activiti:candidateStarterGroups="admin">
+		<startEvent id="startevent1" name="Start">
+			<extensionElements>
+				<activiti:formProperty
+					id="row1field1_行1字段1 row1field1_1_string_t1_$$A" name="行1字段1"
+					type="string" variable="row1field1" required="true"></activiti:formProperty>
+				<activiti:formProperty
+					id="row1field2_行1字段2 row1field2_2_string_t1_$$A" name="行1字段2"
+					type="string" variable="row1field2" required="true"></activiti:formProperty>
+				<activiti:formProperty
+					id="row1field3_行1字段3 row1field3_3_string_t1_$$A" name="行1字段3"
+					type="string" variable="row1field3" required="true"></activiti:formProperty>
+				<activiti:executionListener event="end"
+					class="org.activiti.engine.impl.bpmn.listener.ScriptExecutionListener">
+					<activiti:field name="language">
+						<activiti:string><![CDATA[groovy]]></activiti:string>
+					</activiti:field>
+					<activiti:field name="script">
+						<activiti:string><![CDATA[def row1field1 = execution.getVariable('row1field1')
+    						def row1field2 = execution.getVariable('row1field2')
+							def sql_string = 'insert into test(id,name) values(' + '\''+ row1field1 +'\',' + '\'' +row1field2+'\')'
+							execution.setVariable('sql_string',sql_string)
+							execution.setVariable('dealTime',new Date().getTime())]]></activiti:string>
+					</activiti:field>
+				</activiti:executionListener>
+			</extensionElements>
+		</startEvent>
+		<serviceTask id="servicetask1" name="Camel Service Task"
+			activiti:type="camel">
+			<extensionElements>
+				<activiti:field name="camelContext">
+					<activiti:string><![CDATA[camelContext1]]></activiti:string>
+				</activiti:field>
+			</extensionElements>
+		</serviceTask>
+		<sequenceFlow id="flow1" sourceRef="startevent1"
+			targetRef="servicetask1"></sequenceFlow>
+		<exclusiveGateway id="exclusivegateway1"
+			name="Exclusive Gateway"></exclusiveGateway>
+		<serviceTask id="servicetask2" name="Exec Fail Task"
+			activiti:type="camel">
+			<extensionElements>
+				<activiti:field name="camelContext">
+					<activiti:string><![CDATA[camelContext2]]></activiti:string>
+				</activiti:field>
+			</extensionElements>
+		</serviceTask>
+		<serviceTask id="servicetask3" name="Exec Sucess Task"
+			activiti:type="camel">
+			<extensionElements>
+				<activiti:field name="camelContext">
+					<activiti:string><![CDATA[camelContext3]]></activiti:string>
+				</activiti:field>
+			</extensionElements>
+		</serviceTask>
+		<sequenceFlow id="flow3" sourceRef="exclusivegateway1"
+			targetRef="servicetask3">
+			<conditionExpression xsi:type="tFormalExpression"><![CDATA[${execStatus=="OK"}]]></conditionExpression>
+		</sequenceFlow>
+		<sequenceFlow id="flow4" sourceRef="exclusivegateway1"
+			targetRef="servicetask2">
+			<conditionExpression xsi:type="tFormalExpression"><![CDATA[${execStatus=="Failed"}]]></conditionExpression>
+		</sequenceFlow>
+		<parallelGateway id="parallelgateway1"
+			name="Parallel Gateway"></parallelGateway>
+		<sequenceFlow id="flow5" sourceRef="servicetask3"
+			targetRef="parallelgateway1"></sequenceFlow>
+		<sequenceFlow id="flow6" sourceRef="servicetask2"
+			targetRef="parallelgateway1"></sequenceFlow>
+		<endEvent id="endevent1" name="End"></endEvent>
+		<sequenceFlow id="flow7" sourceRef="parallelgateway1"
+			targetRef="endevent1"></sequenceFlow>
+		<scriptTask id="scripttask1" name="Script Task"
+			activiti:autoStoreVariables="false" scriptFormat="groovy">
+			<script>
+    		<![CDATA[
+    			if(execution.getVariable('camelBody').contains('exec failed')){
+    				execution.setVariable('execStatus','Failed')
+    			} else{
+    				execution.setVariable('execStatus','OK')
+    			}
+    		]]>
+			</script>
+		</scriptTask>
+		<sequenceFlow id="flow8" sourceRef="servicetask1"
+			targetRef="scripttask1"></sequenceFlow>
+		<sequenceFlow id="flow9" sourceRef="scripttask1"
+			targetRef="exclusivegateway1"></sequenceFlow>
+	</process>
+	<bpmndi:BPMNDiagram id="BPMNDiagram_myProcess">
+		<bpmndi:BPMNPlane bpmnElement="myProcess"
+			id="BPMNPlane_myProcess">
+			<bpmndi:BPMNShape bpmnElement="startevent1"
+				id="BPMNShape_startevent1">
+				<omgdc:Bounds height="35.0" width="35.0" x="20.0"
+					y="200.0"></omgdc:Bounds>
+			</bpmndi:BPMNShape>
+			<bpmndi:BPMNShape bpmnElement="servicetask1"
+				id="BPMNShape_servicetask1">
+				<omgdc:Bounds height="55.0" width="105.0" x="90.0"
+					y="190.0"></omgdc:Bounds>
+			</bpmndi:BPMNShape>
+			<bpmndi:BPMNShape bpmnElement="exclusivegateway1"
+				id="BPMNShape_exclusivegateway1">
+				<omgdc:Bounds height="40.0" width="40.0" x="360.0"
+					y="197.0"></omgdc:Bounds>
+			</bpmndi:BPMNShape>
+			<bpmndi:BPMNShape bpmnElement="servicetask2"
+				id="BPMNShape_servicetask2">
+				<omgdc:Bounds height="55.0" width="105.0" x="428.0"
+					y="290.0"></omgdc:Bounds>
+			</bpmndi:BPMNShape>
+			<bpmndi:BPMNShape bpmnElement="servicetask3"
+				id="BPMNShape_servicetask3">
+				<omgdc:Bounds height="55.0" width="105.0" x="440.0"
+					y="90.0"></omgdc:Bounds>
+			</bpmndi:BPMNShape>
+			<bpmndi:BPMNShape bpmnElement="parallelgateway1"
+				id="BPMNShape_parallelgateway1">
+				<omgdc:Bounds height="40.0" width="40.0" x="590.0"
+					y="190.0"></omgdc:Bounds>
+			</bpmndi:BPMNShape>
+			<bpmndi:BPMNShape bpmnElement="endevent1"
+				id="BPMNShape_endevent1">
+				<omgdc:Bounds height="35.0" width="35.0" x="680.0"
+					y="193.0"></omgdc:Bounds>
+			</bpmndi:BPMNShape>
+			<bpmndi:BPMNShape bpmnElement="scripttask1"
+				id="BPMNShape_scripttask1">
+				<omgdc:Bounds height="55.0" width="105.0" x="220.0"
+					y="190.0"></omgdc:Bounds>
+			</bpmndi:BPMNShape>
+			<bpmndi:BPMNEdge bpmnElement="flow1"
+				id="BPMNEdge_flow1">
+				<omgdi:waypoint x="55.0" y="217.0"></omgdi:waypoint>
+				<omgdi:waypoint x="90.0" y="217.0"></omgdi:waypoint>
+			</bpmndi:BPMNEdge>
+			<bpmndi:BPMNEdge bpmnElement="flow3"
+				id="BPMNEdge_flow3">
+				<omgdi:waypoint x="380.0" y="197.0"></omgdi:waypoint>
+				<omgdi:waypoint x="379.0" y="117.0"></omgdi:waypoint>
+				<omgdi:waypoint x="440.0" y="117.0"></omgdi:waypoint>
+			</bpmndi:BPMNEdge>
+			<bpmndi:BPMNEdge bpmnElement="flow4"
+				id="BPMNEdge_flow4">
+				<omgdi:waypoint x="380.0" y="237.0"></omgdi:waypoint>
+				<omgdi:waypoint x="379.0" y="317.0"></omgdi:waypoint>
+				<omgdi:waypoint x="428.0" y="317.0"></omgdi:waypoint>
+			</bpmndi:BPMNEdge>
+			<bpmndi:BPMNEdge bpmnElement="flow5"
+				id="BPMNEdge_flow5">
+				<omgdi:waypoint x="545.0" y="117.0"></omgdi:waypoint>
+				<omgdi:waypoint x="610.0" y="117.0"></omgdi:waypoint>
+				<omgdi:waypoint x="610.0" y="190.0"></omgdi:waypoint>
+			</bpmndi:BPMNEdge>
+			<bpmndi:BPMNEdge bpmnElement="flow6"
+				id="BPMNEdge_flow6">
+				<omgdi:waypoint x="533.0" y="317.0"></omgdi:waypoint>
+				<omgdi:waypoint x="609.0" y="317.0"></omgdi:waypoint>
+				<omgdi:waypoint x="610.0" y="230.0"></omgdi:waypoint>
+			</bpmndi:BPMNEdge>
+			<bpmndi:BPMNEdge bpmnElement="flow7"
+				id="BPMNEdge_flow7">
+				<omgdi:waypoint x="630.0" y="210.0"></omgdi:waypoint>
+				<omgdi:waypoint x="680.0" y="210.0"></omgdi:waypoint>
+			</bpmndi:BPMNEdge>
+			<bpmndi:BPMNEdge bpmnElement="flow8"
+				id="BPMNEdge_flow8">
+				<omgdi:waypoint x="195.0" y="217.0"></omgdi:waypoint>
+				<omgdi:waypoint x="220.0" y="217.0"></omgdi:waypoint>
+			</bpmndi:BPMNEdge>
+			<bpmndi:BPMNEdge bpmnElement="flow9"
+				id="BPMNEdge_flow9">
+				<omgdi:waypoint x="325.0" y="217.0"></omgdi:waypoint>
+				<omgdi:waypoint x="360.0" y="217.0"></omgdi:waypoint>
+			</bpmndi:BPMNEdge>
+		</bpmndi:BPMNPlane>
+	</bpmndi:BPMNDiagram>
+</definitions>
