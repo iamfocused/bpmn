@@ -55,7 +55,7 @@
 			def responseBody = execution.getVariable('_http_response_body')
 			def employeeList = jsonSlurper.parseText(responseBody)
 			if(employeeList.size() != 1) {
-				throw new org.activiti.engine.ActivitiIllegalArgumentException('数据库数据异常，不能获取您的身份信息 The database data is abnormal and you cannot get your identity information.');
+				throw new org.activiti.engine.ActivitiIllegalArgumentException('数据库数据异常，不能获取您的身份信息 The database data is abnormal and you cannot get identity information.');
 			}
 			
 			def employee = employeeList[0]
