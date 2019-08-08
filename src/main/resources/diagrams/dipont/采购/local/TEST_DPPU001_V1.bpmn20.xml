@@ -521,7 +521,7 @@
     <endEvent id="endevent3" name="End"></endEvent>
     <sequenceFlow id="flow39" sourceRef="parallelgateway2" targetRef="endevent3"></sequenceFlow>
     <sequenceFlow id="flow40" sourceRef="scripttask3" targetRef="scripttask4"></sequenceFlow>
-    <userTask id="usertask5" name="多级审批 Multi-level approval" activiti:assignee="${assignee}">
+    <userTask id="usertask5" name="采购申请审批 Purchase request approval" activiti:assignee="${assignee}">
       <extensionElements>
         <activiti:formProperty id="coreaction_审批结果_1_enum_rbv_$$A" name="审批结果 Approval Results" type="enum" variable="coreaction_approvalResult" required="true">
           <activiti:value id="Y" name="同意 Agree"></activiti:value>
