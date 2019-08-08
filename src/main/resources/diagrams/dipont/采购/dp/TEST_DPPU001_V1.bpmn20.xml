@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/pur">
-  <process id="TEST_DPPU001" name="TEST_DPPU001 员工采购流程测试 Employee procurement process" isExecutable="true" activiti:candidateStarterGroups="admin">
+  <process id="TEST_DPPU001" name="TEST_DPPU001 员工采购流程测试 Employee procurement process" isExecutable="true" activiti:candidateStarterGroups="_dpcglc">
     <documentation>{ 
 	"description": "员工填写采购申请，当审批通过后会收到邮件通知，邮件正文中有采购申请单下载链接。The employee fills in the purchase request, and will receive an email notification when the approval is passed. There is a download link for the purchase requisition in the body of the email.", 
  	"documents": [
@@ -37,7 +37,7 @@
 				execution.setVariable("_http_headers", headerMap);
 				execution.setVariable("_http_body", '');
 				def param=java.net.URLEncoder.encode('[{"type":"category","target":["variable",["template-tag","param"]],"value":\"'+ initiator + '\"}]', "UTF-8");
-				execution.setVariable("_http_url", 'https://metabase.eorionsolution.com/public/question/2c5a9a8b-9bf4-4260-8060-0ee2cafb8b28.json?parameters='+param);
+				execution.setVariable("_http_url", 'https://bpmmb.dipont.com/public/question/83c8362c-b3fa-4045-92c5-a62062ce33ec.json?parameters='+param);
 				execution.setVariable("_http_response_body", '');
 				execution.setVariable("_http_response_status_code", '');]]></activiti:string>
           </activiti:field>
@@ -99,8 +99,7 @@
 			execution.setVariable("_http_headers", headerMap);
 			
 			execution.setVariable("_http_body", requestBody);
-			//https://bpmcs.dipont.com/decisiontables/v1/fire/entity_billing_type.xls
-			execution.setVariable("_http_url", 'https://commonservices.eorionsolution.com/decisiontables/v1/fire/entity_billing_type.xls');
+			execution.setVariable("_http_url", 'https://bpmcs.dipont.com/decisiontables/v1/fire/entity_billing_type.xls');
 			execution.setVariable("_http_response_body", '');
 			execution.setVariable("_http_response_status_code", '');
     		
@@ -273,7 +272,7 @@
 			execution.setVariable("_http_headers", headerMap);
 			
 			execution.setVariable("_http_body", requestBody);
-			execution.setVariable("_http_url", 'https://commonservices.eorionsolution.com/decisiontables/v1/fire/dppu001_assignee.xls');
+			execution.setVariable("_http_url", 'https://bpmcs.dipont.com/decisiontables/v1/fire/dppu001_assignee.xls');
 			execution.setVariable("_http_response_body", '');
 			execution.setVariable("_http_response_status_code", '');
     	
@@ -329,7 +328,7 @@
     </sequenceFlow>
     <parallelGateway id="parallelgateway1" name="Parallel Gateway"></parallelGateway>
     <sequenceFlow id="flow17" sourceRef="exclusivegateway3" targetRef="scripttask7"></sequenceFlow>
-    <userTask id="usertask1" name="其他采购查看 Check others purchase" activiti:assignee="${initiator}">
+    <userTask id="usertask1" name="其他采购查看 Check others purchase" activiti:candidateUsers="${adminsStr}">
       <extensionElements>
         <activiti:formProperty id="costcenter_成本中心 Costcenter_1_string_tree_$$VA" name="成本中心 CostCenter" variable="puCostCenter"></activiti:formProperty>
         <activiti:formProperty id="departmentName_部门名称 Department Name_2_string_t1_$$VA" name="部门名称 Department Name" variable="puDeptName"></activiti:formProperty>
@@ -368,7 +367,7 @@
         </activiti:taskListener>
       </extensionElements>
     </userTask>
-    <userTask id="usertask2" name="固定资产采购查看 Check asset purchase" activiti:assignee="${initiator}">
+    <userTask id="usertask2" name="固定资产采购查看 Check asset purchase" activiti:candidateUsers="${adminsStr}">
       <extensionElements>
         <activiti:formProperty id="costcenter_成本中心 Costcenter_1_string_tree_$$VA" name="成本中心 CostCenter" variable="puCostCenter"></activiti:formProperty>
         <activiti:formProperty id="departmentName_部门名称 Department Name_2_string_t1_$$VA" name="部门名称 Department Name" variable="puDeptName"></activiti:formProperty>
@@ -407,7 +406,7 @@
         </activiti:taskListener>
       </extensionElements>
     </userTask>
-    <userTask id="usertask3" name="文具采购查看 Check stationery purchase" activiti:assignee="${initiator}">
+    <userTask id="usertask3" name="文具采购查看 Check stationery purchase" activiti:candidateUsers="${adminsStr}">
       <extensionElements>
         <activiti:formProperty id="costcenter_成本中心 Costcenter_1_string_tree_$$VA" name="成本中心 CostCenter" variable="puCostCenter"></activiti:formProperty>
         <activiti:formProperty id="departmentName_部门名称 Department Name_2_string_t1_$$VA" name="部门名称 Department Name" variable="puDeptName"></activiti:formProperty>
@@ -446,7 +445,7 @@
         </activiti:taskListener>
       </extensionElements>
     </userTask>
-    <userTask id="usertask4" name="低值耐耗品采购查看 Check Low value consumables purchase" activiti:assignee="${initiator}">
+    <userTask id="usertask4" name="低值耐耗品采购查看 Check Low value consumables purchase" activiti:candidateUsers="${adminsStr}">
       <extensionElements>
         <activiti:formProperty id="costcenter_成本中心 Costcenter_1_string_tree_$$VA" name="成本中心 CostCenter" variable="puCostCenter"></activiti:formProperty>
         <activiti:formProperty id="departmentName_部门名称 Department Name_2_string_t1_$$VA" name="部门名称 Department Name" variable="puDeptName"></activiti:formProperty>
@@ -593,7 +592,7 @@
     		dataMap.put('employeeName', employeeName)
     		def processInstanceId = execution.getProcessInstanceId()
     		execution.setVariable('processInstanceId', processInstanceId)
-    		def baseUrl = 'https://commonservices.eorionsolution.com/activitihelper/v1/pdf/download/' //'https://bpmcs.dipont.com/activitihelper/v1/pdf/download/'
+    		def baseUrl = 'https://bpmcs.dipont.com/activitihelper/v1/pdf/download/'
     		
     		def trimEmpName = employeeName.replace(" ", "")
     		if(execution.getVariable('assetSTD')) dataMap.put('assetLink', baseUrl + processInstanceId + '/dp_pu001_asset.yml/' + trimEmpName + '-固资采购申请表')
@@ -601,9 +600,12 @@
     		if(execution.getVariable('consumablesSTD')) dataMap.put('consumablesLink', baseUrl + processInstanceId + '/dp_pu001_consumables.yml/' + trimEmpName + '-低值耐耗品采购申请表')
     		if(execution.getVariable('othersSTD')) dataMap.put('otherLink', baseUrl + processInstanceId + '/dp_pu001_others.yml/' + trimEmpName + '-其他采购申请表')    		
     		
-    		def to = ['baocaixue@eorionsolution.com']
-    		detailMap.put("from", "develop@eorionsolution.com")
+    		def admins = execution.getVariable('adminsStr').split(',')
+    		def to = admins
+    		def cc = [execution.getVariable('initiator')]
+    		detailMap.put("from", "notice@dipont.com")
 			detailMap.put("to", to)
+			detailMap.put("cc", cc)
 			detailMap.put("subject", "采购通知")
 			detailMap.put("templateName", "purchase-notification-template")
 			detailMap.put("templateData",dataMap)
@@ -617,7 +619,7 @@
 			execution.setVariable("_http_headers", headerMap)
 			execution.setVariable("_http_body", body)
 			execution.setVariable("purchaseBody", body)
-			execution.setVariable("_http_url", 'https://commonservices.eorionsolution.com/mailsender/mail/v2/mail')
+			execution.setVariable("_http_url", 'https://bpmcs.dipont.com/mail/v2/mail')
 			execution.setVariable("_http_response_body", '')
 			execution.setVariable("_http_response_status_code", '')
     	
