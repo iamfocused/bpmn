@@ -324,10 +324,9 @@
     <userTask id="usertask1" name="其他采购查看 Check others purchase" activiti:assignee="${initiator}">
       <extensionElements>
         <activiti:formProperty id="costcenter_成本中心 Costcenter_1_string_tree_$$VA" name="成本中心 CostCenter" variable="puCostCenter"></activiti:formProperty>
-        <activiti:formProperty id="departmentName_部门名称 Department Name_2_string_t1_$$VA" name="部门名称 Department Name" variable="puDeptName"/>
-        <activiti:formProperty id="puEmployeeName_采购申请人 Purchase applicant_3_string_t1_$$VA" name="采购申请人 Purchase applicant" variable="puEmployeeName"/>
-        <activiti:formProperty id="puEmployeeMail_申请人邮箱 Applicant's mailbox_4_string_t1_$$VA" name="申请人邮箱 Applicant's mailbox" variable="puEmployeeMail"/>
-        
+        <activiti:formProperty id="departmentName_部门名称 Department Name_2_string_t1_$$VA" name="部门名称 Department Name" variable="puDeptName"></activiti:formProperty>
+        <activiti:formProperty id="puEmployeeName_采购申请人 Purchase applicant_3_string_t1_$$VA" name="采购申请人 Purchase applicant" variable="puEmployeeName"></activiti:formProperty>
+        <activiti:formProperty id="puEmployeeMail_申请人邮箱 Applicant's mailbox_4_string_t1_$$VA" name="申请人邮箱 Applicant's mailbox" variable="puEmployeeMail"></activiti:formProperty>
         <activiti:formProperty id="tbhdpurchasepu005_item" name="采购明细(其他采购项) Others Details" type="string" variable="tbhdpurchasepu005_item" required="true"></activiti:formProperty>
         <activiti:formProperty id="tbhdpurchasepu005_采购类别 Purchase Type_type_1_enum_sbs_$$VA" name="采购类别 Purchase Type" type="enum" variable="tbhdpurchasepu005_type_t00">
           <activiti:value id="固定资产 Fixed Assets" name="固定资产 Fixed Assets"></activiti:value>
@@ -335,21 +334,19 @@
           <activiti:value id="低值耐耗品 Low Value Consumables" name="低值耐耗品 Low Value Consumables"></activiti:value>
           <activiti:value id="其他 Others" name="其他 Others"></activiti:value>
         </activiti:formProperty>
-        <activiti:formProperty id="tbhdpurchasepu005_采购项(其他) Purchase Item(other)_otherItem_5_string_t1_$$VA" name="采购项(其他) Purchase Item(other)" type="string" variable="tbhdpurchasepu005_otherItem_t00"></activiti:formProperty>        
+        <activiti:formProperty id="tbhdpurchasepu005_采购项(其他) Purchase Item(other)_otherItem_5_string_t1_$$VA" name="采购项(其他) Purchase Item(other)" type="string" variable="tbhdpurchasepu005_otherItem_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhdpurchasepu005_计量单位 Unit Of Measurement_unit_6_string_t1_$$VA" name="计量单位 Unit Of Measurement" type="string" variable="tbhdpurchasepu005_unit_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhdpurchasepu005_数量 Quantity_quantity_7_string_t6_$$VA" name="数量 Quantity" type="string" variable="tbhdpurchasepu005_quantity_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhdpurchasepu005_单价 Unit Price_price_8_string_t11_$$VA" name="单价 Unit Price" type="string" variable="tbhdpurchasepu005_price_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhdpurchasepu005_备注 Remarks_remarks_9_string_t2_$$VA" name="备注 Remarks" type="string" variable="tbhdpurchasepu005_remarks_t00"></activiti:formProperty>
-        <activiti:formProperty id="tbhdpurchasepu005_实际金额 Actual price_actualPrice_10_string_t11_$$A" name="实际金额 Actual Price" type="string" variable="tbhdpurchasepu005_actualPrice_t00" required="true"/>
-        <activiti:formProperty id="tbhdpurchasepu005_采购时间 Purchase Time_purchaseTime_11_string_t3_$$A" name="采购时间 Purchase Time" type="string" variable="tbhdpurchasepu005_purchaseTime_t00" required="true"/>
-      
-      	<activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+        <activiti:formProperty id="tbhdpurchasepu005_实际金额 Actual price_actualPrice_10_string_t11_$$A" name="实际金额 Actual Price" type="string" variable="tbhdpurchasepu005_actualPrice_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchasepu005_采购时间 Purchase Time_purchaseTime_11_string_t3_$$A" name="采购时间 Purchase Time" type="string" variable="tbhdpurchasepu005_purchaseTime_t00" required="true"></activiti:formProperty>
+        <activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
           <activiti:field name="language">
             <activiti:string><![CDATA[groovy]]></activiti:string>
           </activiti:field>
           <activiti:field name="script">
-            <activiti:string><![CDATA[
-            	import groovy.json.JsonOutput
+            <activiti:string><![CDATA[import groovy.json.JsonOutput
 				import groovy.json.JsonSlurper
 				
 				def jsonSlurper = new JsonSlurper()
@@ -357,19 +354,17 @@
 				def items = jsonSlurper.parseText(execution.getVariable('tbhdpurchasepu005_item_std'))
 				items.each{
 					if(it.actualPrice == null || it.purchaseTime == null) throw new org.activiti.engine.ActivitiIllegalArgumentException('请补充采购明细 Please supplement the purchase time and actual amount')
-				}
-            ]]></activiti:string>
+				}]]></activiti:string>
           </activiti:field>
         </activiti:taskListener>
       </extensionElements>
     </userTask>
     <userTask id="usertask2" name="固定资产采购查看 Check asset purchase" activiti:assignee="${initiator}">
       <extensionElements>
-		<activiti:formProperty id="costcenter_成本中心 Costcenter_1_string_tree_$$VA" name="成本中心 CostCenter" variable="puCostCenter"></activiti:formProperty>
-        <activiti:formProperty id="departmentName_部门名称 Department Name_2_string_t1_$$VA" name="部门名称 Department Name" variable="puDeptName"/>
-        <activiti:formProperty id="puEmployeeName_采购申请人 Purchase applicant_3_string_t1_$$VA" name="采购申请人 Purchase applicant" variable="puEmployeeName"/>
-        <activiti:formProperty id="puEmployeeMail_申请人邮箱 Applicant's mailbox_4_string_t1_$$VA" name="申请人邮箱 Applicant's mailbox" variable="puEmployeeMail"/>
-        
+        <activiti:formProperty id="costcenter_成本中心 Costcenter_1_string_tree_$$VA" name="成本中心 CostCenter" variable="puCostCenter"></activiti:formProperty>
+        <activiti:formProperty id="departmentName_部门名称 Department Name_2_string_t1_$$VA" name="部门名称 Department Name" variable="puDeptName"></activiti:formProperty>
+        <activiti:formProperty id="puEmployeeName_采购申请人 Purchase applicant_3_string_t1_$$VA" name="采购申请人 Purchase applicant" variable="puEmployeeName"></activiti:formProperty>
+        <activiti:formProperty id="puEmployeeMail_申请人邮箱 Applicant's mailbox_4_string_t1_$$VA" name="申请人邮箱 Applicant's mailbox" variable="puEmployeeMail"></activiti:formProperty>
         <activiti:formProperty id="tbhdpurchasepu002_item" name="采购明细(固定资产采购项) Fixed Assets Details" type="string" variable="tbhdpurchasepu002_item" required="true"></activiti:formProperty>
         <activiti:formProperty id="tbhdpurchasepu002_采购类别 Purchase Type_type_1_enum_sbs_$$VA" name="采购类别 Purchase Type" type="enum" variable="tbhdpurchasepu002_type_t00">
           <activiti:value id="固定资产 Fixed Assets" name="固定资产 Fixed Assets"></activiti:value>
@@ -382,16 +377,14 @@
         <activiti:formProperty id="tbhdpurchasepu002_数量 Quantity_quantity_7_string_t6_$$VA" name="数量 Quantity" type="string" variable="tbhdpurchasepu002_quantity_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhdpurchasepu002_单价 Unit Price_price_8_string_t11_$$VA" name="单价 Unit Price" type="string" variable="tbhdpurchasepu002_price_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhdpurchasepu002_备注 Remarks_remarks_9_string_t2_$$VA" name="备注 Remarks" type="string" variable="tbhdpurchasepu002_remarks_t00"></activiti:formProperty>
-		<activiti:formProperty id="tbhdpurchasepu002_实际金额 Actual price_actualPrice_10_string_t11_$$A" name="实际金额 Actual Price" type="string" variable="tbhdpurchasepu002_actualPrice_t00" required="true"/>
-        <activiti:formProperty id="tbhdpurchasepu002_采购时间 Purchase Time_purchaseTime_11_string_t3_$$A" name="采购时间 Purchase Time" type="string" variable="tbhdpurchasepu002_purchaseTime_t00" required="true"/>
-      
-      	<activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+        <activiti:formProperty id="tbhdpurchasepu002_实际金额 Actual price_actualPrice_10_string_t11_$$A" name="实际金额 Actual Price" type="string" variable="tbhdpurchasepu002_actualPrice_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchasepu002_采购时间 Purchase Time_purchaseTime_11_string_t3_$$A" name="采购时间 Purchase Time" type="string" variable="tbhdpurchasepu002_purchaseTime_t00" required="true"></activiti:formProperty>
+        <activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
           <activiti:field name="language">
             <activiti:string><![CDATA[groovy]]></activiti:string>
           </activiti:field>
           <activiti:field name="script">
-            <activiti:string><![CDATA[
-            	import groovy.json.JsonOutput
+            <activiti:string><![CDATA[import groovy.json.JsonOutput
 				import groovy.json.JsonSlurper
 				
 				def jsonSlurper = new JsonSlurper()
@@ -399,19 +392,17 @@
 				def items = jsonSlurper.parseText(execution.getVariable('tbhdpurchasepu002_item_std'))
 				items.each{
 					if(it.actualPrice == null || it.purchaseTime == null) throw new org.activiti.engine.ActivitiIllegalArgumentException('请补充采购明细 Please supplement the purchase time and actual amount')
-				}
-            ]]></activiti:string>
+				}]]></activiti:string>
           </activiti:field>
         </activiti:taskListener>
-       </extensionElements>
+      </extensionElements>
     </userTask>
     <userTask id="usertask3" name="文具采购查看 Check stationery purchase" activiti:assignee="${initiator}">
       <extensionElements>
-		<activiti:formProperty id="costcenter_成本中心 Costcenter_1_string_tree_$$VA" name="成本中心 CostCenter" variable="puCostCenter"></activiti:formProperty>
-        <activiti:formProperty id="departmentName_部门名称 Department Name_2_string_t1_$$VA" name="部门名称 Department Name" variable="puDeptName"/>
-        <activiti:formProperty id="puEmployeeName_采购申请人 Purchase applicant_3_string_t1_$$VA" name="采购申请人 Purchase applicant" variable="puEmployeeName"/>
-        <activiti:formProperty id="puEmployeeMail_申请人邮箱 Applicant's mailbox_4_string_t1_$$VA" name="申请人邮箱 Applicant's mailbox" variable="puEmployeeMail"/>
-
+        <activiti:formProperty id="costcenter_成本中心 Costcenter_1_string_tree_$$VA" name="成本中心 CostCenter" variable="puCostCenter"></activiti:formProperty>
+        <activiti:formProperty id="departmentName_部门名称 Department Name_2_string_t1_$$VA" name="部门名称 Department Name" variable="puDeptName"></activiti:formProperty>
+        <activiti:formProperty id="puEmployeeName_采购申请人 Purchase applicant_3_string_t1_$$VA" name="采购申请人 Purchase applicant" variable="puEmployeeName"></activiti:formProperty>
+        <activiti:formProperty id="puEmployeeMail_申请人邮箱 Applicant's mailbox_4_string_t1_$$VA" name="申请人邮箱 Applicant's mailbox" variable="puEmployeeMail"></activiti:formProperty>
         <activiti:formProperty id="tbhdpurchasepu003_item" name="采购明细(文具及日用品采购项) Stationery And Necessary Details" type="string" variable="tbhdpurchasepu003_item" required="true"></activiti:formProperty>
         <activiti:formProperty id="tbhdpurchasepu003_采购类别 Purchase Type_type_1_enum_sbs_$$VA" name="采购类别 Purchase Type" type="enum" variable="tbhdpurchasepu003_type_t00">
           <activiti:value id="固定资产 Fixed Assets" name="固定资产 Fixed Assets"></activiti:value>
@@ -424,16 +415,14 @@
         <activiti:formProperty id="tbhdpurchasepu003_数量 Quantity_quantity_7_string_t6_$$VA" name="数量 Quantity" type="string" variable="tbhdpurchasepu003_quantity_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhdpurchasepu003_单价 Unit Price_price_8_string_t11_$$VA" name="单价 Unit Price" type="string" variable="tbhdpurchasepu003_price_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhdpurchasepu003_备注 Remarks_remarks_9_string_t2_$$VA" name="备注 Remarks" type="string" variable="tbhdpurchasepu003_remarks_t00"></activiti:formProperty>
-		<activiti:formProperty id="tbhdpurchasepu003_实际金额 Actual price_actualPrice_10_string_t11_$$A" name="实际金额 Actual Price" type="string" variable="tbhdpurchasepu003_actualPrice_t00" required="true"/>
-        <activiti:formProperty id="tbhdpurchasepu003_采购时间 Purchase Time_purchaseTime_11_string_t3_$$A" name="采购时间 Purchase Time" type="string" variable="tbhdpurchasepu003_purchaseTime_t00" required="true"/>      
-      
-      	<activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+        <activiti:formProperty id="tbhdpurchasepu003_实际金额 Actual price_actualPrice_10_string_t11_$$A" name="实际金额 Actual Price" type="string" variable="tbhdpurchasepu003_actualPrice_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchasepu003_采购时间 Purchase Time_purchaseTime_11_string_t3_$$A" name="采购时间 Purchase Time" type="string" variable="tbhdpurchasepu003_purchaseTime_t00" required="true"></activiti:formProperty>
+        <activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
           <activiti:field name="language">
             <activiti:string><![CDATA[groovy]]></activiti:string>
           </activiti:field>
           <activiti:field name="script">
-            <activiti:string><![CDATA[
-            	import groovy.json.JsonOutput
+            <activiti:string><![CDATA[import groovy.json.JsonOutput
 				import groovy.json.JsonSlurper
 				
 				def jsonSlurper = new JsonSlurper()
@@ -441,19 +430,17 @@
 				def items = jsonSlurper.parseText(execution.getVariable('tbhdpurchasepu003_item_std'))
 				items.each{
 					if(it.actualPrice == null || it.purchaseTime == null) throw new org.activiti.engine.ActivitiIllegalArgumentException('请补充采购明细 Please supplement the purchase time and actual amount')
-				}
-            ]]></activiti:string>
+				}]]></activiti:string>
           </activiti:field>
-        </activiti:taskListener>      
-       </extensionElements>
+        </activiti:taskListener>
+      </extensionElements>
     </userTask>
     <userTask id="usertask4" name="低值耐耗品采购查看 Check Low value consumables purchase" activiti:assignee="${initiator}">
       <extensionElements>
-		<activiti:formProperty id="costcenter_成本中心 Costcenter_1_string_tree_$$VA" name="成本中心 CostCenter" variable="puCostCenter"></activiti:formProperty>
-        <activiti:formProperty id="departmentName_部门名称 Department Name_2_string_t1_$$VA" name="部门名称 Department Name" variable="puDeptName"/>
-        <activiti:formProperty id="puEmployeeName_采购申请人 Purchase applicant_3_string_t1_$$VA" name="采购申请人 Purchase applicant" variable="puEmployeeName"/>
-        <activiti:formProperty id="puEmployeeMail_申请人邮箱 Applicant's mailbox_4_string_t1_$$VA" name="申请人邮箱 Applicant's mailbox" variable="puEmployeeMail"/>
-
+        <activiti:formProperty id="costcenter_成本中心 Costcenter_1_string_tree_$$VA" name="成本中心 CostCenter" variable="puCostCenter"></activiti:formProperty>
+        <activiti:formProperty id="departmentName_部门名称 Department Name_2_string_t1_$$VA" name="部门名称 Department Name" variable="puDeptName"></activiti:formProperty>
+        <activiti:formProperty id="puEmployeeName_采购申请人 Purchase applicant_3_string_t1_$$VA" name="采购申请人 Purchase applicant" variable="puEmployeeName"></activiti:formProperty>
+        <activiti:formProperty id="puEmployeeMail_申请人邮箱 Applicant's mailbox_4_string_t1_$$VA" name="申请人邮箱 Applicant's mailbox" variable="puEmployeeMail"></activiti:formProperty>
         <activiti:formProperty id="tbhdpurchasepu004_item" name="采购明细(低值耐耗品采购项) Low Value Consumables Details" type="string" variable="tbhdpurchasepu004_item" required="true"></activiti:formProperty>
         <activiti:formProperty id="tbhdpurchasepu004_采购类别 Purchase Type_type_1_enum_sbs_$$VA" name="采购类别 Purchase Type" type="enum" variable="tbhdpurchasepu004_type_t00">
           <activiti:value id="固定资产 Fixed Assets" name="固定资产 Fixed Assets"></activiti:value>
@@ -466,16 +453,14 @@
         <activiti:formProperty id="tbhdpurchasepu004_数量 Quantity_quantity_7_string_t6_$$VA" name="数量 Quantity" type="string" variable="tbhdpurchasepu004_quantity_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhdpurchasepu004_单价 Unit Price_price_8_string_t11_$$VA" name="单价 Unit Price" type="string" variable="tbhdpurchasepu004_price_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhdpurchasepu004_备注 Remarks_remarks_9_string_t2_$$VA" name="备注 Remarks" type="string" variable="tbhdpurchasepu004_remarks_t00"></activiti:formProperty>
-		<activiti:formProperty id="tbhdpurchasepu004_实际金额 Actual price_actualPrice_10_string_t11_$$A" name="实际金额 Actual Price" type="string" variable="tbhdpurchasepu004_actualPrice_t00" required="true"/>
-        <activiti:formProperty id="tbhdpurchasepu004_采购时间 Purchase Time_purchaseTime_11_string_t3_$$A" name="采购时间 Purchase Time" type="string" variable="tbhdpurchasepu004_purchaseTime_t00" required="true"/>      
-      
-      	<activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+        <activiti:formProperty id="tbhdpurchasepu004_实际金额 Actual price_actualPrice_10_string_t11_$$A" name="实际金额 Actual Price" type="string" variable="tbhdpurchasepu004_actualPrice_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchasepu004_采购时间 Purchase Time_purchaseTime_11_string_t3_$$A" name="采购时间 Purchase Time" type="string" variable="tbhdpurchasepu004_purchaseTime_t00" required="true"></activiti:formProperty>
+        <activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
           <activiti:field name="language">
             <activiti:string><![CDATA[groovy]]></activiti:string>
           </activiti:field>
           <activiti:field name="script">
-            <activiti:string><![CDATA[
-            	import groovy.json.JsonOutput
+            <activiti:string><![CDATA[import groovy.json.JsonOutput
 				import groovy.json.JsonSlurper
 				
 				def jsonSlurper = new JsonSlurper()
@@ -483,11 +468,10 @@
 				def items = jsonSlurper.parseText(execution.getVariable('tbhdpurchasepu004_item_std'))
 				items.each{
 					if(it.actualPrice == null || it.purchaseTime == null) throw new org.activiti.engine.ActivitiIllegalArgumentException('请补充采购明细 Please supplement the purchase time and actual amount')
-				}
-            ]]></activiti:string>
+				}]]></activiti:string>
           </activiti:field>
-        </activiti:taskListener>      
-       </extensionElements>
+        </activiti:taskListener>
+      </extensionElements>
     </userTask>
     <exclusiveGateway id="exclusivegateway5" name="Exclusive Gateway"></exclusiveGateway>
     <exclusiveGateway id="exclusivegateway6" name="Exclusive Gateway"></exclusiveGateway>
@@ -544,17 +528,15 @@
           <activiti:value id="N" name="拒绝 Refuse"></activiti:value>
         </activiti:formProperty>
         <activiti:formProperty id="corecomments_审批意见_2_string_t2_$$A" name="审批意见 Approval Comments" variable="corecomments_approvalComments"></activiti:formProperty>
-		<activiti:formProperty id="costcenter_成本中心 Costcenter_1_string_tree_$$VA" name="成本中心 CostCenter" variable="puCostCenter"></activiti:formProperty>
-        <activiti:formProperty id="departmentName_部门名称 Department Name_2_string_t1_$$VA" name="部门名称 Department Name" variable="puDeptName"/>
-        <activiti:formProperty id="puEmployeeName_采购申请人 Purchase applicant_3_string_t1_$$VA" name="采购申请人 Purchase applicant" variable="puEmployeeName"/>
-        <activiti:formProperty id="puEmployeeMail_申请人邮箱 Applicant's mailbox_4_string_t1_$$VA" name="申请人邮箱 Applicant's mailbox" variable="puEmployeeMail"/>
-
-        <activiti:formProperty id="totalPrice_总价 Total Price_1_string_t11_$$VB" name="总金额 Total Price" variable="totalPrice"/>
+        <activiti:formProperty id="costcenter_成本中心 Costcenter_1_string_tree_$$VA" name="成本中心 CostCenter" variable="puCostCenter"></activiti:formProperty>
+        <activiti:formProperty id="departmentName_部门名称 Department Name_2_string_t1_$$VA" name="部门名称 Department Name" variable="puDeptName"></activiti:formProperty>
+        <activiti:formProperty id="puEmployeeName_采购申请人 Purchase applicant_3_string_t1_$$VA" name="采购申请人 Purchase applicant" variable="puEmployeeName"></activiti:formProperty>
+        <activiti:formProperty id="puEmployeeMail_申请人邮箱 Applicant's mailbox_4_string_t1_$$VA" name="申请人邮箱 Applicant's mailbox" variable="puEmployeeMail"></activiti:formProperty>
+        <activiti:formProperty id="totalPrice_总价 Total Price_1_string_t11_$$VB" name="总金额 Total Price" variable="totalPrice"></activiti:formProperty>
         <activiti:formProperty id="assetPurchaseTotal_固定资产采购总价 Asset Total Price_2_string_t11_$$VB" name="固定资产采购总金额 Asset Total Price" variable="assetPrice"></activiti:formProperty>
         <activiti:formProperty id="stationeryPurchaseTotal_文具类采购总价 Stationery And Necessary Total Price_3_string_t11_$$VB" name="文具及日用品采购总金额 Stationery And Necessary Total Price" variable="stationeryPrice"></activiti:formProperty>
         <activiti:formProperty id="consumablesPurchaseTotal_低值耐耗品采购总价 Low Value Consumables Total Price_4_string_t11_$$VB" name="低值耐耗品采购总金额 Low Value Consumables Total Price" variable="consumablesPrice"></activiti:formProperty>
-        <activiti:formProperty id="otherPurchaseTotal_其他采购总价 Others Total Price_5_string_t11_$$VB" name="其他采购总金额 Others Total Price" variable="othersPrice"></activiti:formProperty>      
-        
+        <activiti:formProperty id="otherPurchaseTotal_其他采购总价 Others Total Price_5_string_t11_$$VB" name="其他采购总金额 Others Total Price" variable="othersPrice"></activiti:formProperty>
         <activiti:formProperty id="tbhdpurchasepu001_item_$$VA" name="采购明细 Details" type="string" variable="tbhdpurchasepu001_item" required="true"></activiti:formProperty>
         <activiti:formProperty id="tbhdpurchasepu001_采购类别 Purchase Type_type_0_enum_sbs_$$VA" name="采购类别 Purchase Type" type="enum" variable="tbhdpurchasepu001_type_t00">
           <activiti:value id="固定资产 Fixed Assets" name="固定资产 Fixed Assets"></activiti:value>
@@ -565,21 +547,18 @@
         <activiti:formProperty id="tbhdpurchasepu001_采购项(固定资产) Purchase Item(Fixed Assets)_assetsItem_2_string_t1_$$VA" name="采购项(固定资产) Purchase Item(Fixed Assets)" type="string" variable="tbhdpurchasepu001_assetsItem_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhdpurchasepu001_采购项(文具及生活用品) Stationery And Necessary_stationeryItem_3_string_tree_$$VA" name="采购项(文具及生活用品) Stationery And Necessary" type="string" variable="tbhdpurchasepu001_stationeryItem_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhdpurchasepu001_采购项(低值耐耗品) Low Value Consumables_consumablesItem_4_string_tree_$$VA" name="采购项(低值耐耗品) Low Value Consumables" type="string" variable="tbhdpurchasepu001_consumablesItem_t00"></activiti:formProperty>
-        <activiti:formProperty id="tbhdpurchasepu001_采购项(其他) Purchase Item(other)_otherItem_5_string_t1_$$VA" name="采购项(其他) Purchase Item(other)" type="string" variable="tbhdpurchasepu001_otherItem_t00"></activiti:formProperty>        
+        <activiti:formProperty id="tbhdpurchasepu001_采购项(其他) Purchase Item(other)_otherItem_5_string_t1_$$VA" name="采购项(其他) Purchase Item(other)" type="string" variable="tbhdpurchasepu001_otherItem_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhdpurchasepu001_计量单位 Unit Of Measurement_unit_6_string_t1_$$VA" name="计量单位 Unit Of Measurement" type="string" variable="tbhdpurchasepu001_unit_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhdpurchasepu001_数量 Quantity_quantity_7_string_t6_$$VA" name="数量 Quantity" type="string" variable="tbhdpurchasepu001_quantity_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhdpurchasepu001_单价 Unit Price_price_8_string_t11_$$VA" name="单价 Unit Price" type="string" variable="tbhdpurchasepu001_price_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhdpurchasepu001_备注 Remarks_remarks_9_string_t2_$$VA" name="备注 Remarks" type="string" variable="tbhdpurchasepu001_remarks_t00"></activiti:formProperty>
-      
-      	<activiti:taskListener event="create" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+        <activiti:taskListener event="create" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
           <activiti:field name="language">
             <activiti:string><![CDATA[groovy]]></activiti:string>
           </activiti:field>
           <activiti:field name="script">
-            <activiti:string><![CDATA[
-				def execution = task.getExecution()
-				execution.setVariable('corecomments_approvalComments', '')
-            ]]></activiti:string>
+            <activiti:string><![CDATA[def execution = task.getExecution()
+				execution.setVariable('corecomments_approvalComments', '')]]></activiti:string>
           </activiti:field>
         </activiti:taskListener>
       </extensionElements>
@@ -587,9 +566,9 @@
         <completionCondition>${coreaction_approvalResult == "N"}</completionCondition>
       </multiInstanceLoopCharacteristics>
     </userTask>
-    <scriptTask id="scripttask7" name="构造采购邮件" activiti:autoStoreVariables="false" scriptFormat="groovy">
-    	<script>
-    	<![CDATA[
+    <scriptTask id="scripttask7" name="构造采购邮件" scriptFormat="groovy" activiti:autoStoreVariables="false">
+      <script>
+    	
     		import groovy.json.JsonOutput
     		import groovy.json.JsonSlurper
     		
@@ -629,7 +608,7 @@
 			execution.setVariable("_http_url", 'https://commonservices.eorionsolution.com/mailsender/mail/v2/mail')
 			execution.setVariable("_http_response_body", '')
 			execution.setVariable("_http_response_status_code", '')
-    	]]>
+    	
     	</script>
     </scriptTask>
     <serviceTask id="servicetask4" name="采购邮件发送" activiti:class="com.eorionsolution.riying.bpms.javaservice.http.RestAPIService"></serviceTask>
@@ -828,8 +807,7 @@
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow21" id="BPMNEdge_flow21">
-        <omgdi:waypoint x="195.0" y="1910.0"></omgdi:waypoint>
-        <omgdi:waypoint x="142.0" y="1939.0"></omgdi:waypoint>
+        <omgdi:waypoint x="142.0" y="1941.0"></omgdi:waypoint>
         <omgdi:waypoint x="142.0" y="1989.0"></omgdi:waypoint>
         <omgdi:waypoint x="210.0" y="1990.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
