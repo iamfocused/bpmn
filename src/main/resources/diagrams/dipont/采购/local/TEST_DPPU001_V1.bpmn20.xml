@@ -11,7 +11,7 @@
           <activiti:value id="低值耐耗品 Low Value Consumables" name="低值耐耗品 Low Value Consumables"></activiti:value>
           <activiti:value id="其他 Others" name="其他 Others"></activiti:value>
         </activiti:formProperty>
-        <activiti:formProperty id="tbhdpurchasepu001_采购项(固定资产) Purchase Item(Fixed Assets)_assets_2_string_t1_$$A" name="采购项(固定资产) Purchase Item(Fixed Assets)" type="string" variable="tbhdpurchasepu001_assets_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchasepu001_采购项(固定资产) Purchase Item(Fixed Assets)_assetsItem_2_string_t1_$$A" name="采购项(固定资产) Purchase Item(Fixed Assets)" type="string" variable="tbhdpurchasepu001_assetsItem_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhdpurchasepu001_采购项(文具及生活用品) Stationery And Necessary_stationeryItem_3_string_tree_$$A" name="采购项(文具及生活用品) Stationery And Necessary" type="string" variable="tbhdpurchasepu001_stationeryItem_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhdpurchasepu001_采购项(低值耐耗品) Low Value Consumables_consumablesItem_4_string_tree_$$A" name="采购项(低值耐耗品) Low Value Consumables" type="string" variable="tbhdpurchasepu001_consumablesItem_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhdpurchasepu001_采购项(其他) Purchase Item(other)_otherItem_5_string_t1_$$A" name="采购项(其他) Purchase Item(other)" type="string" variable="tbhdpurchasepu001_otherItem_t00"></activiti:formProperty>
@@ -63,6 +63,9 @@
 			def puCorpCode = employee.CORP_SN_?:''
 			execution.setVariable('puCorpCode', puCorpCode)
 			
+			def puCorpName = employee.CORP_NAME_?:''
+			execution.setVariable('puCorpName', puCorpName)
+			
 			def puEmployeeName = employee.NAME_?:''
 			execution.setVariable('puEmployeeName', puEmployeeName)
 			
@@ -109,7 +112,7 @@
 			}
 			def jsonSlurper = new JsonSlurper()
 			def response = jsonSlurper.parseText(execution.getVariable('_http_response_body'))
-			execution.setVariable('puBillingType', response[0].type)
+			execution.setVariable('puBillingType', response[0].type?:'')
     		
     	</script>
     </scriptTask>
@@ -374,7 +377,7 @@
           <activiti:value id="低值耐耗品 Low Value Consumables" name="低值耐耗品 Low Value Consumables"></activiti:value>
           <activiti:value id="其他 Others" name="其他 Others"></activiti:value>
         </activiti:formProperty>
-        <activiti:formProperty id="tbhdpurchasepu002_采购项(固定资产) Purchase Item(Fixed Assets)_assets_2_string_t1_$$VA" name="采购项(固定资产) Purchase Item(Fixed Assets)" type="string" variable="tbhdpurchasepu002_assets_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchasepu002_采购项(固定资产) Purchase Item(Fixed Assets)_assetsItem_2_string_t1_$$VA" name="采购项(固定资产) Purchase Item(Fixed Assets)" type="string" variable="tbhdpurchasepu002_assetsItem_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhdpurchasepu002_计量单位 Unit Of Measurement_unit_6_string_t1_$$VA" name="计量单位 Unit Of Measurement" type="string" variable="tbhdpurchasepu002_unit_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhdpurchasepu002_数量 Quantity_quantity_7_string_t6_$$VA" name="数量 Quantity" type="string" variable="tbhdpurchasepu002_quantity_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhdpurchasepu002_单价 Unit Price_price_8_string_t11_$$VA" name="单价 Unit Price" type="string" variable="tbhdpurchasepu002_price_t00"></activiti:formProperty>
@@ -559,7 +562,7 @@
           <activiti:value id="低值耐耗品 Low Value Consumables" name="低值耐耗品 Low Value Consumables"></activiti:value>
           <activiti:value id="其他 Others" name="其他 Others"></activiti:value>
         </activiti:formProperty>
-        <activiti:formProperty id="tbhdpurchasepu001_采购项(固定资产) Purchase Item(Fixed Assets)_assets_2_string_t1_$$VA" name="采购项(固定资产) Purchase Item(Fixed Assets)" type="string" variable="tbhdpurchasepu001_assets_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchasepu001_采购项(固定资产) Purchase Item(Fixed Assets)_assetsItem_2_string_t1_$$VA" name="采购项(固定资产) Purchase Item(Fixed Assets)" type="string" variable="tbhdpurchasepu001_assetsItem_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhdpurchasepu001_采购项(文具及生活用品) Stationery And Necessary_stationeryItem_3_string_tree_$$VA" name="采购项(文具及生活用品) Stationery And Necessary" type="string" variable="tbhdpurchasepu001_stationeryItem_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhdpurchasepu001_采购项(低值耐耗品) Low Value Consumables_consumablesItem_4_string_tree_$$VA" name="采购项(低值耐耗品) Low Value Consumables" type="string" variable="tbhdpurchasepu001_consumablesItem_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhdpurchasepu001_采购项(其他) Purchase Item(other)_otherItem_5_string_t1_$$VA" name="采购项(其他) Purchase Item(other)" type="string" variable="tbhdpurchasepu001_otherItem_t00"></activiti:formProperty>        
@@ -598,13 +601,14 @@
     		def employeeName = execution.getVariable('puEmployeeName')?:''
     		dataMap.put('employeeName', employeeName)
     		def processInstanceId = execution.getProcessInstanceId()
+    		execution.setVariable('processInstanceId', processInstanceId)
     		def baseUrl = 'https://commonservices.eorionsolution.com/activitihelper/v1/pdf/download/' //'https://bpmcs.dipont.com/activitihelper/v1/pdf/download/'
     		
     		def trimEmpName = employeeName.replace(" ", "")
-    		if(execution.getVariable('othersSTD')) dataMap.put('otherLink', baseUrl + processInstanceId + '/a.yml/' + trimEmpName + '-其他采购申请表')
-    		if(execution.getVariable('assetSTD')) dataMap.put('assetLink', baseUrl + processInstanceId + '/b.yml/' + trimEmpName + '-固资采购申请表')
-    		if(execution.getVariable('stationerySTD')) dataMap.put('stationeryLink', baseUrl + processInstanceId + '/c.yml/' + trimEmpName + '-文具及日用品采购申请表')
-    		if(execution.getVariable('consumablesSTD')) dataMap.put('consumablesLink', baseUrl + processInstanceId + '/d.yml/' + trimEmpName + '-低值耐耗品采购申请表')
+    		if(execution.getVariable('assetSTD')) dataMap.put('assetLink', baseUrl + processInstanceId + '/dp_pu001_asset.yml/' + trimEmpName + '-固资采购申请表')
+    		if(execution.getVariable('stationerySTD')) dataMap.put('stationeryLink', baseUrl + processInstanceId + '/dp_pu001_stationery.yml/' + trimEmpName + '-文具及日用品采购申请表')
+    		if(execution.getVariable('consumablesSTD')) dataMap.put('consumablesLink', baseUrl + processInstanceId + '/dp_pu001_consumables.yml/' + trimEmpName + '-低值耐耗品采购申请表')
+    		if(execution.getVariable('othersSTD')) dataMap.put('otherLink', baseUrl + processInstanceId + '/dp_pu001_others.yml/' + trimEmpName + '-其他采购申请表')    		
     		
     		def to = ['baocaixue@eorionsolution.com']
     		detailMap.put("from", "develop@eorionsolution.com")
