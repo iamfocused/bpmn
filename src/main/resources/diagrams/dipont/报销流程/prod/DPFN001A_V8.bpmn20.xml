@@ -1,0 +1,1195 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/fin">
+  <process id="DPFN001A" name="DPFN001A员工费用报销 Expense Claim" isExecutable="true" activiti:candidateStarterGroups="_all">
+    <documentation>{ "description": "员工填写费用报销后将由费用对应的成本中心进行审批，通过后将费用凭证PDF打印提交至财务进行后续账务处理。After the employee fill in expense reimbursement, it will be examined and approved by the cost center corresponding to the expense. After the approval, the expense voucher will be printed in PDF and submitted to the financial department for subsequent accounting treatment.", 
+	"documents": [
+	{ "name": "EXCEL模板", "path": "https://bpm.dipont.com/images/docs/dpexpense.xlsx", "size": "xlsx" },
+	{ "name": "BPMFLOWCHART", "path": "https://bpm.dipont.com/images/docs/ReimbursementOperation.pdf", "size": "pdf" }
+	<!--, { "name": "操作说明", "path": "https://bpm.dipont.com/images/docs/doc_ch.docx", "size": "docx" }
+	, { "name": "Operating Instructions", "path": "https://bpm.dipont.com/images/docs/doc_en.docx", "size": "docx" }
+	, { "name": "操作视频", "path": "https://bpm.dipont.com/images/docs/video.mp4", "size": "mp4" }-->
+	] }</documentation>
+    <startEvent id="startevent1" name="S1" activiti:initiator="initiator">
+      <documentation>用户启动流程，填写报销单相应信息 User starts the process and fills in the corresponding information of the expense account</documentation>
+      <extensionElements>
+        <activiti:formProperty id="claimby_实际报销人 Claim to_1_string_relation_$$A" name="实际报销人 Claim to" type="string" variable="claimby" required="true"></activiti:formProperty>
+        <activiti:formProperty id="currency_货币 Currency_2_enum_sbs_$$A" name="货币 Currency" type="enum" variable="currency" required="true">
+          <activiti:value id="人民币" name="人民币 RMB"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="ispay_是否冲销 Cash Advance Deduction_3_enum_sbs_$$A" name="是否冲销 Cash Advance Deduction" type="enum" variable="ispay" required="true">
+          <activiti:value id="否" name="否 N"></activiti:value>
+          <!--<activiti:value id="是" name="是 Y"></activiti:value>-->
+        </activiti:formProperty>
+        <!--<activiti:formProperty id="corp_实体_4_string_tree_$$A" name="所属实体 Corp ID (For cross-corp)" type="string" variable="corp"></activiti:formProperty>-->
+        <activiti:formProperty id="comments_报销说明 Comments_1_string_t1_$$B" name="报销说明 Comments" type="string" variable="comments"></activiti:formProperty>
+        <activiti:formProperty id="attachment_附件_1_string_t9_$$F" name="附件" type="string" variable="attachment"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_item" name="报销明细 Details" type="string" variable="tbhdexpdetfn01a_item" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_收支项目a Payment item_ioitem_0_string_tree_$$VA" name="收支项目 Payment item" type="string" variable="tbhdexpdetfn01a_ioitem_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_成本中心 Costcenter_costcenter_1_string_tree_$$A" name="成本中心 Costcenter" type="string" variable="tbhdexpdetfn01a_costcenter_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_项目 Project_project_2_string_tree_$$A" name="项目 Project" type="string" variable="tbhdexpdetfn01a_project_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_开始时间 Start Time_depdate_3_string_t3_$$A" name="开始时间 Start Time" type="string" variable="tbhdexpdetfn01a_depdate_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_结束时间 End Time_arrdate_4_string_t3_$$A" name="结束时间 End Time" type="string" variable="tbhdexpdetfn01a_arrdate_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_几类城市 City Category_citytype_5_enum_sbs_$$A" name="几类城市 City Category" type="enum" variable="tbhdexpdetfn01a_citytype_t00">
+		  <activiti:value id="" name=""></activiti:value>
+          <activiti:value id="国内-1类" name="国内-1类 First-class Chinese city"></activiti:value>
+          <activiti:value id="国内-2类" name="国内-2类 Second-class Chinese city"></activiti:value>
+          <activiti:value id="国内-3类" name="国内-3类 Third-class Chinese city"></activiti:value>
+          <activiti:value id="国外-欧洲" name="国外-欧洲 Euro"></activiti:value>
+          <activiti:value id="国外-亚太" name="国外-亚太 APAC"></activiti:value>
+          <activiti:value id="国外-北美" name="国外-北美 North America"></activiti:value>
+          <activiti:value id="国外-其它" name="国外-其它 Others"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_出发地 Departure_departure_6_string_t1_$$A" name="出发地 Departure" type="string" variable="tbhdexpdetfn01a_departure_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_目的地 Destination_destination_7_string_t1_$$A" name="目的地 Destination" type="string" variable="tbhdexpdetfn01a_destination_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_出差地点 Travel to_desloc_8_string_t1_$$A" name="出差地点 Travel to" type="string" variable="tbhdexpdetfn01a_desloc_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_出差天数 Travel days_arrivaldays_9_string_t6_$$A" name="出差天数 Travel days" type="string" variable="tbhdexpdetfn01a_arrivaldays_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_餐饮费标准 Meal Std._mealstd_10_string_t11_$$HA" name="餐饮费标准 Meal Std." type="string" variable="tbhdexpdetfn01a_mealstd_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_餐饮费超标金额 Meal Exc._mealextra_11_string_t11_$$HA" name="餐饮费超标金额 Meal Exc." type="string" variable="tbhdexpdetfn01a_mealetra_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_住宿费标准 Accommodation Std._hotelstd_12_string_t11_$$HA" name="住宿费标准 Accommodation Std." type="string" variable="tbhdexpdetfn01a_hotelstd_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_住宿费超标金额 Accommodation Exc._hotelextra_13_string_t11_$$HA" name="住宿费超标金额 Accommodation Exc." type="string" variable="tbhdexpdetfn01a_hotelextra_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_金额 Amount_amount_14_string_cny_$$A" name="金额 Amount" type="string" variable="tbhdexpdetfn01a_amount_t00"></activiti:formProperty>
+		
+        <activiti:formProperty id="tbhdexpdetfn01a_税额 Tax_tax_15_string_cny_$$A" name="税额 Tax" type="string" variable="tbhdexpdetfn01a_tax_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_航班类型 Flight Type_flighttype_16_enum_sbs_$$A" name="航班类型 Flight Type" type="enum" variable="tbhdexpdetfn01a_flighttype_t00">
+		  <activiti:value id="" name=""></activiti:value>
+          <activiti:value id="国内航班" name="国内航班 Domestic Flight"></activiti:value>
+          <activiti:value id="国际航班" name="国际航班 International Flight "></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_机票价 Air Fare_airfare_17_string_cny_$$A" name="机票价 Air Fare" type="string" variable="tbhdexpdetfn01a_airfare_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_燃油附加费 YQ_yq_18_string_cny_$$A" name="燃油附加费 YQ" type="string" variable="tbhdexpdetfn01a_yq_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_机场建设费 CN_cn_19_string_cny_$$A" name="机场建设费 CN" type="string" variable="tbhdexpdetfn01a_cn_t00"></activiti:formProperty>
+		<activiti:formProperty id="tbhdexpdetfn01a_发票数量 Qty Invoiced_qtyinvoiced_20_string_t6_$$A" name="发票数量 Qty Invoiced" type="string" variable="tbhdexpdetfn01a_qtyinvoiced_t00"></activiti:formProperty>
+		
+        <activiti:formProperty id="tbhdexpdetfn01a_备注信息 Note_expdetail_21_string_t1_$$A" name="备注信息 Note" type="string" variable="tbhdexpdetfn01a_expdetail_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_利润中心 Profit Center_profitacc_22_string_t1_$$HA" name="利润中心 Profit Center" type="string" variable="tbhdexpdetfn01a_profitacc_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_设备类别 Equipment Type_category_23_string_tree_$$A" name="设备类别 Equipment Type" type="string" variable="tbhdexpdetfn01a_category_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_学科 Subject_discipline_24_enum_sbs_$$A" name="学科 Subject" type="enum" variable="tbhdexpdetfn01a_discipline_t00">
+          <activiti:value id="无" name="无 NA"></activiti:value>
+          <activiti:value id="语文" name="语文 Chi."></activiti:value>
+          <activiti:value id="数学" name="数学 Math."></activiti:value>
+		  <activiti:value id="政治" name="政治 Politics"></activiti:value>
+          <activiti:value id="英语" name="英语 Eng."></activiti:value>
+          <activiti:value id="历史" name="历史 His."></activiti:value>
+          <activiti:value id="地理" name="地理 Geo."></activiti:value>
+          <activiti:value id="物理" name="物理 Phy."></activiti:value>
+          <activiti:value id="生物" name="生物 Bio."></activiti:value>
+          <activiti:value id="化学" name="化学 Chem."></activiti:value>
+          <activiti:value id="体育" name="体育 P.E."></activiti:value>
+          <activiti:value id="美术" name="美术 Art"></activiti:value>
+          <activiti:value id="音乐" name="音乐 Music"></activiti:value>
+          <activiti:value id="其它" name="其它 Other"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_差旅申请号 Travel Request No_application_25_string_auto_$$A" name="差旅申请号 Travel Request No" type="string" variable="tbhdexpdetfn01a_application_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_供应商 Vendor_vendor_26_string_auto_$$A" name="供应商 Vendor" type="string" variable="tbhdexpdetfn01a_vendor_t00"></activiti:formProperty>
+      </extensionElements>
+    </startEvent>
+    <sequenceFlow id="flow31" name="无冲销" sourceRef="exclusivegateway4" targetRef="ST00">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('ispay') == '否'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow32" name="有冲销" sourceRef="exclusivegateway4" targetRef="usertask1">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('ispay') == '是'}]]></conditionExpression>
+    </sequenceFlow>
+    <userTask id="usertask1" name="填写冲销金额Cash Advance Deductions" activiti:assignee="${initiator}" activiti:dueDate="P1D" activiti:priority="8080">
+      <extensionElements>
+        <activiti:formProperty id="tbhdexpdet_item" name="还款明细 Details" type="string" variable="tbhdexpdet_item"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdet_借款余额_borrow_1_string_auto_$$VA" name="借款编号 Cash Advance ID" type="string" variable="tbhdexpdet_crnum_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdet_金额_amount_2_string_t11" name="还款金额 Deduction Amount" type="string" variable="tbhdexpdet_amount_t00"></activiti:formProperty>
+        <activiti:taskListener event="create" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+          <activiti:field name="language">
+            <activiti:string><![CDATA[groovy]]></activiti:string>
+          </activiti:field>
+          <activiti:field name="script">
+            <activiti:string><![CDATA[//冲销报销时不能跨实体，检查是否跨实体
+				if( new groovy.json.JsonSlurper().parseText(task.getExecution().getVariable("corp")) ) {
+					def corpSn = new groovy.json.JsonSlurper().parseText(task.getExecution().getVariable("claimby")).corpSn;
+					def corpSnSecond = new groovy.json.JsonSlurper().parseText(task.getExecution().getVariable("corp")).code;
+					if(corpSn != corpSnSecond) 
+						throw new org.activiti.engine.ActivitiIllegalArgumentException("报销冲销时，您不能跨实体。Corp ID Consistency Invalid");
+				}
+					
+				
+				//冲销报销时，报销明细中的成本中心必须是一个。冲销时也只能抵消这个成本中心借的钱
+				def tbhdexpdetfn01a_item= new groovy.json.JsonSlurper().parseText(task.getExecution().getVariable("tbhdexpdetfn01a_item"));
+				def costCenterArray = [];
+				tbhdexpdetfn01a_item.rows.each{
+					item -> costCenterArray << item[1].code;
+				}
+				if(costCenterArray.size() > 1)
+					throw new org.activiti.engine.ActivitiIllegalArgumentException("报销冲销时，报销明细中不能存在多成本中心，请您修改后重新提交。Multi Costcenters in Expense Claim is not allowed for cash advance deduction");
+				task.getExecution().setVariable("refundCostcenter",costCenterArray[0]);
+				
+				//REFUND VIEW
+				import javax.crypto.Mac;
+				import javax.crypto.spec.SecretKeySpec;
+				import java.security.InvalidKeyException;
+				import java.util.Base64;
+				def hmac_sha256(String secretKey, String data) {
+					try {
+						Mac mac = Mac.getInstance("HmacSHA256");
+						SecretKeySpec secretKeySpec = new SecretKeySpec(secretKey.getBytes(), "HmacSHA256");
+						mac.init(secretKeySpec);
+						byte[] digest = mac.doFinal(data.getBytes());
+						return digest;
+					} catch (InvalidKeyException e) {
+						throw new RuntimeException("Invalid key exception while converting to HMacSHA256");
+					}
+				}
+				def METABASE_SITE_URL = "https://bpmmb.dipont.com";
+				def METABASE_SECRET_KEY = "652af32880df5748cbf37bd6273d8bfe444e76e551012ca323afa69e1f1b41ab";
+				def header = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9";//Base64.getUrlEncoder().encodeToString('{"typ":"JWT","alg":"HS256"}'.bytes);
+				def playloadString = '{"resource":{"question":315},"params":{"userId":"'+task.getExecution().getVariable("initiator")+'","costcenterCode":"'+costCenterArray[0]+'"}}';
+				def playload = Base64.getUrlEncoder().encodeToString(playloadString.bytes);
+
+				def secret =Base64.getUrlEncoder().encodeToString(hmac_sha256(METABASE_SECRET_KEY , header+'.'+playload));
+				def url = METABASE_SITE_URL + "/embed/question/" + header+'.'+playload+'.'+secret + "#bordered=true&titled=false";
+				task.getExecution().setVariableLocal("BBOT_BI_REFUND",url);]]></activiti:string>
+          </activiti:field>
+        </activiti:taskListener>
+        <activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+          <activiti:field name="language">
+            <activiti:string><![CDATA[groovy]]></activiti:string>
+          </activiti:field>
+          <activiti:field name="script">
+            <activiti:string><![CDATA[if(task.getExecution().getVariable("tbhdexpdet_item_std")) {
+						def mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+						def inputList = mapper.readValue(task.getExecution().getVariable("tbhdexpdet_item_std"), new com.fasterxml.jackson.core.type.TypeReference<List<Map<String, Object>>>(){});
+		
+						def procInstIdList = [];
+						def stdNew = inputList.each{ elem ->
+							def balanceDetail = elem.borrow.name;
+							def procInstId = balanceDetail.substring(0,balanceDetail.lastIndexOf("/")).trim();
+							def costcenterCode = new groovy.json.JsonSlurper().parseText(runtimeService.getVariable(procInstId, "costcenter")).code;
+							if(costcenterCode != task.getExecution().getVariable("refundCostcenter"))
+								throw new org.activiti.engine.ActivitiIllegalArgumentException("报销冲销时，冲销明细中的成本中心必须和报销明细中的成本中心保持一致。costcenter in cash advance and expense claim is not consistent.");
+					}
+					}else{
+						task.getExecution().setVariable("ispay","否");
+					}
+					task.getExecution().setVariableLocal("BBOT_BI_REFUND",null);]]></activiti:string>
+          </activiti:field>
+        </activiti:taskListener>
+      </extensionElements>
+    </userTask>
+    <scriptTask id="ST00" name="用户数据预处理" scriptFormat="groovy" activiti:autoStoreVariables="false">
+	<script><![CDATA[  
+		
+				def claimby = new groovy.json.JsonSlurper().parseText(execution.getVariable("claimby"));
+				
+				def user = identityService.createUserQuery().userId(initiator).singleResult(); 
+				execution.setVariable('initiatorname', user.getLastName() + " " + user.getFirstName());
+
+				execution.setVariable("instanceid",execution.getProcessInstanceId());
+				execution.setVariable("claimname",claimby.name);
+				execution.setVariable("claimsn",claimby.sn);
+				execution.setVariable("nccode",claimby.ncCode);
+				execution.setVariable("corpname",claimby.corpName);
+				execution.setVariable("bankname",(claimby.openingBank ? claimby.openingBank : "无"));
+				execution.setVariable("bankaccount",(claimby.accountNo ? claimby.accountNo.replace(" ", "") : "无"));
+				execution.setVariable("bankprovince",(claimby.bankProvince ? claimby.bankProvince : "无"));
+				execution.setVariable("bankcity",(claimby.bankCity ? claimby.bankCity : "无"));
+
+
+				if( ! execution.getVariable("comments") )
+					execution.setVariable("comments","无");
+				
+				
+				def expenseType = claimby.expenseType;//员工报销等级
+				if(expenseType == "" || expenseType == null || (expenseType != "A" && expenseType != "B" && expenseType != "C"))
+					expenseType = "other";
+				//餐饮标准与住宿标准制定，A，B，C代表员工报销级别
+				def claimMealstd = [
+					"A":["国内-1类":10000,"国内-2类":10000,"国内-3类":10000,"国外-欧洲":338.39,"国外-亚太":338.39,"国外-北美":338.39,"国外-其它":338.39],
+					"B":["国内-1类":150,"国内-2类":150,"国内-3类":150,"国外-欧洲":338.39,"国外-亚太":338.39,"国外-北美":338.39,"国外-其它":338.39],
+					"C":["国内-1类":150,"国内-2类":150,"国内-3类":150,"国外-欧洲":338.39,"国外-亚太":338.39,"国外-北美":338.39,"国外-其它":338.39],
+					"other":["国内-1类":100,"国内-2类":100,"国内-3类":70,"国外-欧洲":338.39,"国外-亚太":338.39,"国外-北美":338.39,"国外-其它":338.39]
+				   ];				
+				def claimHotelstd = [
+					"A":["国内-1类":900,"国内-2类":700,"国内-3类":500,"国外-欧洲":900,"国外-亚太":700,"国外-北美":900,"国外-其它":700],
+					"B":["国内-1类":700,"国内-2类":500,"国内-3类":300,"国外-欧洲":900,"国外-亚太":700,"国外-北美":900,"国外-其它":700],
+					"C":["国内-1类":700,"国内-2类":500,"国内-3类":300,"国外-欧洲":900,"国外-亚太":700,"国外-北美":900,"国外-其它":700],
+					"other":["国内-1类":500,"国内-2类":300,"国内-3类":200,"国外-欧洲":900,"国外-亚太":700,"国外-北美":900,"国外-其它":700]
+				   ];
+				
+				//计算报销总金额
+				def tbhdexpdetfn01a_item= new groovy.json.JsonSlurper().parseText(execution.getVariable("tbhdexpdetfn01a_item"));
+				def costCenterArray = [];
+				def totalamount = 0;
+				tbhdexpdetfn01a_item.rows.each{
+					item -> costCenterArray << item[1].code;
+					try{
+						//餐饮标准
+					   if (['100103','100203','100303','100405'].contains(item[0].code)) {
+						   item[10] = claimMealstd."${expenseType}"."${item[5]}"+"";
+						   def overAmount = new BigDecimal(item[14]).subtract( new BigDecimal(claimMealstd."${expenseType}"."${item[5]}").multiply(new BigDecimal(item[9])) ).setScale(2, java.math.RoundingMode.HALF_UP);
+						   if (overAmount > 0)
+							   item[11] = overAmount+"";
+						   else
+							   item[11] = 0+"";
+							   
+						   if(item[5].startsWith("国内") && expenseType == "A") {//国内并且a类员工，实报实销
+								item[10] = "实报实销";
+								item[11] = 0+"";
+						   }
+					   }
+					   //住宿标准
+					   if (['100102','100201','100301','100404'].contains(item[0].code)) {
+						   if(item[5].startsWith("国外")){//国外，实报实销
+								item[12] = "实报实销";
+								item[13] = 0+"";
+						   }else{
+							   item[12] = claimHotelstd."${expenseType}"."${item[5]}"+"";
+							   def overAmount = new java.math.BigDecimal(item[14]).subtract( new java.math.BigDecimal(claimHotelstd."${expenseType}"."${item[5]}").multiply(new java.math.BigDecimal(item[9])) ).setScale(2, java.math.RoundingMode.HALF_UP);
+							   if (overAmount > 0)
+								   item[13] = overAmount+"";
+							   else
+								   item[13] = 0+"";
+						   }
+					   }
+					   
+					   if (item[0].code == "10010101"){ //火车票
+							item[15] = new java.math.BigDecimal(item[14]).multiply( new java.math.BigDecimal("0.09")).divide(new BigDecimal("1.09"),2,BigDecimal.ROUND_HALF_UP)+"";
+					   }
+					   if (item[0].code == "10010102"){ //飞机票 国内（票价+燃油附加费）/(1+9%)*9%
+							if(item[16] == "国内航班")
+								item[15] = (new java.math.BigDecimal(item[17]).add(new java.math.BigDecimal(item[18]))).multiply( new java.math.BigDecimal("0.09")).divide(new BigDecimal("1.09"),2,BigDecimal.ROUND_HALF_UP)+"";
+					   }					   
+					   
+					}
+					catch(Exception e){
+						throw new org.activiti.engine.ActivitiIllegalArgumentException("员工报销级别存在异常，请联系管理员");
+					}
+						
+						
+					def amount = new java.math.BigDecimal(item[14]).setScale(2, java.math.RoundingMode.HALF_UP);
+					totalamount += amount;
+				}
+				
+				execution.setVariable("costCenterArray",costCenterArray.unique());
+				execution.setVariable("totalamount",totalamount+"");
+				execution.setVariable("businessKey",execution.getBusinessKey());
+				execution.setVariable("verifydate",new Date().getTime()+"");//填表日期
+			
+			
+				//成本中心审核人需要成本中心代码和金额去判断
+				def costCenterDrools = []
+				tbhdexpdetfn01a_item.rows.groupBy { elem ->
+					elem[1].code
+				}.each{ k,v ->
+					def costcenterTotalAmount = 0;
+					v.each{
+						def amount = new java.math.BigDecimal(it[14]).setScale(2, java.math.RoundingMode.HALF_UP);
+						costcenterTotalAmount += amount;
+					}
+					costCenterDrools << """{"costcenter":"${k}","amount":"${costcenterTotalAmount}"}""".toString();
+				}
+				
+				
+							
+				execution.setVariable("_http_method", "POST");
+				def headerMap = new java.util.HashMap<String,String>();
+				headerMap.put("Content-Type","application/json");				
+				execution.setVariable("_http_headers", headerMap);
+
+				execution.setVariable("_http_body", costCenterDrools.toString());
+				execution.setVariable("_http_url", 'https://bpmcs.dipont.com/decisiontables/v1/fire/cctype.xls');
+				execution.setVariable("_http_response_body", '');
+			    execution.setVariable("_http_response_status_code", '');
+				
+				//unicode decode
+				def tbhdexpdetfn01a_item_jsonString = groovy.json.JsonOutput.toJson(tbhdexpdetfn01a_item);
+				java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("(\\\\u(\\p{XDigit}{4}))");  
+				java.util.regex.Matcher matcher = pattern.matcher(tbhdexpdetfn01a_item_jsonString);  
+				char ch;  
+				while (matcher.find()) {  
+					String group = matcher.group(2);  
+					ch = (char) Integer.parseInt(group, 16);  
+					String group1 = matcher.group(1);  
+					tbhdexpdetfn01a_item_jsonString = tbhdexpdetfn01a_item_jsonString.replace(group1, Character.toString(ch));  
+				}
+				execution.setVariable('tbhdexpdetfn01a_item',tbhdexpdetfn01a_item_jsonString);
+				]]></script>
+    </scriptTask>
+    <serviceTask id="ST01" name="查询成本中心类型" activiti:class="com.eorionsolution.riying.bpms.javaservice.http.RestAPIService"></serviceTask>
+    <scriptTask id="ST02" name="处理理查询结果" scriptFormat="groovy" activiti:autoStoreVariables="false">
+ 	      <script><![CDATA[		
+				//保存成本中心类型
+				execution.setVariable("costCenterType",execution.getVariable('_http_response_body'));
+		  
+				//设置成本中心审批人查询参数
+				execution.setVariable("_http_method", "POST");
+				def headerMap = new java.util.HashMap<String,String>();
+				headerMap.put("Content-Type","application/json");				
+				execution.setVariable("_http_headers", headerMap);
+
+				execution.setVariable("_http_body",execution.getVariable('_http_response_body'));
+				execution.setVariable("_http_url", 'https://bpmcs.dipont.com/decisiontables/v1/fire/ccfn01a.xls');
+				execution.setVariable("_http_response_body", '');
+			    execution.setVariable("_http_response_status_code", '');
+			]]></script>
+    </scriptTask>
+    <serviceTask id="ST03" name="查询成本中心审批人" activiti:class="com.eorionsolution.riying.bpms.javaservice.http.RestAPIService"></serviceTask>
+    <scriptTask id="ST04" name="处理查询结果" scriptFormat="groovy" activiti:autoStoreVariables="false">
+      <script><![CDATA[
+			//保存成本中心审批人
+			execution.setVariable('costCenterDrools',execution.getVariable('_http_response_body'));
+			
+			def corpSn = new groovy.json.JsonSlurper().parseText(execution.getVariable("claimby")).corpSn;
+			//if(execution.getVariable("corp") && execution.getVariable("corp") != "null"){ //不同的任务提交上来之后，有时候为字符串null，有时候就是空，格外注意
+			//	def newCorp = new groovy.json.JsonSlurper().parseText(execution.getVariable("corp"))
+			//	corpSn = newCorp.code;
+			//	execution.setVariable("corpname",newCorp.name);
+			//}
+			//设置参数查询实体相应信息及实体对应的会计出纳审批人
+			execution.setVariable("_http_method", "POST");
+			def headerMap = new java.util.HashMap<String,String>();
+			headerMap.put("Content-Type","application/json");				
+			execution.setVariable("_http_headers", headerMap);
+			def entitys = '[{"entity":"'+corpSn+'"}]';
+			execution.setVariable("_http_body", entitys);
+			execution.setVariable("_http_url", 'https://bpmcs.dipont.com/decisiontables/v1/fire/entityfn01a.xls');
+			execution.setVariable("_http_response_body", '');
+			execution.setVariable("_http_response_status_code", '');
+			
+     ]]></script>
+    </scriptTask>
+    <serviceTask id="ST05" name="查询实体相应信息" activiti:class="com.eorionsolution.riying.bpms.javaservice.http.RestAPIService"></serviceTask>
+    <scriptTask id="ST06" name="处理查询结果" scriptFormat="groovy" activiti:autoStoreVariables="false">
+		 <script><![CDATA[
+				//保存实体相应信息
+				execution.setVariable('result',execution.getVariable('_http_response_body'));
+			
+		 		def result = new groovy.json.JsonSlurper().parseText(execution.getVariable("_http_response_body"));
+				//分析账簿和财务道审批人信息
+				def accountingbook = result[0].accountingbook;
+				def accountno = result[0].accountno;
+				def accountant = result[0].accountant;
+				def cashier = result[0].cashier;
+				def remark1 = result[0].remark1;
+				def remark2 = result[0].remark2;
+				
+				if(!accountant) {
+					throw new org.activiti.engine.ActivitiIllegalArgumentException("您所属的实体目前不存在会计审批人，请联系管理员");
+				}
+				//remark2格式为a:b,c 当报销人为a时，会计改成b,出纳改成c
+				if(remark2){
+					if(initiator == accountant) {
+						try{
+							accountant = remark2.split(",")[0];
+							cashier = remark2.split(",")[1];
+						}catch(Exception e) {
+							throw new org.activiti.engine.ActivitiIllegalArgumentException("会计或出纳设置错误，请联系管理员");
+						}
+					}
+				}
+				//remark1格式为a:b,c 当报销单中包含a开头的成本中心时，一般a都是02，会计改成b,出纳改成c
+				if(remark1){
+					//判断成本中心列表中是否有02开头的，如果有，就替换审批人
+					if(execution.getVariable("costCenterArray").any{elem -> elem.startsWith(remark1.split(":")[0])}) {
+						try{accountant = remark1.split(":")[1].split(",")[0];}catch(Exception e) {}
+						try{cashier = remark1.split(":")[1].split(",")[1];}catch(Exception e) {}
+					}
+				}
+		 
+		 		execution.setVariable("accountant",accountant);//会计
+				execution.setVariable("cashier",cashier);//出纳
+				execution.setVariable("entitytype",result[0].entitytype);//实体类型（A:学校，B:公司）
+				execution.setVariable("payeraccount",result[0].payeraccount);//付款银行账号
+				execution.setVariable("payerbank",result[0].payerbank);//付款银行
+		 
+		 
+		 
+				def costCenterType = new groovy.json.JsonSlurper().parseText(execution.getVariable("costCenterType"));
+				def mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+				def std = mapper.readValue(execution.getVariable('tbhdexpdetfn01a_item_std'), new com.fasterxml.jackson.core.type.TypeReference<List<Map<String, Object>>>(){});
+				//将成本中心，收支项目等map类型的数据全部将code取出替换原有map，新增type属性，赋值成本中心类型（ABCD）,新增type2属性，赋值成本中心类型（1234）赋值实体类型
+				def dealStd = std.each{ elem ->
+					elem.each{
+						if (it.value instanceof java.util.Map)
+							it.value = it.value.code;
+					}
+					try{elem.type = costCenterType.find { it -> it.costcenter == elem.costcenter}.type;}catch(Exception e) {throw new org.activiti.engine.ActivitiIllegalArgumentException("成本中心类型缺失，请联系管理员");}
+					try{elem.type2 = costCenterType.find { it -> it.costcenter == elem.costcenter}.type2;}catch(Exception e) {throw new org.activiti.engine.ActivitiIllegalArgumentException("成本中心类型缺失，请联系管理员");}
+					elem.entitytype = result[0].entitytype;
+				}
+			
+		 		
+
+				//先处理还款凭证
+				def againstamount = 0;
+				execution.setVariable("againstamount","0.00");
+				if(execution.getVariable('ispay') == '是') {
+					def inputList = mapper.readValue(execution.getVariable("tbhdexpdet_item_std"), new com.fasterxml.jackson.core.type.TypeReference<List<Map<String, Object>>>(){});
+		
+					def procInstIdList = [];
+					def stdNew = inputList.each{ elem ->
+						def balanceDetail = elem.borrow.name;
+						def procInstId = balanceDetail.substring(0,balanceDetail.lastIndexOf("/")).trim();
+						def balance = balanceDetail.substring(balanceDetail.lastIndexOf(":") + 1, balanceDetail.length()).trim();
+						def costcenterCode = new groovy.json.JsonSlurper().parseText(runtimeService.getVariable(procInstId, "costcenter")).code;
+						
+						procInstIdList << procInstId;
+						
+						if (new java.math.BigDecimal(balance) < new java.math.BigDecimal(elem.amount))
+							throw new org.activiti.engine.ActivitiIllegalArgumentException("还款金额不能大于剩余金额");
+							
+						def amount = new java.math.BigDecimal(elem.amount).setScale(2, java.math.RoundingMode.HALF_UP);
+						againstamount += amount;
+
+						elem.balance = balance;				
+						elem.debitacc = "1002";//借方科目（银行存款）
+						elem.dassist = [["0011":accountno]]; //借方辅助核算项（银行账户）
+						elem.creditacc = "122101";//贷方科目（其它应收款-借款备用金）
+						elem.cassist = [["0002":execution.getVariable("nccode")],["ra01":costcenterCode],["0037":"Z"+costcenterCode.substring(0,2)]]; //0002（人员档案），ra01（成本中心），0037（利润中心）
+					}
+
+					execution.setVariable("againstamount",againstamount+""); //冲销总金额
+					
+					
+					//判断还款明细中是否有重复的借款流程，如果有，抛异常
+					if(procInstIdList.clone().unique().size() != procInstIdList.size())
+						throw new org.activiti.engine.ActivitiIllegalArgumentException("还款明细中存在重复的借款流程，请将其合并后再提交");
+						
+					def debitList = [],creditList = [];
+					stdNew.groupBy{ it.subMap('debitacc', 'dassist')}.each{ k,v ->
+						def totalamount = 0;
+						v.each {
+							it.amount = new java.math.BigDecimal(it.amount).setScale(2, java.math.RoundingMode.HALF_UP);
+							totalamount += it.amount;
+						}
+						def debitMap = new java.util.HashMap<String, Object>();
+						debitMap.put(v[0].debitacc,[amount:totalamount,dassist:v[0].dassist]);
+						debitList << debitMap;
+					}
+					stdNew.groupBy{ it.subMap('creditacc', 'cassist')}.each{ k,v ->
+						def totalamount = 0;
+						v.each {
+							it.amount = new java.math.BigDecimal(it.amount).setScale(2, java.math.RoundingMode.HALF_UP);
+							totalamount += it.amount;
+						}
+						def creditMap = new java.util.HashMap<String, Object>();
+						creditMap.put(v[0].creditacc,[amount:totalamount,cassist:v[0].cassist]);
+						creditList << creditMap;
+					}
+					def vocherMap = [explanation:execution.getBusinessKey(),verifydate:execution.getVariable('verifydate'),org:result[0].entity,createUser:result[0].createuser,accountingbook:result[0].accountingbook,debit:debitList,credit:creditList];
+					
+					try
+						{execution.setVariable('refundVocherMapString',groovy.json.JsonOutput.toJson(vocherMap));}
+					catch(Exception e) 
+						{throw new org.activiti.engine.ActivitiIllegalArgumentException("您所选择的收支项目对应的会计科目未维护业务规则，请联系业务规则方或系统管理员");}
+				}
+				
+				
+		 		//设置参数根据收支项目和成本中心类型查询会计科目
+				execution.setVariable("_http_method", "POST");
+				def headerMap = new java.util.HashMap<String,String>();
+				headerMap.put("Content-Type","application/json");				
+				execution.setVariable("_http_headers", headerMap);
+
+				execution.setVariable("_http_body",groovy.json.JsonOutput.toJson(dealStd));
+				execution.setVariable("_http_url", 'https://bpmcs.dipont.com/decisiontables/v1/fire/accsubjectfn01a.xls');
+				execution.setVariable("_http_response_body", '');
+				execution.setVariable("_http_response_status_code", '');
+		 
+     ]]></script>
+    </scriptTask>
+    <serviceTask id="ST07" name="查询会计科目" activiti:class="com.eorionsolution.riying.bpms.javaservice.http.RestAPIService"></serviceTask>
+    <scriptTask id="ST08" name="处理查询结果" scriptFormat="groovy" activiti:autoStoreVariables="false">
+       <script><![CDATA[
+		//保存明细对应的会计科目信息
+		execution.setVariable('dealStd',execution.getVariable('_http_response_body'));
+
+		def dealStd = execution.getVariable('_http_response_body');
+		def result = new groovy.json.JsonSlurper().parseText(execution.getVariable("result"));
+		
+		//借代科目合并
+        def mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+		def inputList = mapper.readValue(dealStd, new com.fasterxml.jackson.core.type.TypeReference<List<Map<String, Object>>>(){});
+
+		def assistMap = [category:"0041",partner:"0004",ioitem:"0008",project:"0010",bankacc:"0011",profitacc:"0037",costcenter:"ra01"];
+		def stdNew = inputList.each{ elem ->
+			if(elem.debitacc == '' || elem.creditacc == '') {
+				throw new org.activiti.engine.ActivitiIllegalArgumentException("您所选择的收支项目对应的会计科目未维护业务规则，请联系业务规则方或系统管理员");
+			}
+			elem.partner = elem.vendor;
+			elem.bankacc = result[0].accountno;
+			elem.profitacc = "Z"+elem.costcenter.substring(0,2);	//利润中心，一般都是Z+成本中心前两位
+			def dassistList = [],cassistList = [];
+
+			try
+			{elem.dassist.split(',').collect{it}.each{ item ->
+					def dassistMap = new java.util.HashMap<String, Object>();
+					dassistMap.put(assistMap."$item", elem."$item");
+					dassistList << dassistMap;
+				}
+				elem.dassist = dassistList.sort();}
+			catch(Exception e)
+			{elem.dassist =[];}
+			
+			try
+			{elem.cassist.split(',').collect{it}.each{ item ->
+					def cassistMap = new java.util.HashMap<String, Object>();
+					cassistMap.put(assistMap."$item", elem."$item");
+					cassistList << cassistMap;
+				}
+				elem.cassist = cassistList.sort();}
+			catch(Exception e)
+			{elem.cassist  =[];}
+		}
+
+		def debitList = [],creditList = [];
+		stdNew.groupBy{ it.subMap('debitacc', 'dassist')}.each{ k,v ->
+			def totalamount = 0;
+			v.each {
+				it.amount = new java.math.BigDecimal(it.amount).setScale(2, java.math.RoundingMode.HALF_UP);
+				totalamount += it.amount;
+			}
+			def debitMap = new java.util.HashMap<String, Object>();
+			debitMap.put(v[0].debitacc,[amount:totalamount,dassist:v[0].dassist]);
+			debitList << debitMap;
+		}
+		stdNew.groupBy{ it.subMap('creditacc', 'cassist')}.each{ k,v ->
+			def totalamount = 0;
+			v.each {
+				it.amount = new java.math.BigDecimal(it.amount).setScale(2, java.math.RoundingMode.HALF_UP);
+				totalamount += it.amount;
+			}
+			def creditMap = new java.util.HashMap<String, Object>();
+			creditMap.put(v[0].creditacc,[amount:totalamount,cassist:v[0].cassist]);
+			creditList << creditMap;
+		}
+		
+		def vocherMap = [explanation:execution.getVariable('businessKey')+"@@"+execution.getVariable('claimname')+"@@"+execution.getProcessInstanceId(),verifydate:execution.getVariable('verifydate'),org:result[0].entity,createUser:result[0].createuser,accountingbook:result[0].accountingbook,debit:debitList,credit:creditList];
+		
+		//有冲销
+		if(execution.getVariable('ispay') == '是') {
+			def refundVocherMap= new groovy.json.JsonSlurper().parseText(execution.getVariable("refundVocherMapString"));
+			def debitDeposit = refundVocherMap.debit.findResult {it."1002"} //冲销
+			def creditDeposit = vocherMap.credit.findResult {it."1002"} //报销
+
+			if(new java.math.BigDecimal(debitDeposit.amount) == new java.math.BigDecimal(creditDeposit.amount)) {//冲销金额=报销总金额
+				vocherMap.credit =vocherMap.credit - vocherMap.credit.find{it -> it.keySet().contains("1002")};
+			}else if(new java.math.BigDecimal(debitDeposit.amount) > new java.math.BigDecimal(creditDeposit.amount)) {//冲销金额>报销金额
+				vocherMap.credit = vocherMap.credit - vocherMap.credit.find{it -> it.keySet().contains("1002")};
+				refundVocherMap.debit[0]."1002".amount = new java.math.BigDecimal(debitDeposit.amount) - new java.math.BigDecimal(creditDeposit.amount);
+				vocherMap.debit = vocherMap.debit + refundVocherMap.debit.find{it -> it.keySet().contains("1002")};
+			}else{//冲销金额<报销金额
+				vocherMap.credit[0]."1002".amount = new java.math.BigDecimal(creditDeposit.amount)- new java.math.BigDecimal(debitDeposit.amount);
+			}
+			vocherMap.credit =vocherMap.credit + refundVocherMap.credit;
+		}
+		
+		
+		try
+			{execution.setVariable('vocherMapString',groovy.json.JsonOutput.toJson(vocherMap));}
+		catch(Exception e) 
+			{throw new org.activiti.engine.ActivitiIllegalArgumentException("收支项目对应的辅助核算项存在异常，请联系管理员");}
+		
+	
+		//设置预算查询参数
+		execution.setVariable("_http_method", "GET");
+		def headerMap = new java.util.HashMap<String,String>();			
+		execution.setVariable("_http_headers", headerMap);
+		execution.setVariable("_http_body", '');
+		def param=java.net.URLEncoder.encode('[{"type":"category","target":["variable",["template-tag","costcenter_code"]],"value":"'+execution.getVariable("costCenterArray").join(",")+'"},{"type":"category","target":["variable",["template-tag","apply_time"]],"value":'+execution.getVariable("verifydate")+'}]', "UTF-8");
+		execution.setVariable("_http_url", 'https://bpmmb.dipont.com/public/question/cf538164-061d-4701-8f5b-684e746ff927.json?parameters='+param);
+		execution.setVariable("_http_response_body", '');
+		execution.setVariable("_http_response_status_code", '');
+      ]]></script>
+    </scriptTask>
+    <serviceTask id="ST09" name="查询预算" activiti:class="com.eorionsolution.riying.bpms.javaservice.http.RestAPIService"></serviceTask>
+    <sequenceFlow id="flow11" sourceRef="ST09" targetRef="ST10"></sequenceFlow>
+    <scriptTask id="ST10" name="处理查询结果" scriptFormat="groovy" activiti:autoStoreVariables="false">
+      <script><![CDATA[
+			execution.setVariable('allBudget',execution.getVariable('_http_response_body'));
+			
+			//调用成本中心审批流程时将审批人清空
+			execution.setVariable("costcentermemo","");
+     ]]></script>
+    </scriptTask>
+    <sequenceFlow id="flow12" sourceRef="ST10" targetRef="CA1"></sequenceFlow>
+    <callActivity id="CA1" name="成本中心审批" calledElement="CA_DPFN001A">
+      <extensionElements>
+        <activiti:in sourceExpression="${costCenterArray[loopCounter]}" target="costCenter"></activiti:in>
+        <activiti:in sourceExpression="${claimname}" target="claimname"></activiti:in>
+        <activiti:in sourceExpression="${claimsn}" target="claimsn"></activiti:in>
+        <activiti:in sourceExpression="${currency}" target="currency"></activiti:in>
+        <activiti:in sourceExpression="${comments}" target="comments"></activiti:in>
+        <activiti:in sourceExpression="${attachment}" target="attachment"></activiti:in>
+        <activiti:in sourceExpression="${costCenterDrools}" target="costCenterDrools"></activiti:in>
+        <activiti:in sourceExpression="${tbhdexpdetfn01a_item}" target="tbhdexpdetfn01a_item"></activiti:in>
+        <activiti:in sourceExpression="${businessKey}" target="businessKey"></activiti:in>
+        <activiti:in sourceExpression="${verifydate}" target="verifydate"></activiti:in>
+        <activiti:in sourceExpression="${allBudget}" target="allBudget"></activiti:in>
+        <activiti:in sourceExpression="${againstamount}" target="againstamount"></activiti:in>
+		<activiti:in sourceExpression="${corpname}" target="corpname"></activiti:in>
+		
+      </extensionElements>
+      <multiInstanceLoopCharacteristics isSequential="false">
+        <loopCardinality>${costCenterArray.size()}</loopCardinality>
+        <completionCondition>${execution.getVariable('coreaction') == '拒绝'}</completionCondition>
+      </multiInstanceLoopCharacteristics>
+    </callActivity>
+    <exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway"></exclusiveGateway>
+    <sequenceFlow id="flow2" sourceRef="CA1" targetRef="exclusivegateway1"></sequenceFlow>
+    <userTask id="UT03" name="驳回后修改 Claim Update" activiti:assignee="${initiator}" activiti:dueDate="P1D" activiti:priority="8080">
+      <documentation>若成本中心或者会计或者出纳拒绝，会启动此任务供用户修改. Claim Update is required due to previous approval results</documentation>
+      <extensionElements>
+        <activiti:formProperty id="claimname_实际报销人 Claim to_1_string_t1_$$VA" name="实际报销人 Claim to" type="string" variable="claimname"></activiti:formProperty>
+        <activiti:formProperty id="currency_货币 Currency_2_enum_sbs_$$VA" name="货币 Currency" type="string" variable="currency"></activiti:formProperty>
+        <activiti:formProperty id="ispay_是否冲销 Cash Advance Deduction_3_enum_sbs_$$VA" name="是否冲销 Cash Advance Deduction" type="string" variable="ispay"></activiti:formProperty>
+        <!--<activiti:formProperty id="corp_实体_4_string_tree_$$VA" name="所属实体 CorpID (For cross-corp)" type="string" variable="corp"></activiti:formProperty>-->
+        <activiti:formProperty id="comments_报销说明 Comments_1_string_t1_$$VB" name="报销说明 Comments" type="string" variable="comments"></activiti:formProperty>
+        <activiti:formProperty id="attachment_附件_1_string_t9_$$VF" name="附件" type="string" variable="attachment"></activiti:formProperty>
+        <activiti:formProperty id="claimby_实际报销人 Claim to_1_string_relation_$$A" name="实际报销人 Claim to" type="string" variable="claimby" required="true"></activiti:formProperty>
+        <activiti:formProperty id="currency_货币 Currency_2_enum_sbs_$$A" name="货币 Currency" type="enum" variable="currency" required="true">
+          <activiti:value id="人民币" name="人民币 RMB"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="ispay_是否冲销 Cash Advance Deduction_3_enum_sbs_$$A" name="是否冲销 Cash Advance Deduction" type="enum" variable="ispay" required="true">
+          <activiti:value id="否" name="否 N"></activiti:value>
+          <!--<activiti:value id="是" name="是 Y"></activiti:value>-->
+        </activiti:formProperty>
+        <!--<activiti:formProperty id="corp_实体_4_string_tree_$$A" name="所属实体 Corp ID  (For cross-corp)" type="string" variable="corp"></activiti:formProperty>-->
+        <activiti:formProperty id="comments_报销说明 Comments_1_string_t1_$$B" name="报销说明 Note" type="string" variable="comments"></activiti:formProperty>
+        <activiti:formProperty id="attachment_附件_1_string_t9_$$F" name="附件" type="string" variable="attachment"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_item" name="报销明细 Details" type="string" variable="tbhdexpdetfn01a_item" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_收支项目a Payment item_ioitem_0_string_tree_$$VA" name="收支项目 Payment item" type="string" variable="tbhdexpdetfn01a_ioitem_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_成本中心 Costcenter_costcenter_1_string_tree_$$A" name="成本中心 Costcenter" type="string" variable="tbhdexpdetfn01a_costcenter_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_项目 Project_project_2_string_tree_$$A" name="项目 Project" type="string" variable="tbhdexpdetfn01a_project_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_开始时间 Start Time_depdate_3_string_t3_$$A" name="开始时间 Start Time" type="string" variable="tbhdexpdetfn01a_depdate_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_结束时间 End Time_arrdate_4_string_t3_$$A" name="结束时间 End Time" type="string" variable="tbhdexpdetfn01a_arrdate_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_几类城市 City Category_citytype_5_enum_sbs_$$A" name="几类城市 City Category" type="enum" variable="tbhdexpdetfn01a_citytype_t00">
+		  <activiti:value id="" name=""></activiti:value>
+          <activiti:value id="国内-1类" name="国内-1类 First-class Chinese city"></activiti:value>
+          <activiti:value id="国内-2类" name="国内-2类 Second-class Chinese city"></activiti:value>
+          <activiti:value id="国内-3类" name="国内-3类 Third-class Chinese city"></activiti:value>
+          <activiti:value id="国外-欧洲" name="国外-欧洲 Euro"></activiti:value>
+          <activiti:value id="国外-亚太" name="国外-亚太 APAC"></activiti:value>
+          <activiti:value id="国外-北美" name="国外-北美 North America"></activiti:value>
+          <activiti:value id="国外-其它" name="国外-其它 Others"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_出发地 Departure_departure_6_string_t1_$$A" name="出发地 Departure" type="string" variable="tbhdexpdetfn01a_departure_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_目的地 Destination_destination_7_string_t1_$$A" name="目的地 Destination" type="string" variable="tbhdexpdetfn01a_destination_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_出差地点 Travel to_desloc_8_string_t1_$$A" name="出差地点 Travel to" type="string" variable="tbhdexpdetfn01a_desloc_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_出差天数 Travel days_arrivaldays_9_string_t6_$$A" name="出差天数 Travel days" type="string" variable="tbhdexpdetfn01a_arrivaldays_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_餐饮费标准 Meal Std._mealstd_10_string_t11_$$HA" name="餐饮费标准 Meal Std." type="string" variable="tbhdexpdetfn01a_mealstd_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_餐饮费超标金额 Meal Exc._mealextra_11_string_t11_$$HA" name="餐饮费超标金额 Meal Exc." type="string" variable="tbhdexpdetfn01a_mealetra_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_住宿费标准 Accommodation Std._hotelstd_12_string_t11_$$HA" name="住宿费标准 Accommodation Std." type="string" variable="tbhdexpdetfn01a_hotelstd_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_住宿费超标金额 Accommodation Exc._hotelextra_13_string_t11_$$HA" name="住宿费超标金额 Accommodation Exc." type="string" variable="tbhdexpdetfn01a_hotelextra_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_金额 Amount_amount_14_string_cny_$$A" name="金额 Amount" type="string" variable="tbhdexpdetfn01a_amount_t00"></activiti:formProperty>
+		
+        <activiti:formProperty id="tbhdexpdetfn01a_税额 Tax_tax_15_string_cny_$$A" name="税额 Tax" type="string" variable="tbhdexpdetfn01a_tax_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_航班类型 Flight Type_flighttype_16_enum_sbs_$$A" name="航班类型 Flight Type" type="enum" variable="tbhdexpdetfn01a_flighttype_t00">
+		  <activiti:value id="" name=""></activiti:value>
+          <activiti:value id="国内航班" name="国内航班 Domestic Flight"></activiti:value>
+          <activiti:value id="国际航班" name="国际航班 International Flight "></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_机票价 Air Fare_airfare_17_string_cny_$$A" name="机票价 Air Fare" type="string" variable="tbhdexpdetfn01a_airfare_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_燃油附加费 YQ_yq_18_string_cny_$$A" name="燃油附加费 YQ" type="string" variable="tbhdexpdetfn01a_yq_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_机场建设费 CN_cn_19_string_cny_$$A" name="机场建设费 CN" type="string" variable="tbhdexpdetfn01a_cn_t00"></activiti:formProperty>
+		<activiti:formProperty id="tbhdexpdetfn01a_发票数量 Qty Invoiced_qtyinvoiced_20_string_t6_$$A" name="发票数量 Qty Invoiced" type="string" variable="tbhdexpdetfn01a_qtyinvoiced_t00"></activiti:formProperty>
+		
+        <activiti:formProperty id="tbhdexpdetfn01a_备注信息 Note_expdetail_21_string_t1_$$A" name="备注信息 Note" type="string" variable="tbhdexpdetfn01a_expdetail_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_利润中心 Profit Center_profitacc_22_string_t1_$$HA" name="利润中心 Profit Center" type="string" variable="tbhdexpdetfn01a_profitacc_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_设备类别 Equipment Type_category_23_string_tree_$$A" name="设备类别 Equipment Type" type="string" variable="tbhdexpdetfn01a_category_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_学科 Subject_discipline_24_enum_sbs_$$A" name="学科 Subject" type="enum" variable="tbhdexpdetfn01a_discipline_t00">
+          <activiti:value id="无" name="无 NA"></activiti:value>
+          <activiti:value id="语文" name="语文 Chi."></activiti:value>
+          <activiti:value id="数学" name="数学 Math."></activiti:value>
+		  <activiti:value id="政治" name="政治 Politics"></activiti:value>
+          <activiti:value id="英语" name="英语 Eng."></activiti:value>
+          <activiti:value id="历史" name="历史 His."></activiti:value>
+          <activiti:value id="地理" name="地理 Geo."></activiti:value>
+          <activiti:value id="物理" name="物理 Phy."></activiti:value>
+          <activiti:value id="生物" name="生物 Bio."></activiti:value>
+          <activiti:value id="化学" name="化学 Chem."></activiti:value>
+          <activiti:value id="体育" name="体育 P.E."></activiti:value>
+          <activiti:value id="美术" name="美术 Art"></activiti:value>
+          <activiti:value id="音乐" name="音乐 Music"></activiti:value>
+          <activiti:value id="其它" name="其它 Other"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_差旅申请号 Travel Request No_application_25_string_auto_$$A" name="差旅申请号 Travel Request No" type="string" variable="tbhdexpdetfn01a_application_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_供应商 Vendor_vendor_26_string_auto_$$A" name="供应商 Vendor" type="string" variable="tbhdexpdetfn01a_vendor_t00"></activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <sequenceFlow id="SEQ1_N" name="成本中心拒绝" sourceRef="exclusivegateway1" targetRef="UT03">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('coreaction') == '拒绝'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow5" sourceRef="UT03" targetRef="exclusivegateway4"></sequenceFlow>
+    <sequenceFlow id="SEQ1_Y" name="成本中心通过" sourceRef="exclusivegateway1" targetRef="ST11">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('coreaction') == '同意'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow8" sourceRef="ST04" targetRef="ST05"></sequenceFlow>
+    <scriptTask id="ST11" name="生成pdf" scriptFormat="groovy" activiti:autoStoreVariables="false">
+ 	      <script><![CDATA[		
+
+				execution.setVariable("approveddate",new Date().getTime()+"");//审批通过日期
+				def costcentermemo = new java.util.ArrayList(java.util.Arrays.asList(execution.getVariable("costcentermemo").split("/"))).unique();
+				costcentermemo.removeAll(["null",""]);
+				execution.setVariable("costcentermemo",costcentermemo.join("/") + " 审批通过");//各成本中心审批说明
+				
+				def mapper = new com.fasterxml.jackson.databind.ObjectMapper();
+				def printstd = mapper.readValue(execution.getVariable('tbhdexpdetfn01a_item_std'), new com.fasterxml.jackson.core.type.TypeReference<List<Map<String, Object>>>(){});
+				def printdetail = printstd.each{ elem ->
+					elem.each{
+						if (it.value instanceof java.util.Map)
+							it.value = it.value.name;
+					}
+					elem.amount = new java.math.BigDecimal(elem.amount).setScale(2, java.math.RoundingMode.HALF_UP)+"";
+				}
+				execution.setVariable("printdetail",groovy.json.JsonOutput.toJson(printdetail));
+				
+				execution.setVariable("bpms_printable",'{"processInstanceId":"'+execution.getProcessInstanceId()+'","templateName":"dp_travel_v1.yml","outputFileName":"DPFN001A"}');
+				
+				
+				//设置凭证url
+				execution.setVariable("_http_method", "POST");
+				def headerMap = new java.util.HashMap<String,String>();				
+				execution.setVariable("_http_headers", headerMap);
+				execution.setVariable("_http_body", '');
+				execution.setVariable("_http_url", 'https://bpmcs.dipont.com/decisiontables/v1/integrate/'+execution.getProcessInstanceId()+'/vocherMapString/with/voucher.xml');
+				execution.setVariable("_http_response_body", '');
+				execution.setVariable("_http_response_status_code", '');	
+			]]></script>
+    </scriptTask>
+    <sequenceFlow id="flow9" sourceRef="ST08" targetRef="ST09"></sequenceFlow>
+    <userTask id="UT01" name="费用报销会计审批 Accounting Approval" activiti:assignee="${accountant}" activiti:dueDate="P1D" activiti:priority="8080">
+      <documentation>成本中心审批通过后，会计复核</documentation>
+      <extensionElements>
+        <activiti:formProperty id="coreaction_审批结果 Approval_1_enum_rbv_$$A" name="审批结果 Approval" type="enum" variable="coreaction_accountant" required="true">
+          <activiti:value id="同意" name="同意"></activiti:value>
+          <activiti:value id="拒绝" name="拒绝"></activiti:value>
+          <activiti:value id="彻底拒绝" name="彻底拒绝"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="corecomments_审批意见 Comments_1_string_t2_$$B" name="审批意见 Comments" type="string" variable="corecomments_accountant"></activiti:formProperty>
+        <activiti:formProperty id="totalexpamt_报销总金额大写 Total Amount_0_string_cny_$$VB" name="报销总金额大写 Total Amount" type="string" variable="totalamount"></activiti:formProperty>
+        <activiti:formProperty id="totalexpamt_报销总金额 Total Amount_1_string_t11_$$VB" name="报销总金额 Total Amount" type="string" variable="totalamount"></activiti:formProperty>
+        <activiti:formProperty id="claimname_实际报销人 Claim to_2_string_t1_$$VB" name="实际报销人 Claim to" type="string" variable="claimname"></activiti:formProperty>
+        <activiti:formProperty id="currency_货币 Currency_3_enum_sbs_$$VB" name="货币 Currency" type="string" variable="currency"></activiti:formProperty>
+        <activiti:formProperty id="againstamount_冲销金额大写 Total Deduction Amount_4_string_cny_$$VB" name="冲销金额大写 Total Deduction Amount" type="string" variable="againstamount"></activiti:formProperty>
+        <activiti:formProperty id="againstamount_冲销金额 Total Deduction Amount_5_string_t11_$$VB" name="冲销金额 Total Deduction Amount" type="string" variable="againstamount"></activiti:formProperty>
+		<activiti:formProperty id="corp_实体 Corp ID_6_string_t1_$$VB" name="所属实体 Corp ID" type="string" variable="corpname"></activiti:formProperty>			
+        <activiti:formProperty id="comments_报销说明 Comments_1_string_t1_$$VC" name="报销说明 Comments" type="string" variable="comments"></activiti:formProperty>
+        <activiti:formProperty id="attachment_附件_1_string_t9_$$VF" name="附件" type="string" variable="attachment"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_item_$$VA" name="报销明细" type="string" variable="tbhdexpdetfn01a_item"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_收支项目a Payment item_ioitem_0_string_tree_$$VA" name="收支项目 Payment item" type="string" variable="tbhdexpdetfn01a_ioitem_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_成本中心 Costcenter_costcenter_1_string_tree_$$VA" name="成本中心 Costcenter" type="string" variable="tbhdexpdetfn01a_costcenter_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_项目 Project_project_2_string_tree_$$VA" name="项目 Project" type="string" variable="tbhdexpdetfn01a_project_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_开始时间 Start Time_depdate_3_string_t3_$$VA" name="开始时间 Start Time" type="string" variable="tbhdexpdetfn01a_depdate_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_结束时间 End Time_arrdate_4_string_t3_$$VA" name="结束时间 End Time" type="string" variable="tbhdexpdetfn01a_arrdate_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_几类城市 City Category_citytype_5_enum_sbs_$$VA" name="几类城市 City Category" type="string" variable="tbhdexpdetfn01a_citytype_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_出发地 Departure_departure_6_string_t1_$$VA" name="出发地 Departure" type="string" variable="tbhdexpdetfn01a_departure_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_目的地 Destination_destination_7_string_t1_$$VA" name="目的地 Destination" type="string" variable="tbhdexpdetfn01a_destination_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_出差地点 Travel to_desloc_8_string_t1_$$VA" name="出差地点 Travel to" type="string" variable="tbhdexpdetfn01a_desloc_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_出差天数 Travel days_arrivaldays_9_string_t6_$$VA" name="出差天数 Travel days" type="string" variable="tbhdexpdetfn01a_arrivaldays_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_餐饮费标准 Meal Std._mealstd_10_string_t11_$$VA" name="餐饮费标准 Meal Std." type="string" variable="tbhdexpdetfn01a_mealstd_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_餐饮费超标金额 Meal Exc._mealextra_11_string_t11_$$VA" name="餐饮费超标金额 Meal Exc." type="string" variable="tbhdexpdetfn01a_mealetra_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_住宿费标准 Accommodation Std._hotelstd_12_string_t11_$$VA" name="住宿费标准 Accommodation Std." type="string" variable="tbhdexpdetfn01a_hotelstd_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_住宿费超标金额 Accommodation Exc._hotelextra_13_string_t11_$$VA" name="住宿费超标金额 Accommodation Exc." type="string" variable="tbhdexpdetfn01a_hotelextra_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_金额 Amount_amount_14_string_cny_$$VA" name="金额 Amount" type="string" variable="tbhdexpdetfn01a_amount_t00"></activiti:formProperty>
+		
+        <activiti:formProperty id="tbhdexpdetfn01a_税额 Tax_tax_15_string_cny_$$VA" name="税额 Tax" type="string" variable="tbhdexpdetfn01a_tax_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_航班类型 Flight Type_flighttype_16_enum_sbs_$$VA" name="航班类型 Flight Type" type="string" variable="tbhdexpdetfn01a_flighttype_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_机票价 Air Fare_airfare_17_string_cny_$$VA" name="机票价 Air Fare" type="string" variable="tbhdexpdetfn01a_airfare_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_燃油附加费 YQ_yq_18_string_cny_$$VA" name="燃油附加费 YQ" type="string" variable="tbhdexpdetfn01a_yq_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_机场建设费 CN_cn_19_string_cny_$$VA" name="机场建设费 CN" type="string" variable="tbhdexpdetfn01a_cn_t00"></activiti:formProperty>		
+		<activiti:formProperty id="tbhdexpdetfn01a_发票数量 Qty Invoiced_qtyinvoiced_20_string_t6_$$VA" name="发票数量 Qty Invoiced" type="string" variable="tbhdexpdetfn01a_qtyinvoiced_t00"></activiti:formProperty>
+		
+        <activiti:formProperty id="tbhdexpdetfn01a_备注信息 Note_expdetail_21_string_t1_$$VA" name="备注信息 Note" type="string" variable="tbhdexpdetfn01a_expdetail_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_利润中心 Profit Center_profitacc_22_string_t1_$$HA" name="利润中心 Profit Center" type="string" variable="tbhdexpdetfn01a_profitacc_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_设备类别 Equipment Type_category_23_string_tree_$$VA" name="设备类别 Equipment Type" type="string" variable="tbhdexpdetfn01a_category_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_学科 Subject_discipline_24_enum_sbs_$$VA" name="学科 Subject" type="string" variable="tbhdexpdetfn01a_discipline_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_差旅申请号 Travel Request No_application_25_string_auto_$$VA" name="差旅申请号 Travel Request No" type="string" variable="tbhdexpdetfn01a_application_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_供应商 Vendor_vendor_26_string_auto_$$VA" name="供应商 Vendor" type="string" variable="tbhdexpdetfn01a_vendor_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdet_item_$$VA" name="还款明细" type="string" variable="tbhdexpdet_item"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdet_借款余额_borrow_1_string_auto_$$VA" name="借款编号 Cash Advance ID" type="string" variable="tbhdexpdet_crnum_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdet_金额_amount_2_string_t11_$$VA" name="还款金额 Deduction Amount" type="string" variable="tbhdexpdet_amount_t00"></activiti:formProperty>
+		
+        <activiti:taskListener event="create" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+          <activiti:field name="language">
+            <activiti:string><![CDATA[groovy]]></activiti:string>
+          </activiti:field>
+          <activiti:field name="script">
+            <activiti:string><![CDATA[
+				//coreaction VIEW
+				import javax.crypto.Mac;
+				import javax.crypto.spec.SecretKeySpec;
+				import java.security.InvalidKeyException;
+				import java.util.Base64;
+				def hmac_sha256(String secretKey, String data) {
+					try {
+						Mac mac = Mac.getInstance("HmacSHA256");
+						SecretKeySpec secretKeySpec = new SecretKeySpec(secretKey.getBytes(), "HmacSHA256");
+						mac.init(secretKeySpec);
+						byte[] digest = mac.doFinal(data.getBytes());
+						return digest;
+					} catch (InvalidKeyException e) {
+						throw new RuntimeException("Invalid key exception while converting to HMacSHA256");
+					}
+				}
+				def METABASE_SITE_URL = "https://bpmmb.dipont.com";
+				def METABASE_SECRET_KEY = "3c7ece2c2a488065d255402e5bb1729b64ef5a4e37bc2dcbef6a2d327ad55275";
+				def header = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9";//Base64.getUrlEncoder().encodeToString('{"typ":"JWT","alg":"HS256"}'.bytes);
+				def playloadString = '{"resource":{"question":51},"params":{"param":"'+task.getExecution().getProcessInstanceId()+'"}}';
+				def playload = Base64.getUrlEncoder().encodeToString(playloadString.bytes);
+
+				def secret =Base64.getUrlEncoder().encodeToString(hmac_sha256(METABASE_SECRET_KEY , header+'.'+playload));
+				def url = METABASE_SITE_URL + "/embed/question/" + header+'.'+playload+'.'+secret + "#bordered=true&titled=true";
+				task.getExecution().setVariableLocal("BBOT_BI_COREACTION",url);]]></activiti:string>
+          </activiti:field>
+        </activiti:taskListener>
+			
+		
+      </extensionElements>
+    </userTask>
+    <sequenceFlow id="SEQ2_N" name="会计拒绝" sourceRef="exclusivegateway2" targetRef="UT03">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('coreaction_accountant') == '拒绝'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="SEQ2_1_Y" name="会计通过并无出纳审批" sourceRef="exclusivegateway2" targetRef="servicetask1">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('coreaction_accountant') == '同意' && execution.getVariable('cashier') == null}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="SEQ2_2_Y" name="会计通过" sourceRef="exclusivegateway2" targetRef="UT02">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('coreaction_accountant') == '同意'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow26" name="会计彻底拒绝" sourceRef="exclusivegateway2" targetRef="E2">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('coreaction_accountant') == '彻底拒绝'}]]></conditionExpression>
+    </sequenceFlow>
+    <endEvent id="E2" name="E2"></endEvent>
+    <userTask id="UT02" name="费用报销出纳审批 Cashier Approval" activiti:assignee="${cashier}" activiti:dueDate="P1D" activiti:priority="8080">
+      <documentation>会计审批通过后，出纳复核</documentation>
+      <extensionElements>
+        <activiti:formProperty id="coreaction_审批结果 Approval_1_enum_rbv_$$A" name="审批结果 Approval" type="enum" variable="coreaction_cashier" required="true">
+          <activiti:value id="同意" name="同意"></activiti:value>
+          <activiti:value id="拒绝" name="拒绝"></activiti:value>
+          <activiti:value id="彻底拒绝" name="彻底拒绝"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="corecomments_审批意见 Comments_1_string_t2_$$B" name="审批意见 Comments" type="string" variable="corecomments_cashier"></activiti:formProperty>
+        <activiti:formProperty id="totalexpamt_报销总金额大写 Total Amount_0_string_cny_$$VB" name="报销总金额大写 Total Amount" type="string" variable="totalamount"></activiti:formProperty>
+        <activiti:formProperty id="totalexpamt_报销总金额 Total Amount_1_string_t11_$$VB" name="报销总金额 Total Amount" type="string" variable="totalamount"></activiti:formProperty>
+        <activiti:formProperty id="claimname_实际报销人 Claim to_2_string_t1_$$VB" name="实际报销人 Claim to" type="string" variable="claimname"></activiti:formProperty>
+        <activiti:formProperty id="currency_货币 Currency_3_enum_sbs_$$VB" name="货币 Currency" type="string" variable="currency"></activiti:formProperty>
+        <activiti:formProperty id="againstamount_冲销金额大写 Total Deduction Amount_4_string_cny_$$VB" name="冲销金额大写 Total Deduction Amount" type="string" variable="againstamount"></activiti:formProperty>
+        <activiti:formProperty id="againstamount_冲销金额 Total Deduction Amount_5_string_t11_$$VB" name="冲销金额 Total Deduction Amount" type="string" variable="againstamount"></activiti:formProperty>
+		<activiti:formProperty id="corp_实体 Corp ID_6_string_t1_$$VB" name="所属实体 Corp ID " type="string" variable="corpname"></activiti:formProperty>	
+        <activiti:formProperty id="comments_报销说明 Comments_1_string_t1_$$VC" name="报销说明 Comments" type="string" variable="comments"></activiti:formProperty>
+        <activiti:formProperty id="attachment_附件_1_string_t9_$$VF" name="附件" type="string" variable="attachment"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_item_$$VA" name="报销明细" type="string" variable="tbhdexpdetfn01a_item"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_收支项目a Payment item_ioitem_0_string_tree_$$VA" name="收支项目 Payment item" type="string" variable="tbhdexpdetfn01a_ioitem_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_成本中心 Costcenter_costcenter_1_string_tree_$$VA" name="成本中心 Costcenter" type="string" variable="tbhdexpdetfn01a_costcenter_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_项目 Project_project_2_string_tree_$$VA" name="项目 Project" type="string" variable="tbhdexpdetfn01a_project_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_开始时间 Start Time_depdate_3_string_t3_$$VA" name="开始时间 Start Time" type="string" variable="tbhdexpdetfn01a_depdate_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_结束时间 End Time_arrdate_4_string_t3_$$VA" name="结束时间 End Time" type="string" variable="tbhdexpdetfn01a_arrdate_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_几类城市 City Category_citytype_5_enum_sbs_$$VA" name="几类城市 City Category" type="string" variable="tbhdexpdetfn01a_citytype_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_出发地 Departure_departure_6_string_t1_$$VA" name="出发地 Departure" type="string" variable="tbhdexpdetfn01a_departure_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_目的地 Destination_destination_7_string_t1_$$VA" name="目的地 Destination" type="string" variable="tbhdexpdetfn01a_destination_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_出差地点 Travel to_desloc_8_string_t1_$$VA" name="出差地点 Travel to" type="string" variable="tbhdexpdetfn01a_desloc_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_出差天数 Travel days_arrivaldays_9_string_t6_$$VA" name="出差天数 Travel days" type="string" variable="tbhdexpdetfn01a_arrivaldays_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_餐饮费标准 Meal Std._mealstd_10_string_t11_$$VA" name="餐饮费标准 Meal Std." type="string" variable="tbhdexpdetfn01a_mealstd_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_餐饮费超标金额 Meal Exc._mealextra_11_string_t11_$$VA" name="餐饮费超标金额 Meal Exc." type="string" variable="tbhdexpdetfn01a_mealetra_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_住宿费标准 Accommodation Std._hotelstd_12_string_t11_$$VA" name="住宿费标准 Accommodation Std." type="string" variable="tbhdexpdetfn01a_hotelstd_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_住宿费超标金额 Accommodation Exc._hotelextra_13_string_t11_$$VA" name="住宿费超标金额 Accommodation Exc." type="string" variable="tbhdexpdetfn01a_hotelextra_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_金额 Amount_amount_14_string_cny_$$VA" name="金额 Amount" type="string" variable="tbhdexpdetfn01a_amount_t00"></activiti:formProperty>
+		
+        <activiti:formProperty id="tbhdexpdetfn01a_税额 Tax_tax_15_string_cny_$$VA" name="税额 Tax" type="string" variable="tbhdexpdetfn01a_tax_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_航班类型 Flight Type_flighttype_16_enum_sbs_$$VA" name="航班类型 Flight Type" type="string" variable="tbhdexpdetfn01a_flighttype_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_机票价 Air Fare_airfare_17_string_cny_$$VA" name="机票价 Air Fare" type="string" variable="tbhdexpdetfn01a_airfare_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_燃油附加费 YQ_yq_18_string_cny_$$VA" name="燃油附加费 YQ" type="string" variable="tbhdexpdetfn01a_yq_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_机场建设费 CN_cn_19_string_cny_$$VA" name="机场建设费 CN" type="string" variable="tbhdexpdetfn01a_cn_t00"></activiti:formProperty>		
+		<activiti:formProperty id="tbhdexpdetfn01a_发票数量 Qty Invoiced_qtyinvoiced_20_string_t6_$$VA" name="发票数量 Qty Invoiced" type="string" variable="tbhdexpdetfn01a_qtyinvoiced_t00"></activiti:formProperty>
+		
+        <activiti:formProperty id="tbhdexpdetfn01a_备注信息 Note_expdetail_21_string_t1_$$VA" name="备注信息 Note" type="string" variable="tbhdexpdetfn01a_expdetail_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_利润中心 Profit Center_profitacc_22_string_t1_$$HA" name="利润中心 Profit Center" type="string" variable="tbhdexpdetfn01a_profitacc_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_设备类别 Equipment Type_category_23_string_tree_$$VA" name="设备类别 Equipment Type" type="string" variable="tbhdexpdetfn01a_category_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_学科 Subject_discipline_24_enum_sbs_$$VA" name="学科 Subject" type="string" variable="tbhdexpdetfn01a_discipline_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_差旅申请号 Travel Request No_application_25_string_auto_$$VA" name="差旅申请号 Travel Request No" type="string" variable="tbhdexpdetfn01a_application_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdetfn01a_供应商 Vendor_vendor_26_string_auto_$$VA" name="供应商 Vendor" type="string" variable="tbhdexpdetfn01a_vendor_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdet_item_$$VA" name="还款明细" type="string" variable="tbhdexpdet_item"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdet_借款余额_borrow_1_string_auto_$$VA" name="借款编号 Cash Advance ID" type="string" variable="tbhdexpdet_crnum_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdexpdet_金额_amount_2_string_t11_$$VA" name="还款金额 Deduction Amount" type="string" variable="tbhdexpdet_amount_t00"></activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <sequenceFlow id="SEQ3_Y" name="出纳通过" sourceRef="exclusivegateway3" targetRef="servicetask1">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('coreaction_cashier') == '同意'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="SEQ3_N" name="出纳拒绝" sourceRef="exclusivegateway3" targetRef="UT03">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('coreaction_cashier') == '拒绝'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow27" name="出纳彻底拒绝" sourceRef="exclusivegateway3" targetRef="E3">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('coreaction_cashier') == '彻底拒绝'}]]></conditionExpression>
+    </sequenceFlow>
+    <endEvent id="E3" name="E3"></endEvent>
+    <serviceTask id="servicetask1" name="生成凭证" activiti:class="com.eorionsolution.riying.bpms.javaservice.http.RestAPIService"></serviceTask>
+    <sequenceFlow id="flow10" sourceRef="servicetask1" targetRef="E1"></sequenceFlow>
+    <endEvent id="E1" name="E1">
+      <extensionElements>
+        <activiti:executionListener event="end" class="org.activiti.engine.impl.bpmn.listener.ScriptExecutionListener">
+          <activiti:field name="language">
+            <activiti:string><![CDATA[groovy]]></activiti:string>
+          </activiti:field>
+          <activiti:field name="script">
+            <activiti:string><![CDATA[if(execution.getVariable('_http_response_status_code')!= 200){
+					def errorMessage = new XmlParser().parseText(execution.getVariable('_http_response_body').replaceAll("\\<\\?xml(.+?)\\?\\>", "").trim()).sendresult.resultdescription.text();
+					throw new org.activiti.engine.ActivitiIllegalArgumentException(errorMessage+"请联系管理员");
+				}]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </endEvent>
+    <sequenceFlow id="flow13" sourceRef="ST00" targetRef="ST01"></sequenceFlow>
+    <sequenceFlow id="flow14" sourceRef="ST11" targetRef="UT01"></sequenceFlow>
+    <sequenceFlow id="flow15" sourceRef="ST07" targetRef="ST08"></sequenceFlow>
+    <sequenceFlow id="flow16" sourceRef="UT02" targetRef="exclusivegateway3"></sequenceFlow>
+    <exclusiveGateway id="exclusivegateway2" name="Exclusive Gateway"></exclusiveGateway>
+    <sequenceFlow id="flow17" sourceRef="UT01" targetRef="exclusivegateway2"></sequenceFlow>
+    <exclusiveGateway id="exclusivegateway3" name="Exclusive Gateway"></exclusiveGateway>
+    <sequenceFlow id="flow20" sourceRef="ST05" targetRef="ST06"></sequenceFlow>
+    <sequenceFlow id="flow21" sourceRef="ST06" targetRef="ST07"></sequenceFlow>
+    <sequenceFlow id="flow25" sourceRef="startevent1" targetRef="exclusivegateway4"></sequenceFlow>
+    <sequenceFlow id="flow28" sourceRef="ST01" targetRef="ST02"></sequenceFlow>
+    <sequenceFlow id="flow29" sourceRef="ST02" targetRef="ST03"></sequenceFlow>
+    <sequenceFlow id="flow30" sourceRef="ST03" targetRef="ST04"></sequenceFlow>
+    <exclusiveGateway id="exclusivegateway4" name="Exclusive Gateway"></exclusiveGateway>
+    <sequenceFlow id="flow33" sourceRef="usertask1" targetRef="ST00"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_DPFN001A">
+    <bpmndi:BPMNPlane bpmnElement="DPFN001A" id="BPMNPlane_DPFN001A">
+      <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="70.0" y="160.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask1" id="BPMNShape_usertask1">
+        <omgdc:Bounds height="65.0" width="105.0" x="210.0" y="50.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="ST00" id="BPMNShape_ST00">
+        <omgdc:Bounds height="67.0" width="105.0" x="208.0" y="144.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="ST01" id="BPMNShape_ST01">
+        <omgdc:Bounds height="67.0" width="105.0" x="348.0" y="144.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="ST02" id="BPMNShape_ST02">
+        <omgdc:Bounds height="67.0" width="105.0" x="489.0" y="144.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="ST03" id="BPMNShape_ST03">
+        <omgdc:Bounds height="67.0" width="105.0" x="630.0" y="144.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="ST04" id="BPMNShape_ST04">
+        <omgdc:Bounds height="67.0" width="107.0" x="771.0" y="144.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="ST05" id="BPMNShape_ST05">
+        <omgdc:Bounds height="71.0" width="115.0" x="767.0" y="230.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="ST06" id="BPMNShape_ST06">
+        <omgdc:Bounds height="71.0" width="105.0" x="630.0" y="230.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="ST07" id="BPMNShape_ST07">
+        <omgdc:Bounds height="72.0" width="111.0" x="486.0" y="229.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="ST08" id="BPMNShape_ST08">
+        <omgdc:Bounds height="71.0" width="105.0" x="348.0" y="230.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="ST09" id="BPMNShape_ST09">
+        <omgdc:Bounds height="71.0" width="105.0" x="348.0" y="320.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="ST10" id="BPMNShape_ST10">
+        <omgdc:Bounds height="71.0" width="105.0" x="489.0" y="320.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="CA1" id="BPMNShape_CA1">
+        <omgdc:Bounds height="65.0" width="105.0" x="489.0" y="430.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway1" id="BPMNShape_exclusivegateway1">
+        <omgdc:Bounds height="40.0" width="40.0" x="521.0" y="540.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="UT03" id="BPMNShape_UT03">
+        <omgdc:Bounds height="67.0" width="105.0" x="210.0" y="527.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="ST11" id="BPMNShape_ST11">
+        <omgdc:Bounds height="66.0" width="105.0" x="489.0" y="605.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="UT01" id="BPMNShape_UT01">
+        <omgdc:Bounds height="68.0" width="105.0" x="489.0" y="690.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="E2" id="BPMNShape_E2">
+        <omgdc:Bounds height="35.0" width="35.0" x="721.0" y="784.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="UT02" id="BPMNShape_UT02">
+        <omgdc:Bounds height="68.0" width="105.0" x="489.0" y="840.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="E3" id="BPMNShape_E3">
+        <omgdc:Bounds height="35.0" width="35.0" x="383.0" y="1006.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="servicetask1" id="BPMNShape_servicetask1">
+        <omgdc:Bounds height="65.0" width="105.0" x="489.0" y="1006.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="E1" id="BPMNShape_E1">
+        <omgdc:Bounds height="35.0" width="35.0" x="524.0" y="1097.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway2" id="BPMNShape_exclusivegateway2">
+        <omgdc:Bounds height="40.0" width="40.0" x="521.0" y="781.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway3" id="BPMNShape_exclusivegateway3">
+        <omgdc:Bounds height="40.0" width="40.0" x="521.0" y="936.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway4" id="BPMNShape_exclusivegateway4">
+        <omgdc:Bounds height="40.0" width="40.0" x="129.0" y="157.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow31" id="BPMNEdge_flow31">
+        <omgdi:waypoint x="169.0" y="177.0"></omgdi:waypoint>
+        <omgdi:waypoint x="208.0" y="177.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="14.0" width="36.0" x="168.0" y="184.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow32" id="BPMNEdge_flow32">
+        <omgdi:waypoint x="149.0" y="157.0"></omgdi:waypoint>
+        <omgdi:waypoint x="150.0" y="82.0"></omgdi:waypoint>
+        <omgdi:waypoint x="210.0" y="82.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="14.0" width="36.0" x="149.0" y="117.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow11" id="BPMNEdge_flow11">
+        <omgdi:waypoint x="453.0" y="355.0"></omgdi:waypoint>
+        <omgdi:waypoint x="489.0" y="355.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow12" id="BPMNEdge_flow12">
+        <omgdi:waypoint x="541.0" y="391.0"></omgdi:waypoint>
+        <omgdi:waypoint x="541.0" y="430.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="541.0" y="495.0"></omgdi:waypoint>
+        <omgdi:waypoint x="541.0" y="540.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="SEQ1_N" id="BPMNEdge_SEQ1_N">
+        <omgdi:waypoint x="521.0" y="560.0"></omgdi:waypoint>
+        <omgdi:waypoint x="315.0" y="560.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="14.0" width="72.0" x="419.0" y="561.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow5" id="BPMNEdge_flow5">
+        <omgdi:waypoint x="210.0" y="560.0"></omgdi:waypoint>
+        <omgdi:waypoint x="150.0" y="559.0"></omgdi:waypoint>
+        <omgdi:waypoint x="149.0" y="197.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="SEQ1_Y" id="BPMNEdge_SEQ1_Y">
+        <omgdi:waypoint x="541.0" y="580.0"></omgdi:waypoint>
+        <omgdi:waypoint x="541.0" y="605.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="14.0" width="72.0" x="559.0" y="579.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow8" id="BPMNEdge_flow8">
+        <omgdi:waypoint x="824.0" y="211.0"></omgdi:waypoint>
+        <omgdi:waypoint x="824.0" y="230.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow9" id="BPMNEdge_flow9">
+        <omgdi:waypoint x="400.0" y="301.0"></omgdi:waypoint>
+        <omgdi:waypoint x="400.0" y="320.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="SEQ2_N" id="BPMNEdge_SEQ2_N">
+        <omgdi:waypoint x="521.0" y="801.0"></omgdi:waypoint>
+        <omgdi:waypoint x="262.0" y="800.0"></omgdi:waypoint>
+        <omgdi:waypoint x="262.0" y="594.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="14.0" width="48.0" x="378.0" y="819.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="SEQ2_1_Y" id="BPMNEdge_SEQ2_1_Y">
+        <omgdi:waypoint x="561.0" y="801.0"></omgdi:waypoint>
+        <omgdi:waypoint x="650.0" y="800.0"></omgdi:waypoint>
+        <omgdi:waypoint x="650.0" y="1038.0"></omgdi:waypoint>
+        <omgdi:waypoint x="594.0" y="1038.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="42.0" width="100.0" x="649.0" y="918.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="SEQ2_2_Y" id="BPMNEdge_SEQ2_2_Y">
+        <omgdi:waypoint x="541.0" y="821.0"></omgdi:waypoint>
+        <omgdi:waypoint x="541.0" y="840.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="14.0" width="48.0" x="549.0" y="817.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow26" id="BPMNEdge_flow26">
+        <omgdi:waypoint x="561.0" y="801.0"></omgdi:waypoint>
+        <omgdi:waypoint x="721.0" y="801.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="14.0" width="72.0" x="599.0" y="781.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="SEQ3_Y" id="BPMNEdge_SEQ3_Y">
+        <omgdi:waypoint x="541.0" y="976.0"></omgdi:waypoint>
+        <omgdi:waypoint x="541.0" y="1006.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="14.0" width="48.0" x="541.0" y="976.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="SEQ3_N" id="BPMNEdge_SEQ3_N">
+        <omgdi:waypoint x="521.0" y="956.0"></omgdi:waypoint>
+        <omgdi:waypoint x="262.0" y="955.0"></omgdi:waypoint>
+        <omgdi:waypoint x="262.0" y="594.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="14.0" width="48.0" x="271.0" y="932.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow27" id="BPMNEdge_flow27">
+        <omgdi:waypoint x="521.0" y="956.0"></omgdi:waypoint>
+        <omgdi:waypoint x="400.0" y="956.0"></omgdi:waypoint>
+        <omgdi:waypoint x="400.0" y="1006.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="14.0" width="72.0" x="318.0" y="990.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow10" id="BPMNEdge_flow10">
+        <omgdi:waypoint x="541.0" y="1071.0"></omgdi:waypoint>
+        <omgdi:waypoint x="541.0" y="1097.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow13" id="BPMNEdge_flow13">
+        <omgdi:waypoint x="313.0" y="177.0"></omgdi:waypoint>
+        <omgdi:waypoint x="348.0" y="177.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow14" id="BPMNEdge_flow14">
+        <omgdi:waypoint x="541.0" y="671.0"></omgdi:waypoint>
+        <omgdi:waypoint x="541.0" y="690.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow15" id="BPMNEdge_flow15">
+        <omgdi:waypoint x="486.0" y="265.0"></omgdi:waypoint>
+        <omgdi:waypoint x="453.0" y="265.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow16" id="BPMNEdge_flow16">
+        <omgdi:waypoint x="541.0" y="908.0"></omgdi:waypoint>
+        <omgdi:waypoint x="541.0" y="936.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow17" id="BPMNEdge_flow17">
+        <omgdi:waypoint x="541.0" y="758.0"></omgdi:waypoint>
+        <omgdi:waypoint x="541.0" y="781.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow20" id="BPMNEdge_flow20">
+        <omgdi:waypoint x="767.0" y="265.0"></omgdi:waypoint>
+        <omgdi:waypoint x="735.0" y="265.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow21" id="BPMNEdge_flow21">
+        <omgdi:waypoint x="630.0" y="265.0"></omgdi:waypoint>
+        <omgdi:waypoint x="597.0" y="265.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow25" id="BPMNEdge_flow25">
+        <omgdi:waypoint x="105.0" y="177.0"></omgdi:waypoint>
+        <omgdi:waypoint x="129.0" y="177.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow28" id="BPMNEdge_flow28">
+        <omgdi:waypoint x="453.0" y="177.0"></omgdi:waypoint>
+        <omgdi:waypoint x="489.0" y="177.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow29" id="BPMNEdge_flow29">
+        <omgdi:waypoint x="594.0" y="177.0"></omgdi:waypoint>
+        <omgdi:waypoint x="630.0" y="177.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow30" id="BPMNEdge_flow30">
+        <omgdi:waypoint x="735.0" y="177.0"></omgdi:waypoint>
+        <omgdi:waypoint x="771.0" y="177.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow33" id="BPMNEdge_flow33">
+        <omgdi:waypoint x="262.0" y="115.0"></omgdi:waypoint>
+        <omgdi:waypoint x="260.0" y="144.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>
