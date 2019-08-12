@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/processdef">
-  <process id="CA_DPFN001A" name="CA_DPFN001A_各成本中心审批子流程 Expense Claim Costcenter Approval" isExecutable="true">
+  <process id="CA_DPFN001A_TEST" name="CA_DPFN001A_各成本中心审批子流程 Expense Claim Costcenter Approval" isExecutable="true">
     <documentation>员工报销，明细中多成本中心拆分审批子流程 Expense Claim Costcenter Approval</documentation>
     <startEvent id="s1" name="s1" activiti:initiator="initiator">
       <extensionElements>
@@ -1000,7 +1000,7 @@
 	        </activiti:taskListener>
 	      </extensionElements>
       </userTask>
-      <userTask id="usertask2" name="串行多级审批" activiti:assignee="${user}">
+      <userTask id="usertask2" name="成本中心审批 Cost center approval" activiti:assignee="${user}">
       <extensionElements>
         <activiti:formProperty id="coreaction_审批结果 Approval_1_enum_rbv_$$A" name="审批结果 Approval" type="enum" variable="approvalResults" required="true">
           <activiti:value id="同意" name="同意 Y"></activiti:value>
