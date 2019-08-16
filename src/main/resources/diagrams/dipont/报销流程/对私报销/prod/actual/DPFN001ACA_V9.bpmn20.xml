@@ -755,7 +755,7 @@
 	  			execution.setVariable('specialDrools', responseBody)
 	  			def droolsResult = jsonSlurper.parseText(responseBody)
 	  			droolsResult.each{
-	  				if(it.verifierfirst == null) {
+	  				if(it.verifierfirst == null && it.specialapproval == null && it.concurrent == null) {
 	  					throw new org.activiti.engine.ActivitiIllegalArgumentException("成本中心：" + it.costcenter + " 项目：" + it.project + " 收支项目：" + it.ioitem + " 金额：" + it.amount + " 对应的审批人不存在！");
 	  				}
 	  			}
