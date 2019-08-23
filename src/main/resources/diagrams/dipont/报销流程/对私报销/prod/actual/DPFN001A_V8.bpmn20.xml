@@ -790,7 +790,7 @@
     </scriptTask>
     <sequenceFlow id="flow9" sourceRef="ST08" targetRef="ST09"/>
     <userTask id="UT01" activiti:assignee="${accountant}" activiti:dueDate="P1D" activiti:priority="8080" name="费用报销会计审批 Accounting Approval">
-      <documentation>成本中心审批通过后，会计复核</documentation>
+      <documentation>成本中心审批通过后，会计复核 After the cost center approval is passed, the accounting review</documentation>
       <extensionElements>
         <activiti:formProperty id="coreaction_审批结果 Approval_1_enum_rbv_$$A" name="审批结果 Approval" required="true" type="enum" variable="coreaction_accountant">
           <activiti:value id="同意 Agree" name="同意 Agree"/>
@@ -891,7 +891,7 @@
       <incoming>flow26</incoming>
     </endEvent>
     <userTask id="UT02" activiti:assignee="${cashier}" activiti:dueDate="P1D" activiti:priority="8080" name="费用报销出纳审批 Cashier Approval">
-      <documentation>会计审批通过后，出纳复核</documentation>
+      <documentation>会计审批通过后，出纳复核 After the approval of the accounting, the cashier review</documentation>
       <extensionElements>
         <activiti:formProperty id="coreaction_审批结果 Approval_1_enum_rbv_$$A" name="审批结果 Approval" required="true" type="enum" variable="coreaction_cashier">
           <activiti:value id="同意 Agree" name="同意 Agree"/>
