@@ -256,7 +256,7 @@
 					   
 					}
 					catch(Exception e){
-						throw new org.activiti.engine.ActivitiIllegalArgumentException("员工报销级别存在异常，请联系管理员");
+						throw new org.activiti.engine.ActivitiIllegalArgumentException("员工报销级别存在异常，请联系管理员 There is an abnormality in the employee reimbursement level. Please contact the administrator.");
 					}
 						
 						
@@ -383,7 +383,7 @@
 				def remark2 = result[0].remark2;
 				
 				if(!accountant) {
-					throw new org.activiti.engine.ActivitiIllegalArgumentException("您所属的实体目前不存在会计审批人，请联系管理员");
+					throw new org.activiti.engine.ActivitiIllegalArgumentException("您所属的实体目前不存在会计审批人，请联系管理员 The entity you belong to does not currently have an accounting approver. Please contact the administrator.");
 				}
 				//remark2格式为a:b,c 当报销人为a时，会计改成b,出纳改成c
 				if(remark2){
@@ -392,7 +392,7 @@
 							accountant = remark2.split(",")[0];
 							cashier = remark2.split(",")[1];
 						}catch(Exception e) {
-							throw new org.activiti.engine.ActivitiIllegalArgumentException("会计或出纳设置错误，请联系管理员");
+							throw new org.activiti.engine.ActivitiIllegalArgumentException("会计或出纳设置错误，请联系管理员 The accounting or cashier settings are incorrect, please contact the administrator");
 						}
 					}
 				}
@@ -422,8 +422,8 @@
 						if (it.value instanceof java.util.Map)
 							it.value = it.value.code;
 					}
-					try{elem.type = costCenterType.find { it -> it.costcenter == elem.costcenter}.type;}catch(Exception e) {throw new org.activiti.engine.ActivitiIllegalArgumentException("成本中心类型缺失，请联系管理员");}
-					try{elem.type2 = costCenterType.find { it -> it.costcenter == elem.costcenter}.type2;}catch(Exception e) {throw new org.activiti.engine.ActivitiIllegalArgumentException("成本中心类型缺失，请联系管理员");}
+					try{elem.type = costCenterType.find { it -> it.costcenter == elem.costcenter}.type;}catch(Exception e) {throw new org.activiti.engine.ActivitiIllegalArgumentException("成本中心类型缺失，请联系管理员 The cost center type is missing, please contact the administrator");}
+					try{elem.type2 = costCenterType.find { it -> it.costcenter == elem.costcenter}.type2;}catch(Exception e) {throw new org.activiti.engine.ActivitiIllegalArgumentException("成本中心类型缺失，请联系管理员 The cost center type is missing, please contact the administrator");}
 					elem.entitytype = result[0].entitytype;
 				}
 			
@@ -445,7 +445,7 @@
 						procInstIdList << procInstId;
 						
 						if (new java.math.BigDecimal(balance) < new java.math.BigDecimal(elem.amount))
-							throw new org.activiti.engine.ActivitiIllegalArgumentException("还款金额不能大于剩余金额");
+							throw new org.activiti.engine.ActivitiIllegalArgumentException("还款金额不能大于剩余金额 The repayment amount cannot be greater than the remaining amount");
 							
 						def amount = new java.math.BigDecimal(elem.amount).setScale(2, java.math.RoundingMode.HALF_UP);
 						againstamount += amount;
@@ -462,7 +462,7 @@
 					
 					//判断还款明细中是否有重复的借款流程，如果有，抛异常
 					if(procInstIdList.clone().unique().size() != procInstIdList.size())
-						throw new org.activiti.engine.ActivitiIllegalArgumentException("还款明细中存在重复的借款流程，请将其合并后再提交");
+						throw new org.activiti.engine.ActivitiIllegalArgumentException("还款明细中存在重复的借款流程，请将其合并后再提交 There are duplicate borrowing processes in the repayment details, please merge them before submitting");
 						
 					def debitList = [],creditList = [];
 					stdNew.groupBy{ it.subMap('debitacc', 'dassist')}.each{ k,v ->
@@ -490,7 +490,7 @@
 					try
 						{execution.setVariable('refundVocherMapString',groovy.json.JsonOutput.toJson(vocherMap));}
 					catch(Exception e) 
-						{throw new org.activiti.engine.ActivitiIllegalArgumentException("您所选择的收支项目对应的会计科目未维护业务规则，请联系业务规则方或系统管理员");}
+						{throw new org.activiti.engine.ActivitiIllegalArgumentException("您所选择的收支项目对应的会计科目未维护业务规则，请联系业务规则方或系统管理员 If the accounting account corresponding to the income and expenditure item you selected does not maintain business rules, please contact the business rule party or system administrator.");}
 				}
 				
 				
@@ -523,12 +523,18 @@
 		
 		//借代科目合并
         def mapper = new com.fasterxml.jackson.databind.ObjectMapper();
-		def inputList = mapper.readValue(dealStd, new com.fasterxml.jackson.core.type.TypeReference<List<Map<String, Object>>>(){});
-
+		def inputList;
+		try{
+			inputList = mapper.readValue(dealStd, new com.fasterxml.jackson.core.type.TypeReference<List<Map<String, Object>>>(){});
+		}catch(Exception e) {
+			throw new org.activiti.engine.ActivitiIllegalArgumentException("未设置成本中心或实体对应的类别，请联系业务规则方或系统管理员 If the category corresponding to the cost center or entity is not set, please contact the business ruler or system administrator.");
+		}
+   
+   
 		def assistMap = [category:"0041",partner:"0004",ioitem:"0008",project:"0010",bankacc:"0011",profitacc:"0037",costcenter:"ra01"];
 		def stdNew = inputList.each{ elem ->
 			if(elem.debitacc == '' || elem.creditacc == '') {
-				throw new org.activiti.engine.ActivitiIllegalArgumentException("您所选择的收支项目对应的会计科目未维护业务规则，请联系业务规则方或系统管理员");
+				throw new org.activiti.engine.ActivitiIllegalArgumentException("您所选择的收支项目对应的会计科目未维护业务规则，请联系业务规则方或系统管理员 If the accounting account corresponding to the income and expenditure item you selected does not maintain business rules, please contact the business rule party or system administrator.");
 			}
 			elem.partner = elem.vendor;
 			elem.bankacc = result[0].accountno;
@@ -602,7 +608,7 @@
 		try
 			{execution.setVariable('vocherMapString',groovy.json.JsonOutput.toJson(vocherMap));}
 		catch(Exception e) 
-			{throw new org.activiti.engine.ActivitiIllegalArgumentException("收支项目对应的辅助核算项存在异常，请联系管理员");}
+			{throw new org.activiti.engine.ActivitiIllegalArgumentException("收支项目对应的辅助核算项存在异常，请联系管理员 The auxiliary accounting item corresponding to the income and expenditure item is abnormal. Please contact the administrator.");}
 		
 	
 		//设置预算查询参数
@@ -652,7 +658,7 @@
       <outgoing>flow2</outgoing>
       <multiInstanceLoopCharacteristics>
         <loopCardinality body="${costCenterArray.size()}">${costCenterArray.size()}</loopCardinality>
-        <completionCondition body="${execution.getVariable('coreaction') == '拒绝'}">${execution.getVariable('coreaction') == '拒绝'}</completionCondition>
+        <completionCondition body="${execution.getVariable('coreaction') == '拒绝 Refuse'}">${execution.getVariable('coreaction') == '拒绝 Refuse'}</completionCondition>
       </multiInstanceLoopCharacteristics>
     </callActivity>
     <exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway">
@@ -741,11 +747,11 @@
       <outgoing>flow5</outgoing>
     </userTask>
     <sequenceFlow id="SEQ1_N" name="成本中心拒绝" sourceRef="exclusivegateway1" targetRef="UT03">
-      <conditionExpression xsi:type="tFormalExpression">${execution.getVariable('coreaction') == '拒绝'}</conditionExpression>
+      <conditionExpression xsi:type="tFormalExpression">${execution.getVariable('coreaction') == '拒绝 Refuse'}</conditionExpression>
     </sequenceFlow>
     <sequenceFlow id="flow5" sourceRef="UT03" targetRef="exclusivegateway4"/>
     <sequenceFlow id="SEQ1_Y" name="成本中心通过" sourceRef="exclusivegateway1" targetRef="ST11">
-      <conditionExpression xsi:type="tFormalExpression">${execution.getVariable('coreaction') == '同意'}</conditionExpression>
+      <conditionExpression xsi:type="tFormalExpression">${execution.getVariable('coreaction') == '同意 Agree'}</conditionExpression>
     </sequenceFlow>
     <sequenceFlow id="flow8" sourceRef="ST04" targetRef="ST05"/>
     <scriptTask id="ST11" activiti:autoStoreVariables="false" name="生成pdf" scriptFormat="groovy">
@@ -787,9 +793,9 @@
       <documentation>成本中心审批通过后，会计复核</documentation>
       <extensionElements>
         <activiti:formProperty id="coreaction_审批结果 Approval_1_enum_rbv_$$A" name="审批结果 Approval" required="true" type="enum" variable="coreaction_accountant">
-          <activiti:value id="同意" name="同意"/>
-          <activiti:value id="拒绝" name="拒绝"/>
-          <activiti:value id="彻底拒绝" name="彻底拒绝"/>
+          <activiti:value id="同意 Agree" name="同意 Agree"/>
+          <activiti:value id="拒绝 Refuse" name="拒绝 Refuse"/>
+          <activiti:value id="彻底拒绝 Total rejection" name="彻底拒绝 Total rejection"/>
         </activiti:formProperty>
         <activiti:formProperty id="corecomments_审批意见 Comments_1_string_t2_$$B" name="审批意见 Comments" type="string" variable="corecomments_accountant"/>
         <activiti:formProperty id="totalexpamt_报销总金额大写 Total Amount_0_string_cny_$$VB" name="报销总金额大写 Total Amount" type="string" variable="totalamount"/>
@@ -870,16 +876,16 @@
       <outgoing>flow17</outgoing>
     </userTask>
     <sequenceFlow id="SEQ2_N" name="会计拒绝" sourceRef="exclusivegateway2" targetRef="UT03">
-      <conditionExpression xsi:type="tFormalExpression">${execution.getVariable('coreaction_accountant') == '拒绝'}</conditionExpression>
+      <conditionExpression xsi:type="tFormalExpression">${execution.getVariable('coreaction_accountant') == '拒绝 Refuse'}</conditionExpression>
     </sequenceFlow>
     <sequenceFlow id="SEQ2_1_Y" name="会计通过并无出纳审批" sourceRef="exclusivegateway2" targetRef="servicetask1">
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('coreaction_accountant') == '同意' && execution.getVariable('cashier') == null}]]></conditionExpression>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('coreaction_accountant') == '同意 Agree' && execution.getVariable('cashier') == null}]]></conditionExpression>
     </sequenceFlow>
     <sequenceFlow id="SEQ2_2_Y" name="会计通过" sourceRef="exclusivegateway2" targetRef="UT02">
-      <conditionExpression xsi:type="tFormalExpression">${execution.getVariable('coreaction_accountant') == '同意'}</conditionExpression>
+      <conditionExpression xsi:type="tFormalExpression">${execution.getVariable('coreaction_accountant') == '同意 Agree'}</conditionExpression>
     </sequenceFlow>
     <sequenceFlow id="flow26" name="会计彻底拒绝" sourceRef="exclusivegateway2" targetRef="E2">
-      <conditionExpression xsi:type="tFormalExpression">${execution.getVariable('coreaction_accountant') == '彻底拒绝'}</conditionExpression>
+      <conditionExpression xsi:type="tFormalExpression">${execution.getVariable('coreaction_accountant') == '彻底拒绝 Total rejection'}</conditionExpression>
     </sequenceFlow>
     <endEvent id="E2" name="E2">
       <incoming>flow26</incoming>
@@ -888,9 +894,9 @@
       <documentation>会计审批通过后，出纳复核</documentation>
       <extensionElements>
         <activiti:formProperty id="coreaction_审批结果 Approval_1_enum_rbv_$$A" name="审批结果 Approval" required="true" type="enum" variable="coreaction_cashier">
-          <activiti:value id="同意" name="同意"/>
-          <activiti:value id="拒绝" name="拒绝"/>
-          <activiti:value id="彻底拒绝" name="彻底拒绝"/>
+          <activiti:value id="同意 Agree" name="同意 Agree"/>
+          <activiti:value id="拒绝 Refuse" name="拒绝 Refuse"/>
+          <activiti:value id="彻底拒绝 Total rejection" name="彻底拒绝 Total rejection"/>
         </activiti:formProperty>
         <activiti:formProperty id="corecomments_审批意见 Comments_1_string_t2_$$B" name="审批意见 Comments" type="string" variable="corecomments_cashier"/>
         <activiti:formProperty id="totalexpamt_报销总金额大写 Total Amount_0_string_cny_$$VB" name="报销总金额大写 Total Amount" type="string" variable="totalamount"/>
@@ -938,13 +944,13 @@
       <outgoing>flow16</outgoing>
     </userTask>
     <sequenceFlow id="SEQ3_Y" name="出纳通过" sourceRef="exclusivegateway3" targetRef="servicetask1">
-      <conditionExpression xsi:type="tFormalExpression">${execution.getVariable('coreaction_cashier') == '同意'}</conditionExpression>
+      <conditionExpression xsi:type="tFormalExpression">${execution.getVariable('coreaction_cashier') == '同意 Agree'}</conditionExpression>
     </sequenceFlow>
     <sequenceFlow id="SEQ3_N" name="出纳拒绝" sourceRef="exclusivegateway3" targetRef="UT03">
-      <conditionExpression xsi:type="tFormalExpression">${execution.getVariable('coreaction_cashier') == '拒绝'}</conditionExpression>
+      <conditionExpression xsi:type="tFormalExpression">${execution.getVariable('coreaction_cashier') == '拒绝 Refuse'}</conditionExpression>
     </sequenceFlow>
     <sequenceFlow id="flow27" name="出纳彻底拒绝" sourceRef="exclusivegateway3" targetRef="E3">
-      <conditionExpression xsi:type="tFormalExpression">${execution.getVariable('coreaction_cashier') == '彻底拒绝'}</conditionExpression>
+      <conditionExpression xsi:type="tFormalExpression">${execution.getVariable('coreaction_cashier') == '彻底拒绝 Total rejection'}</conditionExpression>
     </sequenceFlow>
     <endEvent id="E3" name="E3">
       <incoming>flow27</incoming>
@@ -964,7 +970,7 @@
           <activiti:field name="script">
             <activiti:string><![CDATA[if(execution.getVariable('_http_response_status_code')!= 200){
 					def errorMessage = new XmlParser().parseText(execution.getVariable('_http_response_body').replaceAll("\\<\\?xml(.+?)\\?\\>", "").trim()).sendresult.resultdescription.text();
-					throw new org.activiti.engine.ActivitiIllegalArgumentException(errorMessage+"请联系管理员");
+					throw new org.activiti.engine.ActivitiIllegalArgumentException(errorMessage+"请联系管理员 NC Exception");
 				}]]></activiti:string>
           </activiti:field>
         </activiti:executionListener>

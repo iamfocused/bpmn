@@ -124,7 +124,7 @@
 				}
 				
 				if(localVerifiers.size() == 0) {
-					throw new org.activiti.engine.ActivitiIllegalArgumentException("成本中心审批人不存在，请联系管理员");
+					throw new org.activiti.engine.ActivitiIllegalArgumentException("成本中心审批人不存在，请联系管理员 Cost center approver does not exist, please contact administrator");
 				}
 				
 
@@ -178,8 +178,8 @@
     <userTask id="UT1_1" name="成本中心1级审批 Costcenter Level1 Approval" activiti:assignee="${verifiers[0]}" activiti:dueDate="P1D" activiti:priority="8080">
       <extensionElements>
         <activiti:formProperty id="coreaction_审批结果 Approval_1_enum_rbv_$$A" name="审批结果 Approval" type="enum" variable="coreaction_level1_1" required="true">
-          <activiti:value id="同意" name="同意 Y"></activiti:value>
-          <activiti:value id="拒绝" name="拒绝 N"></activiti:value>
+          <activiti:value id="同意 Agree" name="同意 Agree"></activiti:value>
+          <activiti:value id="拒绝 Refuse" name="拒绝 Refuse"></activiti:value>
         </activiti:formProperty>
         <activiti:formProperty id="corecomments_审批意见 Comments_1_string_t2_$$B" name="审批意见 Comments" type="string" variable="corecomments_level1_1"></activiti:formProperty>
         <activiti:formProperty id="totalexpamt_报销总金额大写 Total Amount_0_string_cny_$$VB" name="报销总金额大写 Total Amount" type="string" variable="totalamount"></activiti:formProperty>
@@ -243,8 +243,8 @@
     <userTask id="UT2_1" name="成本中心1级审批 Costcenter Level1 Approval" activiti:assignee="${verifiers[0]}" activiti:dueDate="P1D" activiti:priority="8080">
       <extensionElements>
         <activiti:formProperty id="coreaction_审批结果 Approval_1_enum_rbv_$$A" name="审批结果 Approval" type="enum" variable="coreaction_level2_1" required="true">
-          <activiti:value id="同意" name="同意 Y"></activiti:value>
-          <activiti:value id="拒绝" name="拒绝 N"></activiti:value>
+          <activiti:value id="同意 Agree" name="同意 Agree"></activiti:value>
+          <activiti:value id="拒绝 Refuse" name="拒绝 Refuse"></activiti:value>
         </activiti:formProperty>
         <activiti:formProperty id="corecomments_审批意见 Comments_1_string_t2_$$B" name="审批意见 Comments" type="string" variable="corecomments_level2_1"></activiti:formProperty>
         <activiti:formProperty id="totalexpamt_报销总金额大写 Total Amount_0_string_cny_$$VB" name="报销总金额大写 Total Amount" type="string" variable="totalamount"></activiti:formProperty>
@@ -307,8 +307,8 @@
     <userTask id="UT2_2" name="成本中心2级审批 Costcenter Level2 Approval" activiti:assignee="${verifiers[1]}" activiti:dueDate="P1D" activiti:priority="8080">
       <extensionElements>
         <activiti:formProperty id="coreaction_审批结果 Approval_1_enum_rbv_$$A" name="审批结果 Approval" type="enum" variable="coreaction_level2_2" required="true">
-          <activiti:value id="同意" name="同意 Y"></activiti:value>
-          <activiti:value id="拒绝" name="拒绝 N"></activiti:value>
+          <activiti:value id="同意 Agree" name="同意 Agree"></activiti:value>
+          <activiti:value id="拒绝 Refuse" name="拒绝 Refuse"></activiti:value>
         </activiti:formProperty>
         <activiti:formProperty id="corecomments_审批意见 Comments_1_string_t2_$$B" name="审批意见 Comments" type="string" variable="corecomments_level2_2"></activiti:formProperty>
         <activiti:formProperty id="totalexpamt_报销总金额大写 Total Amount_0_string_cny_$$VB" name="报销总金额大写 Total Amount" type="string" variable="totalamount"></activiti:formProperty>
@@ -371,8 +371,8 @@
     <userTask id="UT3_1" name="成本中心1级审批 Costcenter Level1 Approval" activiti:assignee="${verifiers[0]}" activiti:dueDate="P1D" activiti:priority="8080">
       <extensionElements>
         <activiti:formProperty id="coreaction_审批结果 Approval_1_enum_rbv_$$A" name="审批结果 Approval" type="enum" variable="coreaction_level3_1" required="true">
-          <activiti:value id="同意" name="同意 Y"></activiti:value>
-          <activiti:value id="拒绝" name="拒绝 N"></activiti:value>
+          <activiti:value id="同意 Agree" name="同意 Agree"></activiti:value>
+          <activiti:value id="拒绝 Refuse" name="拒绝 Refuse"></activiti:value>
         </activiti:formProperty>
         <activiti:formProperty id="corecomments_审批意见 Comments_1_string_t2_$$B" name="审批意见 Comments" type="string" variable="corecomments_level3_1"></activiti:formProperty>
         <activiti:formProperty id="totalexpamt_报销总金额大写 Total Amount_0_string_cny_$$VB" name="报销总金额大写 Total Amount" type="string" variable="totalamount"></activiti:formProperty>
@@ -435,8 +435,8 @@
     <userTask id="UT3_2" name="成本中心2级审批 Costcenter Level2 Approval" activiti:assignee="${verifiers[1]}" activiti:dueDate="P1D" activiti:priority="8080">
       <extensionElements>
         <activiti:formProperty id="coreaction_审批结果 Approval_1_enum_rbv_$$A" name="审批结果 Approval" type="enum" variable="coreaction_level3_2" required="true">
-          <activiti:value id="同意" name="同意 Y"></activiti:value>
-          <activiti:value id="拒绝" name="拒绝 N"></activiti:value>
+          <activiti:value id="同意 Agree" name="同意 Agree"></activiti:value>
+          <activiti:value id="拒绝 Refuse" name="拒绝 Refuse"></activiti:value>
         </activiti:formProperty>
         <activiti:formProperty id="corecomments_审批意见 Comments_1_string_t2_$$B" name="审批意见 Comments" type="string" variable="corecomments_level3_2"></activiti:formProperty>
         <activiti:formProperty id="totalexpamt_报销总金额大写 Total Amount_0_string_cny_$$VB" name="报销总金额大写 Total Amount" type="string" variable="totalamount"></activiti:formProperty>
@@ -499,8 +499,8 @@
     <userTask id="UT3_3" name="成本中心3级审批 Costcenter Level3 Approval" activiti:assignee="${verifiers[2]}" activiti:dueDate="P1D" activiti:priority="8080">
       <extensionElements>
         <activiti:formProperty id="coreaction_审批结果 Approval_1_enum_rbv_$$A" name="审批结果 Approval" type="enum" variable="coreaction_level3_3" required="true">
-          <activiti:value id="同意" name="同意 Y"></activiti:value>
-          <activiti:value id="拒绝" name="拒绝 N"></activiti:value>
+          <activiti:value id="同意 Agree" name="同意 Agree"></activiti:value>
+          <activiti:value id="拒绝 Refuse" name="拒绝 Refuse"></activiti:value>
         </activiti:formProperty>
         <activiti:formProperty id="corecomments_审批意见 Comments_1_string_t2_$$B" name="审批意见 Comments" type="string" variable="corecomments_level3_3"></activiti:formProperty>
         <activiti:formProperty id="totalexpamt_报销总金额大写 Total Amount_0_string_cny_$$VB" name="报销总金额大写 Total Amount" type="string" variable="totalamount"></activiti:formProperty>
@@ -575,40 +575,40 @@
     <sequenceFlow id="flow5" sourceRef="UT1_1" targetRef="exclusivegateway3"></sequenceFlow>
     <endEvent id="END_LEVEL1_N" name="END_LEVEL1_N"></endEvent>
     <sequenceFlow id="seq1_1_Y" name="同意" sourceRef="exclusivegateway3" targetRef="E1">
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('coreaction_level1_1') == '同意'}]]></conditionExpression>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('coreaction_level1_1') == '同意 Agree'}]]></conditionExpression>
     </sequenceFlow>
     <sequenceFlow id="seq1_1_N" name="拒绝" sourceRef="exclusivegateway3" targetRef="END_LEVEL1_N">
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('coreaction_level1_1') == '拒绝'}]]></conditionExpression>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('coreaction_level1_1') == '拒绝 Refuse'}]]></conditionExpression>
     </sequenceFlow>
     <sequenceFlow id="seq2_1_Y" name="同意" sourceRef="exclusivegateway4" targetRef="UT2_2">
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('coreaction_level2_1') == '同意'}]]></conditionExpression>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('coreaction_level2_1') == '同意 Agree'}]]></conditionExpression>
     </sequenceFlow>
     <sequenceFlow id="seq2_2_Y" name="同意" sourceRef="exclusivegateway5" targetRef="E1">
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('coreaction_level2_2') == '同意'}]]></conditionExpression>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('coreaction_level2_2') == '同意 Agree'}]]></conditionExpression>
     </sequenceFlow>
     <sequenceFlow id="seq2_1_N" name="拒绝" sourceRef="exclusivegateway4" targetRef="END_LEVEL2_N">
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('coreaction_level2_1') == '拒绝'}]]></conditionExpression>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('coreaction_level2_1') == '拒绝 Refuse'}]]></conditionExpression>
     </sequenceFlow>
     <sequenceFlow id="seq2_2_N" name="拒绝" sourceRef="exclusivegateway5" targetRef="END_LEVEL2_N">
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('coreaction_level2_2') == '拒绝'}]]></conditionExpression>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('coreaction_level2_2') == '拒绝 Refuse'}]]></conditionExpression>
     </sequenceFlow>
     <sequenceFlow id="seq3_1_Y" name="同意" sourceRef="exclusivegateway6" targetRef="UT3_2">
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('coreaction_level3_1') == '同意'}]]></conditionExpression>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('coreaction_level3_1') == '同意 Agree'}]]></conditionExpression>
     </sequenceFlow>
     <sequenceFlow id="seq3_2_Y" name="同意" sourceRef="exclusivegateway7" targetRef="UT3_3">
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('coreaction_level3_2') == '同意'}]]></conditionExpression>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('coreaction_level3_2') == '同意 Agree'}]]></conditionExpression>
     </sequenceFlow>
     <sequenceFlow id="seq3_3_Y" name="同意" sourceRef="exclusivegateway8" targetRef="E1">
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('coreaction_level3_3') == '同意'}]]></conditionExpression>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('coreaction_level3_3') == '同意 Agree'}]]></conditionExpression>
     </sequenceFlow>
     <sequenceFlow id="seq3_1_N" name="拒绝" sourceRef="exclusivegateway6" targetRef="END_LEVEL3_N">
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('coreaction_level3_1') == '拒绝'}]]></conditionExpression>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('coreaction_level3_1') == '拒绝 Refuse'}]]></conditionExpression>
     </sequenceFlow>
     <sequenceFlow id="seq3_2_N" name="拒绝" sourceRef="exclusivegateway7" targetRef="END_LEVEL3_N">
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('coreaction_level3_2') == '拒绝'}]]></conditionExpression>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('coreaction_level3_2') == '拒绝 Refuse'}]]></conditionExpression>
     </sequenceFlow>
     <sequenceFlow id="seq3_3_N" name="拒绝" sourceRef="exclusivegateway8" targetRef="END_LEVEL3_N">
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('coreaction_level3_3') == '拒绝'}]]></conditionExpression>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('coreaction_level3_3') == '拒绝 Refuse'}]]></conditionExpression>
     </sequenceFlow>
     <sequenceFlow id="sq4" name="并发审批" sourceRef="exclusivegateway1" targetRef="UT4">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('level') == 99}]]></conditionExpression>
@@ -616,8 +616,8 @@
     <userTask id="UT4" name="并发审批" activiti:candidateUsers="${verifiers[0]}" activiti:dueDate="P1D" activiti:priority="8080">
       <extensionElements>
         <activiti:formProperty id="coreaction_审批结果_1_enum_rbv_$$A" name="审批结果 Approval" type="enum" variable="coreaction_level4" required="true">
-          <activiti:value id="同意" name="同意 Y"></activiti:value>
-          <activiti:value id="拒绝" name="拒绝 N"></activiti:value>
+          <activiti:value id="同意 Agree" name="同意 Agree"></activiti:value>
+          <activiti:value id="拒绝 Refuse" name="拒绝 Refuse"></activiti:value>
         </activiti:formProperty>
         <activiti:formProperty id="corecomments_审批意见_1_string_t2_$$B" name="审批意见 Comments" type="string" variable="corecomments_level4"></activiti:formProperty>
         <activiti:formProperty id="totalexpamt_报销总金额大写 Total Amount_0_string_cny_$$VB" name="报销总金额大写 Total Amount" type="string" variable="totalamount"></activiti:formProperty>
@@ -680,10 +680,10 @@
       </extensionElements>
     </userTask>
     <sequenceFlow id="seq4_N" sourceRef="exclusivegateway9" targetRef="END_LEVEL4_N">
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('coreaction_level4') == '拒绝'}]]></conditionExpression>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('coreaction_level4') == '拒绝 Refuse'}]]></conditionExpression>
     </sequenceFlow>
     <sequenceFlow id="seq4_Y" sourceRef="exclusivegateway9" targetRef="E1">
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('coreaction_level4') == '同意'}]]></conditionExpression>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('coreaction_level4') == '同意 Agree'}]]></conditionExpression>
     </sequenceFlow>
     <exclusiveGateway id="exclusivegateway4" name="Exclusive Gateway"></exclusiveGateway>
     <sequenceFlow id="flow7" sourceRef="UT2_1" targetRef="exclusivegateway4"></sequenceFlow>
@@ -748,7 +748,7 @@
 			import groovy.json.JsonOutput;
 			
 	  			if(execution.getVariable('_http_response_status_code') != 200) {
-	  				throw new org.activiti.engine.ActivitiIllegalArgumentException("Drools调用查询审批人异常，请联系管理员！");
+	  				throw new org.activiti.engine.ActivitiIllegalArgumentException("Drools调用查询审批人异常，请联系管理员！ Drools calls the query approver exception, please contact the administrator!");
 	  			}
 	  			def jsonSlurper = new JsonSlurper()
 	  			def responseBody = execution.getVariable('_http_response_body')
@@ -756,7 +756,7 @@
 	  			def droolsResult = jsonSlurper.parseText(responseBody)
 	  			droolsResult.each{
 	  				if(it.verifierfirst == null && it.specialapproval == null && it.concurrent == null) {
-	  					throw new org.activiti.engine.ActivitiIllegalArgumentException("成本中心：" + it.costcenter + " 项目：" + it.project + " 收支项目：" + it.ioitem + " 金额：" + it.amount + " 对应的审批人不存在！");
+	  					throw new org.activiti.engine.ActivitiIllegalArgumentException("成本中心：" + it.costcenter + " 项目：" + it.project + " 收支项目：" + it.ioitem + " 金额：" + it.amount + " 对应的审批人不存在！ The corresponding approver does not exist");
 	  				}
 	  			}
 	  			
@@ -795,7 +795,7 @@
     </scriptTask>
     <subProcess id="subprocess1" name="Sub Process">
       <multiInstanceLoopCharacteristics isSequential="false" activiti:collection="mergeResult" activiti:elementVariable="list">
-      	<completionCondition>${CurApprovalResults=="拒绝"}</completionCondition>
+      	<completionCondition>${CurApprovalResults=="拒绝 Refuse"}</completionCondition>
       </multiInstanceLoopCharacteristics>
       <startEvent id="startevent1" name="Start">
         <extensionElements>
@@ -881,7 +881,7 @@
 						}
 						
 						if(localVerifiers.size() == 0) {
-							throw new org.activiti.engine.ActivitiIllegalArgumentException("成本中心审批人不存在，请联系管理员");
+							throw new org.activiti.engine.ActivitiIllegalArgumentException("成本中心审批人不存在，请联系管理员 Cost center approver does not exist, please contact administrator");
 						}
 						
 						def tbhd_item = list.tbhd_items
@@ -933,8 +933,8 @@
       <userTask id="usertask1" name="并发审批" activiti:candidateUsers="${users[0]}">
       <extensionElements>
 	        <activiti:formProperty id="coreaction_审批结果_1_enum_rbv_$$A" name="审批结果 Approval" type="enum" variable="coreaction_level4" required="true">
-	          <activiti:value id="同意" name="同意 Y"></activiti:value>
-	          <activiti:value id="拒绝" name="拒绝 N"></activiti:value>
+	          <activiti:value id="同意 Agree" name="同意 Agree"></activiti:value>
+	          <activiti:value id="拒绝 Refuse" name="拒绝 Refuse"></activiti:value>
 	        </activiti:formProperty>
 	        <activiti:formProperty id="corecomments_审批意见_1_string_t2_$$B" name="审批意见 Comments" type="string" variable="corecomments_level4"></activiti:formProperty>
 	        <activiti:formProperty id="totalexpamt_报销总金额大写 Total Amount_0_string_cny_$$VB" name="报销总金额大写 Total Amount" type="string" variable="totalamount"></activiti:formProperty>
@@ -1003,8 +1003,8 @@
       <userTask id="usertask2" name="成本中心审批 Cost center approval" activiti:assignee="${user}">
       <extensionElements>
         <activiti:formProperty id="coreaction_审批结果 Approval_1_enum_rbv_$$A" name="审批结果 Approval" type="enum" variable="approvalResults" required="true">
-          <activiti:value id="同意" name="同意 Y"></activiti:value>
-          <activiti:value id="拒绝" name="拒绝 N"></activiti:value>
+          <activiti:value id="同意 Agree" name="同意 Agree"></activiti:value>
+          <activiti:value id="拒绝 Refuse" name="拒绝 Refuse"></activiti:value>
         </activiti:formProperty>
         <activiti:formProperty id="corecomments_审批意见 Comments_1_string_t2_$$B" name="审批意见 Comments" type="string" variable="approvalComments"></activiti:formProperty>
         <activiti:formProperty id="totalexpamt_报销总金额大写 Total Amount_0_string_cny_$$VB" name="报销总金额大写 Total Amount" type="string" variable="totalamount"></activiti:formProperty>
@@ -1086,7 +1086,7 @@
         </activiti:taskListener>
        </extensionElements>
        <multiInstanceLoopCharacteristics isSequential="true" activiti:collection="users" activiti:elementVariable="user">
-         <completionCondition>${CurApprovalResults=='拒绝'}</completionCondition>
+         <completionCondition>${CurApprovalResults=='拒绝 Refuse'}</completionCondition>
        </multiInstanceLoopCharacteristics>
       </userTask>
       <sequenceFlow id="flow24" sourceRef="startevent1" targetRef="exclusivegateway11"></sequenceFlow>
