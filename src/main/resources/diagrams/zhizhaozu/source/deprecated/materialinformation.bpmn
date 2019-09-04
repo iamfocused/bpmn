@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:activiti="http://activiti.org/bpmn" xmlns:xsd="http://www.w3.org/2001/XMLSchema" targetNamespace="http://www.activiti.org/processdef">
+  <process id="materialinformation0902" name="materialinformation0902" isExecutable="true" activiti:candidateStarterGroups="admin">
+    <startEvent id="StartEvent_1">
+      <extensionElements>
+        <activiti:formProperty id="itemname_物料名称_1_string_t1_$$A" name="物料名称" type="string" variable="itemname" writable="true" required="false" />
+        <activiti:formProperty id="itemnumber_物料编号_2_string_t1_$$A" name="物料编号" type="string" variable="itemnumber" writable="true" required="false" />
+        <activiti:formProperty id="ORDCODE_物料型号_3_string_t1_$$A" name="物料型号" type="string" variable="ORDCODE" writable="true" required="false" />
+        <activiti:formProperty id="mainmaterial_主要材料_4_string_t1_$$A" name="主要材料" type="string" variable="mainmaterial" writable="true" required="false" />
+      </extensionElements>
+      <outgoing>SequenceFlow_1p92g9g</outgoing>
+    </startEvent>
+    <userTask id="UserTask_1c5up66" activiti:assignee="yaojiaxin">
+      <extensionElements>
+        <activiti:formProperty id="itemname_物料名称_1_string_t1_$$A" name="物料名称" type="string" variable="itemname" writable="true" required="false" />
+        <activiti:formProperty id="itemnumber_物料编号_2_string_t1_$$A" name="物料编号" type="string" variable="itemnumber" writable="true" required="false" />
+        <activiti:formProperty id="ORDCODE_物料型号_3_string_t1_$$A" name="物料型号" type="string" variable="ORDCODE" writable="true" required="false" />
+        <activiti:formProperty id="mainmaterial_主要材料_4_string_t1_$$A" name="主要材料" type="string" variable="mainmaterial" writable="true" required="false" />
+      </extensionElements>
+      <incoming>SequenceFlow_1p92g9g</incoming>
+      <outgoing>SequenceFlow_1ss8shn</outgoing>
+    </userTask>
+    <sequenceFlow id="SequenceFlow_1p92g9g" sourceRef="StartEvent_1" targetRef="UserTask_1c5up66" />
+    <endEvent id="EndEvent_0abhbql">
+      <extensionElements>
+        <activiti:formProperty id="itemname_物料名称_1_string_t1_$$A" name="物料名称" type="string" variable="itemname" writable="true" required="false" />
+        <activiti:formProperty id="itemnumber_物料编号_2_string_t1_$$A" name="物料编号" type="string" variable="itemnumber" writable="true" required="false" />
+        <activiti:formProperty id="ORDCODE_物料型号_3_string_t1_$$A" name="物料型号" type="string" variable="ORDCODE" writable="true" required="false" />
+        <activiti:formProperty id="mainmaterial_主要材料_4_string_t1_$$A" name="主要材料" type="string" variable="mainmaterial" writable="true" required="false" />
+      </extensionElements>
+      <incoming>SequenceFlow_1ss8shn</incoming>
+    </endEvent>
+    <sequenceFlow id="SequenceFlow_1ss8shn" sourceRef="UserTask_1c5up66" targetRef="EndEvent_0abhbql" />
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_1">
+    <bpmndi:BPMNPlane id="BPMNPlane_1" bpmnElement="materialinformation0902">
+      <bpmndi:BPMNShape id="_BPMNShape_StartEvent_2" bpmnElement="StartEvent_1">
+        <omgdc:Bounds x="412" y="50" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape id="UserTask_1c5up66_di" bpmnElement="UserTask_1c5up66">
+        <omgdc:Bounds x="498" y="28" width="100" height="80" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_1p92g9g_di" bpmnElement="SequenceFlow_1p92g9g">
+        <omgdi:waypoint x="448" y="68" />
+        <omgdi:waypoint x="498" y="68" />
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape id="EndEvent_0abhbql_di" bpmnElement="EndEvent_0abhbql">
+        <omgdc:Bounds x="648" y="50" width="36" height="36" />
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge id="SequenceFlow_1ss8shn_di" bpmnElement="SequenceFlow_1ss8shn">
+        <omgdi:waypoint x="598" y="68" />
+        <omgdi:waypoint x="648" y="68" />
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

@@ -677,7 +677,11 @@
 
 				def secret =Base64.getUrlEncoder().encodeToString(hmac_sha256(METABASE_SECRET_KEY , header+'.'+playload));
 				def url = METABASE_SITE_URL + "/embed/question/" + header+'.'+playload+'.'+secret + "#bordered=true&titled=true";
-				task.getExecution().setVariableLocal("BBOT_BI_COREACTION",url);]]></activiti:string>
+				task.getExecution().setVariableLocal("BBOT_BI_COREACTION",url);
+				
+				task.getExecution().setVariable('coreaction_accountant', '')
+				task.getExecution().setVariable('corecomments_accountant', '')
+				]]></activiti:string>
           </activiti:field>
         </activiti:taskListener>
 		
@@ -727,6 +731,18 @@
         <activiti:formProperty id="tbhdexpdet_item_$$VA" name="还款明细" type="string" variable="tbhdexpdet_item"></activiti:formProperty>
         <activiti:formProperty id="tbhdexpdet_借款余额_borrow_1_string_auto_$$VA" name="借款编号 Cash Advance ID" type="string" variable="tbhdexpdet_crnum_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhdexpdet_金额_amount_2_string_t11_$$VA" name="还款金额 Deduction Amount" type="string" variable="tbhdexpdet_amount_t00"></activiti:formProperty>
+      
+		<activiti:taskListener class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener" event="create">
+          <activiti:field name="language">
+            <activiti:string>groovy</activiti:string>
+          </activiti:field>
+          <activiti:field name="script">
+            <activiti:string><![CDATA[
+				task.getExecution().setVariable('coreaction_cashier','')
+				task.getExecution().setVariable('corecomments_cashier','')
+				]]></activiti:string>
+          </activiti:field>
+        </activiti:taskListener>      
       </extensionElements>
     </userTask>
     <sequenceFlow id="SEQ3_Y" name="出纳通过" sourceRef="exclusivegateway3" targetRef="servicetask1">

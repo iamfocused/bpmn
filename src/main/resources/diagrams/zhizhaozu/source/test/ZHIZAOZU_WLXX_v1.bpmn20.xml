@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/pur">
+  <process id="materialinf0902" name="materialinf0902" isExecutable="true" activiti:candidateStarterUsers="18616741835" activiti:candidateStarterGroups="admin">
+    <startEvent id="StartEvent_1" activiti:initiator="initiator">
+      <extensionElements>
+        <activiti:formProperty id="accountingtype_核算类型_1_enum_sbs_$$A" name="核算类型" type="enum" variable="accountingtype">
+          <activiti:value id="1" name="产成品"></activiti:value>
+          <activiti:value id="2" name="半成品"></activiti:value>
+          <activiti:value id="3" name="原材料"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="itemtype_物料类型_2_enum_sbs_$$A" name="物料类型" type="enum" variable="accountingtype">
+          <activiti:value id="1" name="刀具"></activiti:value>
+          <activiti:value id="2" name="夹具"></activiti:value>
+          <activiti:value id="3" name="机床附件"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="itemname_物料名称_3_string_t1_$$A" name="物料名称" type="string" variable="itemname"></activiti:formProperty>
+        <activiti:formProperty id="ORDCODE_物料型号_4_string_t1_$$A" name="物料型号" type="string" variable="itemname"></activiti:formProperty>
+        <activiti:formProperty id="itemnumber_物料编号_5_string_t1_$$A" name="物料编号" type="string" variable="itemname"></activiti:formProperty>
+        <activiti:formProperty id="itemgroup_产品组别_6_string_t1_$$A" name="产品组别" type="string" variable="itemgroup"></activiti:formProperty>
+        <activiti:formProperty id="mainmaterial_主要材料_7_string_t1_$$A" name="主要材料" type="string" variable="mainmaterial"></activiti:formProperty>
+        <activiti:formProperty id="materialtype_材料类别_8_string_t1_$$A" name="材料类别" type="string" variable="mainmaterial"></activiti:formProperty>
+        <activiti:formProperty id="2ddrawing_二维图形_9_string_t9i_$$A" name="二维图形" type="string" variable="2ddrawing"></activiti:formProperty>
+        <activiti:formProperty id="3dmodel_三维模型_10_string_t9i_$$A" name="三维模型" type="string" variable="2ddrawing"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566810817138_item" name="物料清单" type="string" variable="header1566810817138"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566810817138_itemname2_物料名称_2_string_t1_$$A" name="物料名称" type="string" variable="itemname2"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566810817138_itemnumber2_物料编号_3_string_t1_$$A" name="物料编号" type="string" variable="itemname2"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566810817138_ORDCODE2_物料型号_4_string_t1_$$A" name="物料型号" type="string" variable="itemname2"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566810817138_itemqty2_数量_5_string_t6_$$A" name="数量" type="string" variable="itemqty2"></activiti:formProperty>
+      </extensionElements>
+    </startEvent>
+    <endEvent id="EndEvent_1wypne1">
+    </endEvent>
+    <sequenceFlow id="SequenceFlow_0xbt7m2" sourceRef="StartEvent_1" targetRef="usertask1"></sequenceFlow>
+    <userTask id="usertask1" name="循环更新物料信息" activiti:assignee="${initiator}">
+      <extensionElements>
+        <activiti:formProperty id="accountingtype_核算类型_1_enum_sbs_$$A" name="核算类型" type="enum" variable="accountingtype">
+          <activiti:value id="1" name="产成品"></activiti:value>
+          <activiti:value id="2" name="半成品"></activiti:value>
+          <activiti:value id="3" name="原材料"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="itemtype_物料类型_2_enum_sbs_$$A" name="物料类型" type="enum" variable="accountingtype">
+          <activiti:value id="1" name="刀具"></activiti:value>
+          <activiti:value id="2" name="夹具"></activiti:value>
+          <activiti:value id="3" name="机床附件"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="itemname_物料名称_3_string_t1_$$A" name="物料名称" type="string" variable="itemname"></activiti:formProperty>
+        <activiti:formProperty id="ORDCODE_物料型号_4_string_t1_$$A" name="物料型号" type="string" variable="itemname"></activiti:formProperty>
+        <activiti:formProperty id="itemnumber_物料编号_5_string_t1_$$A" name="物料编号" type="string" variable="itemname"></activiti:formProperty>
+        <activiti:formProperty id="itemgroup_产品组别_6_string_t1_$$A" name="产品组别" type="string" variable="itemgroup"></activiti:formProperty>
+        <activiti:formProperty id="mainmaterial_主要材料_7_string_t1_$$A" name="主要材料" type="string" variable="mainmaterial"></activiti:formProperty>
+        <activiti:formProperty id="materialtype_材料类别_8_string_t1_$$A" name="材料类别" type="string" variable="mainmaterial"></activiti:formProperty>
+        <activiti:formProperty id="2ddrawing_二维图形_9_string_t9i_$$A" name="二维图形" type="string" variable="2ddrawing"></activiti:formProperty>
+        <activiti:formProperty id="3dmodel_三维模型_10_string_t9i_$$A" name="三维模型" type="string" variable="2ddrawing"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566810817138_item" name="物料清单" type="string" variable="header1566810817138"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566810817138_itemname2_物料名称_2_string_t1_$$A" name="物料名称" type="string" variable="itemname2"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566810817138_itemnumber2_物料编号_3_string_t1_$$A" name="物料编号" type="string" variable="itemname2"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566810817138_ORDCODE2_物料型号_4_string_t1_$$A" name="物料型号" type="string" variable="itemname2"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566810817138_itemqty2_数量_5_string_t6_$$A" name="数量" type="string" variable="itemqty2"></activiti:formProperty>
+      </extensionElements>    
+    </userTask>
+    <sequenceFlow id="flow1" sourceRef="usertask1" targetRef="usertask1"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_materialinf0902">
+    <bpmndi:BPMNPlane bpmnElement="materialinf0902" id="BPMNPlane_materialinf0902">
+      <bpmndi:BPMNShape bpmnElement="StartEvent_1" id="BPMNShape_StartEvent_1">
+        <omgdc:Bounds height="36.0" width="36.0" x="192.0" y="210.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="EndEvent_1wypne1" id="BPMNShape_EndEvent_1wypne1">
+        <omgdc:Bounds height="36.0" width="36.0" x="498.0" y="50.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask1" id="BPMNShape_usertask1">
+        <omgdc:Bounds height="55.0" width="105.0" x="380.0" y="200.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="SequenceFlow_0xbt7m2" id="BPMNEdge_SequenceFlow_0xbt7m2">
+        <omgdi:waypoint x="228.0" y="228.0"></omgdi:waypoint>
+        <omgdi:waypoint x="380.0" y="227.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="485.0" y="227.0"></omgdi:waypoint>
+        <omgdi:waypoint x="530.0" y="226.0"></omgdi:waypoint>
+        <omgdi:waypoint x="530.0" y="168.0"></omgdi:waypoint>
+        <omgdi:waypoint x="432.0" y="168.0"></omgdi:waypoint>
+        <omgdi:waypoint x="432.0" y="200.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>
