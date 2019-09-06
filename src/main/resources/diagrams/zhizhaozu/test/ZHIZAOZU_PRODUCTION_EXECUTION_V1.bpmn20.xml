@@ -4,6 +4,7 @@
     <startEvent id="startevent1" name="生产执行启动事件" activiti:initiator="initiator">
     	<extensionElements>
     		<activiti:formProperty id="processNumber_工艺编号_1_string_auto_$$A" name="选择工艺编号" variable="processNumber" required="true"/>
+    		<activiti:formProperty id="productionOrderNumber_生产加工单_2_string_t1_$$A" name="生产加工单" variable="productionOrderNumber" required="true"/>
     		<activiti:executionListener event="end" class="org.activiti.engine.impl.bpmn.listener.ScriptExecutionListener">
     			<activiti:field name="language"><activiti:string><![CDATA[groovy]]></activiti:string></activiti:field>
     			<activiti:field name="script">
@@ -104,8 +105,9 @@
     </startEvent>
     <userTask id="usertask1" name="制定时间分配组" activiti:assignee="${initiator}">
     	<extensionElements>
-    		<activiti:formProperty id="processcount1_工序数量_1_string_t6_$$A" name="工序数量" type="string" variable="processcount1" required="true"/>    		
+    		<activiti:formProperty id="processcount1_工序数量_1_string_t6_$$A" name="工序数量" type="string" variable="processcount1" required="true"/>
     	
+    		<activiti:formProperty id="productionOrderNumber_生产加工单_1_string_t1_$$VA" name="生产加工单" variable="productionOrderNumber" required="true"/>    		
     		<activiti:formProperty id="tbheader1566744708879_item" name="工序表" type="string" variable="header1566744708879" writable="true" required="false" />
 	        <activiti:formProperty id="tbheader1566744708879_opnumber_工序编号_2_string_t1_$$A" name="工序编号" type="string" variable="opnumber"></activiti:formProperty>
 	        <activiti:formProperty id="tbheader1566744708879_opname_工序名称_3_string_t1_$$A" name="工序名称" type="string" variable="opnumber"></activiti:formProperty>
@@ -145,6 +147,8 @@
     					li<<count
     					li<<it.工序类型
     					li<<it.工序名称
+    					li<<it.计划开始时间
+    					li<<it.计划结束时间
     					
     					map.put(it.工序编号,li)
     					dList.add(JsonOutput.toJson(map))
@@ -172,12 +176,15 @@
       				import groovy.json.JsonSlurper
       				
       				def jsonSlurper = new JsonSlurper()
-      				def map = jsonSlurper.parseText(execution.getVariable('map'))//key:工序编号 value:[分配组,分配数量,工序类型,工序名称]
+      				def map = jsonSlurper.parseText(execution.getVariable('map'))//key:工序编号 value:[分配组,分配数量,工序类型,工序名称,计划开始时间,计划结束时间]
       				def key = map.keySet()[0]
       				execution.setVariableLocal('group',map.get(key)[0].code)
+      				execution.setVariableLocal('totalCount',map.get(key)[1])
       				execution.setVariableLocal('count',map.get(key)[1])
       				execution.setVariableLocal('processType',map.get(key)[2])
       				execution.setVariableLocal('gxProcessName',map.get(key)[3])
+      				execution.setVariableLocal('planStart',map.get(key)[4])
+      				execution.setVariableLocal('planEnd',map.get(key)[5])
       				execution.setVariableLocal('processNumber1', key)
       				]]>
       				</activiti:string>
@@ -200,6 +207,11 @@
       			<activiti:field name="script">
       				<activiti:string>
       				<![CDATA[
+      					import groovy.json.JsonSlurper
+						import groovy.json.JsonOutput
+      					
+      					def jsonSlurper = new JsonSlurper()
+      					
       					def execution = task.getExecution()
       					def count = execution.getVariable('count')?.toInteger()
       					def complete = execution.getVariable('completecount')?.toInteger()
@@ -214,13 +226,36 @@
       					
       					execution.setVariableLocal('count', nowCount)
       					execution.setVariableLocal('completecountSave',execution.getVariable('completecount'))
-      					execution.setVariableLocal('completetimeSave',execution.getVariable('completetime'))
+      					def completeTime = execution.getVariable('completetime')
+      					execution.setVariableLocal('completetimeSave',completeTime)
       					execution.setVariableLocal('actualstarttimeSave',execution.getVariable('actualstarttime'))
       					
       					execution.setVariable('completecount', '')
       					execution.setVariable('completetime', '')
       					execution.setVariable('actualstarttime','')
       					
+      					//供报表使用的var
+      					def proProgressStr = execution.getVariable('proProgress')
+      					def proProgress
+      					if(proProgressStr == null) {
+      						proProgress = new ArrayList()
+      					} else {
+      						proProgress = jsonSlurper.parseText(proProgressStr)
+      					}
+      					def curPro = new HashMap()//当前执行记录
+      					curPro.put('orderNum',execution.getVariable('productionOrderNumber'))//生产加工单编号
+      					curPro.put('sectionNum',execution.getVariable('group'))//工段编号
+      					curPro.put('processNum',execution.getVariable('processNumber1'))//工序编号
+      					curPro.put('planStart',execution.getVariable('planStart'))//计划开始时间
+      					curPro.put('planEnd',execution.getVariable('planEnd'))//计划结束时间
+      					def totalCount = execution.getVariable('totalCount')
+      					curPro.put('totalCount',totalCount)//计划数量
+      					curPro.put('completeCount',totalCount?.toDouble() - nowCount?.toDouble())//累计完成数量
+      					curPro.put('completeTime',completeTime)//此次完成时间
+      					
+      					proProgress<<curPro
+      					
+      					execution.setVariable('proProgress',JsonOutput.toJson(proProgress))
       				]]>
       				</activiti:string>
       			</activiti:field>
