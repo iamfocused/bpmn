@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
+  <process id="SRM_MAT_PRICE" name="SRM_物料价格" isExecutable="true" activiti:candidateStarterGroups="admin">
+    <startEvent id="s1" name="s1" activiti:initiator="initiator">
+      <extensionElements>
+        <activiti:formProperty id="vndid_供应商id_1_string_tree_$$A" name="供应商id" type="string" variable="VND_ID_" required="true"></activiti:formProperty>
+        <activiti:formProperty id="material_物料id_1_string_tree_$$A" name="物料id" type="string" variable="matid" required="true"></activiti:formProperty>
+        <!--<activiti:formProperty id="matversion_物料版本号_3_string_t1_$$A" name="物料版本号" type="string" variable="MAT_VERSION_" required="true"></activiti:formProperty>-->
+        <activiti:formProperty id="tbhddetail_item" name="物料价格明细" type="string" variable="tbhddetail_item" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_价格记录（流水号）_prcid_1_string_t1_$$A" name="价格记录（流水号）" type="string" variable="tbhddetail_prcid_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_价格类型_prctype_2_enum_sbs_$$A" name="价格类型" type="enum" variable="tbhddetail_prctype_t00">
+          <activiti:value id="A" name="A"></activiti:value>
+          <activiti:value id="B" name="B"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_价格单位_prcunit_3_string_t1_$$A" name="价格单位" type="string" variable="tbhddetail_prcunit_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_价格货币_prccurrency_4_string_t1_$$A" name="价格货币" type="string" variable="tbhddetail_prccurrency_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_单价_prcprice_5_string_t11_$$A" name="单价" type="string" variable="tbhddetail_prcprice_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_价格阶梯从_levelf_6_string_t11_$$A" name="价格阶梯从" type="string" variable="tbhddetail_levelf_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_价格阶梯至_levelt_7_string_t11_$$A" name="价格阶梯至" type="string" variable="tbhddetail_levelt_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_采购提前期_lt_8_string_t1_$$A" name="采购提前期" type="string" variable="tbhddetail_lt_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_最小采购量_moq_9_string_t6_$$A" name="最小采购量" type="string" variable="tbhddetail_moq_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_最小包装量_mpq_10_string_t6_$$A" name="最小包装量" type="string" variable="tbhddetail_mpq_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_价格有效期开始_valdatef_11_string_t3_$$A" name="价格有效期开始" type="string" variable="tbhddetail_valdatef_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_价格有效期结束_valdatet_12_string_t3_$$A" name="价格有效期结束" type="string" variable="tbhddetail_valdatet_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_备注_comment_13_string_t2_$$A" name="备注" type="string" variable="tbhddetail_comment_t00"></activiti:formProperty>
+      </extensionElements>
+    </startEvent>
+    <userTask id="T1" name="T1: 修改" activiti:assignee="${initiator}">
+      <extensionElements>
+        <activiti:formProperty id="coreaction_操作_1_enum_rbv_$$A" name="操作" type="enum" variable="coreaction_t01" required="true">
+          <activiti:value id="更新" name="更新"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="vndid_供应商id_1_string_tree_$$VA" name="供应商id" type="string" variable="VND_ID_" required="true"></activiti:formProperty>
+        <activiti:formProperty id="material_物料id_1_string_tree_$$VA" name="物料id" type="string" variable="matid" required="true"></activiti:formProperty>
+        <!--<activiti:formProperty id="matversion_物料版本号_3_string_t1_$$VA" name="物料版本号" type="string" variable="MAT_VERSION_" required="true"></activiti:formProperty>-->
+        <activiti:formProperty id="tbhddetail_item" name="物料价格明细" type="string" variable="tbhddetail_item" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_价格记录（流水号）_prcid_1_string_t1_$$A" name="价格记录（流水号）" type="string" variable="tbhddetail_prcid_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_价格类型_prctype_2_enum_sbs_$$A" name="价格类型" type="enum" variable="tbhddetail_prctype_t00">
+          <activiti:value id="A" name="A"></activiti:value>
+          <activiti:value id="B" name="B"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_价格单位_prcunit_3_string_t1_$$A" name="价格单位" type="string" variable="tbhddetail_prcunit_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_价格货币_prccurrency_4_string_t1_$$A" name="价格货币" type="string" variable="tbhddetail_prccurrency_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_单价_prcprice_5_string_t11_$$A" name="单价" type="string" variable="tbhddetail_prcprice_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_价格阶梯从_levelf_6_string_t11_$$A" name="价格阶梯从" type="string" variable="tbhddetail_levelf_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_价格阶梯至_levelt_7_string_t11_$$A" name="价格阶梯至" type="string" variable="tbhddetail_levelt_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_采购提前期_lt_8_string_t1_$$A" name="采购提前期" type="string" variable="tbhddetail_lt_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_最小采购量_moq_9_string_t6_$$A" name="最小采购量" type="string" variable="tbhddetail_moq_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_最小包装量_mpq_10_string_t6_$$A" name="最小包装量" type="string" variable="tbhddetail_mpq_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_价格有效期开始_valdatef_11_string_t3_$$A" name="价格有效期开始" type="string" variable="tbhddetail_valdatef_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_价格有效期结束_valdatet_12_string_t3_$$A" name="价格有效期结束" type="string" variable="tbhddetail_valdatet_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_备注_comment_13_string_t2_$$A" name="备注" type="string" variable="tbhddetail_comment_t00"></activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway"></exclusiveGateway>
+    <sequenceFlow id="SQ2" name="更新" sourceRef="exclusivegateway1" targetRef="T1">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${coreaction_t01 == '更新'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow1" sourceRef="s1" targetRef="T1"></sequenceFlow>
+    <endEvent id="e1" name="e1"></endEvent>
+    <sequenceFlow id="SQ1" name="结束" sourceRef="exclusivegateway1" targetRef="e1">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${coreaction_t01 == '结束'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow2" sourceRef="T1" targetRef="exclusivegateway1"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_SRM_MATERIAL_INSERT">
+    <bpmndi:BPMNPlane bpmnElement="SRM_MATERIAL_INSERT" id="BPMNPlane_SRM_MATERIAL_INSERT">
+      <bpmndi:BPMNShape bpmnElement="s1" id="BPMNShape_s1">
+        <omgdc:Bounds height="35.0" width="35.0" x="80.0" y="170.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="T1" id="BPMNShape_T1">
+        <omgdc:Bounds height="55.0" width="105.0" x="160.0" y="160.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway1" id="BPMNShape_exclusivegateway1">
+        <omgdc:Bounds height="40.0" width="40.0" x="310.0" y="167.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="e1" id="BPMNShape_e1">
+        <omgdc:Bounds height="35.0" width="35.0" x="600.0" y="171.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="SQ2" id="BPMNEdge_SQ2">
+        <omgdi:waypoint x="330.0" y="207.0"></omgdi:waypoint>
+        <omgdi:waypoint x="329.0" y="327.0"></omgdi:waypoint>
+        <omgdi:waypoint x="212.0" y="327.0"></omgdi:waypoint>
+        <omgdi:waypoint x="212.0" y="215.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="14.0" width="24.0" x="331.0" y="269.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="115.0" y="187.0"></omgdi:waypoint>
+        <omgdi:waypoint x="160.0" y="187.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="SQ1" id="BPMNEdge_SQ1">
+        <omgdi:waypoint x="350.0" y="187.0"></omgdi:waypoint>
+        <omgdi:waypoint x="600.0" y="188.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="14.0" width="100.0" x="450.0" y="194.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="265.0" y="187.0"></omgdi:waypoint>
+        <omgdi:waypoint x="310.0" y="187.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

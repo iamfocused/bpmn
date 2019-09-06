@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<definitions xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:activiti="http://camunda.org/schema/1.0/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xsi:schemaLocation="http://www.omg.org/spec/BPMN/20100524/MODEL BPMN20.xsd" exporter="camunda modeler" exporterVersion="3.0.0" targetNamespace="http://www.activiti.org/fin">
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/fin">
   <process id="DPFN001A" activiti:candidateStarterGroups="_all" name="DPFN001A员工费用报销 Expense Claim" isExecutable="true">
     <documentation><![CDATA[{ "description": "员工填写费用报销后将由费用对应的成本中心进行审批，通过后将费用凭证PDF打印提交至财务进行后续账务处理。After the employee fill in expense reimbursement, it will be examined and approved by the cost center corresponding to the expense. After the approval, the expense voucher will be printed in PDF and submitted to the financial department for subsequent accounting treatment.", 
 	"documents": [
@@ -436,6 +436,10 @@
 					def inputList = mapper.readValue(execution.getVariable("tbhdexpdet_item_std"), new com.fasterxml.jackson.core.type.TypeReference<List<Map<String, Object>>>(){});
 		
 					def procInstIdList = [];
+					
+					//用于搜索利润中心
+					def costCenterDrools = new groovy.json.JsonSlurper().parseText(execution.getVariable('costCenterDrools'))
+					
 					def stdNew = inputList.each{ elem ->
 						def balanceDetail = elem.borrow.name;
 						def procInstId = balanceDetail.substring(0,balanceDetail.lastIndexOf("/")).trim();
@@ -454,7 +458,9 @@
 						elem.debitacc = "1002";//借方科目（银行存款）
 						elem.dassist = [["0011":accountno]]; //借方辅助核算项（银行账户）
 						elem.creditacc = "122101";//贷方科目（其它应收款-借款备用金）
-						elem.cassist = [["0002":execution.getVariable("nccode")],["ra01":costcenterCode],["0037":"Z"+costcenterCode.substring(0,2)]]; //0002（人员档案），ra01（成本中心），0037（利润中心）
+						
+						def profit = costCenterDrools.find{it.costcenter == costcenterCode}.profit//利润中心
+						elem.cassist = [["0002":execution.getVariable("nccode")],["ra01":costcenterCode],["0037":profit]]; //0002（人员档案），ra01（成本中心），0037（利润中心）
 					}
 
 					execution.setVariable("againstamount",againstamount+""); //冲销总金额
@@ -532,13 +538,17 @@
    
    
 		def assistMap = [category:"0041",partner:"0004",ioitem:"0008",project:"0010",bankacc:"0011",profitacc:"0037",costcenter:"ra01"];
+		
+		//用于搜索利润中心
+		def costCenterDrools = new groovy.json.JsonSlurper().parseText(execution.getVariable('costCenterDrools'))
+		
 		def stdNew = inputList.each{ elem ->
 			if(elem.debitacc == '' || elem.creditacc == '') {
 				throw new org.activiti.engine.ActivitiIllegalArgumentException("您所选择的收支项目对应的会计科目未维护业务规则，请联系业务规则方或系统管理员 If the accounting account corresponding to the income and expenditure item you selected does not maintain business rules, please contact the business rule party or system administrator.");
 			}
 			elem.partner = elem.vendor;
 			elem.bankacc = result[0].accountno;
-			elem.profitacc = "Z"+elem.costcenter.substring(0,2);	//利润中心，一般都是Z+成本中心前两位
+			elem.profitacc = costCenterDrools.find{it.costcenter == elem.costcenter}.profit;	//利润中心，一般都是Z+成本中心前两位
 			def dassistList = [],cassistList = [];
 
 			try
@@ -657,8 +667,8 @@
       <incoming>flow12</incoming>
       <outgoing>flow2</outgoing>
       <multiInstanceLoopCharacteristics>
-        <loopCardinality body="${costCenterArray.size()}">${costCenterArray.size()}</loopCardinality>
-        <completionCondition body="${execution.getVariable('coreaction') == '拒绝 Refuse'}">${execution.getVariable('coreaction') == '拒绝 Refuse'}</completionCondition>
+        <loopCardinality>${costCenterArray.size()}</loopCardinality>
+        <completionCondition>${execution.getVariable('coreaction') == '拒绝 Refuse'}</completionCondition>
       </multiInstanceLoopCharacteristics>
     </callActivity>
     <exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway">

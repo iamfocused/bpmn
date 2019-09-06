@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/pur">
-  <process id="workshopinf0902" name="workshopinf0902" isExecutable="true" activiti:candidateStarterUsers="18616741835" activiti:candidateStarterGroups="admin">
+  <process id="workshopinf0902" name="车间信息流程测试" isExecutable="true" activiti:candidateStarterUsers="18616741835" activiti:candidateStarterGroups="admin">
     <startEvent id="StartEvent_1" activiti:initiator="initiator">
       <extensionElements>
         <activiti:formProperty id="workshopname_车间名称_1_string_t1_$$A" name="车间名称" type="string" variable="workshopname"></activiti:formProperty>

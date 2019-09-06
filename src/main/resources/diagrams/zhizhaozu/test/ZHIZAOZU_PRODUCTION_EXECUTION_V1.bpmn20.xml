@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/pur">
-  <process id="productionExecution" name="生产执行流程" isExecutable="true" activiti:candidateStarterGroups="admin">
+  <process id="productionExecution" name="生产执行流程测试" isExecutable="true" activiti:candidateStarterGroups="admin">
     <startEvent id="startevent1" name="生产执行启动事件" activiti:initiator="initiator">
     	<extensionElements>
     		<activiti:formProperty id="processNumber_工艺编号_1_string_auto_$$A" name="选择工艺编号" variable="processNumber" required="true"/>
@@ -91,6 +91,11 @@
     					} else {
     						throw new org.activiti.engine.ActivitiIllegalArgumentException('流程变量(检验指标报表std)未找到,流程实例ID:' + proInstId)
     					}
+    					
+    					def var8 = list.stream().filter({x->x.getVariableName().equals('processname')}).findFirst().orElse(null)
+    					if(var8) {
+    						execution.setVariable('processname',var8.getValue())
+    					}
     				]]>
     				</activiti:string>
     			</activiti:field>
@@ -104,9 +109,8 @@
     		<activiti:formProperty id="tbheader1566744708879_item" name="工序表" type="string" variable="header1566744708879" writable="true" required="false" />
 	        <activiti:formProperty id="tbheader1566744708879_opnumber_工序编号_2_string_t1_$$A" name="工序编号" type="string" variable="opnumber"></activiti:formProperty>
 	        <activiti:formProperty id="tbheader1566744708879_opname_工序名称_3_string_t1_$$A" name="工序名称" type="string" variable="opnumber"></activiti:formProperty>
-	        <activiti:formProperty id="tbheader1566744708879_sendsectionnumber_分配工段编号_4_string_t1_$$A" name="分配工段编号" type="string" variable="sendsectionnumber"></activiti:formProperty>
-	        <activiti:formProperty id="tbheader1566744708879_plannedstarttime_计划开始时间_5_string_t5_$$A" name="计划开始时间" type="string" variable="plannedstarttime"></activiti:formProperty>
-	        <activiti:formProperty id="tbheader1566744708879_plannedendtime_计划结束时间_6_string_t5_$$A" name="计划结束时间" type="string" variable="plannedstarttime"></activiti:formProperty>
+	        <activiti:formProperty id="tbheader1566744708879_plannedstarttime_计划开始时间_5_string_t5_$$A" name="计划开始时间" type="string" variable="plannedstarttime" required="true"></activiti:formProperty>
+	        <activiti:formProperty id="tbheader1566744708879_plannedendtime_计划结束时间_6_string_t5_$$A" name="计划结束时间" type="string" variable="plannedstarttime" required="true"></activiti:formProperty>
 	        <activiti:formProperty id="tbheader1566744708879_optype_工序类型_7_enum_sbs_$$A" name="工序类型" type="enum" variable="optype">
 	          <activiti:value id="通用" name="通用"></activiti:value>
 	          <activiti:value id="车削" name="车削"></activiti:value>
@@ -140,6 +144,7 @@
     					li<<it.工段名称
     					li<<count
     					li<<it.工序类型
+    					li<<it.工序名称
     					
     					map.put(it.工序编号,li)
     					dList.add(JsonOutput.toJson(map))
@@ -167,11 +172,12 @@
       				import groovy.json.JsonSlurper
       				
       				def jsonSlurper = new JsonSlurper()
-      				def map = jsonSlurper.parseText(execution.getVariable('map'))//key:工序编号 value:[分配组,分配数量,工序类型]
+      				def map = jsonSlurper.parseText(execution.getVariable('map'))//key:工序编号 value:[分配组,分配数量,工序类型,工序名称]
       				def key = map.keySet()[0]
       				execution.setVariableLocal('group',map.get(key)[0].code)
       				execution.setVariableLocal('count',map.get(key)[1])
       				execution.setVariableLocal('processType',map.get(key)[2])
+      				execution.setVariableLocal('gxProcessName',map.get(key)[3])
       				execution.setVariableLocal('processNumber1', key)
       				]]>
       				</activiti:string>
@@ -185,6 +191,10 @@
       		<activiti:formProperty id="actualstarttime_实际开始时间_2_string_t3_$$A" variable="actualstarttime" name="开始时间" required="true"/>
       		<activiti:formProperty id="completetime_完成时间_2_string_t3_$$A" variable="completetime" name="完成时间" required="true"/>
       	
+      		<activiti:formProperty id="lave_剩余数量_1_string_t1_$$VA" variable="lave" name="剩余数量"/>
+      		<activiti:formProperty id="processname_工艺名称_2_string_t1_$$VA" name="工艺名称" type="string" variable="processname"/>
+      		<activiti:formProperty id="gxProcessName_工序名称_3_string_t1_$$VA" name="工序名称" type="string" variable="gxProcessName"/>
+
       		<activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
       			<activiti:field name="language"><activiti:string><![CDATA[groovy]]></activiti:string></activiti:field>
       			<activiti:field name="script">
@@ -225,6 +235,10 @@
 						import java.security.InvalidKeyException
 						
       					def execution = task.getExecution()
+      					
+      					def count = execution.getVariable('count')
+      					
+      					execution.setVariableLocal('lave',count)
       					
       					def procInstId = execution.getVariable('proInstId')
       					def processNumber = execution.getVariable('processNumber1')

@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
+  <process id="SRM_VENDOR" name="SRM_供应商" isExecutable="true" activiti:candidateStarterGroups="admin">
+    <startEvent id="s1" name="s1" activiti:initiator="initiator">
+      <extensionElements>
+        <activiti:formProperty id="vndid_供应商ID_1_string_t1_$$A" name="供应商ID" type="string" variable="VND_ID_" required="true"></activiti:formProperty>
+        <activiti:formProperty id="vndname1_供应商名称1_1_string_t1_$$A" name="供应商名称1" type="string" variable="VND_NAME1_" required="true"></activiti:formProperty>
+        <activiti:formProperty id="vndname2_供应商名称2_1_string_t1_$$A" name="供应商名称2" type="string" variable="VND_NAME2_"></activiti:formProperty>
+        <activiti:formProperty id="vndscode_供应商简称_1_string_t1_$$A" name="供应商简称" type="string" variable="VND_SCODE_"></activiti:formProperty>
+        <activiti:formProperty id="vndcredit_信用代码_1_string_t1_$$A" name="信用代码" type="string" variable="VND_CREDIT_" required="true"></activiti:formProperty>
+        <activiti:formProperty id="vndpayment_付款代码_1_string_t1_$$A" name="付款代码" type="string" variable="VND_PAYMENT_" required="true"></activiti:formProperty>
+        <activiti:formProperty id="vndtype_供应商类型_1_string_t1_$$A" name="供应商类型" type="string" variable="VND_TYPE_" required="true"></activiti:formProperty>
+        <activiti:formProperty id="vndstatus_供应商状态_1_string_t1_$$A" name="供应商状态" type="string" variable="VND_STATUS_" required="true"></activiti:formProperty>
+        <activiti:formProperty id="vndaddress1_供应商地址1_1_string_t1_$$A" name="供应商地址1" type="string" variable="VND_ADDRESS1_" required="true"></activiti:formProperty>
+        <activiti:formProperty id="vndaddress2_供应商地址2_1_string_t1_$$A" name="供应商地址2" type="string" variable="VND_ADDRESS2_"></activiti:formProperty>
+        <activiti:formProperty id="vndcontact_联系人_1_string_t1_$$A" name="联系人" type="string" variable="VND_CONTACT_" required="true"></activiti:formProperty>
+        <activiti:formProperty id="vndpugroup_采购组_1_string_t1_$$A" name="采购组" type="string" variable="VND_PU_GROUP_" required="true"></activiti:formProperty>
+        <activiti:formProperty id="vndlicenseto_营业执照有效期至_1_string_t3_$$A" name="营业执照有效期至" type="long" variable="VND_LICENSE_TO_" required="true"></activiti:formProperty>
+        <activiti:formProperty id="vndsyscertto_体系证书有效期至_1_string_t3_$$A" name="体系证书有效期至" type="long" variable="VND_SYSCERT_TO_" required="true"></activiti:formProperty>
+        <activiti:formProperty id="vndcontractto_合同有效期至_1_string_t3_$$A" name="合同有效期至" type="long" variable="VND_CONTRACT_TO_" required="true"></activiti:formProperty>
+        <activiti:formProperty id="vndsccode_认证码_1_string_t1_$$A" name="认证码" type="string" variable="VND_SC_CODE_"></activiti:formProperty>
+      </extensionElements>
+    </startEvent>
+    <userTask id="T1" name="T1: 修改" activiti:assignee="${initiator}">
+      <extensionElements>
+        <activiti:formProperty id="coreaction_操作_1_enum_rbv_$$A" name="操作" type="enum" variable="coreaction_t01" required="true">
+          <activiti:value id="更新" name="更新"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="vndid_供应商ID_1_string_t1_$$B" name="供应商ID" type="string" variable="VND_ID_"></activiti:formProperty>
+        <activiti:formProperty id="vndname1_供应商名称1_1_string_t1_$$B" name="供应商名称1" type="string" variable="VND_NAME1_"></activiti:formProperty>
+        <activiti:formProperty id="vndname2_供应商名称2_1_string_t1_$$B" name="供应商名称2" type="string" variable="VND_NAME2_"></activiti:formProperty>
+        <activiti:formProperty id="vndscode_供应商简称_1_string_t1_$$B" name="供应商简称" type="string" variable="VND_SCODE_"></activiti:formProperty>
+        <activiti:formProperty id="vndcredit_信用代码_1_string_t1_$$B" name="信用代码" type="string" variable="VND_CREDIT_"></activiti:formProperty>
+        <activiti:formProperty id="vndpayment_付款代码_1_string_t1_$$B" name="付款代码" type="string" variable="VND_PAYMENT_"></activiti:formProperty>
+        <activiti:formProperty id="vndtype_供应商类型_1_string_t1_$$B" name="供应商类型" type="string" variable="VND_TYPE_"></activiti:formProperty>
+        <activiti:formProperty id="vndstatus_供应商状态_1_string_t1_$$B" name="供应商状态" type="string" variable="VND_STATUS_"></activiti:formProperty>
+        <activiti:formProperty id="vndaddress1_供应商地址1_1_string_t1_$$B" name="供应商地址1" type="string" variable="VND_ADDRESS1_"></activiti:formProperty>
+        <activiti:formProperty id="vndaddress2_供应商地址2_1_string_t1_$$B" name="供应商地址2" type="string" variable="VND_ADDRESS2_"></activiti:formProperty>
+        <activiti:formProperty id="vndcontact_联系人_1_string_t1_$$B" name="联系人" type="string" variable="VND_CONTACT_"></activiti:formProperty>
+        <activiti:formProperty id="vndpugroup_采购组_1_string_t1_$$B" name="采购组" type="string" variable="VND_PU_GROUP_"></activiti:formProperty>
+        <activiti:formProperty id="vndlicenseto_营业执照有效期至_1_string_t3_$$B" name="营业执照有效期至" type="long" variable="VND_LICENSE_TO_"></activiti:formProperty>
+        <activiti:formProperty id="vndsyscertto_体系证书有效期至_1_string_t3_$$B" name="体系证书有效期至" type="long" variable="VND_SYSCERT_TO_"></activiti:formProperty>
+        <activiti:formProperty id="vndcontractto_合同有效期至_1_string_t3_$$B" name="合同有效期至" type="long" variable="VND_CONTRACT_TO_"></activiti:formProperty>
+        <activiti:formProperty id="vndsccode_认证码_1_string_t1_$$B" name="认证码" type="string" variable="VND_SC_CODE_"></activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway"></exclusiveGateway>
+    <sequenceFlow id="SQ2" name="更新" sourceRef="exclusivegateway1" targetRef="T1">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${coreaction_t01 == '更新'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow1" sourceRef="s1" targetRef="T1"></sequenceFlow>
+    <endEvent id="e1" name="e1">
+      <extensionElements>
+        <activiti:executionListener event="end" class="org.activiti.engine.impl.bpmn.listener.ScriptExecutionListener">
+          <activiti:field name="language">
+            <activiti:string><![CDATA[groovy]]></activiti:string>
+          </activiti:field>
+          <activiti:field name="script">
+            <activiti:string><![CDATA[if(execution.getVariable('camelBody').contains('exec failed'))
+							throw new org.activiti.engine.ActivitiIllegalArgumentException("保存失败，请联系管理员")]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </endEvent>
+    <sequenceFlow id="SQ1" name="结束" sourceRef="exclusivegateway1" targetRef="e1">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${coreaction_t01 == '结束'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow2" sourceRef="T1" targetRef="exclusivegateway1"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_SRM_MATERIAL_INSERT">
+    <bpmndi:BPMNPlane bpmnElement="SRM_MATERIAL_INSERT" id="BPMNPlane_SRM_MATERIAL_INSERT">
+      <bpmndi:BPMNShape bpmnElement="s1" id="BPMNShape_s1">
+        <omgdc:Bounds height="35.0" width="35.0" x="80.0" y="170.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="T1" id="BPMNShape_T1">
+        <omgdc:Bounds height="55.0" width="105.0" x="160.0" y="160.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway1" id="BPMNShape_exclusivegateway1">
+        <omgdc:Bounds height="40.0" width="40.0" x="310.0" y="167.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="e1" id="BPMNShape_e1">
+        <omgdc:Bounds height="35.0" width="35.0" x="600.0" y="171.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="SQ2" id="BPMNEdge_SQ2">
+        <omgdi:waypoint x="330.0" y="207.0"></omgdi:waypoint>
+        <omgdi:waypoint x="329.0" y="327.0"></omgdi:waypoint>
+        <omgdi:waypoint x="212.0" y="327.0"></omgdi:waypoint>
+        <omgdi:waypoint x="212.0" y="215.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="14.0" width="24.0" x="331.0" y="269.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="115.0" y="187.0"></omgdi:waypoint>
+        <omgdi:waypoint x="160.0" y="187.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="SQ1" id="BPMNEdge_SQ1">
+        <omgdi:waypoint x="350.0" y="187.0"></omgdi:waypoint>
+        <omgdi:waypoint x="600.0" y="188.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="14.0" width="100.0" x="450.0" y="194.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="265.0" y="187.0"></omgdi:waypoint>
+        <omgdi:waypoint x="310.0" y="187.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

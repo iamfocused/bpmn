@@ -1,0 +1,320 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
+  <process id="SRM_execute" name="SRM采购计划执行" isExecutable="true" activiti:candidateStarterGroups="admin">
+    <documentation>{
+	    "description":"根据制定的采购计划，选择合适的计划进行采购",
+	    "documents":[
+	        {
+	            "name":"BPMFLOWCHART",
+	            "path":"https://bpms.eorionsolution.com/images/docs/bean-validation-specification.pdf",
+	            "size":"pdf"
+	        }
+	    ]
+	}</documentation>
+    <startEvent id="s1" name="选择采购计划" activiti:initiator="initiator">
+      <extensionElements>
+        <activiti:formProperty id="chooseplan_选择采购计划_1_string_tree_$$A" name="选择采购计划" type="string" variable="chooseplan" required="true"></activiti:formProperty>
+      </extensionElements>
+    </startEvent>
+    <scriptTask id="scripttask1" name="采购计划信息获取" scriptFormat="groovy" activiti:autoStoreVariables="false">
+      <script>
+      <![CDATA[
+    		import groovy.json.JsonSlurper
+    		
+    		def jsonSlurper = new JsonSlurper()
+    		def processInstId = jsonSlurper.parseText(execution.getVariable('chooseplan')).code
+    		
+    		def planExecution = runtimeService.createExecutionQuery().processInstanceId(processInstId).singleResult();
+    		if(planExecution == null) {
+    			throw new org.activiti.engine.ActivitiIllegalArgumentException('采购计划已被删除，流程ID是：' + processInstId)
+    		}
+    		def info = planExecution.getVariable('tbhddetail_item')
+    		if(info == null) {
+    			throw new org.activiti.engine.ActivitiIllegalArgumentException('采购计划信息数据异常，流程ID是：' + processInstId)
+    		}
+    		execution.setVariable('tbhddetail_item', info)
+    		
+    		execution.setVariable('VND_ID_',planExecution.getVariable('VND_ID_'))
+    		execution.setVariable('PLAN_FROM_',planExecution.getVariable('PLAN_FROM_'))
+    		execution.setVariable('PLAN_TO_',planExecution.getVariable('PLAN_TO_'))
+    	]]>
+    	</script>
+    </scriptTask>
+    <userTask id="usertask1" name="填写需求量" activiti:assignee="${initiator}">
+      <extensionElements>
+        <activiti:formProperty id="vndid_供应商id_1_string_tree_$$VA" name="供应商id" type="string" variable="VND_ID_"></activiti:formProperty>
+        <activiti:formProperty id="planfrom_计划开始_2_string_t3_$$VA" name="计划开始时间" type="string" variable="PLAN_FROM_"></activiti:formProperty>
+        <activiti:formProperty id="planto_计划结束_3_string_t3_$$VA" name="计划结束时间" type="string" variable="PLAN_TO_"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_item" name="采购计划明细 Detail" type="string" variable="tbhddetail_item" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_物料信息_matinfo_1_string_tree_$$VA" name="物料信息" type="string" variable="tbhddetail_matinfo_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_计划数量_planqty_2_string_t6_$$VA" name="计划数量" type="string" variable="tbhddetail_planqty_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_剩余数量_remainqty_3_string_t6_$$VA" name="剩余数量" type="string" variable="tbhddetail_remainqty_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_单价_prcprice_4_string_t11_$$VA" name="单价" type="string" variable="tbhddetail_prcprice_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_订货日期_orderdate_5_string_t3_$$A" name="订货日期" type="string" variable="tbhddetail_orderdate_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_订货数量_orderqty_6_string_t6_$$A" name="订货数量" type="string" variable="tbhddetail_orderqty_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_批次_batch_7_string_t1_$$HA" name="批次" type="string" variable="tbhddetail_batch_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_实际送货数量_deliveryqty_8_string_t6_$$HA" name="实际送货数量" type="string" variable="tbhddetail_deliveryqty_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_送货日期_deliverydate_9_string_t3_$$HA" name="送货日期" type="string" variable="tbhddetail_deliverydate_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_到货日期_arrivaldate_10_string_t3_$$HA" name="到货日期" type="string" variable="tbhddetail_arrivaldate_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_合格数_accnumber_11_string_t6_$$HA" name="合格数" type="string" variable="tbhddetail_accnumber_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_不合格数_defnumber_12_string_t6_$$HA" name="不合格数" type="string" variable="tbhddetail_defnumber_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_实际总金额_amount_13_string_t11_$$HA" name="实际总金额" type="string" variable="tbhddetail_amount_t00"></activiti:formProperty>
+        <activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+          <activiti:field name="language">
+            <activiti:string><![CDATA[groovy]]></activiti:string>
+          </activiti:field>
+          <activiti:field name="script">
+            <activiti:string><![CDATA[import groovy.json.JsonSlurper
+    					
+    					def jsonSlurper = new JsonSlurper()
+    					def execution = task.getExecution()
+    					
+    					def itemStd = jsonSlurper.parseText(execution.getVariable('tbhddetail_item_std'))
+    					itemStd.each{
+    						if(it.orderdate == null){
+    							throw new org.activiti.engine.ActivitiIllegalArgumentException('请填写订货日期')
+    						}
+    						if(it.orderqty == null){
+    							throw new org.activiti.engine.ActivitiIllegalArgumentException('请填写订货数量')
+    						}
+    					}]]></activiti:string>
+          </activiti:field>
+        </activiti:taskListener>
+      </extensionElements>
+    </userTask>
+    <userTask id="usertask2" name="供应商发货" activiti:assignee="${initiator}">
+      <extensionElements>
+        <activiti:formProperty id="tbhddetail_item" name="采购计划明细 Detail" type="string" variable="tbhddetail_item" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_物料信息_matinfo_1_string_tree_$$VA" name="物料信息" type="string" variable="tbhddetail_matinfo_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_计划数量_planqty_2_string_t6_$$HA" name="计划数量" type="string" variable="tbhddetail_planqty_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_剩余数量_remainqty_3_string_t6_$$HA" name="剩余数量" type="string" variable="tbhddetail_remainqty_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_单价_prcprice_4_string_t11_$$VA" name="单价" type="string" variable="tbhddetail_prcprice_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_订货日期_orderdate_5_string_t3_$$VA" name="订货日期" type="string" variable="tbhddetail_orderdate_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_订货数量_orderqty_6_string_t6_$$VA" name="订货数量" type="string" variable="tbhddetail_orderqty_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_批次_batch_7_string_t1_$$A" name="批次" type="string" variable="tbhddetail_batch_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_实际送货数量_deliveryqty_8_string_t6_$$A" name="实际送货数量" type="string" variable="tbhddetail_deliveryqty_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_送货日期_deliverydate_9_string_t3_$$A" name="送货日期" type="string" variable="tbhddetail_deliverydate_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_到货日期_arrivaldate_10_string_t3_$$HA" name="到货日期" type="string" variable="tbhddetail_arrivaldate_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_合格数_accnumber_11_string_t6_$$HA" name="合格数" type="string" variable="tbhddetail_accnumber_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_不合格数_defnumber_12_string_t6_$$HA" name="不合格数" type="string" variable="tbhddetail_defnumber_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_实际总金额_amount_13_string_t11_$$HA" name="实际总金额" type="string" variable="tbhddetail_amount_t00"></activiti:formProperty>
+        <activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+          <activiti:field name="language">
+            <activiti:string><![CDATA[groovy]]></activiti:string>
+          </activiti:field>
+          <activiti:field name="script">
+            <activiti:string><![CDATA[import groovy.json.JsonSlurper
+    					
+    					def jsonSlurper = new JsonSlurper()
+    					def execution = task.getExecution()
+    					
+    					def itemStd = jsonSlurper.parseText(execution.getVariable('tbhddetail_item_std'))
+    					itemStd.each{
+    						if(it.batch == null){
+    							throw new org.activiti.engine.ActivitiIllegalArgumentException('请填写批次')
+    						}
+    						if(it.deliveryqty == null){
+    							throw new org.activiti.engine.ActivitiIllegalArgumentException('请填写实际送货数量')
+    						}
+    						if(it.deliverydate == null){
+    							throw new org.activiti.engine.ActivitiIllegalArgumentException('请填写送货日期')
+    						}
+    					}]]></activiti:string>
+          </activiti:field>
+        </activiti:taskListener>
+      </extensionElements>
+    </userTask>
+    <sequenceFlow id="flow1" sourceRef="s1" targetRef="scripttask1"></sequenceFlow>
+    <sequenceFlow id="flow2" sourceRef="scripttask1" targetRef="usertask1"></sequenceFlow>
+    <sequenceFlow id="flow3" sourceRef="usertask1" targetRef="usertask2"></sequenceFlow>
+    <userTask id="usertask3" name="质量检验" activiti:assignee="${initiator}">
+      <extensionElements>
+        <activiti:formProperty id="vndid_供应商id_1_string_tree_$$VA" name="供应商id" type="string" variable="VND_ID_"></activiti:formProperty>
+        <activiti:formProperty id="planfrom_计划开始_2_string_t3_$$VA" name="计划开始时间" type="string" variable="PLAN_FROM_"></activiti:formProperty>
+        <activiti:formProperty id="planto_计划结束_3_string_t3_$$VA" name="计划结束时间" type="string" variable="PLAN_TO_"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_item" name="采购计划明细 Detail" type="string" variable="tbhddetail_item" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_物料信息_matinfo_1_string_tree_$$VA" name="物料信息" type="string" variable="tbhddetail_matinfo_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_计划数量_planqty_2_string_t6_$$VA" name="计划数量" type="string" variable="tbhddetail_planqty_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_剩余数量_remainqty_3_string_t6_$$VA" name="剩余数量" type="string" variable="tbhddetail_remainqty_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_单价_prcprice_4_string_t11_$$VA" name="单价" type="string" variable="tbhddetail_prcprice_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_订货日期_orderdate_5_string_t3_$$VA" name="订货日期" type="string" variable="tbhddetail_orderdate_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_订货数量_orderqty_6_string_t6_$$VA" name="订货数量" type="string" variable="tbhddetail_orderqty_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_批次_batch_7_string_t1_$$VA" name="批次" type="string" variable="tbhddetail_batch_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_实际送货数量_deliveryqty_8_string_t6_$$VA" name="实际送货数量" type="string" variable="tbhddetail_deliveryqty_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_送货日期_deliverydate_9_string_t3_$$VA" name="送货日期" type="string" variable="tbhddetail_deliverydate_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_到货日期_arrivaldate_10_string_t3_$$A" name="到货日期" type="string" variable="tbhddetail_arrivaldate_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_合格数_accnumber_11_string_t6_$$A" name="合格数" type="string" variable="tbhddetail_accnumber_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_不合格数_defnumber_12_string_t6_$$A" name="不合格数" type="string" variable="tbhddetail_defnumber_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_实际总金额_amount_13_string_t11_$$HA" name="实际总金额" type="string" variable="tbhddetail_amount_t00"></activiti:formProperty>
+        <activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+          <activiti:field name="language">
+            <activiti:string><![CDATA[groovy]]></activiti:string>
+          </activiti:field>
+          <activiti:field name="script">
+            <activiti:string><![CDATA[import groovy.json.JsonSlurper
+    					
+    					def jsonSlurper = new JsonSlurper()
+    					def execution = task.getExecution()
+    					
+    					def itemStd = jsonSlurper.parseText(execution.getVariable('tbhddetail_item_std'))
+    					itemStd.each{
+    						if(it.accnumber == null){
+    							throw new org.activiti.engine.ActivitiIllegalArgumentException('请填写此次采购的合格数量')
+    						}
+    						if(it.defnumber == null){
+    							throw new org.activiti.engine.ActivitiIllegalArgumentException('请填写此次采购的不合格数量')
+    						}
+    					}]]></activiti:string>
+          </activiti:field>
+        </activiti:taskListener>
+      </extensionElements>
+    </userTask>
+    <sequenceFlow id="flow4" sourceRef="usertask2" targetRef="usertask4"></sequenceFlow>
+    <endEvent id="endevent1" name="End"></endEvent>
+    <sequenceFlow id="flow5" sourceRef="usertask3" targetRef="scripttask2"></sequenceFlow>
+    <scriptTask id="scripttask2" name="更新采购计划" scriptFormat="groovy" activiti:autoStoreVariables="false">
+      <script>
+      <![CDATA[
+    		import groovy.json.JsonSlurper
+    		import groovy.json.JsonOutput
+    		
+    		def jsonSlurper = new JsonSlurper()
+    		def processInstId = jsonSlurper.parseText(execution.getVariable('chooseplan')).code
+    		
+    		def planExecution = runtimeService.createExecutionQuery().processInstanceId(processInstId).singleResult();
+    		if(planExecution == null) {
+    			throw new org.activiti.engine.ActivitiIllegalArgumentException('采购计划已被删除，流程ID是：' + processInstId)
+    		}
+    		def tbhddetail_item = jsonSlurper.parseText(planExecution.getVariable('tbhddetail_item'))
+    		def tbhddetail_item_std = jsonSlurper.parseText(planExecution.getVariable('tbhddetail_item_std'))
+    		
+    		//本地var
+    		def std = jsonSlurper.parseText(execution.getVariable('tbhddetail_item_std'))
+    		
+    		tbhddetail_item.each{k,v ->
+    			if(k == 'rows') {
+    				v.each{item -&gt;
+			            def find = std.find{it.matinfo == item[0]}
+			            if(find){
+			                item[2] = item[2].toBigDecimal().subtract(find.accnumber.toBigDecimal())
+			            }
+			        }
+    			}
+    		}
+    		
+    		tbhddetail_item_std.each{item ->
+    			def find = std.find{it.matinfo == item.matinfo}
+			    if(find) {
+			        item.remainqty = item.remainqty.toBigDecimal().subtract(find.accnumber.toBigDecimal())
+			    }
+    		}
+    		
+    		planExecution.setVariable('tbhddetail_item',JsonOutput.toJson(tbhddetail_item))
+    		planExecution.setVariable('tbhddetail_item_std',JsonOutput.toJson(tbhddetail_item_std))
+    	]]>
+    	</script>
+    </scriptTask>
+    <sequenceFlow id="flow6" sourceRef="scripttask2" targetRef="endevent1"></sequenceFlow>
+    <userTask id="usertask4" name="打印" activiti:assignee="${initiator}">
+    	<extensionElements>
+        <activiti:formProperty id="vndid_供应商id_1_string_tree_$$VA" name="供应商id" type="string" variable="VND_ID_"></activiti:formProperty>
+        <activiti:formProperty id="planfrom_计划开始_2_string_t3_$$VA" name="计划开始时间" type="string" variable="PLAN_FROM_"></activiti:formProperty>
+        <activiti:formProperty id="planto_计划结束_3_string_t3_$$VA" name="计划结束时间" type="string" variable="PLAN_TO_"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_item_$$VA" name="采购计划明细 Detail" type="string" variable="tbhddetail_item" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_物料信息_matinfo_1_string_tree_$$VA" name="物料信息" type="string" variable="tbhddetail_matinfo_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_计划数量_planqty_2_string_t6_$$VA" name="计划数量" type="string" variable="tbhddetail_planqty_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_剩余数量_remainqty_3_string_t6_$$VA" name="剩余数量" type="string" variable="tbhddetail_remainqty_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_单价_prcprice_4_string_t11_$$VA" name="单价" type="string" variable="tbhddetail_prcprice_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_订货日期_orderdate_5_string_t3_$$VA" name="订货日期" type="string" variable="tbhddetail_orderdate_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_订货数量_orderqty_6_string_t6_$$VA" name="订货数量" type="string" variable="tbhddetail_orderqty_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_批次_batch_7_string_t1_$$VA" name="批次" type="string" variable="tbhddetail_batch_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_实际送货数量_deliveryqty_8_string_t6_$$VA" name="实际送货数量" type="string" variable="tbhddetail_deliveryqty_t00"></activiti:formProperty>
+        
+        <activiti:formProperty id="tbhddetail_送货日期_deliverydate_9_string_t3_$$VA" name="送货日期" type="string" variable="tbhddetail_deliverydate_t00"></activiti:formProperty>    		
+    		<activiti:taskListener event="create" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+    			<activiti:field name="language">
+    				<activiti:string><![CDATA[groovy]]></activiti:string>
+    			</activiti:field>
+    			<activiti:field name="script">
+    				<activiti:string>
+    				<![CDATA[
+    				import groovy.json.JsonOutput
+					import groovy.json.JsonSlurper
+					
+					def jsonSlurper = new JsonSlurper()
+					def execution = task.getExecution()
+					
+					def pdf_std = jsonSlurper.parseText(execution.getVariable('tbhddetail_item_std'))
+					def VND_ID_ = jsonSlurper.parseText(execution.getVariable('VND_ID_'))
+					
+					pdf_std.each{
+						it.put('VND_ID_',VND_ID_)
+					}
+					
+					execution.setVariable('pdf_std',JsonOutput.toJson(pdf_std))
+    				
+    				]]>
+    				</activiti:string>
+    			</activiti:field>
+    		</activiti:taskListener>
+    	</extensionElements>
+    </userTask>
+    <sequenceFlow id="flow7" sourceRef="usertask4" targetRef="usertask3"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_SRM_execute">
+    <bpmndi:BPMNPlane bpmnElement="SRM_execute" id="BPMNPlane_SRM_execute">
+      <bpmndi:BPMNShape bpmnElement="s1" id="BPMNShape_s1">
+        <omgdc:Bounds height="35.0" width="35.0" x="30.0" y="190.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scripttask1" id="BPMNShape_scripttask1">
+        <omgdc:Bounds height="61.0" width="105.0" x="130.0" y="177.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask1" id="BPMNShape_usertask1">
+        <omgdc:Bounds height="61.0" width="105.0" x="290.0" y="177.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask2" id="BPMNShape_usertask2">
+        <omgdc:Bounds height="61.0" width="105.0" x="440.0" y="177.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask3" id="BPMNShape_usertask3">
+        <omgdc:Bounds height="61.0" width="105.0" x="730.0" y="177.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="1020.0" y="190.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scripttask2" id="BPMNShape_scripttask2">
+        <omgdc:Bounds height="61.0" width="105.0" x="880.0" y="177.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask4" id="BPMNShape_usertask4">
+        <omgdc:Bounds height="61.0" width="105.0" x="580.0" y="177.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="65.0" y="207.0"></omgdi:waypoint>
+        <omgdi:waypoint x="130.0" y="207.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="235.0" y="207.0"></omgdi:waypoint>
+        <omgdi:waypoint x="290.0" y="207.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3">
+        <omgdi:waypoint x="395.0" y="207.0"></omgdi:waypoint>
+        <omgdi:waypoint x="440.0" y="207.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow4" id="BPMNEdge_flow4">
+        <omgdi:waypoint x="545.0" y="207.0"></omgdi:waypoint>
+        <omgdi:waypoint x="580.0" y="207.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow5" id="BPMNEdge_flow5">
+        <omgdi:waypoint x="835.0" y="207.0"></omgdi:waypoint>
+        <omgdi:waypoint x="880.0" y="207.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow6" id="BPMNEdge_flow6">
+        <omgdi:waypoint x="985.0" y="207.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1020.0" y="207.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow7" id="BPMNEdge_flow7">
+        <omgdi:waypoint x="685.0" y="207.0"></omgdi:waypoint>
+        <omgdi:waypoint x="730.0" y="207.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>
