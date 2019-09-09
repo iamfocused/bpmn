@@ -1,0 +1,288 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/processdef">
+  <process id="MGVB001" name="访客管理流程" isExecutable="true" activiti:candidateStarterGroups="admin">
+    <documentation>访客管理流程主要用于访客来访时的登记，受访人收到来访申请后进行审批，门卫根据审批结果判断是否放行</documentation>
+    <startEvent id="S1" name="访客登记">
+      <documentation>访客填写来访信息</documentation>
+      <extensionElements>
+        <activiti:formProperty id="interviewertel_拜访者手机_1_string_t1_$$A" name="拜访者手机" type="string" variable="interviewerTel" required="true"/>
+        <activiti:formProperty id="interviewername_拜访者姓名_2_string_t1_$$A" name="拜访者姓名" type="string" variable="interviewerName" required="true"/>
+        <activiti:formProperty id="interviewercorp_拜访者单位_3_string_t1_$$A" name="拜访者单位" type="string" variable="interviewerCorp" required="true"/>
+		<activiti:formProperty id="visitTime_会见时间_4_string_t5_$$A" name="会见时间" type="long" variable="visitTime"/>
+		<activiti:formProperty id="interviewernums_访客人数_5_string_t6_$$A" name="访客人数" type="long" variable="interviewerNums" required="true"/>
+		<activiti:formProperty id="carId_车牌号_6_string_t1_$$A" name="车牌号" type="string" variable="carId"/>
+		<activiti:formProperty id="enterworkshop_是否进入车间_7_enum_sbs_$$A" name="是否进入车间" type="enum" variable="enterWorkshop" required="true">
+		  <activiti:value id="" name=""/>
+          <activiti:value id="是" name="是"/>
+          <activiti:value id="否" name="否"/>
+        </activiti:formProperty>
+        <activiti:formProperty id="accompanyingarticle_携带物品_8_string_t1_$$A" name="携带物品" type="string" variable="accompanyingArticle" required="true"/>
+        <activiti:formProperty id="remark_备注_9_string_t1_$$A" name="备注" type="string" variable="remark" required="true"/>
+        <activiti:formProperty id="intervieweename_受访人姓名_1_string_psbn_$$B" name="受访人姓名" type="string" variable="intervieweeName" required="true"/>
+        <activiti:formProperty id="intervieweeuid_受访人id_2_string_t1_$$B" name="受访人id" type="string" variable="intervieweeUid"/>
+        <activiti:formProperty id="intervieweeemail_受访人邮箱_3_string_t1_$$B" name="受访人邮箱" type="string" variable="intervieweeEmail"/>
+        <activiti:formProperty id="intervieweetel_受访人手机_4_string_t1_$$B" name="受访人手机" type="string" variable="intervieweeTel"/>
+        <activiti:formProperty id="intervieweedpt_受访人部门_5_string_t1_$$B" name="受访人部门" type="string" variable="intervieweeDpt"/>
+		<activiti:formProperty id="attachment_附件_1_string_t9_$$F" name="附件" type="string" variable="attachment"/>
+		<activiti:executionListener event="end" class="org.activiti.engine.impl.bpmn.listener.ScriptExecutionListener"> 
+          <activiti:field name="language"> 
+            <activiti:string><![CDATA[ groovy ]]></activiti:string> 
+          </activiti:field>  
+          <activiti:field name="script"> 
+            <activiti:string> 
+			<![CDATA[
+			execution.setVariable('visitState',"等待审批");
+			execution.setVariable('applyTime',new Date().getTime());
+			execution.setVariable('wechatSendTime',0);
+			def visitingReasons = execution.getBusinessKey().substring(5); 
+			return visitingReasons;
+			]]> 
+		</activiti:string> 
+          </activiti:field>  
+          <activiti:field name="resultVariable"> 
+            <activiti:string> <![CDATA[ visitingReasons ]]> </activiti:string> 
+          </activiti:field> 
+        </activiti:executionListener> 		
+      </extensionElements>
+    </startEvent>
+    <parallelGateway id="G01" name="G01"/>
+    <serviceTask id="M01" name="MGVB001:访问消息推送给被访者" activiti:async="true" activiti:exclusive="false" activiti:type="mail">
+      <extensionElements>
+        <activiti:field name="to">
+          <activiti:string><![CDATA[esbwechatnotification@bpms.dev]]></activiti:string>
+        </activiti:field>
+        <activiti:field name="from">
+          <activiti:string><![CDATA[bpmsmail@bpms.dev]]></activiti:string>
+        </activiti:field>
+        <activiti:field name="subject">
+          <activiti:string><![CDATA[wxnotification]]></activiti:string>
+        </activiti:field>
+        <activiti:field name="text">
+          <activiti:expression><![CDATA[{ "touser":"${intervieweeEmail}", "agentid":"1000005", "title":"有访客来访，请确认是否接待", "description":"访客: ${interviewerName}<br>访客单位: ${interviewerCorp}<br>拜访事由: ${visitingReasons}", "url":"https://bpmswx.eorionsolution.com/ui/task.html?type=unfinished" }]]></activiti:expression>
+        </activiti:field>
+        <activiti:field name="charset">
+          <activiti:string><![CDATA[UTF-8]]></activiti:string>
+        </activiti:field>
+      </extensionElements>
+    </serviceTask>
+    <intermediateCatchEvent id="sid-DF78578B-0BF4-4624-8AE1-5B11EE008FE4">
+      <timerEventDefinition>
+        <timeDuration>PT2M</timeDuration>
+      </timerEventDefinition>
+    </intermediateCatchEvent>
+    <scriptTask id="sid-B667C953-1FA3-4FCC-95B4-D71FC5C1EEB4" name="MGVB001:受访人未审批时每隔2分钟向受访人发送微信提醒，最多发送三次" scriptFormat="groovy" activiti:autoStoreVariables="false">
+      <script><![CDATA[
+		execution.setVariable('wechatSendTime', execution.getVariable('wechatSendTime')+1);
+	  ]]></script>
+    </scriptTask>
+    <userTask id="T01" name="MGVB001:访问审批" activiti:assignee="${intervieweeUid}">
+	  <documentation>访问审批</documentation>
+      <extensionElements>
+        <activiti:formProperty id="interviewername_拜访者姓名_1_string_t1_$$VA" name="拜访者姓名" type="string" variable="interviewerName"/>
+        <activiti:formProperty id="interviewertel_拜访者手机_2_string_t1_$$VA" name="拜访者手机" type="string" variable="interviewerTel"/>
+        <activiti:formProperty id="interviewercorp_拜访者单位_3_string_t1_$$VA" name="拜访者单位" type="string" variable="interviewerCorp"/>
+		<activiti:formProperty id="visitingreasons_拜访事由_4_string_t1_$$VA" name="拜访事由" type="string" variable="visitingReasons"/>
+		<activiti:formProperty id="visitTime_会见时间_5_string_t5_$$VA" name="会见时间" type="long" variable="visitTime"/>
+		<activiti:formProperty id="interviewernums_访客人数_6_string_t6_$$VA" name="访客人数" type="long" variable="interviewerNums" />
+		<activiti:formProperty id="carId_车牌号_7_string_t1_$$VA" name="车牌号" type="string" variable="carId"/>
+		<activiti:formProperty id="enterworkshop_是否进入车间_8_enum_sbs_$$VA" name="是否进入车间" type="string" variable="enterWorkshop"/>
+        <activiti:formProperty id="accompanyingarticle_携带物品_9_string_t1_$$VA" name="携带物品" type="string" variable="accompanyingArticle"/>
+        <activiti:formProperty id="remark_备注_10_string_t1_$$VA" name="备注" type="string" variable="remark"/>
+		<activiti:formProperty id="attachment_附件_1_string_t9_$$VF" name="附件" type="string" variable="attachment"/>		
+        <activiti:formProperty id="coreaction_是否同意访问_1_enum_sbs_$$A" name="是否同意访问" type="enum" variable="result" required="true">
+		  <activiti:value id="" name=""/>
+          <activiti:value id="同意" name="同意"/>
+          <activiti:value id="拒绝" name="拒绝"/>
+        </activiti:formProperty>
+		<activiti:formProperty id="corecomments_拒绝原因_2_enum_sbs_$$A" name="拒绝原因" type="enum" variable="refusalReason">
+          <activiti:value id="有事外出" name="有事外出"/>
+          <activiti:value id="正在开会" name="正在开会"/>
+		  <activiti:value id="其他" name="其他"/>
+        </activiti:formProperty>
+		<activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+			<activiti:field name="language">
+				<activiti:string>
+				<![CDATA[ groovy ]]>
+				</activiti:string>
+				</activiti:field>
+				<activiti:field name="script">
+				<activiti:string>
+				<![CDATA[
+				def result = task.getExecution().getVariable('result'); 
+				if (result == "同意")
+					task.getExecution().setVariable('visitState',"同意进厂");
+				else {
+					if(task.getExecution().getVariable('refusalReason') == null)
+						task.getExecution().setVariable('visitState',"拒绝进厂");
+					else
+						task.getExecution().setVariable('visitState',"拒绝进厂（"+task.getExecution().getVariable('refusalReason')+")");
+				}
+				]]>
+				</activiti:string>
+			</activiti:field>
+		</activiti:taskListener>
+      </extensionElements>
+    </userTask>
+    <serviceTask id="M02" name="MGVB001:将审批结果发送给门卫" activiti:async="true" activiti:exclusive="false" activiti:type="mail">
+      <extensionElements>
+        <activiti:field name="to">
+          <activiti:string><![CDATA[esbwechatnotification@bpms.dev]]></activiti:string>
+        </activiti:field>
+        <activiti:field name="from">
+          <activiti:string><![CDATA[bpmsmail@bpms.dev]]></activiti:string>
+        </activiti:field>
+        <activiti:field name="subject">
+          <activiti:string><![CDATA[wxnotification]]></activiti:string>
+        </activiti:field>
+        <activiti:field name="text">
+          <activiti:expression><![CDATA[{ "touser":"caojiajie@eorionsolution.com", "agentid":"1000005", "title":"${intervieweeName}已审批", "description":"审批结果: ${result}${interviewerName}访问", "url":"https://bpmswx.eorionsolution.com/ui/task.html?type=unfinished" }]]></activiti:expression>
+        </activiti:field>
+        <activiti:field name="charset">
+          <activiti:string><![CDATA[UTF-8]]></activiti:string>
+        </activiti:field>
+      </extensionElements>
+    </serviceTask>
+    <userTask id="T03" name="MGVB001:填写拜访者带出物品信息" activiti:assignee="${intervieweeUid}">
+      <extensionElements>
+        <activiti:formProperty id="interviewername_拜访者姓名_1_string_t1_$$VA" name="拜访者姓名" type="string" variable="interviewerName"/>
+        <activiti:formProperty id="interviewertel_拜访者手机_2_string_t1_$$VA" name="拜访者手机" type="string" variable="interviewerTel"/>
+        <activiti:formProperty id="interviewercorp_拜访者单位_3_string_t1_$$VA" name="拜访者单位" type="string" variable="interviewerCorp"/>
+		<activiti:formProperty id="visitingreasons_拜访事由_4_string_t1_$$VA" name="拜访事由" type="string" variable="visitingReasons"/>
+		<activiti:formProperty id="visitTime_会见时间_5_string_t5_$$VA" name="会见时间" type="long" variable="visitTime"/>
+		<activiti:formProperty id="interviewernums_访客人数_6_string_t6_$$VA" name="访客人数" type="long" variable="interviewerNums" />
+		<activiti:formProperty id="carId_车牌号_7_string_t1_$$VA" name="车牌号" type="string" variable="carId"/>
+		<activiti:formProperty id="enterworkshop_是否进入车间_8_enum_sbs_$$VA" name="是否进入车间" type="string" variable="enterWorkshop"/>
+        <activiti:formProperty id="accompanyingarticle_携带物品_9_string_t1_$$VA" name="携带物品" type="string" variable="accompanyingArticle"/>
+        <activiti:formProperty id="remark_备注_10_string_t1_$$VA" name="备注" type="string" variable="remark"/>
+        <activiti:formProperty id="texarticlesbroughtout_带出物品_1_string_t2_$$A" name="带出物品" type="string" variable="texarticlesBroughtOut"  required="true"/>
+		<activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+			<activiti:field name="language">
+				<activiti:string>
+				<![CDATA[ groovy ]]>
+				</activiti:string>
+				</activiti:field>
+				<activiti:field name="script">
+				<activiti:string>
+				<![CDATA[
+					if(task.getExecution().getVariable('visitState') != "进厂")
+						throw new IllegalAccessException("请联系门卫，确认访客是否进厂");
+					else
+						task.getExecution().setVariable('visitState',"准备出厂");
+				]]>
+				</activiti:string>
+			</activiti:field>
+		</activiti:taskListener>
+      </extensionElements>
+    </userTask>
+    <userTask id="T02" name="MGVB001:门卫" activiti:assignee="100010">
+      <extensionElements>
+        <activiti:formProperty id="interviewername_拜访者姓名_1_string_t1_$$VA" name="拜访者姓名" type="string" variable="interviewerName"/>
+        <activiti:formProperty id="interviewertel_拜访者手机_2_string_t1_$$VA" name="拜访者手机" type="string" variable="interviewerTel"/>
+        <activiti:formProperty id="interviewercorp_拜访者单位_3_string_t1_$$VA" name="拜访者单位" type="string" variable="interviewerCorp"/>
+		<activiti:formProperty id="visitingreasons_拜访事由_4_string_t1_$$VA" name="拜访事由" type="string" variable="visitingReasons"/>
+		<activiti:formProperty id="visitTime_会见时间_5_string_t5_$$VA" name="会见时间" type="long" variable="visitTime"/>
+		<activiti:formProperty id="interviewernums_访客人数_6_string_t1_$$VA" name="访客人数" type="long" variable="interviewerNums" />
+		<activiti:formProperty id="carId_车牌号_7_string_t1_$$VA" name="车牌号" type="string" variable="carId"/>
+		<activiti:formProperty id="enterworkshop_是否进入车间_8_enum_sbs_$$VA" name="是否进入车间" type="string" variable="enterWorkshop"/>
+        <activiti:formProperty id="accompanyingarticle_携带物品_9_string_t1_$$VA" name="携带物品" type="string" variable="accompanyingArticle"/>
+        <activiti:formProperty id="remark_备注_10_string_t1_$$VA" name="备注" type="string" variable="remark"/>
+        <activiti:formProperty id="intervieweename_受访人姓名_1_string_psbn_$$VB" name="受访人姓名" type="string" variable="intervieweeName"/>
+        <activiti:formProperty id="intervieweetel_受访人电话_2_string_t1_$$VB" name="受访人电话" type="string" variable="intervieweeTel"/>
+        <activiti:formProperty id="intervieweedpt_受访人部门_3_string_t1_$$VB" name="受访人部门" type="string" variable="intervieweeDpt"/>
+		<activiti:formProperty id="result_是否同意访问_1_enum_sbs_$$VC" name="是否同意访问" type="string" variable="result"/>
+		<activiti:formProperty id="refusalreason_拒绝原因_2_enum_sbs_$$VC" name="拒绝原因" type="string" variable="refusalReason"/>
+		<activiti:formProperty id="texarticlesbroughtout_带出物品_3_string_t1_$$VC" name="带出物品" type="string" variable="texarticlesBroughtOut"/>
+		<activiti:formProperty id="visitstate_来访状态_1_string_t1_$$VD" name="来访状态" type="string" variable="visitState"/>     
+      </extensionElements>
+    </userTask>
+    <endEvent id="E1" name="结束访问"/>
+    <sequenceFlow id="sid-05567BDD-54BA-4236-B54A-E8E1178B14A4" sourceRef="T02" targetRef="E1"/>
+    <sequenceFlow id="sid-99F90832-D1C3-45E8-A438-21DC895AA091" sourceRef="G01" targetRef="M01"/>
+    <sequenceFlow id="sid-98F70923-397B-4549-9996-BADC02C371B4" sourceRef="G01" targetRef="T02"/>
+    <sequenceFlow id="sid-69D8A5B6-3FEB-48B4-82F1-F10E68034C55" sourceRef="G01" targetRef="T01"/>
+    <sequenceFlow id="sid-54CAF6FF-EACA-48B2-BC68-4F556DBD53CA" sourceRef="T01" targetRef="M02"/>
+    <sequenceFlow id="sid-13360C06-9E1F-4526-8858-981F5F0AC218" sourceRef="S1" targetRef="G01"/>
+    <sequenceFlow id="S01" name="受访者同意访问" sourceRef="T01" targetRef="T03">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${result=="同意"}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="sid-483CA1E7-9511-4108-A71A-99D498BF1EE1" sourceRef="M01" targetRef="sid-B667C953-1FA3-4FCC-95B4-D71FC5C1EEB4"/>
+    <sequenceFlow id="sid-BE8B8D57-DE44-4EB1-8804-DE135875A0C8" sourceRef="sid-B667C953-1FA3-4FCC-95B4-D71FC5C1EEB4" targetRef="sid-DF78578B-0BF4-4624-8AE1-5B11EE008FE4"/>
+    <sequenceFlow id="sid-5E9B106E-3B03-44CF-A452-C9536E44CFF0" sourceRef="sid-DF78578B-0BF4-4624-8AE1-5B11EE008FE4" targetRef="M01">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${wechatSendTime < 3 && execution.getVariable('result') == null}]]></conditionExpression>
+    </sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_MGVB001">
+    <bpmndi:BPMNPlane bpmnElement="MGVB001" id="BPMNPlane_MGVB001">
+      <bpmndi:BPMNShape bpmnElement="S1" id="BPMNShape_S1">
+        <omgdc:Bounds height="30.0" width="30.0" x="235.0" y="135.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="G01" id="BPMNShape_G01">
+        <omgdc:Bounds height="40.0" width="40.0" x="230.0" y="290.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="M01" id="BPMNShape_M01">
+        <omgdc:Bounds height="80.0" width="100.0" x="60.0" y="270.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="sid-DF78578B-0BF4-4624-8AE1-5B11EE008FE4" id="BPMNShape_sid-DF78578B-0BF4-4624-8AE1-5B11EE008FE4">
+        <omgdc:Bounds height="31.0" width="31.0" x="45.0" y="390.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="sid-B667C953-1FA3-4FCC-95B4-D71FC5C1EEB4" id="BPMNShape_sid-B667C953-1FA3-4FCC-95B4-D71FC5C1EEB4">
+        <omgdc:Bounds height="80.0" width="100.0" x="60.0" y="465.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="T01" id="BPMNShape_T01">
+        <omgdc:Bounds height="80.0" width="100.0" x="200.0" y="570.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="M02" id="BPMNShape_M02">
+        <omgdc:Bounds height="80.0" width="100.0" x="60.0" y="570.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="T03" id="BPMNShape_T03">
+        <omgdc:Bounds height="80.0" width="100.0" x="200.0" y="735.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="T02" id="BPMNShape_T02">
+        <omgdc:Bounds height="80.0" width="100.0" x="325.0" y="270.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="E1" id="BPMNShape_E1">
+        <omgdc:Bounds height="28.0" width="28.0" x="361.0" y="575.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="sid-69D8A5B6-3FEB-48B4-82F1-F10E68034C55" id="BPMNEdge_sid-69D8A5B6-3FEB-48B4-82F1-F10E68034C55">
+        <omgdi:waypoint x="250.0" y="330.0"/>
+        <omgdi:waypoint x="250.0" y="570.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-54CAF6FF-EACA-48B2-BC68-4F556DBD53CA" id="BPMNEdge_sid-54CAF6FF-EACA-48B2-BC68-4F556DBD53CA">
+        <omgdi:waypoint x="200.0" y="610.0"/>
+        <omgdi:waypoint x="160.0" y="610.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-13360C06-9E1F-4526-8858-981F5F0AC218" id="BPMNEdge_sid-13360C06-9E1F-4526-8858-981F5F0AC218">
+        <omgdi:waypoint x="250.0" y="165.0"/>
+        <omgdi:waypoint x="250.0" y="290.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-99F90832-D1C3-45E8-A438-21DC895AA091" id="BPMNEdge_sid-99F90832-D1C3-45E8-A438-21DC895AA091">
+        <omgdi:waypoint x="230.0" y="310.0"/>
+        <omgdi:waypoint x="160.0" y="310.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-483CA1E7-9511-4108-A71A-99D498BF1EE1" id="BPMNEdge_sid-483CA1E7-9511-4108-A71A-99D498BF1EE1">
+        <omgdi:waypoint x="110.0" y="350.0"/>
+        <omgdi:waypoint x="110.0" y="465.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-05567BDD-54BA-4236-B54A-E8E1178B14A4" id="BPMNEdge_sid-05567BDD-54BA-4236-B54A-E8E1178B14A4">
+        <omgdi:waypoint x="375.0" y="350.0"/>
+        <omgdi:waypoint x="375.0" y="575.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="S01" id="BPMNEdge_S01">
+        <omgdi:waypoint x="250.0" y="650.0"/>
+        <omgdi:waypoint x="250.0" y="735.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-98F70923-397B-4549-9996-BADC02C371B4" id="BPMNEdge_sid-98F70923-397B-4549-9996-BADC02C371B4">
+        <omgdi:waypoint x="270.0" y="310.0"/>
+        <omgdi:waypoint x="325.0" y="310.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-5E9B106E-3B03-44CF-A452-C9536E44CFF0" id="BPMNEdge_sid-5E9B106E-3B03-44CF-A452-C9536E44CFF0">
+        <omgdi:waypoint x="61.0" y="390.0"/>
+        <omgdi:waypoint x="61.0" y="350.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-BE8B8D57-DE44-4EB1-8804-DE135875A0C8" id="BPMNEdge_sid-BE8B8D57-DE44-4EB1-8804-DE135875A0C8">
+        <omgdi:waypoint x="61.0" y="465.0"/>
+        <omgdi:waypoint x="61.00000000000001" y="422.0"/>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>
