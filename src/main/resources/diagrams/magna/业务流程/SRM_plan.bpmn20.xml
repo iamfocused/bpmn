@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/pla">
-  <process id="SRM_PLAN" name="SRM_采购计划" isExecutable="true" activiti:candidateStarterGroups="PUMGR">
+  <process id="SRM_PLAN" name="SRM_采购计划" isExecutable="true" activiti:candidateStarterGroups="PUMGR,admin">
     <startEvent id="s1" name="s1" activiti:initiator="initiator" activiti:dueDate="P1D">
       <extensionElements>
         <activiti:formProperty id="vndid_供应商id_1_string_tree_$$A" name="供应商id" type="string" variable="VND_ID_" required="true"></activiti:formProperty>
@@ -20,6 +20,12 @@
         <activiti:formProperty id="tbhddetail_合格数_accnumber_11_string_t11_$$HA" name="合格数" type="string" variable="tbhddetail_accnumber_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhddetail_不合格数_defnumber_12_string_t11_$$HA" name="不合格数" type="string" variable="tbhddetail_defnumber_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhddetail_实际总金额_amount_13_string_t11_$$HA" name="实际总金额" type="string" variable="tbhddetail_amount_t00"></activiti:formProperty>
+      	<activiti:formProperty id="tbhddetail_车次_trainnumber_14_enum_sbs_$$HA" name="车次" type="enum" variable="tbhddetail_trainnumber_t00">
+			<activiti:value id="车次1" name="车次1"/>
+			<activiti:value id="车次2" name="车次2"/>
+			<activiti:value id="车次3" name="车次3"/>
+			<activiti:value id="车次4" name="车次4"/>   	
+      	</activiti:formProperty>
       </extensionElements>
     </startEvent>
     <userTask id="T1" name="T1: 修改" activiti:assignee="${initiator}" activiti:dueDate="P1D">
@@ -49,6 +55,12 @@
         <activiti:formProperty id="tbhddetail_合格数_accnumber_11_string_t11_$$HA" name="合格数" type="string" variable="tbhddetail_accnumber_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhddetail_不合格数_defnumber_12_string_t11_$$HA" name="不合格数" type="string" variable="tbhddetail_defnumber_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhddetail_实际总金额_amount_13_string_t11_$$HA" name="实际总金额" type="string" variable="tbhddetail_amount_t00"></activiti:formProperty>
+      	<activiti:formProperty id="tbhddetail_车次_trainnumber_14_enum_sbs_$$HA" name="车次" type="enum" variable="tbhddetail_trainnumber_t00">
+			<activiti:value id="车次1" name="车次1"/>
+			<activiti:value id="车次2" name="车次2"/>
+			<activiti:value id="车次3" name="车次3"/>
+			<activiti:value id="车次4" name="车次4"/>   	
+      	</activiti:formProperty>      	
       </extensionElements>
     </userTask>
     <exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway"></exclusiveGateway>
@@ -119,7 +131,7 @@ execution.setVariable("tbhddetail_item_std",JsonOutput.toJson(tbhddetail_item_st
     </scriptTask>
     <sequenceFlow id="flow7" sourceRef="scripttask3" targetRef="usertask1"></sequenceFlow>
     <sequenceFlow id="flow8" sourceRef="s1" targetRef="scripttask3"></sequenceFlow>
-    <userTask id="usertask1" name="供应商能否满足需求" activiti:candidateGroups="VENDOR" activiti:dueDate="P1D">
+    <userTask id="usertask1" name="供应商能否满足需求" activiti:candidateGroups="VENDOR,admin" activiti:dueDate="P1D">
     	<extensionElements>
     		<activiti:formProperty id="isok_能否满足计划需求_1_enum_rbv_$$A" name="能否满足计划需求" required="true" type="enum" variable="isok">
     			<activiti:value id="可以满足需求" name="可以满足需求"></activiti:value>
@@ -142,6 +154,12 @@ execution.setVariable("tbhddetail_item_std",JsonOutput.toJson(tbhddetail_item_st
 	        <activiti:formProperty id="tbhddetail_合格数_accnumber_11_string_t11_$$HA" name="合格数" type="string" variable="tbhddetail_accnumber_t00"></activiti:formProperty>
 	        <activiti:formProperty id="tbhddetail_不合格数_defnumber_12_string_t11_$$HA" name="不合格数" type="string" variable="tbhddetail_defnumber_t00"></activiti:formProperty>
 	        <activiti:formProperty id="tbhddetail_实际总金额_amount_13_string_t11_$$HA" name="实际总金额" type="string" variable="tbhddetail_amount_t00"></activiti:formProperty>    	
+	      	<activiti:formProperty id="tbhddetail_车次_trainnumber_14_enum_sbs_$$HA" name="车次" type="enum" variable="tbhddetail_trainnumber_t00">
+				<activiti:value id="车次1" name="车次1"/>
+				<activiti:value id="车次2" name="车次2"/>
+				<activiti:value id="车次3" name="车次3"/>
+				<activiti:value id="车次4" name="车次4"/>   	
+	      	</activiti:formProperty>    	
     	</extensionElements>
     </userTask>
     <sequenceFlow id="flow9" sourceRef="usertask1" targetRef="T1"></sequenceFlow>

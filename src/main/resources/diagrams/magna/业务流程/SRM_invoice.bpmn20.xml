@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/inv">
-  <process id="SRM_invoice" name="SRM采购开票流程" isExecutable="true" activiti:candidateStarterGroups="FININV">
+  <process id="SRM_invoice" name="SRM采购开票流程" isExecutable="true" activiti:candidateStarterGroups="FININV,admin">
     <startEvent id="startevent1" name="选择时间范围" activiti:initiator="initiator">
       <extensionElements>
         <activiti:formProperty id="executeFrom_开始时间_1_string_t3_$$A" name="开始时间" type="string" variable="executeFrom" required="true"></activiti:formProperty>
@@ -49,7 +49,7 @@
     			it[12] = it[10].toDouble() * it[3].toDouble()
     		}
     		def items = jsonSlurper.parseText("""
-    		{"rows": [], "headers": [{"block": "VA", "controlType": "tree", "datePattern": null, "enumValues": [], "fieldType": "string", "id": "tbhddetail_物料信息_matinfo_1_string_tree_\$\$VA", "name": "物料信息", "readable": true, "seq": 1, "type": "string", "writable": true}, {"block": "VA", "controlType": "t11", "datePattern": null, "enumValues": [], "fieldType": "string", "id": "tbhddetail_计划数量_planqty_2_string_t11_\$\$VA", "name": "计划数量", "readable": true, "seq": 2, "type": "string", "writable": true}, {"block": "VA", "controlType": "t11", "datePattern": null, "enumValues": [], "fieldType": "string", "id": "tbhddetail_剩余数量_remainqty_3_string_t11_\$\$VA", "name": "剩余数量", "readable": true, "seq": 3, "type": "string", "writable": true}, {"block": "VA", "controlType": "t11", "datePattern": null, "enumValues": [], "fieldType": "string", "id": "tbhddetail_单价_prcprice_4_string_t11_\$\$VA", "name": "单价", "readable": true, "seq": 4, "type": "string", "writable": true}, {"block": "VA", "controlType": "t3", "datePattern": null, "enumValues": [], "fieldType": "string", "id": "tbhddetail_订货日期_orderdate_5_string_t3_\$\$VA", "name": "订货日期", "readable": true, "seq": 5, "type": "string", "writable": true}, {"block": "VA", "controlType": "t11", "datePattern": null, "enumValues": [], "fieldType": "string", "id": "tbhddetail_订货数量_orderqty_6_string_t11_\$\$VA", "name": "订货数量", "readable": true, "seq": 6, "type": "string", "writable": true}, {"block": "VA", "controlType": "t1", "datePattern": null, "enumValues": [], "fieldType": "string", "id": "tbhddetail_批次_batch_7_string_t1_\$\$VA", "name": "批次", "readable": true, "seq": 7, "type": "string", "writable": true}, {"block": "VA", "controlType": "t11", "datePattern": null, "enumValues": [], "fieldType": "string", "id": "tbhddetail_实际送货数量_deliveryqty_8_string_t11_\$\$VA", "name": "实际送货数量", "readable": true, "seq": 8, "type": "string", "writable": true}, {"block": "VA", "controlType": "t3", "datePattern": null, "enumValues": [], "fieldType": "string", "id": "tbhddetail_送货日期_deliverydate_9_string_t3_\$\$VA", "name": "送货日期", "readable": true, "seq": 9, "type": "string", "writable": true}, {"block": "A", "controlType": "t3", "datePattern": null, "enumValues": [], "fieldType": "string", "id": "tbhddetail_到货日期_arrivaldate_10_string_t3_\$\$A", "name": "到货日期", "readable": true, "seq": 10, "type": "string", "writable": true}, {"block": "A", "controlType": "t11", "datePattern": null, "enumValues": [], "fieldType": "string", "id": "tbhddetail_合格数_accnumber_11_string_t11_\$\$A", "name": "合格数", "readable": true, "seq": 11, "type": "string", "writable": true}, {"block": "A", "controlType": "t11", "datePattern": null, "enumValues": [], "fieldType": "string", "id": "tbhddetail_不合格数_defnumber_12_string_t11_\$\$A", "name": "不合格数", "readable": true, "seq": 12, "type": "string", "writable": true}, {"block": "HA", "controlType": "t11", "datePattern": null, "enumValues": [], "fieldType": "string", "id": "tbhddetail_实际总金额_amount_13_string_t11_\$\$HA", "name": "实际总金额", "readable": true, "seq": 13, "type": "string", "writable": true}], "tableName": "tbhddetail"}
+    		{"rows": [], "headers": [{"block": "VA", "controlType": "tree", "datePattern": null, "enumValues": [], "fieldType": "string", "id": "tbhddetail_物料信息_matinfo_1_string_tree_\$\$VA", "name": "物料信息", "readable": true, "seq": 1, "type": "string", "writable": true}, {"block": "VA", "controlType": "t11", "datePattern": null, "enumValues": [], "fieldType": "string", "id": "tbhddetail_计划数量_planqty_2_string_t11_\$\$VA", "name": "计划数量", "readable": true, "seq": 2, "type": "string", "writable": true}, {"block": "VA", "controlType": "t11", "datePattern": null, "enumValues": [], "fieldType": "string", "id": "tbhddetail_剩余数量_remainqty_3_string_t11_\$\$VA", "name": "剩余数量", "readable": true, "seq": 3, "type": "string", "writable": true}, {"block": "VA", "controlType": "t11", "datePattern": null, "enumValues": [], "fieldType": "string", "id": "tbhddetail_单价_prcprice_4_string_t11_\$\$VA", "name": "单价", "readable": true, "seq": 4, "type": "string", "writable": true}, {"block": "VA", "controlType": "t3", "datePattern": null, "enumValues": [], "fieldType": "string", "id": "tbhddetail_订货日期_orderdate_5_string_t3_\$\$VA", "name": "订货日期", "readable": true, "seq": 5, "type": "string", "writable": true}, {"block": "VA", "controlType": "t11", "datePattern": null, "enumValues": [], "fieldType": "string", "id": "tbhddetail_订货数量_orderqty_6_string_t11_\$\$VA", "name": "订货数量", "readable": true, "seq": 6, "type": "string", "writable": true}, {"block": "VA", "controlType": "t1", "datePattern": null, "enumValues": [], "fieldType": "string", "id": "tbhddetail_批次_batch_7_string_t1_\$\$VA", "name": "批次", "readable": true, "seq": 7, "type": "string", "writable": true}, {"block": "VA", "controlType": "t11", "datePattern": null, "enumValues": [], "fieldType": "string", "id": "tbhddetail_实际送货数量_deliveryqty_8_string_t11_\$\$VA", "name": "实际送货数量", "readable": true, "seq": 8, "type": "string", "writable": true}, {"block": "VA", "controlType": "t3", "datePattern": null, "enumValues": [], "fieldType": "string", "id": "tbhddetail_送货日期_deliverydate_9_string_t3_\$\$VA", "name": "送货日期", "readable": true, "seq": 9, "type": "string", "writable": true}, {"block": "A", "controlType": "t3", "datePattern": null, "enumValues": [], "fieldType": "string", "id": "tbhddetail_到货日期_arrivaldate_10_string_t3_\$\$A", "name": "到货日期", "readable": true, "seq": 10, "type": "string", "writable": true}, {"block": "A", "controlType": "t11", "datePattern": null, "enumValues": [], "fieldType": "string", "id": "tbhddetail_合格数_accnumber_11_string_t11_\$\$A", "name": "合格数", "readable": true, "seq": 11, "type": "string", "writable": true}, {"block": "A", "controlType": "t11", "datePattern": null, "enumValues": [], "fieldType": "string", "id": "tbhddetail_不合格数_defnumber_12_string_t11_\$\$A", "name": "不合格数", "readable": true, "seq": 12, "type": "string", "writable": true}, {"block": "HA", "controlType": "t11", "datePattern": null, "enumValues": [], "fieldType": "string", "id": "tbhddetail_实际总金额_amount_13_string_t11_\$\$HA", "name": "实际总金额", "readable": true, "seq": 13, "type": "string", "writable": true},{"block":"VA","controlType":"sbs","datePattern":null,"enumValues":[{"id":"车次1","name":"车次1"},{"id":"车次2","name":"车次2"},{"id":"车次3","name":"车次3"},{"id":"车次4","name":"车次4"}],"fieldType":"enum","id":"tbhddetail_车次_trainnumber_14_enum_sbs_\$\$VA","name":"车次","readable":true,"seq":14,"type":"enum","writable":true}], "tableName": "tbhddetail"}
     		""")
     		items.each {item -&gt; 
     			if(item.key == 'rows'){
@@ -78,6 +78,12 @@
         <activiti:formProperty id="tbhddetail_合格数_accnumber_11_string_t11_$$VA" name="合格数" type="string" variable="tbhddetail_accnumber_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhddetail_不合格数_defnumber_12_string_t11_$$VA" name="不合格数" type="string" variable="tbhddetail_defnumber_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhddetail_实际总金额_amount_13_string_t11_$$A" name="实际总金额" type="string" variable="tbhddetail_amount_t00"></activiti:formProperty>
+      	<activiti:formProperty id="tbhddetail_车次_trainnumber_14_enum_sbs_$$VA" name="车次" type="enum" variable="tbhddetail_trainnumber_t00">
+			<activiti:value id="车次1" name="车次1"/>
+			<activiti:value id="车次2" name="车次2"/>
+			<activiti:value id="车次3" name="车次3"/>
+			<activiti:value id="车次4" name="车次4"/>   	
+      	</activiti:formProperty>       
       </extensionElements>
     </userTask>
     <sequenceFlow id="flow2" sourceRef="scripttask1" targetRef="usertask1"></sequenceFlow>
@@ -85,7 +91,7 @@
     <sequenceFlow id="flow3" sourceRef="usertask1" targetRef="usertask2"></sequenceFlow>
     <serviceTask id="servicetask1" name="metabase调用" activiti:class="com.eorionsolution.riying.bpms.javaservice.http.RestAPIService"></serviceTask>
     <sequenceFlow id="flow4" sourceRef="servicetask1" targetRef="scripttask1"></sequenceFlow>
-    <userTask id="usertask2" name="供应商填写单据编号" activiti:candidateGroups="VENDOR" activiti:dueDate="P1D">
+    <userTask id="usertask2" name="供应商填写单据编号" activiti:candidateGroups="VENDOR,admin" activiti:dueDate="P1D">
     	<extensionElements>
     		<activiti:formProperty id="invoicenumber_发票编号_1_string_t1_$$A" name="发票编号" type="string" required="true" variable="invoicenumber"/>
 	        <activiti:formProperty id="tbhddetail_item_$$VA" name="采购计划明细 Detail" type="string" variable="tbhddetail_item" required="true"></activiti:formProperty>
@@ -102,6 +108,12 @@
 	        <activiti:formProperty id="tbhddetail_合格数_accnumber_11_string_t11_$$VA" name="合格数" type="string" variable="tbhddetail_accnumber_t00"></activiti:formProperty>
 	        <activiti:formProperty id="tbhddetail_不合格数_defnumber_12_string_t11_$$VA" name="不合格数" type="string" variable="tbhddetail_defnumber_t00"></activiti:formProperty>
 	        <activiti:formProperty id="tbhddetail_实际总金额_amount_13_string_t11_$$VA" name="实际总金额" type="string" variable="tbhddetail_amount_t00"></activiti:formProperty>    	
+	      	<activiti:formProperty id="tbhddetail_车次_trainnumber_14_enum_sbs_$$VA" name="车次" type="enum" variable="tbhddetail_trainnumber_t00">
+				<activiti:value id="车次1" name="车次1"/>
+				<activiti:value id="车次2" name="车次2"/>
+				<activiti:value id="车次3" name="车次3"/>
+				<activiti:value id="车次4" name="车次4"/>   	
+	      	</activiti:formProperty>     	
     	</extensionElements>
     </userTask>
     <userTask id="usertask3" name="提交财务" activiti:assignee="${initiator}" activiti:dueDate="P1D">
@@ -124,6 +136,12 @@
 	        <activiti:formProperty id="tbhddetail_合格数_accnumber_11_string_t11_$$VA" name="合格数" type="string" variable="tbhddetail_accnumber_t00"></activiti:formProperty>
 	        <activiti:formProperty id="tbhddetail_不合格数_defnumber_12_string_t11_$$VA" name="不合格数" type="string" variable="tbhddetail_defnumber_t00"></activiti:formProperty>
 	        <activiti:formProperty id="tbhddetail_实际总金额_amount_13_string_t11_$$VA" name="实际总金额" type="string" variable="tbhddetail_amount_t00"></activiti:formProperty>    	
+	      	<activiti:formProperty id="tbhddetail_车次_trainnumber_14_enum_sbs_$$VA" name="车次" type="enum" variable="tbhddetail_trainnumber_t00">
+				<activiti:value id="车次1" name="车次1"/>
+				<activiti:value id="车次2" name="车次2"/>
+				<activiti:value id="车次3" name="车次3"/>
+				<activiti:value id="车次4" name="车次4"/>   	
+	      	</activiti:formProperty>     	
     	</extensionElements>
     </userTask>
     <sequenceFlow id="flow5" sourceRef="usertask2" targetRef="usertask3"></sequenceFlow>

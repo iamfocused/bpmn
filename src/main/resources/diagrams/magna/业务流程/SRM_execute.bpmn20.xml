@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/del">
-  <process id="SRM_execute" name="SRM采购计划执行" isExecutable="true" activiti:candidateStarterGroups="PUMGR">
+  <process id="SRM_execute" name="SRM采购计划执行" isExecutable="true" activiti:candidateStarterGroups="PUMGR,admin">
     <documentation>{
 	    "description":"根据制定的采购计划，选择合适的计划进行采购",
 	    "documents":[
@@ -20,6 +20,7 @@
       <script>
       
     		import groovy.json.JsonSlurper
+    		import groovy.json.JsonOutput
     		
     		def jsonSlurper = new JsonSlurper()
     		def processInstId = jsonSlurper.parseText(execution.getVariable('chooseplan')).code
@@ -37,7 +38,6 @@
     		execution.setVariable('VND_ID_',planExecution.getVariable('VND_ID_'))
     		execution.setVariable('PLAN_FROM_',planExecution.getVariable('PLAN_FROM_'))
     		execution.setVariable('PLAN_TO_',planExecution.getVariable('PLAN_TO_'))
-    	
     	</script>
     </scriptTask>
     <userTask id="usertask1" name="填写需求量" activiti:assignee="${initiator}" activiti:dueDate="P1D">
@@ -59,6 +59,12 @@
         <activiti:formProperty id="tbhddetail_合格数_accnumber_11_string_t11_$$HA" name="合格数" type="string" variable="tbhddetail_accnumber_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhddetail_不合格数_defnumber_12_string_t11_$$HA" name="不合格数" type="string" variable="tbhddetail_defnumber_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhddetail_实际总金额_amount_13_string_t11_$$HA" name="实际总金额" type="string" variable="tbhddetail_amount_t00"></activiti:formProperty>
+      	<activiti:formProperty id="tbhddetail_车次_trainnumber_14_enum_sbs_$$HA" name="车次" type="enum" variable="tbhddetail_trainnumber_t00">
+			<activiti:value id="车次1" name="车次1"/>
+			<activiti:value id="车次2" name="车次2"/>
+			<activiti:value id="车次3" name="车次3"/>
+			<activiti:value id="车次4" name="车次4"/>   	
+      	</activiti:formProperty>        
         <activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
           <activiti:field name="language">
             <activiti:string><![CDATA[groovy]]></activiti:string>
@@ -102,12 +108,61 @@
 						execution.setVariable("_http_url", 'https://bpms.eorionsolution.com/wso2esb/wechat/message/send')
 						execution.setVariable("_http_response_body", '')
 						execution.setVariable("_http_response_status_code", '')
+						
     					]]></activiti:string>
           </activiti:field>
         </activiti:taskListener>
+        <activiti:taskListener event="create" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+        	<activiti:field name="language"><activiti:string><![CDATA[groovy]]></activiti:string></activiti:field>
+        	<activiti:field name="script">
+        		<activiti:string>
+        		<![CDATA[
+       			    import java.time.LocalDateTime
+					import java.time.ZoneOffset
+					import java.time.temporal.TemporalAdjusters
+					import javax.crypto.Mac
+					import javax.crypto.spec.SecretKeySpec
+					import java.security.InvalidKeyException
+        		
+        			def execution = task.getExecution()
+					//车次运送量报表
+					def today = LocalDateTime.now()
+					def firstDay = LocalDateTime.of(today.getYear(), today.getMonthValue(), 1,0,0,0)
+					def lastDay = today.with(TemporalAdjusters.lastDayOfMonth())
+					lastDay = lastDay.withHour(23)
+					lastDay = lastDay.withMinute(59)
+					lastDay = lastDay.withSecond(59)
+					
+					def from_ = firstDay.toInstant(ZoneOffset.of("+8")).toEpochMilli().toString()
+					def to_ = lastDay.toInstant(ZoneOffset.of("+8")).toEpochMilli().toString()
+					
+					def hmac_sha256(String secretKey, String data) {
+					    try {
+					        Mac mac = Mac.getInstance("HmacSHA256")
+					        SecretKeySpec secretKeySpec = new SecretKeySpec(secretKey.getBytes(), "HmacSHA256")
+					        mac.init(secretKeySpec)
+					        byte[] digest = mac.doFinal(data.getBytes())
+					        return digest
+					    } catch (InvalidKeyException e) {
+					        throw new RuntimeException("Invalid key exception while converting to HMacSHA256")
+					    }
+					}
+					def METABASE_SITE_URL = "https://metabase.eorionsolution.com"
+					def METABASE_SECRET_KEY = "8322aa8500b6ae07df7590b25d1bff56cb5e631dc829704c15cb66e80fed9f50"
+					def header = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9"
+					def playloadString = '{"resource":{"question":72},"params":{"from_":"'+ from_ +'" , '+ '"to_":"'+ to_ +'" }}'
+					def playload = Base64.getUrlEncoder().encodeToString(playloadString.bytes)
+					def secret =Base64.getUrlEncoder().encodeToString(hmac_sha256(METABASE_SECRET_KEY , header+'.'+playload))
+					
+					def url = METABASE_SITE_URL + "/embed/question/" + header+'.'+playload+'.'+secret + "#bordered=true&titled=true"
+   					execution.setVariable('BBOT_BI_TRAIN_NUMBER',url)
+        		]]>
+        		</activiti:string>
+        	</activiti:field>
+        </activiti:taskListener>
       </extensionElements>
     </userTask>
-    <userTask id="usertask2" name="供应商发货" activiti:candidateGroups="VENDOR" activiti:dueDate="P1D">
+    <userTask id="usertask2" name="供应商发货" activiti:candidateGroups="VENDOR,admin" activiti:dueDate="P1D">
       <extensionElements>
         <activiti:formProperty id="tbhddetail_item" name="采购计划明细 Detail" type="string" variable="tbhddetail_item" required="true"></activiti:formProperty>
         <activiti:formProperty id="tbhddetail_物料信息_matinfo_1_string_tree_$$VA" name="物料信息" type="string" variable="tbhddetail_matinfo_t00"></activiti:formProperty>
@@ -123,6 +178,12 @@
         <activiti:formProperty id="tbhddetail_合格数_accnumber_11_string_t11_$$HA" name="合格数" type="string" variable="tbhddetail_accnumber_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhddetail_不合格数_defnumber_12_string_t11_$$HA" name="不合格数" type="string" variable="tbhddetail_defnumber_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhddetail_实际总金额_amount_13_string_t11_$$HA" name="实际总金额" type="string" variable="tbhddetail_amount_t00"></activiti:formProperty>
+      	<activiti:formProperty id="tbhddetail_车次_trainnumber_14_enum_sbs_$$A" name="车次" type="enum" variable="tbhddetail_trainnumber_t00" required="true">
+			<activiti:value id="车次1" name="车次1"/>
+			<activiti:value id="车次2" name="车次2"/>
+			<activiti:value id="车次3" name="车次3"/>
+			<activiti:value id="车次4" name="车次4"/>   	
+      	</activiti:formProperty>        
         <activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
           <activiti:field name="language">
             <activiti:string><![CDATA[groovy]]></activiti:string>
@@ -138,6 +199,7 @@
     					
     					def itemStd = jsonSlurper.parseText(execution.getVariable('tbhddetail_item_std'))
     					def isNormal = 'Y'
+    					
     					itemStd.each{
     						if(it.batch == null){
     							throw new org.activiti.engine.ActivitiIllegalArgumentException('请填写批次')
@@ -148,10 +210,14 @@
     						if(it.deliverydate == null){
     							throw new org.activiti.engine.ActivitiIllegalArgumentException('请填写送货日期')
     						}
+    						if(it.trainnumber == null){
+    							throw new org.activiti.engine.ActivitiIllegalArgumentException('请填写车次')
+    						}
     						
     						if(it.deliveryqty != it.orderqty) {
     							isNormal = 'N'
     						}
+    						
     					}
     					execution.setVariable('isNormal', isNormal)
     					
@@ -177,6 +243,54 @@
 						]]></activiti:string>
           </activiti:field>
         </activiti:taskListener>
+        <activiti:taskListener event="create" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+        	<activiti:field name="language"><activiti:string><![CDATA[groovy]]></activiti:string></activiti:field>
+        	<activiti:field name="script">
+        		<activiti:string>
+        		<![CDATA[
+       			    import java.time.LocalDateTime
+					import java.time.ZoneOffset
+					import java.time.temporal.TemporalAdjusters
+					import javax.crypto.Mac
+					import javax.crypto.spec.SecretKeySpec
+					import java.security.InvalidKeyException
+        		
+        			def execution = task.getExecution()
+					//车次运送量报表
+					def today = LocalDateTime.now()
+					def firstDay = LocalDateTime.of(today.getYear(), today.getMonthValue(), 1,0,0,0)
+					def lastDay = today.with(TemporalAdjusters.lastDayOfMonth())
+					lastDay = lastDay.withHour(23)
+					lastDay = lastDay.withMinute(59)
+					lastDay = lastDay.withSecond(59)
+					
+					def from_ = firstDay.toInstant(ZoneOffset.of("+8")).toEpochMilli().toString()
+					def to_ = lastDay.toInstant(ZoneOffset.of("+8")).toEpochMilli().toString()
+					
+					def hmac_sha256(String secretKey, String data) {
+					    try {
+					        Mac mac = Mac.getInstance("HmacSHA256")
+					        SecretKeySpec secretKeySpec = new SecretKeySpec(secretKey.getBytes(), "HmacSHA256")
+					        mac.init(secretKeySpec)
+					        byte[] digest = mac.doFinal(data.getBytes())
+					        return digest
+					    } catch (InvalidKeyException e) {
+					        throw new RuntimeException("Invalid key exception while converting to HMacSHA256")
+					    }
+					}
+					def METABASE_SITE_URL = "https://metabase.eorionsolution.com"
+					def METABASE_SECRET_KEY = "8322aa8500b6ae07df7590b25d1bff56cb5e631dc829704c15cb66e80fed9f50"
+					def header = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9"
+					def playloadString = '{"resource":{"question":72},"params":{"from_":"'+ from_ +'" , '+ '"to_":"'+ to_ +'" }}'
+					def playload = Base64.getUrlEncoder().encodeToString(playloadString.bytes)
+					def secret =Base64.getUrlEncoder().encodeToString(hmac_sha256(METABASE_SECRET_KEY , header+'.'+playload))
+					
+					def url = METABASE_SITE_URL + "/embed/question/" + header+'.'+playload+'.'+secret + "#bordered=true&titled=true"
+   					execution.setVariable('BBOT_BI_TRAIN_NUMBER',url)
+        		]]>
+        		</activiti:string>
+        	</activiti:field>
+        </activiti:taskListener>        
       </extensionElements>
     </userTask>
     <sequenceFlow id="flow1" sourceRef="s1" targetRef="scripttask1"></sequenceFlow>
@@ -201,6 +315,12 @@
         <activiti:formProperty id="tbhddetail_合格数_accnumber_11_string_t11_$$A" name="合格数" type="string" variable="tbhddetail_accnumber_t00" required="true"></activiti:formProperty>
         <activiti:formProperty id="tbhddetail_不合格数_defnumber_12_string_t11_$$A" name="不合格数" type="string" variable="tbhddetail_defnumber_t00" required="true"></activiti:formProperty>
         <activiti:formProperty id="tbhddetail_实际总金额_amount_13_string_t11_$$HA" name="实际总金额" type="string" variable="tbhddetail_amount_t00"></activiti:formProperty>
+      	<activiti:formProperty id="tbhddetail_车次_trainnumber_14_enum_sbs_$$VA" name="车次" type="enum" variable="tbhddetail_trainnumber_t00">
+			<activiti:value id="车次1" name="车次1"/>
+			<activiti:value id="车次2" name="车次2"/>
+			<activiti:value id="车次3" name="车次3"/>
+			<activiti:value id="车次4" name="车次4"/>   	
+      	</activiti:formProperty>         
         <activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
           <activiti:field name="language">
             <activiti:string><![CDATA[groovy]]></activiti:string>
@@ -222,6 +342,54 @@
     					}]]></activiti:string>
           </activiti:field>
         </activiti:taskListener>
+        <activiti:taskListener event="create" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+        	<activiti:field name="language"><activiti:string><![CDATA[groovy]]></activiti:string></activiti:field>
+        	<activiti:field name="script">
+        		<activiti:string>
+        		<![CDATA[
+       			    import java.time.LocalDateTime
+					import java.time.ZoneOffset
+					import java.time.temporal.TemporalAdjusters
+					import javax.crypto.Mac
+					import javax.crypto.spec.SecretKeySpec
+					import java.security.InvalidKeyException
+        		
+        			def execution = task.getExecution()
+					//车次运送量报表
+					def today = LocalDateTime.now()
+					def firstDay = LocalDateTime.of(today.getYear(), today.getMonthValue(), 1,0,0,0)
+					def lastDay = today.with(TemporalAdjusters.lastDayOfMonth())
+					lastDay = lastDay.withHour(23)
+					lastDay = lastDay.withMinute(59)
+					lastDay = lastDay.withSecond(59)
+					
+					def from_ = firstDay.toInstant(ZoneOffset.of("+8")).toEpochMilli().toString()
+					def to_ = lastDay.toInstant(ZoneOffset.of("+8")).toEpochMilli().toString()
+					
+					def hmac_sha256(String secretKey, String data) {
+					    try {
+					        Mac mac = Mac.getInstance("HmacSHA256")
+					        SecretKeySpec secretKeySpec = new SecretKeySpec(secretKey.getBytes(), "HmacSHA256")
+					        mac.init(secretKeySpec)
+					        byte[] digest = mac.doFinal(data.getBytes())
+					        return digest
+					    } catch (InvalidKeyException e) {
+					        throw new RuntimeException("Invalid key exception while converting to HMacSHA256")
+					    }
+					}
+					def METABASE_SITE_URL = "https://metabase.eorionsolution.com"
+					def METABASE_SECRET_KEY = "8322aa8500b6ae07df7590b25d1bff56cb5e631dc829704c15cb66e80fed9f50"
+					def header = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9"
+					def playloadString = '{"resource":{"question":72},"params":{"from_":"'+ from_ +'" , '+ '"to_":"'+ to_ +'" }}'
+					def playload = Base64.getUrlEncoder().encodeToString(playloadString.bytes)
+					def secret =Base64.getUrlEncoder().encodeToString(hmac_sha256(METABASE_SECRET_KEY , header+'.'+playload))
+					
+					def url = METABASE_SITE_URL + "/embed/question/" + header+'.'+playload+'.'+secret + "#bordered=true&titled=true"
+   					execution.setVariable('BBOT_BI_TRAIN_NUMBER',url)
+        		]]>
+        		</activiti:string>
+        	</activiti:field>
+        </activiti:taskListener>        
       </extensionElements>
     </userTask>
     <sequenceFlow id="flow4" sourceRef="usertask2" targetRef="servicetask1"></sequenceFlow>
@@ -288,6 +456,12 @@
         <activiti:formProperty id="tbhddetail_批次_batch_7_string_t1_$$VA" name="批次" type="string" variable="tbhddetail_batch_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhddetail_实际送货数量_deliveryqty_8_string_t11_$$VA" name="实际送货数量" type="string" variable="tbhddetail_deliveryqty_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhddetail_送货日期_deliverydate_9_string_t3_$$VA" name="送货日期" type="string" variable="tbhddetail_deliverydate_t00"></activiti:formProperty>
+      	<activiti:formProperty id="tbhddetail_车次_trainnumber_14_enum_sbs_$$VA" name="车次" type="enum" variable="tbhddetail_trainnumber_t00" required="true">
+			<activiti:value id="车次1" name="车次1"/>
+			<activiti:value id="车次2" name="车次2"/>
+			<activiti:value id="车次3" name="车次3"/>
+			<activiti:value id="车次4" name="车次4"/>   	
+      	</activiti:formProperty>         
         <activiti:taskListener event="create" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
           <activiti:field name="language">
             <activiti:string><![CDATA[groovy]]></activiti:string>
@@ -298,6 +472,9 @@
 					import javax.crypto.Mac
 					import javax.crypto.spec.SecretKeySpec
 					import java.security.InvalidKeyException
+					import java.time.LocalDateTime
+					import java.time.ZoneOffset
+					import java.time.temporal.TemporalAdjusters
 					
 					def jsonSlurper = new JsonSlurper()
 					def execution = task.getExecution()
@@ -331,7 +508,26 @@
 					
 					def secret =Base64.getUrlEncoder().encodeToString(hmac_sha256(METABASE_SECRET_KEY , header+'.'+playload))
 					def url = METABASE_SITE_URL + "/embed/question/" + header+'.'+playload+'.'+secret + "#bordered=true&titled=true"
-     				execution.setVariableLocal('BBOT_BI_PDF_LINK',url)]]></activiti:string>
+     				execution.setVariableLocal('BBOT_BI_PDF_LINK',url)
+     				
+					//车次运送量报表
+					def today = LocalDateTime.now()
+					def firstDay = LocalDateTime.of(today.getYear(), today.getMonthValue(), 1,0,0,0)
+					def lastDay = today.with(TemporalAdjusters.lastDayOfMonth())
+					lastDay = lastDay.withHour(23)
+					lastDay = lastDay.withMinute(59)
+					lastDay = lastDay.withSecond(59)
+					
+					def from_ = firstDay.toInstant(ZoneOffset.of("+8")).toEpochMilli().toString()
+					def to_ = lastDay.toInstant(ZoneOffset.of("+8")).toEpochMilli().toString()
+					
+					playloadString = '{"resource":{"question":72},"params":{"from_":"'+ from_ +'" , '+ '"to_":"'+ to_ +'" }}'
+					playload = Base64.getUrlEncoder().encodeToString(playloadString.bytes)
+					secret =Base64.getUrlEncoder().encodeToString(hmac_sha256(METABASE_SECRET_KEY , header+'.'+playload))
+					
+					url = METABASE_SITE_URL + "/embed/question/" + header+'.'+playload+'.'+secret + "#bordered=true&titled=true"
+   					execution.setVariable('BBOT_BI_TRAIN_NUMBER',url)     				
+     				]]></activiti:string>
           </activiti:field>
         </activiti:taskListener>
       </extensionElements>
@@ -360,12 +556,61 @@
         <activiti:formProperty id="tbhddetail_批次_batch_7_string_t1_$$VA" name="批次" type="string" variable="tbhddetail_batch_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhddetail_实际送货数量_deliveryqty_8_string_t11_$$VA" name="实际送货数量" type="string" variable="tbhddetail_deliveryqty_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhddetail_送货日期_deliverydate_9_string_t3_$$VA" name="送货日期" type="string" variable="tbhddetail_deliverydate_t00"></activiti:formProperty>
+      	<activiti:formProperty id="tbhddetail_车次_trainnumber_14_enum_sbs_$$VA" name="车次" type="enum" variable="tbhddetail_trainnumber_t00" required="true">
+			<activiti:value id="车次1" name="车次1"/>
+			<activiti:value id="车次2" name="车次2"/>
+			<activiti:value id="车次3" name="车次3"/>
+			<activiti:value id="车次4" name="车次4"/>   	
+      	</activiti:formProperty>         
         <activiti:taskListener event="create" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
           <activiti:field name="language">
             <activiti:string><![CDATA[groovy]]></activiti:string>
           </activiti:field>
           <activiti:field name="script">
-            <activiti:string><![CDATA[task.getExecution().setVariable('shownote','此次采购，供应商的发货数量不满足需求数量，请关注采购明细')]]></activiti:string>
+            <activiti:string><![CDATA[
+            import java.time.LocalDateTime
+			import java.time.ZoneOffset
+			import java.time.temporal.TemporalAdjusters
+			import javax.crypto.Mac
+			import javax.crypto.spec.SecretKeySpec
+			import java.security.InvalidKeyException
+            
+            def execution = task.getExecution()
+            execution.setVariable('shownote','此次采购，供应商的发货数量不满足需求数量，请关注采购明细')
+            
+			//车次运送量报表
+			def today = LocalDateTime.now()
+			def firstDay = LocalDateTime.of(today.getYear(), today.getMonthValue(), 1,0,0,0)
+			def lastDay = today.with(TemporalAdjusters.lastDayOfMonth())
+			lastDay = lastDay.withHour(23)
+			lastDay = lastDay.withMinute(59)
+			lastDay = lastDay.withSecond(59)
+			
+			def from_ = firstDay.toInstant(ZoneOffset.of("+8")).toEpochMilli().toString()
+			def to_ = lastDay.toInstant(ZoneOffset.of("+8")).toEpochMilli().toString()
+			
+			def hmac_sha256(String secretKey, String data) {
+			    try {
+			        Mac mac = Mac.getInstance("HmacSHA256")
+			        SecretKeySpec secretKeySpec = new SecretKeySpec(secretKey.getBytes(), "HmacSHA256")
+			        mac.init(secretKeySpec)
+			        byte[] digest = mac.doFinal(data.getBytes())
+			        return digest
+			    } catch (InvalidKeyException e) {
+			        throw new RuntimeException("Invalid key exception while converting to HMacSHA256")
+			    }
+			}
+			def METABASE_SITE_URL = "https://metabase.eorionsolution.com"
+			def METABASE_SECRET_KEY = "8322aa8500b6ae07df7590b25d1bff56cb5e631dc829704c15cb66e80fed9f50"
+			def header = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9"
+			def playloadString = '{"resource":{"question":72},"params":{"from_":"'+ from_ +'" , '+ '"to_":"'+ to_ +'" }}'
+			def playload = Base64.getUrlEncoder().encodeToString(playloadString.bytes)
+			def secret =Base64.getUrlEncoder().encodeToString(hmac_sha256(METABASE_SECRET_KEY , header+'.'+playload))
+			
+			def url = METABASE_SITE_URL + "/embed/question/" + header+'.'+playload+'.'+secret + "#bordered=true&titled=true"
+ 			execution.setVariable('BBOT_BI_TRAIN_NUMBER',url)            
+            
+            ]]></activiti:string>
           </activiti:field>
         </activiti:taskListener>
       </extensionElements>
