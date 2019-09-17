@@ -10,7 +10,19 @@
           <activiti:field name="script">
             <activiti:string><![CDATA[//update businessKey
     					def upBusinessKey = execution.getVariable("businessKey") + "-" +execution.getVariable("employee") 
-    					runtimeService.updateBusinessKey(execution.getProcessInstanceId(), upBusinessKey)]]></activiti:string>
+    					runtimeService.updateBusinessKey(execution.getProcessInstanceId(), upBusinessKey)
+    					
+    					def employeeSn = execution.getVariable('employee')
+        			
+	        			execution.setVariable("_http_method", "GET")
+						def headerMap = new java.util.HashMap<String,String>()	
+						execution.setVariable("_http_headers", headerMap)
+						execution.setVariable("_http_body", '')
+						def param=java.net.URLEncoder.encode('[{"type":"category","target":["variable",["template-tag","sn"]],"value":\"'+ employeeSn+ '\"}]', "UTF-8")
+						execution.setVariable("_http_url", 'https://metabase.eorionsolution.com/public/question/ab9d592d-0e01-4e02-9a56-eb80b7123a41.json?parameters='+param)
+						execution.setVariable("_http_response_body", '')
+						execution.setVariable("_http_response_status_code", '')
+    					]]></activiti:string>
           </activiti:field>
         </activiti:executionListener>
       </extensionElements>
@@ -79,6 +91,8 @@
           </activiti:field>
           <activiti:field name="script">
             <activiti:string><![CDATA[import groovy.json.JsonSlurper
+            		import groovy.json.JsonOutput
+            		
             		def jsonSlurper = new JsonSlurper()
             		def execution = task.getExecution()
 
@@ -88,21 +102,60 @@
             			}
             		}
             		
-        			def employeeSn = execution.getVariable('employee')
-        			
-        			execution.setVariable("_http_method", "GET")
-					def headerMap = new java.util.HashMap<String,String>()	
+					//邮件通知manager
+					def bodyMap = new java.util.HashMap()
+					def detailMap = new java.util.HashMap()
+					def dataMap = new java.util.HashMap()
+					
+					dataMap.put('type1','1')
+					def performanceList = new ArrayList()
+					jsonSlurper.parseText(execution.getVariable('tbhdperformance_item_std')).each{
+						performanceList<< [
+							'perspective':it.perspective?:'',
+							'description':it.description?:'',
+							'objective':it.objective?:'',
+							'kpi':it.kpi?:'',
+							'weighting':it.weighting?:'',
+							'unit':it.unit?:'',
+							'actual':it.actual?:'',
+							'kpiattribute':it.kpiattribute?:'',
+							'planq1':it.planq1?:'',
+							'planq2':it.planq2?:'',
+							'planq3':it.planq3?:'',
+							'planq4':it.planq4?:''
+						]
+					}
+					dataMap.put('performanceList', performanceList)
+					def employeeName = execution.getVariable('employeename')
+					dataMap.put('employeeName', employeeName)
+					
+					def employee = execution.getVariable('employee')
+					detailMap.put("from", "develop@eorionsolution.com")
+					detailMap.put("to", ["baocaixue@eorionsolution.com"])//TODO managerSn
+					detailMap.put("cc", ["caojiajie@eorionsolution.com"])//TODO employee
+					detailMap.put("subject", employeeName + "绩效考核计划Review")
+					detailMap.put("templateName", "performance-appraisal-all-template")
+					detailMap.put("templateData",dataMap)
+					
+					bodyMap.put("mail", detailMap)
+					
+					def body = JsonOutput.toJson(bodyMap)
+					execution.setVariable("_http_method", "POST")
+					def headerMap = new HashMap()
+					headerMap.put("Content-Type","application/json")
 					execution.setVariable("_http_headers", headerMap)
-					execution.setVariable("_http_body", '')
-					def param=java.net.URLEncoder.encode('[{"type":"category","target":["variable",["template-tag","sn"]],"value":\"'+ employeeSn+ '\"}]', "UTF-8")
-					execution.setVariable("_http_url", 'https://metabase.eorionsolution.com/public/question/ab9d592d-0e01-4e02-9a56-eb80b7123a41.json?parameters='+param)
+					execution.setVariable("_http_body", body)
+					execution.setVariable("mailBody1", body)
+					execution.setVariable("_http_url", 'https://commonservices.eorionsolution.com/mailsender/mail/v2/mail')
 					execution.setVariable("_http_response_body", '')
-					execution.setVariable("_http_response_status_code", '')]]></activiti:string>
+					execution.setVariable("_http_response_status_code", '')            		
+            		
+				]]></activiti:string>
           </activiti:field>
         </activiti:taskListener>
       </extensionElements>
     </userTask>
-    <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="usertask1"></sequenceFlow>
+    <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="servicetask7"></sequenceFlow>
     <serviceTask id="servicetask1" name="发送邮件 Send mail service1" activiti:class="com.eorionsolution.riying.bpms.javaservice.http.RestAPIService"></serviceTask>
     <userTask id="usertask2" name="领导审阅 Review" activiti:assignee="${managerSn}" activiti:dueDate="P1D">
       <extensionElements>
@@ -312,17 +365,17 @@
         <activiti:formProperty id="tbhdperformance_item" name="绩效考核表 Performance appraisal table" type="string" variable="tbhdperformance_item" required="true"></activiti:formProperty>
         <activiti:formProperty id="tbhdperformance_构面 Perspective_perspective_1_string_t1_$$VA" name="构面 Perspective" type="string" variable="tbhdperformance_perspective_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhdperformance_说明 Description_description_2_string_t1_$$VA" name="说明 Description" type="string" variable="tbhdperformance_description_t00"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_目标 Objective_objective_3_string_t1_$$VA" name="目标 Objective" type="string" variable="tbhdperformance_objective_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_绩效指标 KPI_kpi_4_string_t1_$$VA" name="绩效指标 KPI" type="string" variable="tbhdperformance_kpi_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_权重 Weighting(%)_weighting_5_string_t1_$$VA" name="权重 Weighting(%)" type="string" variable="tbhdperformance_weighting_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdperformance_目标 Objective_objective_3_string_t1_$$VA" name="目标 Objective" type="string" variable="tbhdperformance_objective_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdperformance_绩效指标 KPI_kpi_4_string_t1_$$VA" name="绩效指标 KPI" type="string" variable="tbhdperformance_kpi_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdperformance_权重 Weighting(%)_weighting_5_string_t1_$$VA" name="权重 Weighting(%)" type="string" variable="tbhdperformance_weighting_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhdperformance_单位 Unit_unit_6_string_t1_$$VA" name="单位 Unit" type="string" variable="tbhdperformance_unit_t00"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_上年度实际 Actual last year_actual_7_string_t1_$$VA" name="上年度实际 Actual last year" type="string" variable="tbhdperformance_actual_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdperformance_上年度实际 Actual last year_actual_7_string_t1_$$VA" name="上年度实际 Actual last year" type="string" variable="tbhdperformance_actual_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhdperformance_指标属性 KPI achievement measurement(Fill in ≥ or ≤)_kpiattribute_8_string_t1_$$VA" name="指标属性 KPI achievement measurement(Fill in ≥ or ≤)" type="string" variable="tbhdperformance_kpiattribute_t00"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_Plan Q1_planq1_9_string_t1_$$VA" name="Plan Q1" type="string" variable="tbhdperformance_planq1_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_Plan Q2_planq2_10_string_t1_$$HA" name="Plan Q2" type="string" variable="tbhdperformance_planq2_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_Plan Q3_planq3_11_string_t1_$$HA" name="Plan Q3" type="string" variable="tbhdperformance_planq3_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_Plan Q4_planq4_12_string_t1_$$HA" name="Plan Q4" type="string" variable="tbhdperformance_planq4_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_Actual Q1_actualq1_13_string_t1_$$A" name="Actual Q1" type="string" variable="tbhdperformance_actualq1_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdperformance_Plan Q1_planq1_9_string_t1_$$VA" name="Plan Q1" type="string" variable="tbhdperformance_planq1_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdperformance_Plan Q2_planq2_10_string_t1_$$HA" name="Plan Q2" type="string" variable="tbhdperformance_planq2_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdperformance_Plan Q3_planq3_11_string_t1_$$HA" name="Plan Q3" type="string" variable="tbhdperformance_planq3_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdperformance_Plan Q4_planq4_12_string_t1_$$HA" name="Plan Q4" type="string" variable="tbhdperformance_planq4_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdperformance_Actual Q1_actualq1_13_string_t1_$$A" name="Actual Q1" type="string" variable="tbhdperformance_actualq1_t00" required="true"></activiti:formProperty>
         <activiti:formProperty id="tbhdperformance_Actual Q2_actualq2_14_string_t1_$$HA" name="Actual Q2" type="string" variable="tbhdperformance_actualq2_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhdperformance_Actual Q3_actualq3_15_string_t1_$$HA" name="Actual Q3" type="string" variable="tbhdperformance_actualq3_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhdperformance_Actual Q4_actualq4_16_string_t1_$$HA" name="Actual Q4" type="string" variable="tbhdperformance_actualq4_t00"></activiti:formProperty>
@@ -338,6 +391,13 @@
     					//发送employee绩效结果
     					def jsonSlurper = new JsonSlurper()
 						def execution = task.getExecution()
+						
+						//校验
+						jsonSlurper.parseText(execution.getVariable('tbhdperformance_item_std')).each{
+							if(it.actualq1 == null || it.actualq1.trim() == ''){
+								throw new org.activiti.engine.ActivitiIllegalArgumentException('请填写Q1阶段实际完成情况 Please fill in the actual completion of the Q1 phase.')
+							}
+						}
 						
 						def bodyMap = new java.util.HashMap()
 						def detailMap = new java.util.HashMap()
@@ -483,18 +543,18 @@
         <activiti:formProperty id="tbhdperformance_item" name="绩效考核表 Performance appraisal table" type="string" variable="tbhdperformance_item" required="true"></activiti:formProperty>
         <activiti:formProperty id="tbhdperformance_构面 Perspective_perspective_1_string_t1_$$VA" name="构面 Perspective" type="string" variable="tbhdperformance_perspective_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhdperformance_说明 Description_description_2_string_t1_$$VA" name="说明 Description" type="string" variable="tbhdperformance_description_t00"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_目标 Objective_objective_3_string_t1_$$VA" name="目标 Objective" type="string" variable="tbhdperformance_objective_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_绩效指标 KPI_kpi_4_string_t1_$$VA" name="绩效指标 KPI" type="string" variable="tbhdperformance_kpi_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_权重 Weighting(%)_weighting_5_string_t1_$$VA" name="权重 Weighting(%)" type="string" variable="tbhdperformance_weighting_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdperformance_目标 Objective_objective_3_string_t1_$$VA" name="目标 Objective" type="string" variable="tbhdperformance_objective_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdperformance_绩效指标 KPI_kpi_4_string_t1_$$VA" name="绩效指标 KPI" type="string" variable="tbhdperformance_kpi_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdperformance_权重 Weighting(%)_weighting_5_string_t1_$$VA" name="权重 Weighting(%)" type="string" variable="tbhdperformance_weighting_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhdperformance_单位 Unit_unit_6_string_t1_$$VA" name="单位 Unit" type="string" variable="tbhdperformance_unit_t00"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_上年度实际 Actual last year_actual_7_string_t1_$$VA" name="上年度实际 Actual last year" type="string" variable="tbhdperformance_actual_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdperformance_上年度实际 Actual last year_actual_7_string_t1_$$VA" name="上年度实际 Actual last year" type="string" variable="tbhdperformance_actual_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhdperformance_指标属性 KPI achievement measurement(Fill in ≥ or ≤)_kpiattribute_8_string_t1_$$VA" name="指标属性 KPI achievement measurement(Fill in ≥ or ≤)" type="string" variable="tbhdperformance_kpiattribute_t00"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_Plan Q1_planq1_9_string_t1_$$HA" name="Plan Q1" type="string" variable="tbhdperformance_planq1_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_Plan Q2_planq2_10_string_t1_$$VA" name="Plan Q2" type="string" variable="tbhdperformance_planq2_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_Plan Q3_planq3_11_string_t1_$$HA" name="Plan Q3" type="string" variable="tbhdperformance_planq3_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_Plan Q4_planq4_12_string_t1_$$HA" name="Plan Q4" type="string" variable="tbhdperformance_planq4_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdperformance_Plan Q1_planq1_9_string_t1_$$HA" name="Plan Q1" type="string" variable="tbhdperformance_planq1_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdperformance_Plan Q2_planq2_10_string_t1_$$VA" name="Plan Q2" type="string" variable="tbhdperformance_planq2_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdperformance_Plan Q3_planq3_11_string_t1_$$HA" name="Plan Q3" type="string" variable="tbhdperformance_planq3_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdperformance_Plan Q4_planq4_12_string_t1_$$HA" name="Plan Q4" type="string" variable="tbhdperformance_planq4_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhdperformance_Actual Q1_actualq1_13_string_t1_$$HA" name="Actual Q1" type="string" variable="tbhdperformance_actualq1_t00"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_Actual Q2_actualq2_14_string_t1_$$A" name="Actual Q2" type="string" variable="tbhdperformance_actualq2_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdperformance_Actual Q2_actualq2_14_string_t1_$$A" name="Actual Q2" type="string" variable="tbhdperformance_actualq2_t00" required="true"></activiti:formProperty>
         <activiti:formProperty id="tbhdperformance_Actual Q3_actualq3_15_string_t1_$$HA" name="Actual Q3" type="string" variable="tbhdperformance_actualq3_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhdperformance_Actual Q4_actualq4_16_string_t1_$$HA" name="Actual Q4" type="string" variable="tbhdperformance_actualq4_t00"></activiti:formProperty>
         <activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
@@ -509,6 +569,13 @@
     					//发送employee绩效结果
     					def jsonSlurper = new JsonSlurper()
 						def execution = task.getExecution()
+						
+						//校验
+						jsonSlurper.parseText(execution.getVariable('tbhdperformance_item_std')).each{
+							if(it.actualq2 == null || it.actualq2.trim() == ''){
+								throw new org.activiti.engine.ActivitiIllegalArgumentException('请填写Q2阶段实际完成情况 Please fill in the actual completion of the Q2 phase.')
+							}
+						}						
 						
 						def bodyMap = new java.util.HashMap()
 						def detailMap = new java.util.HashMap()
@@ -654,19 +721,19 @@
         <activiti:formProperty id="tbhdperformance_item" name="绩效考核表 Performance appraisal table" type="string" variable="tbhdperformance_item" required="true"></activiti:formProperty>
         <activiti:formProperty id="tbhdperformance_构面 Perspective_perspective_1_string_t1_$$VA" name="构面 Perspective" type="string" variable="tbhdperformance_perspective_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhdperformance_说明 Description_description_2_string_t1_$$VA" name="说明 Description" type="string" variable="tbhdperformance_description_t00"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_目标 Objective_objective_3_string_t1_$$VA" name="目标 Objective" type="string" variable="tbhdperformance_objective_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_绩效指标 KPI_kpi_4_string_t1_$$VA" name="绩效指标 KPI" type="string" variable="tbhdperformance_kpi_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_权重 Weighting(%)_weighting_5_string_t1_$$VA" name="权重 Weighting(%)" type="string" variable="tbhdperformance_weighting_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdperformance_目标 Objective_objective_3_string_t1_$$VA" name="目标 Objective" type="string" variable="tbhdperformance_objective_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdperformance_绩效指标 KPI_kpi_4_string_t1_$$VA" name="绩效指标 KPI" type="string" variable="tbhdperformance_kpi_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdperformance_权重 Weighting(%)_weighting_5_string_t1_$$VA" name="权重 Weighting(%)" type="string" variable="tbhdperformance_weighting_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhdperformance_单位 Unit_unit_6_string_t1_$$VA" name="单位 Unit" type="string" variable="tbhdperformance_unit_t00"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_上年度实际 Actual last year_actual_7_string_t1_$$VA" name="上年度实际 Actual last year" type="string" variable="tbhdperformance_actual_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdperformance_上年度实际 Actual last year_actual_7_string_t1_$$VA" name="上年度实际 Actual last year" type="string" variable="tbhdperformance_actual_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhdperformance_指标属性 KPI achievement measurement(Fill in ≥ or ≤)_kpiattribute_8_string_t1_$$VA" name="指标属性 KPI achievement measurement(Fill in ≥ or ≤)" type="string" variable="tbhdperformance_kpiattribute_t00"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_Plan Q1_planq1_9_string_t1_$$HA" name="Plan Q1" type="string" variable="tbhdperformance_planq1_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_Plan Q2_planq2_10_string_t1_$$HA" name="Plan Q2" type="string" variable="tbhdperformance_planq2_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_Plan Q3_planq3_11_string_t1_$$VA" name="Plan Q3" type="string" variable="tbhdperformance_planq3_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_Plan Q4_planq4_12_string_t1_$$HA" name="Plan Q4" type="string" variable="tbhdperformance_planq4_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdperformance_Plan Q1_planq1_9_string_t1_$$HA" name="Plan Q1" type="string" variable="tbhdperformance_planq1_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdperformance_Plan Q2_planq2_10_string_t1_$$HA" name="Plan Q2" type="string" variable="tbhdperformance_planq2_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdperformance_Plan Q3_planq3_11_string_t1_$$VA" name="Plan Q3" type="string" variable="tbhdperformance_planq3_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdperformance_Plan Q4_planq4_12_string_t1_$$HA" name="Plan Q4" type="string" variable="tbhdperformance_planq4_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhdperformance_Actual Q1_actualq1_13_string_t1_$$HA" name="Actual Q1" type="string" variable="tbhdperformance_actualq1_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhdperformance_Actual Q2_actualq2_14_string_t1_$$HA" name="Actual Q2" type="string" variable="tbhdperformance_actualq2_t00"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_Actual Q3_actualq3_15_string_t1_$$A" name="Actual Q3" type="string" variable="tbhdperformance_actualq3_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdperformance_Actual Q3_actualq3_15_string_t1_$$A" name="Actual Q3" type="string" variable="tbhdperformance_actualq3_t00" required="true"></activiti:formProperty>
         <activiti:formProperty id="tbhdperformance_Actual Q4_actualq4_16_string_t1_$$HA" name="Actual Q4" type="string" variable="tbhdperformance_actualq4_t00"></activiti:formProperty>
         <activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
           <activiti:field name="language">
@@ -680,6 +747,13 @@
     					//发送employee绩效结果
     					def jsonSlurper = new JsonSlurper()
 						def execution = task.getExecution()
+						
+						//校验
+						jsonSlurper.parseText(execution.getVariable('tbhdperformance_item_std')).each{
+							if(it.actualq3 == null || it.actualq3.trim() == ''){
+								throw new org.activiti.engine.ActivitiIllegalArgumentException('请填写Q3阶段实际完成情况 Please fill in the actual completion of the Q3 phase.')
+							}
+						}						
 						
 						def bodyMap = new java.util.HashMap()
 						def detailMap = new java.util.HashMap()
@@ -825,20 +899,20 @@
         <activiti:formProperty id="tbhdperformance_item" name="绩效考核表 Performance appraisal table" type="string" variable="tbhdperformance_item" required="true"></activiti:formProperty>
         <activiti:formProperty id="tbhdperformance_构面 Perspective_perspective_1_string_t1_$$VA" name="构面 Perspective" type="string" variable="tbhdperformance_perspective_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhdperformance_说明 Description_description_2_string_t1_$$VA" name="说明 Description" type="string" variable="tbhdperformance_description_t00"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_目标 Objective_objective_3_string_t1_$$VA" name="目标 Objective" type="string" variable="tbhdperformance_objective_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_绩效指标 KPI_kpi_4_string_t1_$$VA" name="绩效指标 KPI" type="string" variable="tbhdperformance_kpi_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_权重 Weighting(%)_weighting_5_string_t1_$$VA" name="权重 Weighting(%)" type="string" variable="tbhdperformance_weighting_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdperformance_目标 Objective_objective_3_string_t1_$$VA" name="目标 Objective" type="string" variable="tbhdperformance_objective_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdperformance_绩效指标 KPI_kpi_4_string_t1_$$VA" name="绩效指标 KPI" type="string" variable="tbhdperformance_kpi_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdperformance_权重 Weighting(%)_weighting_5_string_t1_$$VA" name="权重 Weighting(%)" type="string" variable="tbhdperformance_weighting_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhdperformance_单位 Unit_unit_6_string_t1_$$VA" name="单位 Unit" type="string" variable="tbhdperformance_unit_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhdperformance_上年度实际 Actual last year_actual_7_string_t1_$$VA" name="上年度实际 Actual last year" type="string" variable="tbhdperformance_actual_t00" required="true"></activiti:formProperty>
         <activiti:formProperty id="tbhdperformance_指标属性 KPI achievement measurement(Fill in ≥ or ≤)_kpiattribute_8_string_t1_$$VA" name="指标属性 KPI achievement measurement(Fill in ≥ or ≤)" type="string" variable="tbhdperformance_kpiattribute_t00"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_Plan Q1_planq1_9_string_t1_$$HA" name="Plan Q1" type="string" variable="tbhdperformance_planq1_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_Plan Q2_planq2_10_string_t1_$$HA" name="Plan Q2" type="string" variable="tbhdperformance_planq2_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_Plan Q3_planq3_11_string_t1_$$HA" name="Plan Q3" type="string" variable="tbhdperformance_planq3_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_Plan Q4_planq4_12_string_t1_$$VA" name="Plan Q4" type="string" variable="tbhdperformance_planq4_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdperformance_Plan Q1_planq1_9_string_t1_$$HA" name="Plan Q1" type="string" variable="tbhdperformance_planq1_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdperformance_Plan Q2_planq2_10_string_t1_$$HA" name="Plan Q2" type="string" variable="tbhdperformance_planq2_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdperformance_Plan Q3_planq3_11_string_t1_$$HA" name="Plan Q3" type="string" variable="tbhdperformance_planq3_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdperformance_Plan Q4_planq4_12_string_t1_$$VA" name="Plan Q4" type="string" variable="tbhdperformance_planq4_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhdperformance_Actual Q1_actualq1_13_string_t1_$$HA" name="Actual Q1" type="string" variable="tbhdperformance_actualq1_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhdperformance_Actual Q2_actualq2_14_string_t1_$$HA" name="Actual Q2" type="string" variable="tbhdperformance_actualq2_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhdperformance_Actual Q3_actualq3_15_string_t1_$$HA" name="Actual Q3" type="string" variable="tbhdperformance_actualq3_t00"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_Actual Q4_actualq4_16_string_t1_$$A" name="Actual Q4" type="string" variable="tbhdperformance_actualq4_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdperformance_Actual Q4_actualq4_16_string_t1_$$A" name="Actual Q4" type="string" variable="tbhdperformance_actualq4_t00" required="true"></activiti:formProperty>
         <activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
           <activiti:field name="language">
             <activiti:string><![CDATA[groovy]]></activiti:string>
@@ -851,6 +925,13 @@
     					//发送employee绩效结果
     					def jsonSlurper = new JsonSlurper()
 						def execution = task.getExecution()
+						
+						//校验
+						jsonSlurper.parseText(execution.getVariable('tbhdperformance_item_std')).each{
+							if(it.actualq4 == null || it.actualq4.trim() == ''){
+								throw new org.activiti.engine.ActivitiIllegalArgumentException('请填写Q4阶段实际完成情况 Please fill in the actual completion of the Q4 phase.')
+							}
+						}							
 						
 						def bodyMap = new java.util.HashMap()
 						def detailMap = new java.util.HashMap()
@@ -913,7 +994,7 @@
     <serviceTask id="servicetask4" name="发送邮件 Send mail service4" activiti:class="com.eorionsolution.riying.bpms.javaservice.http.RestAPIService"></serviceTask>
     <serviceTask id="servicetask5" name="发送邮件 Send mail service5" activiti:class="com.eorionsolution.riying.bpms.javaservice.http.RestAPIService"></serviceTask>
     <serviceTask id="servicetask6" name="发送邮件 Send mail service6" activiti:class="com.eorionsolution.riying.bpms.javaservice.http.RestAPIService"></serviceTask>
-    <sequenceFlow id="flow2" sourceRef="usertask1" targetRef="servicetask7"></sequenceFlow>
+    <sequenceFlow id="flow2" sourceRef="usertask1" targetRef="servicetask1"></sequenceFlow>
     <sequenceFlow id="flow3" sourceRef="servicetask1" targetRef="usertask2"></sequenceFlow>
     <sequenceFlow id="flow4" sourceRef="usertask2" targetRef="servicetask2"></sequenceFlow>
     <sequenceFlow id="flow5" sourceRef="servicetask2" targetRef="parallelgateway1"></sequenceFlow>
@@ -934,7 +1015,7 @@
     <sequenceFlow id="flow20" sourceRef="servicetask5" targetRef="scripttask4"></sequenceFlow>
     <sequenceFlow id="flow21" sourceRef="servicetask6" targetRef="scripttask5"></sequenceFlow>
     <endEvent id="endevent1" name="End"></endEvent>
-    <serviceTask id="servicetask7" name="metabase查询领导信息" activiti:class="com.eorionsolution.riying.bpms.javaservice.http.RestAPIService"></serviceTask>
+    <serviceTask id="servicetask7" name="metabase查询个人信息" activiti:class="com.eorionsolution.riying.bpms.javaservice.http.RestAPIService"></serviceTask>
     <scriptTask id="scripttask1" name="返回数据处理 Handle data" scriptFormat="groovy" activiti:autoStoreVariables="false">
       <script>
     	
@@ -949,7 +1030,7 @@
 			}
 			def responseBody = jsonSlurper.parseText(execution.getVariable('_http_response_body'))
 			if(responseBody.size() == 0){
-				throw new org.activiti.engine.ActivitiIllegalArgumentException('数据库中不存在您的汇报对象信息 Your report object information does not exist in the database.')
+				throw new org.activiti.engine.ActivitiIllegalArgumentException('数据库中不存在 '+execution.getVariable('employee')+' 的汇报对象信息 report object information does not exist in the database.')
 			}
 			
 			def managerSn = responseBody[0].managerSn
@@ -960,61 +1041,22 @@
 			def managerName = managerOpt.map({m -&gt; m.getLastName() + m.getFirstName()}).orElse('')
 			execution.setVariable('managerName', managerName)
 			
-			//邮件通知manager
-			def bodyMap = new java.util.HashMap()
-			def detailMap = new java.util.HashMap()
-			def dataMap = new java.util.HashMap()
+			//成本中心code
+			def costCenterCode = responseBody[0].costCenterCode
+			//成本中心name
+			def costCenterName = responseBody[0].costCenterName
+			execution.setVariable('costcenter',JsonOutput.toJson(['code':costCenterCode, 'name':costCenterName]))
+			//职能
+			def function = responseBody[0].function
+			execution.setVariable('function', function)
 			
-			dataMap.put('type1','1')
-			def performanceList = new ArrayList()
-			jsonSlurper.parseText(execution.getVariable('tbhdperformance_item_std')).each{
-				performanceList&lt;&lt; [
-					'perspective':it.perspective?:'',
-					'description':it.description?:'',
-					'objective':it.objective?:'',
-					'kpi':it.kpi?:'',
-					'weighting':it.weighting?:'',
-					'unit':it.unit?:'',
-					'actual':it.actual?:'',
-					'kpiattribute':it.kpiattribute?:'',
-					'planq1':it.planq1?:'',
-					'planq2':it.planq2?:'',
-					'planq3':it.planq3?:'',
-					'planq4':it.planq4?:''
-				]
-			}
-			dataMap.put('performanceList', performanceList)
-			def employeeName = execution.getVariable('employeename')
-			dataMap.put('employeeName', employeeName)
-			
-			def employee = execution.getVariable('employee')
-			detailMap.put("from", "develop@eorionsolution.com")
-			detailMap.put("to", ["baocaixue@eorionsolution.com"])//TODO managerSn
-			detailMap.put("cc", ["caojiajie@eorionsolution.com"])//TODO employee
-			detailMap.put("subject", employeeName + "绩效考核计划Review")
-			detailMap.put("templateName", "performance-appraisal-all-template")
-			detailMap.put("templateData",dataMap)
-			
-			bodyMap.put("mail", detailMap)
-			
-			def body = JsonOutput.toJson(bodyMap)
-			execution.setVariable("_http_method", "POST")
-			def headerMap = new HashMap()
-			headerMap.put("Content-Type","application/json")
-			execution.setVariable("_http_headers", headerMap)
-			execution.setVariable("_http_body", body)
-			execution.setVariable("mailBody1", body)
-			execution.setVariable("_http_url", 'https://commonservices.eorionsolution.com/mailsender/mail/v2/mail')
-			execution.setVariable("_http_response_body", '')
-			execution.setVariable("_http_response_status_code", '')
-    	
     	</script>
     </scriptTask>
     <sequenceFlow id="flow23" sourceRef="servicetask7" targetRef="scripttask1"></sequenceFlow>
-    <sequenceFlow id="flow24" sourceRef="scripttask1" targetRef="servicetask1"></sequenceFlow>
-    <scriptTask id="scripttask2" name="Q1考核结束发送汇报对象邮件" activiti:autoStoreVariables="false" scriptFormat="groovy">
-    	<script>
-    	<![CDATA[
+    <sequenceFlow id="flow24" sourceRef="scripttask1" targetRef="usertask1"></sequenceFlow>
+    <scriptTask id="scripttask2" name="Q1考核结束发送汇报对象邮件" scriptFormat="groovy" activiti:autoStoreVariables="false">
+      <script>
+    	
     		import groovy.json.JsonSlurper
 			import groovy.json.JsonOutput
 			import java.time.LocalDate
@@ -1029,7 +1071,7 @@
 			dataMap.put('type4','Q1')
 			def performanceList = new ArrayList()
 			jsonSlurper.parseText(execution.getVariable('tbhdperformance_item_std')).each{
-				performanceList << [
+				performanceList &lt;&lt; [
 					'perspective':it.perspective?:'',
 					'description':it.description?:'',
 					'objective':it.objective?:'',
@@ -1078,14 +1120,14 @@
 			execution.setVariable("_http_url", 'https://commonservices.eorionsolution.com/mailsender/mail/v2/mail')
 			execution.setVariable("_http_response_body", '')
 			execution.setVariable("_http_response_status_code", '')	
-    	]]>
+    	
     	</script>
     </scriptTask>
     <serviceTask id="servicetask8" name="发送邮件 Send mail service7" activiti:class="com.eorionsolution.riying.bpms.javaservice.http.RestAPIService"></serviceTask>
     <sequenceFlow id="flow25" sourceRef="scripttask2" targetRef="servicetask8"></sequenceFlow>
-    <scriptTask id="scripttask3" name="Q2考核结束发送汇报对象邮件" activiti:autoStoreVariables="false" scriptFormat="groovy">
-    	<script>
-    	<![CDATA[
+    <scriptTask id="scripttask3" name="Q2考核结束发送汇报对象邮件" scriptFormat="groovy" activiti:autoStoreVariables="false">
+      <script>
+    	
     		import groovy.json.JsonSlurper
 			import groovy.json.JsonOutput
 			import java.time.LocalDate
@@ -1100,7 +1142,7 @@
 			dataMap.put('type4','Q2')
 			def performanceList = new ArrayList()
 			jsonSlurper.parseText(execution.getVariable('tbhdperformance_item_std')).each{
-				performanceList << [
+				performanceList &lt;&lt; [
 					'perspective':it.perspective?:'',
 					'description':it.description?:'',
 					'objective':it.objective?:'',
@@ -1149,14 +1191,14 @@
 			execution.setVariable("_http_url", 'https://commonservices.eorionsolution.com/mailsender/mail/v2/mail')
 			execution.setVariable("_http_response_body", '')
 			execution.setVariable("_http_response_status_code", '')				
-    	]]>
+    	
     	</script>
     </scriptTask>
     <serviceTask id="servicetask9" name="发送邮件 Send mail service8" activiti:class="com.eorionsolution.riying.bpms.javaservice.http.RestAPIService"></serviceTask>
     <sequenceFlow id="flow28" sourceRef="scripttask3" targetRef="servicetask9"></sequenceFlow>
-    <scriptTask id="scripttask4" name="Q3考核结束发送汇报对象邮件" activiti:autoStoreVariables="false" scriptFormat="groovy">
-    	<script>
-    	<![CDATA[
+    <scriptTask id="scripttask4" name="Q3考核结束发送汇报对象邮件" scriptFormat="groovy" activiti:autoStoreVariables="false">
+      <script>
+    	
     		import groovy.json.JsonSlurper
 			import groovy.json.JsonOutput
 			import java.time.LocalDate
@@ -1171,7 +1213,7 @@
 			dataMap.put('type4','Q3')
 			def performanceList = new ArrayList()
 			jsonSlurper.parseText(execution.getVariable('tbhdperformance_item_std')).each{
-				performanceList << [
+				performanceList &lt;&lt; [
 					'perspective':it.perspective?:'',
 					'description':it.description?:'',
 					'objective':it.objective?:'',
@@ -1220,14 +1262,14 @@
 			execution.setVariable("_http_url", 'https://commonservices.eorionsolution.com/mailsender/mail/v2/mail')
 			execution.setVariable("_http_response_body", '')
 			execution.setVariable("_http_response_status_code", '')		
-    	]]>
+    	
     	</script>
     </scriptTask>
     <serviceTask id="servicetask10" name="发送邮件 Send mail service9" activiti:class="com.eorionsolution.riying.bpms.javaservice.http.RestAPIService"></serviceTask>
     <sequenceFlow id="flow30" sourceRef="scripttask4" targetRef="servicetask10"></sequenceFlow>
-    <scriptTask id="scripttask5" name="Q4考核结束发送汇报对象邮件" activiti:autoStoreVariables="false" scriptFormat="groovy">
-    	<script>
-    	<![CDATA[
+    <scriptTask id="scripttask5" name="Q4考核结束发送汇报对象邮件" scriptFormat="groovy" activiti:autoStoreVariables="false">
+      <script>
+    	
     		import groovy.json.JsonSlurper
 			import groovy.json.JsonOutput
 			import java.time.LocalDate
@@ -1242,7 +1284,7 @@
 			dataMap.put('type4','Q4')
 			def performanceList = new ArrayList()
 			jsonSlurper.parseText(execution.getVariable('tbhdperformance_item_std')).each{
-				performanceList << [
+				performanceList &lt;&lt; [
 					'perspective':it.perspective?:'',
 					'description':it.description?:'',
 					'objective':it.objective?:'',
@@ -1292,7 +1334,7 @@
 			execution.setVariable("_http_response_body", '')
 			execution.setVariable("_http_response_status_code", '')    	
     	
-    	]]>
+    	
     	</script>
     </scriptTask>
     <serviceTask id="servicetask11" name="发送邮件 Send mail service10" activiti:class="com.eorionsolution.riying.bpms.javaservice.http.RestAPIService"></serviceTask>
@@ -1310,228 +1352,228 @@
         <omgdc:Bounds height="35.0" width="35.0" x="282.0" y="1.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="usertask1" id="BPMNShape_usertask1">
-        <omgdc:Bounds height="61.0" width="105.0" x="247.0" y="71.0"></omgdc:Bounds>
+        <omgdc:Bounds height="61.0" width="105.0" x="247.0" y="272.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="servicetask1" id="BPMNShape_servicetask1">
-        <omgdc:Bounds height="61.0" width="105.0" x="248.0" y="361.0"></omgdc:Bounds>
+        <omgdc:Bounds height="61.0" width="105.0" x="248.0" y="372.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="usertask2" id="BPMNShape_usertask2">
-        <omgdc:Bounds height="61.0" width="105.0" x="248.0" y="451.0"></omgdc:Bounds>
+        <omgdc:Bounds height="61.0" width="105.0" x="248.0" y="472.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="servicetask2" id="BPMNShape_servicetask2">
-        <omgdc:Bounds height="65.0" width="105.0" x="248.0" y="553.0"></omgdc:Bounds>
+        <omgdc:Bounds height="65.0" width="105.0" x="248.0" y="574.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="parallelgateway1" id="BPMNShape_parallelgateway1">
-        <omgdc:Bounds height="40.0" width="40.0" x="280.0" y="663.0"></omgdc:Bounds>
+        <omgdc:Bounds height="40.0" width="40.0" x="280.0" y="684.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="timerintermediatecatchevent1" id="BPMNShape_timerintermediatecatchevent1">
-        <omgdc:Bounds height="35.0" width="35.0" x="40.0" y="751.0"></omgdc:Bounds>
+        <omgdc:Bounds height="35.0" width="35.0" x="40.0" y="772.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="timerintermediatecatchevent2" id="BPMNShape_timerintermediatecatchevent2">
-        <omgdc:Bounds height="35.0" width="35.0" x="185.0" y="751.0"></omgdc:Bounds>
+        <omgdc:Bounds height="35.0" width="35.0" x="185.0" y="772.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="timerintermediatecatchevent3" id="BPMNShape_timerintermediatecatchevent3">
-        <omgdc:Bounds height="35.0" width="35.0" x="370.0" y="751.0"></omgdc:Bounds>
+        <omgdc:Bounds height="35.0" width="35.0" x="370.0" y="772.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="timerintermediatecatchevent4" id="BPMNShape_timerintermediatecatchevent4">
-        <omgdc:Bounds height="35.0" width="35.0" x="510.0" y="751.0"></omgdc:Bounds>
+        <omgdc:Bounds height="35.0" width="35.0" x="510.0" y="772.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="usertask3" id="BPMNShape_usertask3">
-        <omgdc:Bounds height="61.0" width="105.0" x="5.0" y="841.0"></omgdc:Bounds>
+        <omgdc:Bounds height="61.0" width="105.0" x="5.0" y="862.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="usertask4" id="BPMNShape_usertask4">
-        <omgdc:Bounds height="61.0" width="105.0" x="150.0" y="841.0"></omgdc:Bounds>
+        <omgdc:Bounds height="61.0" width="105.0" x="150.0" y="862.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="usertask5" id="BPMNShape_usertask5">
-        <omgdc:Bounds height="61.0" width="105.0" x="335.0" y="841.0"></omgdc:Bounds>
+        <omgdc:Bounds height="61.0" width="105.0" x="335.0" y="862.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="usertask6" id="BPMNShape_usertask6">
-        <omgdc:Bounds height="61.0" width="105.0" x="475.0" y="841.0"></omgdc:Bounds>
+        <omgdc:Bounds height="61.0" width="105.0" x="475.0" y="862.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="servicetask3" id="BPMNShape_servicetask3">
-        <omgdc:Bounds height="65.0" width="105.0" x="5.0" y="981.0"></omgdc:Bounds>
+        <omgdc:Bounds height="65.0" width="105.0" x="5.0" y="1002.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="servicetask4" id="BPMNShape_servicetask4">
-        <omgdc:Bounds height="65.0" width="105.0" x="150.0" y="981.0"></omgdc:Bounds>
+        <omgdc:Bounds height="65.0" width="105.0" x="150.0" y="1002.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="servicetask5" id="BPMNShape_servicetask5">
-        <omgdc:Bounds height="65.0" width="105.0" x="335.0" y="981.0"></omgdc:Bounds>
+        <omgdc:Bounds height="65.0" width="105.0" x="335.0" y="1002.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="servicetask6" id="BPMNShape_servicetask6">
-        <omgdc:Bounds height="65.0" width="105.0" x="475.0" y="981.0"></omgdc:Bounds>
+        <omgdc:Bounds height="65.0" width="105.0" x="475.0" y="1002.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
-        <omgdc:Bounds height="35.0" width="35.0" x="273.0" y="1590.0"></omgdc:Bounds>
+        <omgdc:Bounds height="35.0" width="35.0" x="273.0" y="1611.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="servicetask7" id="BPMNShape_servicetask7">
-        <omgdc:Bounds height="61.0" width="105.0" x="247.0" y="162.0"></omgdc:Bounds>
+        <omgdc:Bounds height="61.0" width="105.0" x="247.0" y="71.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="scripttask1" id="BPMNShape_scripttask1">
-        <omgdc:Bounds height="61.0" width="105.0" x="248.0" y="261.0"></omgdc:Bounds>
+        <omgdc:Bounds height="61.0" width="105.0" x="247.0" y="171.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="scripttask2" id="BPMNShape_scripttask2">
-        <omgdc:Bounds height="65.0" width="105.0" x="5.0" y="1120.0"></omgdc:Bounds>
+        <omgdc:Bounds height="65.0" width="105.0" x="5.0" y="1141.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="servicetask8" id="BPMNShape_servicetask8">
-        <omgdc:Bounds height="65.0" width="105.0" x="5.0" y="1256.0"></omgdc:Bounds>
+        <omgdc:Bounds height="65.0" width="105.0" x="5.0" y="1277.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="scripttask3" id="BPMNShape_scripttask3">
-        <omgdc:Bounds height="65.0" width="105.0" x="150.0" y="1120.0"></omgdc:Bounds>
+        <omgdc:Bounds height="65.0" width="105.0" x="150.0" y="1141.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="servicetask9" id="BPMNShape_servicetask9">
-        <omgdc:Bounds height="65.0" width="105.0" x="150.0" y="1256.0"></omgdc:Bounds>
+        <omgdc:Bounds height="65.0" width="105.0" x="150.0" y="1277.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="scripttask4" id="BPMNShape_scripttask4">
-        <omgdc:Bounds height="66.0" width="105.0" x="335.0" y="1120.0"></omgdc:Bounds>
+        <omgdc:Bounds height="66.0" width="105.0" x="335.0" y="1141.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="servicetask10" id="BPMNShape_servicetask10">
-        <omgdc:Bounds height="65.0" width="105.0" x="335.0" y="1256.0"></omgdc:Bounds>
+        <omgdc:Bounds height="65.0" width="105.0" x="335.0" y="1277.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="scripttask5" id="BPMNShape_scripttask5">
-        <omgdc:Bounds height="65.0" width="105.0" x="475.0" y="1120.0"></omgdc:Bounds>
+        <omgdc:Bounds height="65.0" width="105.0" x="475.0" y="1141.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="servicetask11" id="BPMNShape_servicetask11">
-        <omgdc:Bounds height="66.0" width="105.0" x="475.0" y="1256.0"></omgdc:Bounds>
+        <omgdc:Bounds height="66.0" width="105.0" x="475.0" y="1277.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="parallelgateway2" id="BPMNShape_parallelgateway2">
-        <omgdc:Bounds height="40.0" width="40.0" x="270.0" y="1460.0"></omgdc:Bounds>
+        <omgdc:Bounds height="40.0" width="40.0" x="270.0" y="1481.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
         <omgdi:waypoint x="299.0" y="36.0"></omgdi:waypoint>
         <omgdi:waypoint x="299.0" y="71.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
-        <omgdi:waypoint x="299.0" y="132.0"></omgdi:waypoint>
-        <omgdi:waypoint x="299.0" y="162.0"></omgdi:waypoint>
+        <omgdi:waypoint x="299.0" y="333.0"></omgdi:waypoint>
+        <omgdi:waypoint x="300.0" y="372.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3">
-        <omgdi:waypoint x="300.0" y="422.0"></omgdi:waypoint>
-        <omgdi:waypoint x="300.0" y="451.0"></omgdi:waypoint>
+        <omgdi:waypoint x="300.0" y="433.0"></omgdi:waypoint>
+        <omgdi:waypoint x="300.0" y="472.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow4" id="BPMNEdge_flow4">
-        <omgdi:waypoint x="300.0" y="512.0"></omgdi:waypoint>
-        <omgdi:waypoint x="300.0" y="553.0"></omgdi:waypoint>
+        <omgdi:waypoint x="300.0" y="533.0"></omgdi:waypoint>
+        <omgdi:waypoint x="300.0" y="574.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow5" id="BPMNEdge_flow5">
-        <omgdi:waypoint x="353.0" y="585.0"></omgdi:waypoint>
-        <omgdi:waypoint x="299.0" y="618.0"></omgdi:waypoint>
-        <omgdi:waypoint x="300.0" y="663.0"></omgdi:waypoint>
+        <omgdi:waypoint x="353.0" y="606.0"></omgdi:waypoint>
+        <omgdi:waypoint x="299.0" y="639.0"></omgdi:waypoint>
+        <omgdi:waypoint x="300.0" y="684.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow6" id="BPMNEdge_flow6">
-        <omgdi:waypoint x="280.0" y="683.0"></omgdi:waypoint>
-        <omgdi:waypoint x="57.0" y="682.0"></omgdi:waypoint>
-        <omgdi:waypoint x="57.0" y="751.0"></omgdi:waypoint>
+        <omgdi:waypoint x="280.0" y="704.0"></omgdi:waypoint>
+        <omgdi:waypoint x="57.0" y="703.0"></omgdi:waypoint>
+        <omgdi:waypoint x="57.0" y="772.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow7" id="BPMNEdge_flow7">
-        <omgdi:waypoint x="280.0" y="683.0"></omgdi:waypoint>
-        <omgdi:waypoint x="202.0" y="682.0"></omgdi:waypoint>
-        <omgdi:waypoint x="202.0" y="751.0"></omgdi:waypoint>
+        <omgdi:waypoint x="280.0" y="704.0"></omgdi:waypoint>
+        <omgdi:waypoint x="202.0" y="703.0"></omgdi:waypoint>
+        <omgdi:waypoint x="202.0" y="772.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow8" id="BPMNEdge_flow8">
-        <omgdi:waypoint x="320.0" y="683.0"></omgdi:waypoint>
-        <omgdi:waypoint x="387.0" y="683.0"></omgdi:waypoint>
-        <omgdi:waypoint x="387.0" y="751.0"></omgdi:waypoint>
+        <omgdi:waypoint x="320.0" y="704.0"></omgdi:waypoint>
+        <omgdi:waypoint x="387.0" y="704.0"></omgdi:waypoint>
+        <omgdi:waypoint x="387.0" y="772.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow9" id="BPMNEdge_flow9">
-        <omgdi:waypoint x="320.0" y="683.0"></omgdi:waypoint>
-        <omgdi:waypoint x="527.0" y="683.0"></omgdi:waypoint>
-        <omgdi:waypoint x="527.0" y="751.0"></omgdi:waypoint>
+        <omgdi:waypoint x="320.0" y="704.0"></omgdi:waypoint>
+        <omgdi:waypoint x="527.0" y="704.0"></omgdi:waypoint>
+        <omgdi:waypoint x="527.0" y="772.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow10" id="BPMNEdge_flow10">
-        <omgdi:waypoint x="57.0" y="786.0"></omgdi:waypoint>
-        <omgdi:waypoint x="57.0" y="841.0"></omgdi:waypoint>
+        <omgdi:waypoint x="57.0" y="807.0"></omgdi:waypoint>
+        <omgdi:waypoint x="57.0" y="862.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow11" id="BPMNEdge_flow11">
-        <omgdi:waypoint x="202.0" y="786.0"></omgdi:waypoint>
-        <omgdi:waypoint x="202.0" y="841.0"></omgdi:waypoint>
+        <omgdi:waypoint x="202.0" y="807.0"></omgdi:waypoint>
+        <omgdi:waypoint x="202.0" y="862.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow12" id="BPMNEdge_flow12">
-        <omgdi:waypoint x="387.0" y="786.0"></omgdi:waypoint>
-        <omgdi:waypoint x="387.0" y="841.0"></omgdi:waypoint>
+        <omgdi:waypoint x="387.0" y="807.0"></omgdi:waypoint>
+        <omgdi:waypoint x="387.0" y="862.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow13" id="BPMNEdge_flow13">
-        <omgdi:waypoint x="527.0" y="786.0"></omgdi:waypoint>
-        <omgdi:waypoint x="527.0" y="841.0"></omgdi:waypoint>
+        <omgdi:waypoint x="527.0" y="807.0"></omgdi:waypoint>
+        <omgdi:waypoint x="527.0" y="862.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow14" id="BPMNEdge_flow14">
-        <omgdi:waypoint x="57.0" y="902.0"></omgdi:waypoint>
-        <omgdi:waypoint x="57.0" y="981.0"></omgdi:waypoint>
+        <omgdi:waypoint x="57.0" y="923.0"></omgdi:waypoint>
+        <omgdi:waypoint x="57.0" y="1002.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow15" id="BPMNEdge_flow15">
-        <omgdi:waypoint x="202.0" y="902.0"></omgdi:waypoint>
-        <omgdi:waypoint x="202.0" y="981.0"></omgdi:waypoint>
+        <omgdi:waypoint x="202.0" y="923.0"></omgdi:waypoint>
+        <omgdi:waypoint x="202.0" y="1002.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow16" id="BPMNEdge_flow16">
-        <omgdi:waypoint x="387.0" y="902.0"></omgdi:waypoint>
-        <omgdi:waypoint x="387.0" y="981.0"></omgdi:waypoint>
+        <omgdi:waypoint x="387.0" y="923.0"></omgdi:waypoint>
+        <omgdi:waypoint x="387.0" y="1002.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow17" id="BPMNEdge_flow17">
-        <omgdi:waypoint x="527.0" y="902.0"></omgdi:waypoint>
-        <omgdi:waypoint x="527.0" y="981.0"></omgdi:waypoint>
+        <omgdi:waypoint x="527.0" y="923.0"></omgdi:waypoint>
+        <omgdi:waypoint x="527.0" y="1002.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow18" id="BPMNEdge_flow18">
-        <omgdi:waypoint x="57.0" y="1046.0"></omgdi:waypoint>
-        <omgdi:waypoint x="57.0" y="1120.0"></omgdi:waypoint>
+        <omgdi:waypoint x="57.0" y="1067.0"></omgdi:waypoint>
+        <omgdi:waypoint x="57.0" y="1141.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow19" id="BPMNEdge_flow19">
-        <omgdi:waypoint x="202.0" y="1046.0"></omgdi:waypoint>
-        <omgdi:waypoint x="202.0" y="1120.0"></omgdi:waypoint>
+        <omgdi:waypoint x="202.0" y="1067.0"></omgdi:waypoint>
+        <omgdi:waypoint x="202.0" y="1141.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow20" id="BPMNEdge_flow20">
-        <omgdi:waypoint x="387.0" y="1046.0"></omgdi:waypoint>
-        <omgdi:waypoint x="387.0" y="1120.0"></omgdi:waypoint>
+        <omgdi:waypoint x="387.0" y="1067.0"></omgdi:waypoint>
+        <omgdi:waypoint x="387.0" y="1141.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow21" id="BPMNEdge_flow21">
-        <omgdi:waypoint x="527.0" y="1046.0"></omgdi:waypoint>
-        <omgdi:waypoint x="527.0" y="1120.0"></omgdi:waypoint>
+        <omgdi:waypoint x="527.0" y="1067.0"></omgdi:waypoint>
+        <omgdi:waypoint x="527.0" y="1141.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow23" id="BPMNEdge_flow23">
-        <omgdi:waypoint x="299.0" y="223.0"></omgdi:waypoint>
-        <omgdi:waypoint x="300.0" y="261.0"></omgdi:waypoint>
+        <omgdi:waypoint x="299.0" y="132.0"></omgdi:waypoint>
+        <omgdi:waypoint x="299.0" y="171.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow24" id="BPMNEdge_flow24">
-        <omgdi:waypoint x="300.0" y="322.0"></omgdi:waypoint>
-        <omgdi:waypoint x="300.0" y="361.0"></omgdi:waypoint>
+        <omgdi:waypoint x="299.0" y="232.0"></omgdi:waypoint>
+        <omgdi:waypoint x="299.0" y="272.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow25" id="BPMNEdge_flow25">
-        <omgdi:waypoint x="57.0" y="1185.0"></omgdi:waypoint>
-        <omgdi:waypoint x="57.0" y="1256.0"></omgdi:waypoint>
+        <omgdi:waypoint x="57.0" y="1206.0"></omgdi:waypoint>
+        <omgdi:waypoint x="57.0" y="1277.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow28" id="BPMNEdge_flow28">
-        <omgdi:waypoint x="202.0" y="1185.0"></omgdi:waypoint>
-        <omgdi:waypoint x="202.0" y="1256.0"></omgdi:waypoint>
+        <omgdi:waypoint x="202.0" y="1206.0"></omgdi:waypoint>
+        <omgdi:waypoint x="202.0" y="1277.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow30" id="BPMNEdge_flow30">
-        <omgdi:waypoint x="387.0" y="1186.0"></omgdi:waypoint>
-        <omgdi:waypoint x="387.0" y="1256.0"></omgdi:waypoint>
+        <omgdi:waypoint x="387.0" y="1207.0"></omgdi:waypoint>
+        <omgdi:waypoint x="387.0" y="1277.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow32" id="BPMNEdge_flow32">
-        <omgdi:waypoint x="527.0" y="1185.0"></omgdi:waypoint>
-        <omgdi:waypoint x="527.0" y="1256.0"></omgdi:waypoint>
+        <omgdi:waypoint x="527.0" y="1206.0"></omgdi:waypoint>
+        <omgdi:waypoint x="527.0" y="1277.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow34" id="BPMNEdge_flow34">
-        <omgdi:waypoint x="57.0" y="1321.0"></omgdi:waypoint>
-        <omgdi:waypoint x="57.0" y="1480.0"></omgdi:waypoint>
-        <omgdi:waypoint x="270.0" y="1480.0"></omgdi:waypoint>
+        <omgdi:waypoint x="57.0" y="1342.0"></omgdi:waypoint>
+        <omgdi:waypoint x="57.0" y="1501.0"></omgdi:waypoint>
+        <omgdi:waypoint x="270.0" y="1501.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow35" id="BPMNEdge_flow35">
-        <omgdi:waypoint x="202.0" y="1321.0"></omgdi:waypoint>
-        <omgdi:waypoint x="202.0" y="1479.0"></omgdi:waypoint>
-        <omgdi:waypoint x="270.0" y="1480.0"></omgdi:waypoint>
+        <omgdi:waypoint x="202.0" y="1342.0"></omgdi:waypoint>
+        <omgdi:waypoint x="202.0" y="1500.0"></omgdi:waypoint>
+        <omgdi:waypoint x="270.0" y="1501.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow36" id="BPMNEdge_flow36">
-        <omgdi:waypoint x="387.0" y="1321.0"></omgdi:waypoint>
-        <omgdi:waypoint x="387.0" y="1479.0"></omgdi:waypoint>
-        <omgdi:waypoint x="310.0" y="1480.0"></omgdi:waypoint>
+        <omgdi:waypoint x="387.0" y="1342.0"></omgdi:waypoint>
+        <omgdi:waypoint x="387.0" y="1500.0"></omgdi:waypoint>
+        <omgdi:waypoint x="310.0" y="1501.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow37" id="BPMNEdge_flow37">
-        <omgdi:waypoint x="527.0" y="1322.0"></omgdi:waypoint>
-        <omgdi:waypoint x="527.0" y="1479.0"></omgdi:waypoint>
-        <omgdi:waypoint x="310.0" y="1480.0"></omgdi:waypoint>
+        <omgdi:waypoint x="527.0" y="1343.0"></omgdi:waypoint>
+        <omgdi:waypoint x="527.0" y="1500.0"></omgdi:waypoint>
+        <omgdi:waypoint x="310.0" y="1501.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow38" id="BPMNEdge_flow38">
-        <omgdi:waypoint x="290.0" y="1500.0"></omgdi:waypoint>
-        <omgdi:waypoint x="290.0" y="1590.0"></omgdi:waypoint>
+        <omgdi:waypoint x="290.0" y="1521.0"></omgdi:waypoint>
+        <omgdi:waypoint x="290.0" y="1611.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>

@@ -11,90 +11,28 @@
 	        	<activiti:value id="1" name="远低于要求 Far Below expectation"></activiti:value>
 	        </activiti:formProperty>
 	        
-	        <activiti:formProperty id="competencies1q1_选择做的好的胜任力 Choose competency_1_enum_sbs_$$B" name="选择做的好的胜任力 Choose competency as employee's advantage" type="enum" variable="competencies1q1" required="true">
-	        	<activiti:value id="1.追求品质&amp;目标导向Quality Driven &amp; result go-getter" name="追求品质&amp;目标导向Quality Driven &amp; result go-getter"></activiti:value>
-	        	<activiti:value id="2.工作态度Work Attitude" name="工作态度Work Attitude"></activiti:value>
-	        	<activiti:value id="3.客户满意度Customer Satisfaction" name="客户满意度Customer Satisfaction"></activiti:value>
-	        	<activiti:value id="4.团队合作 &amp; 关系建立Team Work &amp; relationship building" name="团队合作 &amp; 关系建立Team Work &amp; relationship building"></activiti:value>
-	        	<activiti:value id="5.执行及解决问题的能力Execution &amp; puzzle solving" name="执行及解决问题的能力Execution &amp; puzzle solving"></activiti:value>
-	        	<activiti:value id="6.说服沟通Persuasive Communication" name="说服沟通Persuasive Communication"></activiti:value>
-	        	<activiti:value id="7.创新改进Innovation &amp; Improvement" name="创新改进Innovation &amp; Improvement"></activiti:value>
-	        	<activiti:value id="8.销售意识Sales Orientation" name="销售意识Sales Orientation"></activiti:value>
-	        	<activiti:value id="9.学习能力Learning Ability" name="学习能力Learning Ability"></activiti:value>
-	        	<activiti:value id="10.服务导向Service Orientation" name="服务导向Service Orientation"></activiti:value>
-	        	<activiti:value id="11.承受压力Stress Tolerance" name="承受压力Stress Tolerance"></activiti:value>
-	        	<activiti:value id="12.自我认知Self-assessment" name="自我认知Self-assessment"></activiti:value>
-	        	<activiti:value id="13.逻辑推理Logical Reasoning" name="逻辑推理Logical Reasoning"></activiti:value>
-	        	<activiti:value id="14.领导与授权Leadership &amp; Delegation" name="领导与授权Leadership &amp; Delegation"></activiti:value>
-	        	<activiti:value id="15.培养人才Talent Development" name="培养人才Talent Development"></activiti:value>
-	        	<activiti:value id="16.组织规划Organizing and Planning" name="组织规划Organizing and Planning"></activiti:value>
-	        	<activiti:value id="17.决断能力Decisive &amp; Decision making" name="决断能力Decisive &amp; Decision making"></activiti:value>
-	        	<activiti:value id="18.控制安排Controlling" name="控制安排Controlling"></activiti:value>
-	        	<activiti:value id="19.商业意识Cemmercial Awareness" name="商业意识Cemmercial Awareness"></activiti:value>
-	        	<activiti:value id="20.激励他人Motivationg Others" name="激励他人Motivationg Others"></activiti:value>
-	        </activiti:formProperty>
-	        
-	        <activiti:formProperty id="competencies2q1_选择做的好的胜任力 Choose competency_2_enum_sbs_$$B" name="选择做的好的胜任力 Choose competency as employee's advantage" type="enum" variable="competencies2q1">
-	        	<activiti:value id="1.追求品质&amp;目标导向Quality Driven &amp; result go-getter" name="追求品质&amp;目标导向Quality Driven &amp; result go-getter"></activiti:value>
-	        	<activiti:value id="2.工作态度Work Attitude" name="工作态度Work Attitude"></activiti:value>
-	        	<activiti:value id="3.客户满意度Customer Satisfaction" name="客户满意度Customer Satisfaction"></activiti:value>
-	        	<activiti:value id="4.团队合作 &amp; 关系建立Team Work &amp; relationship building" name="团队合作 &amp; 关系建立Team Work &amp; relationship building"></activiti:value>
-	        	<activiti:value id="5.执行及解决问题的能力Execution &amp; puzzle solving" name="执行及解决问题的能力Execution &amp; puzzle solving"></activiti:value>
-	        	<activiti:value id="6.说服沟通Persuasive Communication" name="说服沟通Persuasive Communication"></activiti:value>
-	        	<activiti:value id="7.创新改进Innovation &amp; Improvement" name="创新改进Innovation &amp; Improvement"></activiti:value>
-	        	<activiti:value id="8.销售意识Sales Orientation" name="销售意识Sales Orientation"></activiti:value>
-	        	<activiti:value id="9.学习能力Learning Ability" name="学习能力Learning Ability"></activiti:value>
-	        	<activiti:value id="10.服务导向Service Orientation" name="服务导向Service Orientation"></activiti:value>
-	        	<activiti:value id="11.承受压力Stress Tolerance" name="承受压力Stress Tolerance"></activiti:value>
-	        	<activiti:value id="12.自我认知Self-assessment" name="自我认知Self-assessment"></activiti:value>
-	        	<activiti:value id="13.逻辑推理Logical Reasoning" name="逻辑推理Logical Reasoning"></activiti:value>
-	        	<activiti:value id="14.领导与授权Leadership &amp; Delegation" name="领导与授权Leadership &amp; Delegation"></activiti:value>
-	        	<activiti:value id="15.培养人才Talent Development" name="培养人才Talent Development"></activiti:value>
-	        	<activiti:value id="16.组织规划Organizing and Planning" name="组织规划Organizing and Planning"></activiti:value>
-	        	<activiti:value id="17.决断能力Decisive &amp; Decision making" name="决断能力Decisive &amp; Decision making"></activiti:value>
-	        	<activiti:value id="18.控制安排Controlling" name="控制安排Controlling"></activiti:value>
-	        	<activiti:value id="19.商业意识Cemmercial Awareness" name="商业意识Cemmercial Awareness"></activiti:value>
-	        	<activiti:value id="20.激励他人Motivationg Others" name="激励他人Motivationg Others"></activiti:value>
-	        </activiti:formProperty>
-	        
-	        <activiti:formProperty id="keepworkq1_你愿意下一阶段选择他/她继续在你的团队工作吗 Do you want to he/her work in your team in next stage_1_enum_sbs_$$C" name="下一阶段选择他/她继续在你的团队工作 Do you want to he/her work in your team in next stage" type="enum" variable="keepworkq1" required="true">
-	        	<activiti:value id="Yes" name="✔"></activiti:value>
-	        	<activiti:value id="No" name="❌"></activiti:value>
-	        	<activiti:value id="Wait and see" name="⭕"></activiti:value>
-	        </activiti:formProperty>
-	        
-	        <activiti:formProperty id="salaryincq1_你愿意为他/她申请加薪吗 Do you want to apply for salary increasing for him/her_2_enum_sbs_$$C" name="为他/她申请加薪 Do you want to apply for salary increasing for him/her" type="enum" variable="salaryincq1" required="true">
-	        	<activiti:value id="Yes" name="✔"></activiti:value>
-	        	<activiti:value id="No" name="❌"></activiti:value>
-	        	<activiti:value id="Wait and see" name="⭕"></activiti:value>	        
-	        </activiti:formProperty>
-	        
-	        <activiti:formProperty id="promotionq1_为他/她申请晋升 Do you think he/she is ready for promotion and taking more responsibility_3_enum_sbs_$$C" name="为他/她申请晋升 Do you think he/she is ready for promotion and taking more responsibility" type="enum" variable="promotionq1" required="true">
-	        	<activiti:value id="Yes" name="✔"></activiti:value>
-	        	<activiti:value id="No" name="❌"></activiti:value>
-	        	<activiti:value id="Wait and see" name="⭕"></activiti:value>	        	
-	        </activiti:formProperty>
-        <activiti:executionListener event="end" class="org.activiti.engine.impl.bpmn.listener.ScriptExecutionListener">
-          <activiti:field name="language">
-            <activiti:string><![CDATA[groovy]]></activiti:string>
-          </activiti:field>
-          <activiti:field name="script">
-            <activiti:string><![CDATA[execution.setVariable('mail', identityService.createUserQuery().userId(initiator).singleResult().getEmail())]]></activiti:string>
-          </activiti:field>
-        </activiti:executionListener>
       </extensionElements>
     </startEvent>
-    <userTask id="usertask1" name="User Task" activiti:assignee="Dptest1">
+    <userTask id="usertask1" name="User Task" activiti:assignee="${initiator}">
       <extensionElements>
-        <activiti:formProperty id="mail_邮件_1_string_t1_$$A" name="邮件" type="string" variable="mail"></activiti:formProperty>
-        <activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
-          <activiti:field name="language">
-            <activiti:string><![CDATA[groovy]]></activiti:string>
-          </activiti:field>
-          <activiti:field name="script">
-            <activiti:string><![CDATA[task.getExecution().setVariable('mail1',identityService.createUserQuery().userId('100010').singerResult().getEmail())]]></activiti:string>
-          </activiti:field>
-        </activiti:taskListener>
+         <activiti:formProperty id="performanceresultq1_绩效结果 Performance Result_1_enum_sbs_$$A" name="绩效结果 Performance Result" type="enum" variable="performanceresultq1" required="true">
+	        	<activiti:value id="5" name="杰出 Outstanding"></activiti:value>
+	        	<activiti:value id="4" name="超过目标 Exceeds expectations"></activiti:value>
+	        	<activiti:value id="3" name="达到目标 Meets expectations"></activiti:value>
+	        	<activiti:value id="2" name="需要改善 Improvement needed"></activiti:value>
+	        	<activiti:value id="1" name="远低于要求 Far Below expectation"></activiti:value>
+	        </activiti:formProperty>
+	        
+	        <activiti:executionListener event="start" class="org.activiti.engine.impl.bpmn.listener.ScriptExecutionListener">
+	        	<activiti:field name="language"><activiti:string><![CDATA[groovy]]></activiti:string></activiti:field>
+	        	<activiti:field name="script">
+	        		<activiti:string>
+	        		<![CDATA[
+	        			execution.setVariable('performanceresultq1','22')
+	        		]]>
+	        		</activiti:string>
+	        	</activiti:field>
+	        </activiti:executionListener>        
       </extensionElements>
     </userTask>
     <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="usertask1"></sequenceFlow>

@@ -27,7 +27,17 @@
     		}
     		
     		//if std is empty, using ldap fill employees
-    		employees << 'ldap'
+    		//com.eorionsolution.bpms.extension.ldap.LdapService.getUsersByGroupName('_dpcglc').each{
+    		//	employees<<it
+    		//}
+    		
+    		employees << 'dptest1'//TODO delete
+    		employees<< 'dptest2'//TODO delete
+    		
+    		if(employees.size() == 0){
+    			throw new org.activiti.engine.ActivitiIllegalArgumentException('LDAP search result is empty, please contact Administrator')
+    		}
+    		
     		execution.setVariable('employees', employees)
     		execution.setVariable('businessKey', execution.getBusinessKey())
     		
