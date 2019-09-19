@@ -1,0 +1,240 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/pur">
+  <process id="amsProcess" name="资产流程" isExecutable="true" activiti:candidateStarterGroups="admin">
+    <startEvent id="startevent1" name="资产绑定启动流程" activiti:initiator="initiator">
+      <extensionElements>
+        <activiti:formProperty id="existuser_已有用户_1_enum_rbv_$$A" name="已有用户" type="enum" variable="existuser" required="true">
+          <activiti:value id="Y" name="老用户"></activiti:value>
+          <activiti:value id="N" name="新用户"></activiti:value>
+        </activiti:formProperty>
+      </extensionElements>
+    </startEvent>
+    <exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway"></exclusiveGateway>
+    <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="exclusivegateway1"></sequenceFlow>
+    <userTask id="usertask1" name="新建人员信息"  activiti:assignee="${initiator}" activiti:dueDate="P1D">
+    	<extensionElements>
+    		<activiti:formProperty id="firstname_名字_1_string_t1_$$A" name="名字" type="string" variable="firstname" required="true"/>
+    		<activiti:formProperty id="lastname_姓氏_2_string_t1_$$A" name="姓氏" type="string" variable="lastname" required="true"/>
+    		<activiti:formProperty id="username_用户名_3_string_t1_$$A" name="用户名" type="string" variable="username" required="true"/>
+    		<activiti:formProperty id="password_密码_4_string_t1_$$A" name="密码" type="string" variable="password" required="true"/>
+    		<activiti:formProperty id="email_邮箱_5_string_t1_$$A" name="邮箱" type="string" variable="email" required="true"/>
+    		
+    		<activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+    			<activiti:field name="language">
+    				<activiti:string><![CDATA[groovy]]></activiti:string>
+    			</activiti:field>
+    			<activiti:field name="script">
+    				<activiti:string>
+    				<![CDATA[
+    					import groovy.json.JsonSlurper
+    					import groovy.json.JsonOutput
+    					
+    					def jsonSlurper = new JsonSlurper()
+    					def execution = task.getExecution()
+    					
+    					def password = execution.getVariable('password')
+    					
+    					if(password.length() < 10) {
+    						throw new org.activiti.engine.ActivitiIllegalArgumentException('密码长度不能小于10')
+    					}
+    					
+    					def token = """Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6IjA3YmU3OTFiY2FmYjM5MzRmYzU1N2M1MWE3ZGMyNmI4OGU3YmQzYzY0ZDYxNjQzODBkMDY0YTRlOTUyMjRjNjVmZmM4OTA5N2ZlMjRmYjllIn0.eyJhdWQiOiIxIiwianRpIjoiMDdiZTc5MWJjYWZiMzkzNGZjNTU3YzUxYTdkYzI2Yjg4ZTdiZDNjNjRkNjE2NDM4MGQwNjRhNGU5NTIyNGM2NWZmYzg5MDk3ZmUyNGZiOWUiLCJpYXQiOjE1Njg2OTY2MDUsIm5iZiI6MTU2ODY5NjYwNSwiZXhwIjoxNjAwMzE5MDA1LCJzdWIiOiIxIiwic2NvcGVzIjpbXX0.YiwHapzImM-rfDGru7WWDXtIFqTptpgXi1cpQLLUs5n2u_tD_byMM13IOZKeqYEWOYUpA2xzO3JTOOe9R6sKwEJF4vYxEwxTW42TyW1ORkHOJpEPoXCzwoqNytW18JMWBPnukjxZF8yPBUIAQ3lEKPX6jMHcLmEyT3gky8C62IqV3XQ349oQn2Gl03VRfCNCyPqftgchguaGLx635VU2PL_-QnoyLmeBoolntLDbPl-8NoUpRHpPpZwrm8vOBHNfyEnflZ7xmQ7A0AKiaDz3JjRFlvtZ1bEOKc-mshMN3uFIATb70pRKDYUBHWFdCIusHKi-eFdlKC_gPun8G9vLq5DGlvVp6iJvlq8ZsvNHc1C9CVIJ1f3Vxvz2s87I9NGKgqC_KkD3SN4dfK8f1o7rbKCdRhrrXskNRQNaLqdQlmgFfxekNQNNVrNF5G0xwLs_PzJUOR3mIAXOgbJa3sJID6L6ZIS4PyB41S9iGBrE2lJx39FiuHCQVQVfRqKP2337mzwXKO1zrtIDTJ1QuXqW3f9xngYl2HzfQqoYC2bMziVDJuAKBSErfL43O8RdapDaf6bd6Da2X0Wt2KrEghIQ6DVaF2-Ac-N-MVjppT_sRVhCatPH-aqNG5VLgH9jTgkLkXS-xK-0Jz1TekqUNxDo3yfV6gx7eKgzfilyfX--KFg"""
+    					
+    					def bodyMap = new HashMap()
+    					bodyMap.put('first_name', execution.getVariable('firstname'))
+    					bodyMap.put('last_name', execution.getVariable('lastname'))
+    					bodyMap.put('username', execution.getVariable('username'))
+    					bodyMap.put('password', password)
+    					bodyMap.put('password_confirmation', execution.getVariable('password'))
+    					bodyMap.put('email', execution.getVariable('email'))
+    					
+						def body = JsonOutput.toJson(bodyMap)
+						
+						execution.setVariable("_http_method", "POST")
+						def headerMap = new HashMap()
+						headerMap.put("Content-Type","application/json")
+						headerMap.put("Accept","application/json")
+						headerMap.put("Authorization", token)
+						execution.setVariable("_http_headers", headerMap)
+						execution.setVariable("_http_body", body)
+						execution.setVariable("_http_url", 'https://ams.eorionsolution.com/api/v1/users')
+						execution.setVariable("_http_response_body", '')
+						execution.setVariable("_http_response_status_code", '')    					
+    					
+    				]]>
+    				</activiti:string>
+    			</activiti:field>
+    		</activiti:taskListener>
+    	</extensionElements>
+    </userTask>
+    <sequenceFlow id="flow2" name="需要新建人员" sourceRef="exclusivegateway1" targetRef="usertask1">
+    	<conditionExpression xsi:type="tFormalExpression">${execution.getVariable('existuser') == 'N'}</conditionExpression>
+    </sequenceFlow>
+    <userTask id="usertask2" name="资产绑定" activiti:assignee="${initiator}" activiti:dueDate="P1D">
+    	<extensionElements>
+    		<activiti:formProperty id="userid_选择用户_1_string_auto_$$A" name="选择用户" type="string" variable="userid" required="true"/>
+    		<activiti:formProperty id="assetid_选择资产_2_string_tree_$$A" name="选择资产" type="string" variable="assetid" required="true"/>
+    	
+    		<activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+    			<activiti:field name="language">
+    				<activiti:string><![CDATA[groovy]]></activiti:string>
+    			</activiti:field>
+    			<activiti:field name="script">
+    				<activiti:string>
+    				<![CDATA[
+    					import groovy.json.JsonSlurper
+    					import groovy.json.JsonOutput
+    					
+    					def jsonSlurper = new JsonSlurper()
+    					def execution = task.getExecution()
+    					
+    					def token = """Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJSUzI1NiIsImp0aSI6IjA3YmU3OTFiY2FmYjM5MzRmYzU1N2M1MWE3ZGMyNmI4OGU3YmQzYzY0ZDYxNjQzODBkMDY0YTRlOTUyMjRjNjVmZmM4OTA5N2ZlMjRmYjllIn0.eyJhdWQiOiIxIiwianRpIjoiMDdiZTc5MWJjYWZiMzkzNGZjNTU3YzUxYTdkYzI2Yjg4ZTdiZDNjNjRkNjE2NDM4MGQwNjRhNGU5NTIyNGM2NWZmYzg5MDk3ZmUyNGZiOWUiLCJpYXQiOjE1Njg2OTY2MDUsIm5iZiI6MTU2ODY5NjYwNSwiZXhwIjoxNjAwMzE5MDA1LCJzdWIiOiIxIiwic2NvcGVzIjpbXX0.YiwHapzImM-rfDGru7WWDXtIFqTptpgXi1cpQLLUs5n2u_tD_byMM13IOZKeqYEWOYUpA2xzO3JTOOe9R6sKwEJF4vYxEwxTW42TyW1ORkHOJpEPoXCzwoqNytW18JMWBPnukjxZF8yPBUIAQ3lEKPX6jMHcLmEyT3gky8C62IqV3XQ349oQn2Gl03VRfCNCyPqftgchguaGLx635VU2PL_-QnoyLmeBoolntLDbPl-8NoUpRHpPpZwrm8vOBHNfyEnflZ7xmQ7A0AKiaDz3JjRFlvtZ1bEOKc-mshMN3uFIATb70pRKDYUBHWFdCIusHKi-eFdlKC_gPun8G9vLq5DGlvVp6iJvlq8ZsvNHc1C9CVIJ1f3Vxvz2s87I9NGKgqC_KkD3SN4dfK8f1o7rbKCdRhrrXskNRQNaLqdQlmgFfxekNQNNVrNF5G0xwLs_PzJUOR3mIAXOgbJa3sJID6L6ZIS4PyB41S9iGBrE2lJx39FiuHCQVQVfRqKP2337mzwXKO1zrtIDTJ1QuXqW3f9xngYl2HzfQqoYC2bMziVDJuAKBSErfL43O8RdapDaf6bd6Da2X0Wt2KrEghIQ6DVaF2-Ac-N-MVjppT_sRVhCatPH-aqNG5VLgH9jTgkLkXS-xK-0Jz1TekqUNxDo3yfV6gx7eKgzfilyfX--KFg"""
+    					
+    					def userId = jsonSlurper.parseText(execution.getVariable('userid')).code
+    					def assetId = jsonSlurper.parseText(execution.getVariable('assetid')).code
+    					
+    					def bodyMap = new HashMap()
+    					bodyMap.put('assigned_user', userId)
+    					bodyMap.put('checkout_to_type','user')
+    					
+						def body = JsonOutput.toJson(bodyMap)
+						
+						execution.setVariable("_http_method", "POST")
+						def headerMap = new HashMap()
+						headerMap.put("Content-Type","application/json")
+						headerMap.put("Accept","application/json")
+						headerMap.put("Authorization", token)
+						execution.setVariable("_http_headers", headerMap)
+						execution.setVariable("_http_body", body)
+						execution.setVariable("_http_url", 'https://ams.eorionsolution.com/api/v1/hardware/' + assetId + '/checkout')
+						execution.setVariable("_http_response_body", '')
+						execution.setVariable("_http_response_status_code", '')     				
+    				
+    				]]>
+    				</activiti:string>
+    			</activiti:field>
+    		</activiti:taskListener>
+    	</extensionElements>
+    </userTask>
+    <sequenceFlow id="flow3" sourceRef="usertask1" targetRef="servicetask2"></sequenceFlow>
+    <sequenceFlow id="flow4" name="已有人员信息" sourceRef="exclusivegateway1" targetRef="usertask2">
+    	<conditionExpression xsi:type="tFormalExpression">${execution.getVariable('existuser') == 'Y'}</conditionExpression>
+    </sequenceFlow>
+    <serviceTask id="servicetask1" name="人员资产绑定" activiti:class="com.eorionsolution.riying.bpms.javaservice.http.RestAPIService"></serviceTask>
+    <sequenceFlow id="flow5" sourceRef="usertask2" targetRef="servicetask1"></sequenceFlow>
+    <scriptTask id="scripttask1" name="资产绑定结果解析" activiti:autoStoreVariables="false" scriptFormat="groovy">
+    	<script>
+    	<![CDATA[
+    		import groovy.json.JsonSlurper
+    		
+    		def jsonSlurper = new JsonSlurper()
+    		
+    		def responseCode = execution.getVariable("_http_response_status_code")
+    		
+    		if(responseCode != 200) {
+    			def errMsg = jsonSlurper.parseText(execution.getVariable("_http_response_body")).message
+    			throw new org.activiti.engine.ActivitiIllegalArgumentException("资产绑定失败 "+ responseCode +"，错误信息为:" + errMsg);
+    		}    		
+    		
+    	]]>
+    	</script>
+    </scriptTask>
+    <sequenceFlow id="flow6" sourceRef="servicetask1" targetRef="scripttask1"></sequenceFlow>
+    <endEvent id="endevent1" name="End"></endEvent>
+    <sequenceFlow id="flow7" sourceRef="scripttask1" targetRef="endevent1"></sequenceFlow>
+    <serviceTask id="servicetask2" name="资管系统新建用户" activiti:class="com.eorionsolution.riying.bpms.javaservice.http.RestAPIService"></serviceTask>
+    <scriptTask id="scripttask2" name="新建用户结果解析" activiti:autoStoreVariables="false" scriptFormat="groovy">
+    	<script>
+    	<![CDATA[
+    		import groovy.json.JsonSlurper
+    		
+    		def jsonSlurper = new JsonSlurper()
+    		
+    		def responseCode = execution.getVariable("_http_response_status_code")
+    		
+    		if(responseCode != 200) {
+    			def errMsg = jsonSlurper.parseText(execution.getVariable("_http_response_body")).message
+    			throw new org.activiti.engine.ActivitiIllegalArgumentException("新建用户失败 "+ responseCode +"，错误信息为:" + errMsg);
+    		}
+    	]]>
+    	</script>
+    </scriptTask>
+    <sequenceFlow id="flow8" sourceRef="servicetask2" targetRef="scripttask2"></sequenceFlow>
+    <sequenceFlow id="flow9" sourceRef="scripttask2" targetRef="usertask2"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_amsProcess">
+    <bpmndi:BPMNPlane bpmnElement="amsProcess" id="BPMNPlane_amsProcess">
+      <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="360.0" y="21.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway1" id="BPMNShape_exclusivegateway1">
+        <omgdc:Bounds height="40.0" width="40.0" x="357.0" y="130.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask1" id="BPMNShape_usertask1">
+        <omgdc:Bounds height="61.0" width="105.0" x="325.0" y="230.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask2" id="BPMNShape_usertask2">
+        <omgdc:Bounds height="61.0" width="105.0" x="325.0" y="610.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="servicetask1" id="BPMNShape_servicetask1">
+        <omgdc:Bounds height="61.0" width="105.0" x="325.0" y="713.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scripttask1" id="BPMNShape_scripttask1">
+        <omgdc:Bounds height="61.0" width="105.0" x="325.0" y="832.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="360.0" y="940.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="servicetask2" id="BPMNShape_servicetask2">
+        <omgdc:Bounds height="62.0" width="105.0" x="325.0" y="360.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scripttask2" id="BPMNShape_scripttask2">
+        <omgdc:Bounds height="61.0" width="105.0" x="325.0" y="480.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="377.0" y="56.0"></omgdi:waypoint>
+        <omgdi:waypoint x="377.0" y="130.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="377.0" y="170.0"></omgdi:waypoint>
+        <omgdi:waypoint x="377.0" y="230.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="66.0" x="290.0" y="189.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3">
+        <omgdi:waypoint x="377.0" y="291.0"></omgdi:waypoint>
+        <omgdi:waypoint x="377.0" y="360.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow4" id="BPMNEdge_flow4">
+        <omgdi:waypoint x="397.0" y="150.0"></omgdi:waypoint>
+        <omgdi:waypoint x="570.0" y="149.0"></omgdi:waypoint>
+        <omgdi:waypoint x="570.0" y="640.0"></omgdi:waypoint>
+        <omgdi:waypoint x="430.0" y="640.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="66.0" x="439.0" y="156.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow5" id="BPMNEdge_flow5">
+        <omgdi:waypoint x="377.0" y="671.0"></omgdi:waypoint>
+        <omgdi:waypoint x="377.0" y="713.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow6" id="BPMNEdge_flow6">
+        <omgdi:waypoint x="377.0" y="774.0"></omgdi:waypoint>
+        <omgdi:waypoint x="377.0" y="832.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow7" id="BPMNEdge_flow7">
+        <omgdi:waypoint x="377.0" y="893.0"></omgdi:waypoint>
+        <omgdi:waypoint x="377.0" y="940.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow8" id="BPMNEdge_flow8">
+        <omgdi:waypoint x="377.0" y="422.0"></omgdi:waypoint>
+        <omgdi:waypoint x="377.0" y="480.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow9" id="BPMNEdge_flow9">
+        <omgdi:waypoint x="377.0" y="541.0"></omgdi:waypoint>
+        <omgdi:waypoint x="377.0" y="610.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

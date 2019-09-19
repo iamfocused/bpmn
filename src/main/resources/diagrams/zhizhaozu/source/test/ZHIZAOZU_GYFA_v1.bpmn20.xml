@@ -11,12 +11,12 @@
         <activiti:formProperty id="3dnumber_三维模型_8_string_t1_$$A" name="三维模型" type="string" variable="3dnumber"></activiti:formProperty>
         <activiti:formProperty id="processeditor_工艺编制_9_string_t1_$$A" name="工艺编制" type="string" variable="processeditor"></activiti:formProperty>
         <activiti:formProperty id="edittime_编制时间_10_string_t5_$$A" name="编制时间" type="string" variable="edittime"></activiti:formProperty>
-        <activiti:formProperty id="WORKDAY_工作天数（天/年）_13_string_t6_$$A" name="工作天数（天/年）" type="string" variable="WORKDAY"></activiti:formProperty>
-        <activiti:formProperty id="SHIFT_换班次数（班/天）_14_string_t6_$$A" name="换班次数（班/天）" type="string" variable="SHIFT"></activiti:formProperty>
-        <activiti:formProperty id="SHIFTH_单班工作时间（小时）_15_string_t6_$$A" name="单班工作时间（小时）" type="string" variable="SHIFTH"></activiti:formProperty>
-        <activiti:formProperty id="LINE_规划产线数_17_string_t6_$$A" name="规划产线数" type="string" variable="LINE"></activiti:formProperty>
+        <activiti:formProperty id="WORKDAY_工作天数（天/年）_13_string_t6_$$A" name="工作天数（天/年）" type="string" variable="WORKDAY" required="true"></activiti:formProperty>
+        <activiti:formProperty id="SHIFT_换班次数（班/天）_14_string_t6_$$A" name="换班次数（班/天）" type="string" variable="SHIFT" required="true"></activiti:formProperty>
+        <activiti:formProperty id="SHIFTH_单班工作时间（小时）_15_string_t6_$$A" name="单班工作时间（小时）" type="string" variable="SHIFTH" required="true"></activiti:formProperty>
+        <activiti:formProperty id="LINE_规划产线数_17_string_t6_$$A" name="规划产线数" type="string" variable="LINE" required="true"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879_item" name="工序表" type="string" variable="header1566744708879"></activiti:formProperty>
-        <activiti:formProperty id="tbheader1566744708879_opnumber_工序编号_2_string_t1_$$A" name="工序编号" type="string" variable="opnumber"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566744708879_opnumber_工序编号_2_string_t1_$$A" name="工序编号" type="string" variable="opnumber" required="true"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879_opname_工序名称_3_string_t1_$$A" name="工序名称" type="string" variable="opname"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879_sendsectionnumber_分配工段编号_4_string_t1_$$HA" name="分配工段编号" type="string" variable="sendsectionnumber"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879_plannedstarttime_计划开始时间_5_string_t5_$$HA" name="计划开始时间" type="string" variable="plannedstarttime"></activiti:formProperty>
@@ -28,10 +28,10 @@
         </activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879_opdesc_工序描述_8_string_t2_$$A" name="工序描述" type="string" variable="opdesc"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879_eqpttypecode_设备型号_9_string_t1_$$A" name="设备型号" type="string" variable="eqpttypecode"></activiti:formProperty>
-        <activiti:formProperty id="tbheader1566744708879_NOFIX_装夹件数（件）_10_string_t6_$$A" name="装夹件数（件）" type="string" variable="NOFIX"></activiti:formProperty>
-        <activiti:formProperty id="tbheader1566744708879_TMHA_人员操作时间（秒）_11_string_t6_$$A" name="人员操作时间（秒）" type="string" variable="TMHA"></activiti:formProperty>
-        <activiti:formProperty id="tbheader1566744708879_TMQC_人工检测时间（秒）_12_string_t6_$$A" name="人工检测时间（秒）" type="string" variable="TMQC"></activiti:formProperty>
-        <activiti:formProperty id="tbheader1566744708879_TMNO_其它时间（秒）_13_string_t6_$$A" name="其它时间（秒）" type="string" variable="TMNO"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566744708879_NOFIX_装夹件数（件）_10_string_t6_$$A" name="装夹件数（件）" type="string" variable="NOFIX" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566744708879_TMHA_人员操作时间（秒）_11_string_t6_$$A" name="人员操作时间（秒）" type="string" variable="TMHA" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566744708879_TMQC_人工检测时间（秒）_12_string_t6_$$A" name="人工检测时间（秒）" type="string" variable="TMQC" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566744708879_TMNO_其它时间（秒）_13_string_t6_$$A" name="其它时间（秒）" type="string" variable="TMNO" required="true"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879_TMMT_加工时间（秒）_14_string_t6_$$HA" name="加工时间（秒）" type="string" variable="TMMT"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879_TMOP_工序时间（秒）_15_string_t6_$$HA" name="工序时间（秒）" type="string" variable="TMOP"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879_opsketch_工序简图_16_string_t9i_$$A" name="工序简图" type="string" variable="opsketch"></activiti:formProperty>
@@ -60,7 +60,7 @@
         <activiti:formProperty id="tbheader1566744708879-header-1566746045367_valuemin_检测值下限_4_string_t6_$$A" name="检测值下限" type="string" variable="valuemin"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header-1566746045367_join-key_Key_10_string_t1_$$A" name="Key" type="string"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header-1566746044755_item" name="通用工步表" type="string" variable="header1566746042674"></activiti:formProperty>
-        <activiti:formProperty id="tbheader1566744708879-header-1566746044755_commonstepnumber_工步序号_2_string_t1_$$A" name="工步序号" type="string" variable="commonstepnumber"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566744708879-header-1566746044755_commonstepnumber_工步序号_2_string_t1_$$A" name="工步序号" type="string" variable="commonstepnumber" required="true"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header-1566746044755_cstoolnumber_工具编号_3_string_t1_$$A" name="工具编号" type="string" variable="cstoolnumber"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header-1566746044755_cstoolname_工具名称_4_string_t1_$$A" name="工具名称" type="string" variable="cstoolname"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header-1566746044755_csdesc_工步描述_5_string_t2_$$A" name="工步描述" type="string" variable="csdesc"></activiti:formProperty>
@@ -68,14 +68,14 @@
         <activiti:formProperty id="tbheader1566744708879-header-1566746044755_csTMSUP_辅助时间（秒）_7_string_t6_$$A" name="辅助时间（秒）" type="string" variable="csTMSUP"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header-1566746044755_join-key_Key_10_string_t1_$$A" name="Key" type="string"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header-1566746165617_item" name="车削工步表" type="string" variable="header1566746165617"></activiti:formProperty>
-        <activiti:formProperty id="tbheader1566744708879-header-1566746165617_tsnumber_工步序号_2_string_t1_$$A" name="工步序号" type="string" variable="tsnumber"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566744708879-header-1566746165617_tsnumber_工步序号_2_string_t1_$$A" name="工步序号" type="string" variable="tsnumber" required="true"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header-1566746165617_knifesetnumber_刀组编号_3_string_t1_$$A" name="刀组编号" type="string" variable="knifesetnumber"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header-1566746165617_knifesetname_刀组名称_4_string_t1_$$A" name="刀组名称" type="string" variable="knifesetname"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header-1566746165617_tsdesc_工步描述_5_string_t2_$$A" name="工步描述" type="string" variable="tsdesc"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header-1566746165617_tsVC_切削速度（m/min）_6_string_t6_$$A" name="切削速度（m/min）" type="string" variable="tsVC"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header-1566746165617_tsDCX_最大车削直径（mm）_7_string_t6_$$A" name="最大车削直径（mm）" type="string" variable="tsDCX"></activiti:formProperty>
-        <activiti:formProperty id="tbheader1566744708879-header-1566746165617_tsDCN_最小车削直径（mm）_8_string_t6_$$A" name="最小车削直径（mm）" type="string" variable="tsDCN"></activiti:formProperty>
-        <activiti:formProperty id="tbheader1566744708879-header-1566746165617_tsFR_每转进给量（mm/rev）_9_string_t6_$$A" name="每转进给量（mm/rev）" type="string" variable="tsFR"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566744708879-header-1566746165617_tsDCN_最小车削直径（mm）_8_string_t6_$$A" name="最小车削直径（mm）" type="string" variable="tsDCN" ></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566744708879-header-1566746165617_tsFR_每转进给量（mm/rev）_9_string_t6_$$A" name="每转进给量（mm/rev）" type="string" variable="tsFR" ></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header-1566746165617_tsLC_切削长度（mm）_10_string_t6_$$A" name="切削长度（mm）" type="string" variable="tsLC"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header-1566746165617_tsNOC_切削次数（次）_11_string_t6_$$A" name="切削次数（次）" type="string" variable="tsNOC"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header-1566746165617_tsNOLIFE_刀具寿命（件）_12_string_t6_$$A" name="刀具寿命（件）" type="string" variable="tsNOLIFE"></activiti:formProperty>
@@ -88,7 +88,7 @@
         <activiti:formProperty id="tbheader1566744708879-header-1566746165617_tsTMSUP_辅助时间（秒）_19_string_t6_$$A" name="辅助时间（秒）" type="string" variable="tsTMSUP"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header-1566746165617_join-key_Key_10_string_t1_$$A" name="Key" type="string"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header-1566746163577_item" name="铣削工步表" type="string" variable="header1566746163577"></activiti:formProperty>
-        <activiti:formProperty id="tbheader1566744708879-header-1566746163577_msnumber_工步序号_2_string_t1_$$A" name="工步序号" type="string" variable="msnumber"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566744708879-header-1566746163577_msnumber_工步序号_2_string_t1_$$A" name="工步序号" type="string" variable="msnumber" required="true"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header-1566746163577_msknifesetnumber_刀组编号_3_string_t1_$$A" name="刀组编号" type="string" variable="msknifesetnumber"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header-1566746163577_msknifesetname_刀组名称_4_string_t1_$$A" name="刀组名称" type="string" variable="msknifesetname"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header-1566746163577_msdesc_工步描述_5_string_t2_$$A" name="工步描述" type="string" variable="msdesc"></activiti:formProperty>
@@ -124,18 +124,19 @@
         <activiti:formProperty id="3dnumber_三维模型_8_string_t1_$$A" name="三维模型" type="string" variable="3dnumber"></activiti:formProperty>
         <activiti:formProperty id="processeditor_工艺编制_9_string_t1_$$A" name="工艺编制" type="string" variable="processeditor"></activiti:formProperty>
         <activiti:formProperty id="edittime_编制时间_10_string_t5_$$A" name="编制时间" type="string" variable="edittime"></activiti:formProperty>
-        <activiti:formProperty id="WORKDAY_工作天数（天/年）_13_string_t6_$$A" name="工作天数（天/年）" type="string" variable="WORKDAY"></activiti:formProperty>
-        <activiti:formProperty id="SHIFT_换班次数（班/天）_14_string_t6_$$A" name="换班次数（班/天）" type="string" variable="SHIFT"></activiti:formProperty>
-        <activiti:formProperty id="SHIFTH_单班工作时间（小时）_15_string_t6_$$A" name="单班工作时间（小时）" type="string" variable="SHIFTH"></activiti:formProperty>
-        <activiti:formProperty id="TMCYCLE_工艺节拍（秒）_16_string_t6_$$HA" name="工艺节拍（秒）" type="string" variable="TMCYCLE"></activiti:formProperty>
-        <activiti:formProperty id="LINE_规划产线数_17_string_t6_$$A" name="规划产线数" type="string" variable="LINE"></activiti:formProperty>
+        <activiti:formProperty id="WORKDAY_工作天数（天/年）_13_string_t6_$$A" name="工作天数（天/年）" type="string" variable="WORKDAY" required="true"></activiti:formProperty>
+        <activiti:formProperty id="SHIFT_换班次数（班/天）_14_string_t6_$$A" name="换班次数（班/天）" type="string" variable="SHIFT" required="true"></activiti:formProperty>
+        <activiti:formProperty id="SHIFTH_单班工作时间（小时）_15_string_t6_$$A" name="单班工作时间（小时）" type="string" variable="SHIFTH" required="true"></activiti:formProperty>
+        <activiti:formProperty id="TMCYCLE_工艺节拍（秒）_16_string_t6_$$A" name="工艺节拍（秒）" type="string" variable="TMCYCLE"></activiti:formProperty>
+        <activiti:formProperty id="LINE_规划产线数_17_string_t6_$$A" name="规划产线数" type="string" variable="LINE" required="true"></activiti:formProperty>
         <activiti:formProperty id="PROCAP_产能测算（件/年）_18_string_t6_$$A" name="产能测算（件/年）" type="string" variable="PROCAP"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879_item" name="工序表" type="string" variable="header1566744708879"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879_opnumber_工序编号_2_string_t1_$$A" name="工序编号" type="string" variable="opnumber"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879_opname_工序名称_3_string_t1_$$A" name="工序名称" type="string" variable="opname"></activiti:formProperty>
-        <activiti:formProperty id="tbheader1566744708879_sendsectionnumber_分配工段编号_4_string_t1_$$A" name="分配工段编号" type="string" variable="sendsectionnumber"></activiti:formProperty>
-        <activiti:formProperty id="tbheader1566744708879_plannedstarttime_计划开始时间_5_string_t5_$$A" name="计划开始时间" type="string" variable="plannedstarttime"></activiti:formProperty>
-        <activiti:formProperty id="tbheader1566744708879_plannedendtime_计划结束时间_6_string_t5_$$A" name="计划结束时间" type="string" variable="plannedendtime"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566744708879_sendsectionnumber_分配工段编号_4_string_t1_$$HA" name="分配工段编号" type="string" variable="sendsectionnumber"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566744708879_plannedstarttime_计划开始时间_5_string_t5_$$HA" name="计划开始时间" type="string" variable="plannedstarttime"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566744708879_plannedendtime_计划结束时间_6_string_t5_$$HA" name="计划结束时间" type="string" variable="plannedendtime"></activiti:formProperty>
+                
         <activiti:formProperty id="tbheader1566744708879_optype_工序类型_7_enum_sbs_$$A" name="工序类型" type="enum" variable="optype">
           <activiti:value id="通用" name="通用"></activiti:value>
           <activiti:value id="车削" name="车削"></activiti:value>
@@ -143,12 +144,12 @@
         </activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879_opdesc_工序描述_8_string_t2_$$A" name="工序描述" type="string" variable="opdesc"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879_eqpttypecode_设备型号_9_string_t1_$$A" name="设备型号" type="string" variable="eqpttypecode"></activiti:formProperty>
-        <activiti:formProperty id="tbheader1566744708879_NOFIX_装夹件数（件）_10_string_t6_$$A" name="装夹件数（件）" type="string" variable="NOFIX"></activiti:formProperty>
-        <activiti:formProperty id="tbheader1566744708879_TMHA_人员操作时间（秒）_11_string_t6_$$A" name="人员操作时间（秒）" type="string" variable="TMHA"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566744708879_NOFIX_装夹件数（件）_10_string_t6_$$A" name="装夹件数（件）" type="string" variable="NOFIX" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566744708879_TMHA_人员操作时间（秒）_11_string_t6_$$A" name="人员操作时间（秒）" type="string" variable="TMHA" required="true"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879_TMQC_人工检测时间（秒）_12_string_t6_$$A" name="人工检测时间（秒）" type="string" variable="TMQC"></activiti:formProperty>
-        <activiti:formProperty id="tbheader1566744708879_TMNO_其它时间（秒）_13_string_t6_$$A" name="其它时间（秒）" type="string" variable="TMNO"></activiti:formProperty>
-        <activiti:formProperty id="tbheader1566744708879_TMMT_加工时间（秒）_14_string_t6_$$A" name="加工时间（秒）" type="string" variable="TMMT"></activiti:formProperty>
-        <activiti:formProperty id="tbheader1566744708879_TMOP_工序时间（秒）_15_string_t6_$$A" name="工序时间（秒）" type="string" variable="TMOP"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566744708879_TMNO_其它时间（秒）_13_string_t6_$$A" name="其它时间（秒）" type="string" variable="TMNO" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566744708879_TMMT_加工时间（秒）_14_string_t6_$$A" name="加工时间（秒）" type="string" variable="TMMT" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566744708879_TMOP_工序时间（秒）_15_string_t6_$$A" name="工序时间（秒）" type="string" variable="TMOP" required="true"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879_opsketch_工序简图_16_string_t9i_$$A" name="工序简图" type="string" variable="opsketch"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879_opprogram_加工程序_17_string_t9i_$$A" name="加工程序" type="string" variable="opprogram"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879_header1566746042674_工序物料清单_18_string_join_$$A" name="工序物料清单" type="string" variable="join1566748354574"></activiti:formProperty>
@@ -237,6 +238,9 @@
 			def jsonSlurper = new JsonSlurper()
 			//主表Std
 			def totalStd = jsonSlurper.parseText(execution.getVariable('tbheader1566744708879_item_std'))
+			if(totalStd.stream().map({it.工序编号}).distinct().count() != totalStd.size()){
+				throw new org.activiti.engine.ActivitiIllegalArgumentException('存在重复的工序编号')
+			}
 			
 			if(totalStd.size() == 0) {
 				return
@@ -265,10 +269,10 @@
 			        case '车削':li&lt;&lt; it.车削工步表;break
 			        default: throw new RuntimeException("找不到对应工序类型") ;break
 			    }
-			    li&lt;&lt;it.get('装夹件数（件）')
-			    li&lt;&lt;it.get('人员操作时间（秒）')
-			    li&lt;&lt;it.get('人工检测时间（秒）')
-			    li&lt;&lt;it.get('其它时间（秒）')
+			    li&lt;&lt;it.get('装夹件数（件）')?:'0'
+			    li&lt;&lt;it.get('人员操作时间（秒）')?:'0'
+			    li&lt;&lt;it.get('人工检测时间（秒）')?:'0'
+			    li&lt;&lt;it.get('其它时间（秒）')?:'0'
 			}).collect(Collectors.toList())
 			
 			list.each { gx -&gt;
@@ -276,7 +280,12 @@
 			        case '通用':
 			            def collect = tyStd.stream().filter({ ty -&gt; gx[2].split(",").contains(ty.Key) }).collect(Collectors.toList())
 			            //赋值给主表加工时间TMMT index 12
-			            def tmmt = collect.stream().mapToDouble({it.get('工进时间（秒）').toDouble() + it.get('辅助时间（秒）').toDouble()}).sum().toBigDecimal().setScale(2, RoundingMode.HALF_UP)
+
+			            def tmmt = collect.stream().mapToDouble({
+				            def gjsj = it.get('工进时间（秒）')?:'0'
+				            def fzsj = it.get('辅助时间（秒）')?:'0'			            
+				            gjsj.toDouble() + fzsj.toDouble()
+			            }).sum().toBigDecimal().setScale(2, RoundingMode.HALF_UP)
 			            //赋值给主表工序时间TMOP index 13
 			            def tmop = tmmt.add(gx[4].toBigDecimal()).add(gx[5].toBigDecimal()).add(gx[6].toBigDecimal()).setScale(2, RoundingMode.HALF_UP)
 						
@@ -300,15 +309,28 @@
 			        case '车削':
 			            def collect = cxStd.stream().filter({ cx -&gt; gx[2].split(",").contains(cx.Key) }).collect(Collectors.toList())
 			            def tmmt = collect.stream().mapToDouble({ cx-&gt;
-			                def tsRPMAVE = cx.get('切削速度（m/min）').toBigDecimal().multiply(BigDecimal.valueOf(2000)).divide(Math.PI,2, RoundingMode.HALF_UP).divide(cx.get('最小车削直径（mm）').toBigDecimal().add(cx.get('最大车削直径（mm）').toBigDecimal()),2, RoundingMode.HALF_UP)
-			                def tsVF = cx.get('每转进给量（mm/rev）').toBigDecimal().multiply(tsRPMAVE).toBigDecimal().setScale(2, RoundingMode.HALF_UP)
-			                def tsTMPOS = cx.get('单次定位时间（秒）').toBigDecimal().multiply(cx.get('切削次数（次）').toBigDecimal()).multiply(gx[3].toBigDecimal()).toBigDecimal().setScale(2, RoundingMode.HALF_UP)
-			                def tsTMENG = cx.get('切削长度（mm）').toBigDecimal().multiply(BigDecimal.valueOf(60)).multiply(cx.get('切削次数（次）').toBigDecimal()).multiply(gx[3].toBigDecimal()).divide(tsVF,2, RoundingMode.HALF_UP)
+			            	def cxsd = cx.get('切削速度（m/min）')?:'0'
+			            	def zxcxzj = cx.get('最小车削直径（mm）')?:'1'
+			            	def zdcxzj = cx.get('最大车削直径（mm）')?:'0'
+			                def tsRPMAVE = cxsd.toBigDecimal().multiply(BigDecimal.valueOf(2000)).divide(Math.PI,2, RoundingMode.HALF_UP).divide(zxcxzj.toBigDecimal().add(zdcxzj.toBigDecimal()),2, RoundingMode.HALF_UP)
+			                
+			                def mzjgl = cx.get('每转进给量（mm/rev）')?:'0'
+			                def tsVF = mzjgl.toBigDecimal().multiply(tsRPMAVE).toBigDecimal().setScale(2, RoundingMode.HALF_UP)
+			                def dcdwsj = cx.get('单次定位时间（秒）')?:'0'
+			                def cxcs = cx.get('切削次数（次）')?:'0'
+			                def tsTMPOS = dcdwsj.toBigDecimal().multiply(cxcs.toBigDecimal()).multiply(gx[3].toBigDecimal()).toBigDecimal().setScale(2, RoundingMode.HALF_UP)
+			                
+			                def qxcd = cx.get('切削长度（mm）')?:'0'
+			                
+			                def tsTMENG =0.toBigDecimal()
+			                if(tsVF > 0) {
+			                	tsTMENG = qxcd.toBigDecimal().multiply(BigDecimal.valueOf(60)).multiply(cxcs.toBigDecimal()).multiply(gx[3].toBigDecimal()).divide(tsVF,2, RoundingMode.HALF_UP)
+			                }
 			                
 			                cxItem.each {k,v -&gt;
 			                    if(k == 'rows'){
 			                        v.each{
-			                            if(it[0] == cx.get('工步序号')){
+			                            if(it[0] == cx.get('工步序号') &amp;&amp; cx.Key == it[9]){
 			                                it[12] = tsRPMAVE
 			                                it[13] = tsVF
 			                                it[17] = tsTMPOS
@@ -318,7 +340,9 @@
 			                    }
 			                }
 			                
-			                return tsTMENG.add(tsTMPOS).add(cx.get('换刀时间（秒）').toBigDecimal()).add(cx.get('辅助时间（秒）').toBigDecimal()).toDouble()
+			                def hdsj = cx.get('换刀时间（秒）')?:'0'
+			                def fzsj = cx.get('辅助时间（秒）')?:'0'
+			                return tsTMENG.add(tsTMPOS).add(hdsj.toBigDecimal()).add(fzsj.toBigDecimal()).toDouble()
 			            }).sum().toBigDecimal().setScale(2, RoundingMode.HALF_UP)
 			            def tmop = tmmt.add(gx[4].toBigDecimal()).add(gx[5].toBigDecimal()).add(gx[6].toBigDecimal()).setScale(2, RoundingMode.HALF_UP)
 			            totalStd.each{item-&gt;
@@ -341,15 +365,27 @@
 			        case '铣削':
 			            def collect = xxStd.stream().filter({ xx -&gt; gx[2].split(",").contains(xx.Key) }).collect(Collectors.toList())
 			            def tmmt = collect.stream().mapToDouble({ xx -&gt;
-			                def msRPM = xx.get('切削速度（m/min）').toBigDecimal().multiply(BigDecimal.valueOf(1000)).divide(Math.PI,2, RoundingMode.HALF_UP).divide(xx.get('切削直径（mm）').toBigDecimal(),2, RoundingMode.HALF_UP)
-			                def msVF = xx.get('每齿进给量（mm/tooth）').toBigDecimal().multiply(xx.get('有效齿数&amp;nbsp;').toBigDecimal()).multiply(msRPM).toBigDecimal().setScale(2, RoundingMode.HALF_UP)
-			                def msTMPOS = xx.get('单次定位时间（秒）').toBigDecimal().multiply(xx.get('切削次数（次）').toBigDecimal()).multiply(gx[3].toBigDecimal()).toBigDecimal().setScale(2, RoundingMode.HALF_UP)
-			                def msTMENG = xx.get('切削长度（mm）').toBigDecimal().multiply(BigDecimal.valueOf(60)).multiply(xx.get('切削次数（次）').toBigDecimal()).multiply(gx[3].toBigDecimal()).divide(msVF,2, RoundingMode.HALF_UP)
+			            	def qxsd = xx.get('切削速度（m/min）')?:'0'
+			            	def qxzj = xx.get('切削直径（mm）')?:'1'
+			                def msRPM = qxsd.toBigDecimal().multiply(BigDecimal.valueOf(1000)).divide(Math.PI,2, RoundingMode.HALF_UP).divide(qxzj.toBigDecimal(),2, RoundingMode.HALF_UP)
 			                
+			                def mcjgl = xx.get('每齿进给量（mm/tooth）')?:'0'
+			                def yxcs = xx.get('有效齿数&amp;nbsp;')?:'0'
+			                def msVF = mcjgl.toBigDecimal().multiply(yxcs.toBigDecimal()).multiply(msRPM).toBigDecimal().setScale(2, RoundingMode.HALF_UP)
+			                
+			                def dcdwsj = xx.get('单次定位时间（秒）')?:'0'
+			                def qxcs = xx.get('切削次数（次）')?:'0'
+			                def msTMPOS = dcdwsj.toBigDecimal().multiply(qxcs.toBigDecimal()).multiply(gx[3].toBigDecimal()).toBigDecimal().setScale(2, RoundingMode.HALF_UP)
+			                
+			                def qxcd = xx.get('切削长度（mm）')?:'0'
+			                def msTMENG = 0.toBigDecimal()
+			                if(msVF > 0){
+			                	msTMENG = qxcd.toBigDecimal().multiply(BigDecimal.valueOf(60)).multiply(qxcs.toBigDecimal()).multiply(gx[3].toBigDecimal()).divide(msVF,2, RoundingMode.HALF_UP)
+			                }
 			                xxItem.each {k,v -&gt;
 			                    if(k == 'rows'){
 			                        v.each{
-			                            if(it[0] == xx.get('工步序号')){
+			                            if(it[0] == xx.get('工步序号') &amp;&amp; xx.Key == it[9]){
 			                                it[12] = msRPM
 			                                it[13] = msVF
 			                                it[17] = msTMPOS
@@ -359,7 +395,9 @@
 			                    }
 			                }
 			                
-			                return msTMENG.add(xx.get('换刀时间（秒）').toBigDecimal()).add(msTMPOS).add(xx.get('辅助时间（秒）').toBigDecimal()).toDouble()
+			                def hdsj=xx.get('换刀时间（秒）')?:'0'
+			                def fzsj = xx.get('辅助时间（秒）')?:'0'
+			                return msTMENG.add(hdsj.toBigDecimal()).add(msTMPOS).add(fzsj.toBigDecimal()).toDouble()
 			            }).sum().toBigDecimal().setScale(2, RoundingMode.HALF_UP)
 			            def tmop = tmmt.add(gx[4].toBigDecimal()).add(gx[5].toBigDecimal()).add(gx[6].toBigDecimal())
 			            totalStd.each{item-&gt;
