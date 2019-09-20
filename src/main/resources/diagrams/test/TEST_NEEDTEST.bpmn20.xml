@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/frm">
+  <process id="AAATEST" name="AAATEST" isExecutable="true" activiti:candidateStarterGroups="admin">
+    <startEvent id="startevent1" name="Start">
+    	<extensionElements>
+    		<activiti:formProperty id="tba_item" name="A表" type="string" variable="zhubiao"/>
+    		<activiti:formProperty id="tba_b_rel_1_string_join_$$A" name="关联" type="string" variable="rel"/>
+    		<activiti:formProperty id="tba-b_item" name="B表" type="string" variable="zibiao"/>
+    		<activiti:formProperty id="tba-b_字段_param_1_string_t1_$$A" name="字段" type="string" variable="param"/>
+    		<activiti:formProperty id="tba-b_join-key_key_2_string_t1_$$A" name="Key" type="string"/>
+    	</extensionElements>
+    </startEvent>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_AAATEST">
+    <bpmndi:BPMNPlane bpmnElement="AAATEST" id="BPMNPlane_AAATEST">
+      <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="210.0" y="200.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>
