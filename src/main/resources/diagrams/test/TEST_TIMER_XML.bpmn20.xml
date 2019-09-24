@@ -11,7 +11,7 @@
     					import java.time.Year
     					
     					def year = Year.now().toString()
-    					def time = year+"-09-05T12:00:00"
+    					def time = year+"-09-23T09:15:00"
     					execution.setVariable('time', time)
     				]]>
     				</activiti:string>
@@ -23,8 +23,9 @@
     <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="timerintermediatecatchevent1"></sequenceFlow>
     <intermediateCatchEvent id="timerintermediatecatchevent1" name="TimerCatchEvent">
       <timerEventDefinition>
+		<timeDuration>PT1M</timeDuration>
       	<!-- <timeCycle>0 43 10 5 9 ? *</timeCycle> -->
-      	<timeDate>${execution.getVariable('time')}</timeDate>
+      	<!-- <timeDate>${execution.getVariable('time')}</timeDate> -->
       </timerEventDefinition>
     </intermediateCatchEvent>
     <sequenceFlow id="flow2" sourceRef="timerintermediatecatchevent1" targetRef="usertask1"></sequenceFlow>

@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/frm">
+  <process id="performanceMainProcess" name="绩效考核主流程 Performance appraisal main process" isExecutable="true" activiti:candidateStarterGroups="_dpmsadmin">
+    <startEvent id="startevent1" name="Start" activiti:initiator="initiator">
+    	<extensionElements>
+    		<activiti:formProperty id="tbhdaddemployees_item" name="指定员工列表 Designated employee list" type="string" variable="tbhdaddemployees_item"/>
+    		<activiti:formProperty id="tbhdaddemployees_员工 Employee_employeesn_1_string_psbi_$$A" name="员工 Employee" type="string" variable="tbhdaddemployees_employeesn_t00"/>
+    	
+    	</extensionElements>
+    </startEvent>
+    <scriptTask id="scripttask1" name="人员查询 Query employee information" activiti:autoStoreVariables="false" scriptFormat="groovy">
+    	<script>
+    	<![CDATA[
+    		import groovy.json.JsonSlurper;
+    		import com.eorionsolution.bpms.extension.ldap.LdapService;
+    		
+    		def jsonSlurper = new JsonSlurper()
+    		
+    		def std = jsonSlurper.parseText(execution.getVariable('tbhdaddemployees_item_std'))
+    		def employees = []
+    		
+    		if(std && std.size() > 0) {
+    			std.each{
+    				employees << it.employeesn
+    			}
+    			execution.setVariable('employees', employees)
+    			execution.setVariable('businessKey', execution.getBusinessKey())
+    			
+    			return
+    		}
+    		
+    		//if std is empty, using ldap fill employees
+    		LdapService.getUsersByGroupName('_erpf').each{
+    			employees<<it
+    		}
+    		
+    		if(employees.size() == 0){
+    			throw new org.activiti.engine.ActivitiIllegalArgumentException('LDAP search result is empty, please contact Administrator')
+    		}
+    		
+    		execution.setVariable('employees', employees)
+    		execution.setVariable('businessKey', execution.getBusinessKey())
+    		
+    	]]>	
+    	</script>
+    </scriptTask>
+    <callActivity id="callactivity1" name="分配绩效考核子流程 Allocation subprocess" calledElement="performanceSubProcess">
+    	<extensionElements>
+    		<activiti:in target="employee" sourceExpression="${employees[loopCounter]}"/>
+    		<activiti:in sourceExpression="${businessKey}" target="businessKey"/>
+    	</extensionElements>
+    	<multiInstanceLoopCharacteristics>
+    		<loopCardinality>${employees.size()}</loopCardinality>
+    		<completionCondition>nrOfCompletedInstances/nrOfInstances == 1</completionCondition>
+    	</multiInstanceLoopCharacteristics>
+    </callActivity>
+    <sequenceFlow id="flow2" sourceRef="scripttask1" targetRef="callactivity1"></sequenceFlow>
+    <endEvent id="endevent1" name="End"></endEvent>
+    <sequenceFlow id="flow3" sourceRef="callactivity1" targetRef="endevent1"></sequenceFlow>
+    <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="scripttask1"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_performanceProcess">
+    <bpmndi:BPMNPlane bpmnElement="performanceProcess" id="BPMNPlane_performanceProcess">
+      <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="20.0" y="180.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scripttask1" id="BPMNShape_scripttask1">
+        <omgdc:Bounds height="61.0" width="105.0" x="155.0" y="167.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="callactivity1" id="BPMNShape_callactivity1">
+        <omgdc:Bounds height="65.0" width="105.0" x="360.0" y="165.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="565.0" y="180.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="260.0" y="197.0"></omgdi:waypoint>
+        <omgdi:waypoint x="360.0" y="197.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3">
+        <omgdi:waypoint x="465.0" y="197.0"></omgdi:waypoint>
+        <omgdi:waypoint x="565.0" y="197.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="55.0" y="197.0"></omgdi:waypoint>
+        <omgdi:waypoint x="155.0" y="197.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

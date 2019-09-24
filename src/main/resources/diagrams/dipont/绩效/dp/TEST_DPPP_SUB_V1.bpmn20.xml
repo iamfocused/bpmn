@@ -109,7 +109,7 @@
 					execution.setVariable("_http_headers", headerMap)
 					execution.setVariable("_http_body", '')
 					def param=java.net.URLEncoder.encode('[{"type":"category","target":["variable",["template-tag","sn"]],"value":\"'+ employeeSn+ '\"}]', "UTF-8")
-					execution.setVariable("_http_url", 'https://metabase.eorionsolution.com/public/question/ab9d592d-0e01-4e02-9a56-eb80b7123a41.json?parameters='+param)
+					execution.setVariable("_http_url", 'https://bpmmb.dipont.com/public/question/5926235d-8d7f-4e8d-bc1a-71284fcd2a82.json?parameters='+param)
 					execution.setVariable("_http_response_body", '')
 					execution.setVariable("_http_response_status_code", '')
 					]]></activiti:string>
@@ -195,8 +195,9 @@
 						def employeeName = execution.getVariable('employeename')
 						def employee = execution.getVariable('employee')
 						def managerSn = execution.getVariable('managerSn')
-						detailMap.put("from", "develop@eorionsolution.com")
-						detailMap.put("to", ["baocaixue@eorionsolution.com"])
+						detailMap.put("from", "notice@dipont.com")
+						detailMap.put("to", [employee])
+						detailMap.put("cc", [managerSn])
 						detailMap.put("subject", employeeName + "绩效考核计划已Review")
 						detailMap.put("templateName", "performance-appraisal-all-template")
 						detailMap.put("templateData",dataMap)
@@ -210,7 +211,7 @@
 						execution.setVariable("_http_headers", headerMap)
 						execution.setVariable("_http_body", body)
 						execution.setVariable("mailBody2", body)
-						execution.setVariable("_http_url", 'https://commonservices.eorionsolution.com/mailsender/mail/v2/mail')
+						execution.setVariable("_http_url", 'https://bpmcs.dipont.com/mail/v2/mail')
 						execution.setVariable("_http_response_body", '')
 						execution.setVariable("_http_response_status_code", '')]]></activiti:string>
           </activiti:field>
@@ -380,8 +381,8 @@
 						dataMap.put('managerName', execution.getVariable('managerName')?:'')
 						
 						def employee = execution.getVariable('employee')
-						detailMap.put("from", "develop@eorionsolution.com")
-						detailMap.put("to", ["baocaixue@eorionsolution.com"])
+						detailMap.put("from", "notice@dipont.com")
+						detailMap.put("to", [employee])
 						detailMap.put("subject", employeeName + "Q1绩效考核结果")
 						detailMap.put("templateName", "performance-appraisal-all-template")
 						detailMap.put("templateData",dataMap)						
@@ -395,7 +396,7 @@
 						execution.setVariable("_http_headers", headerMap)
 						execution.setVariable("_http_body", body)
 						execution.setVariable("mailBody3", body)
-						execution.setVariable("_http_url", 'https://commonservices.eorionsolution.com/mailsender/mail/v2/mail')
+						execution.setVariable("_http_url", 'https://bpmcs.dipont.com/mail/v2/mail')
 						execution.setVariable("_http_response_body", '')
 						execution.setVariable("_http_response_status_code", '')]]></activiti:string>
           </activiti:field>
@@ -558,8 +559,8 @@
 						dataMap.put('managerName', execution.getVariable('managerName')?:'')
 						
 						def employee = execution.getVariable('employee')
-						detailMap.put("from", "develop@eorionsolution.com")
-						detailMap.put("to", ["baocaixue@eorionsolution.com"])
+						detailMap.put("from", "notice@dipont.com")
+						detailMap.put("to", [employee])
 						detailMap.put("subject", employeeName + "Q2绩效考核结果")
 						detailMap.put("templateName", "performance-appraisal-all-template")
 						detailMap.put("templateData",dataMap)						
@@ -573,7 +574,7 @@
 						execution.setVariable("_http_headers", headerMap)
 						execution.setVariable("_http_body", body)
 						execution.setVariable("mailBody4", body)
-						execution.setVariable("_http_url", 'https://commonservices.eorionsolution.com/mailsender/mail/v2/mail')
+						execution.setVariable("_http_url", 'https://bpmcs.dipont.com/mail/v2/mail')
 						execution.setVariable("_http_response_body", '')
 						execution.setVariable("_http_response_status_code", '')]]></activiti:string>
           </activiti:field>
@@ -721,8 +722,8 @@
 						dataMap.put('managerName', execution.getVariable('managerName')?:'')
 						
 						def employee = execution.getVariable('employee')
-						detailMap.put("from", "develop@eorionsolution.com")
-						detailMap.put("to", ["baocaixue@eorionsolution.com"])
+						detailMap.put("from", "notice@dipont.com")
+						detailMap.put("to", [employee])
 						detailMap.put("subject", employeeName + "Q3绩效考核结果")
 						detailMap.put("templateName", "performance-appraisal-all-template")
 						detailMap.put("templateData",dataMap)						
@@ -736,7 +737,7 @@
 						execution.setVariable("_http_headers", headerMap)
 						execution.setVariable("_http_body", body)
 						execution.setVariable("mailBody5", body)
-						execution.setVariable("_http_url", 'https://commonservices.eorionsolution.com/mailsender/mail/v2/mail')
+						execution.setVariable("_http_url", 'https://bpmcs.dipont.com/mail/v2/mail')
 						execution.setVariable("_http_response_body", '')
 						execution.setVariable("_http_response_status_code", '')]]></activiti:string>
           </activiti:field>
@@ -899,8 +900,8 @@
 						dataMap.put('managerName', execution.getVariable('managerName')?:'')
 						
 						def employee = execution.getVariable('employee')
-						detailMap.put("from", "develop@eorionsolution.com")
-						detailMap.put("to", ["baocaixue@eorionsolution.com"])
+						detailMap.put("from", "notice@dipont.com")
+						detailMap.put("to", [employee])
 						detailMap.put("subject", employeeName + "Q4绩效考核结果")
 						detailMap.put("templateName", "performance-appraisal-all-template")
 						detailMap.put("templateData",dataMap)						
@@ -914,7 +915,7 @@
 						execution.setVariable("_http_headers", headerMap)
 						execution.setVariable("_http_body", body)
 						execution.setVariable("mailBody6", body)
-						execution.setVariable("_http_url", 'https://commonservices.eorionsolution.com/mailsender/mail/v2/mail')
+						execution.setVariable("_http_url", 'https://bpmcs.dipont.com/mail/v2/mail')
 						execution.setVariable("_http_response_body", '')
 						execution.setVariable("_http_response_status_code", '')]]></activiti:string>
           </activiti:field>
@@ -1000,8 +1001,9 @@
 			dataMap.put('employeeName', employeeName)
 			
 			def employee = execution.getVariable('employee')
-			detailMap.put("from", "develop@eorionsolution.com")
-			detailMap.put("to", ["baocaixue@eorionsolution.com"])
+			detailMap.put("from", "notice@dipont.com")
+			detailMap.put("to", [execution.getVariable('managerSn')])
+			detailMap.put("cc", [employee])
 			detailMap.put("subject", employeeName + "绩效考核计划Review")
 			detailMap.put("templateName", "performance-appraisal-all-template")
 			detailMap.put("templateData",dataMap)
@@ -1015,7 +1017,7 @@
 			execution.setVariable("_http_headers", headerMap)
 			execution.setVariable("_http_body", body)
 			execution.setVariable("mailBody1", body)
-			execution.setVariable("_http_url", 'https://commonservices.eorionsolution.com/mailsender/mail/v2/mail')
+			execution.setVariable("_http_url", 'https://bpmcs.dipont.com/mail/v2/mail')
 			execution.setVariable("_http_response_body", '')
 			execution.setVariable("_http_response_status_code", '')
     	</script>
@@ -1070,8 +1072,8 @@
 			dataMap.put('promotion', execution.getVariable('promotionq1')?:'N/A')
 			
 			def managerSn = execution.getVariable('managerSn')
-			detailMap.put("from", "develop@eorionsolution.com")
-			detailMap.put("to", ["baocaixue@eorionsolution.com"])
+			detailMap.put("from", "notice@dipont.com")
+			detailMap.put("to", [managerSn])
 			detailMap.put("subject", employeeName + "Q1绩效考核结果存档")
 			detailMap.put("templateName", "performance-appraisal-all-template")
 			detailMap.put("templateData",dataMap)
@@ -1085,7 +1087,7 @@
 			execution.setVariable("_http_headers", headerMap)
 			execution.setVariable("_http_body", body)
 			execution.setVariable("mailBody7", body)
-			execution.setVariable("_http_url", 'https://commonservices.eorionsolution.com/mailsender/mail/v2/mail')
+			execution.setVariable("_http_url", 'https://bpmcs.dipont.com/mail/v2/mail')
 			execution.setVariable("_http_response_body", '')
 			execution.setVariable("_http_response_status_code", '')	
     	
@@ -1141,8 +1143,8 @@
 			dataMap.put('promotion', execution.getVariable('promotionq2')?:'')
 			
 			def managerSn = execution.getVariable('managerSn')
-			detailMap.put("from", "develop@eorionsolution.com")
-			detailMap.put("to", ["baocaixue@eorionsolution.com"])
+			detailMap.put("from", "notice@dipont.com")
+			detailMap.put("to", [managerSn])
 			detailMap.put("subject", employeeName + "Q2绩效考核结果存档")
 			detailMap.put("templateName", "performance-appraisal-all-template")
 			detailMap.put("templateData",dataMap)								
@@ -1156,7 +1158,7 @@
 			execution.setVariable("_http_headers", headerMap)
 			execution.setVariable("_http_body", body)
 			execution.setVariable("mailBody8", body)
-			execution.setVariable("_http_url", 'https://commonservices.eorionsolution.com/mailsender/mail/v2/mail')
+			execution.setVariable("_http_url", 'https://bpmcs.dipont.com/mail/v2/mail')
 			execution.setVariable("_http_response_body", '')
 			execution.setVariable("_http_response_status_code", '')				
     	
@@ -1212,8 +1214,8 @@
 			dataMap.put('promotion', execution.getVariable('promotionq3')?:'N/A')
 			
 			def managerSn = execution.getVariable('managerSn')
-			detailMap.put("from", "develop@eorionsolution.com")
-			detailMap.put("to", ["baocaixue@eorionsolution.com"])
+			detailMap.put("from", "notice@dipont.com")
+			detailMap.put("to", [managerSn])
 			detailMap.put("subject", employeeName + "Q3绩效考核结果存档")
 			detailMap.put("templateName", "performance-appraisal-all-template")
 			detailMap.put("templateData",dataMap)
@@ -1227,7 +1229,7 @@
 			execution.setVariable("_http_headers", headerMap)
 			execution.setVariable("_http_body", body)
 			execution.setVariable("mailBody9", body)
-			execution.setVariable("_http_url", 'https://commonservices.eorionsolution.com/mailsender/mail/v2/mail')
+			execution.setVariable("_http_url", 'https://bpmcs.dipont.com/mail/v2/mail')
 			execution.setVariable("_http_response_body", '')
 			execution.setVariable("_http_response_status_code", '')		
     	
@@ -1283,8 +1285,8 @@
 			dataMap.put('promotion', execution.getVariable('promotionq4')?:'')
 			
 			def managerSn = execution.getVariable('managerSn')
-			detailMap.put("from", "develop@eorionsolution.com")
-			detailMap.put("to", ["baocaixue@eorionsolution.com"])
+			detailMap.put("from", "notice@dipont.com")
+			detailMap.put("to", [managerSn])
 			detailMap.put("subject", employeeName + "Q4绩效考核结果存档")
 			detailMap.put("templateName", "performance-appraisal-all-template")
 			detailMap.put("templateData",dataMap)
@@ -1298,7 +1300,7 @@
 			execution.setVariable("_http_headers", headerMap)
 			execution.setVariable("_http_body", body)
 			execution.setVariable("mailBody10", body)
-			execution.setVariable("_http_url", 'https://commonservices.eorionsolution.com/mailsender/mail/v2/mail')
+			execution.setVariable("_http_url", 'https://bpmcs.dipont.com/mail/v2/mail')
 			execution.setVariable("_http_response_body", '')
 			execution.setVariable("_http_response_status_code", '')    	
     	
