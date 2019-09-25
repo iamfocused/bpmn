@@ -45,8 +45,15 @@
           <activiti:value id="教务" name="教务 Academic affairs"></activiti:value>
         </activiti:formProperty>
         <activiti:formProperty id="tbhdperformance_item" name="绩效考核表 Performance appraisal table" type="string" variable="tbhdperformance_item" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_构面 Perspective_perspective_1_string_t1_$$A" name="构面 Perspective" type="string" variable="tbhdperformance_perspective_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_说明 Description_description_2_string_t1_$$A" name="说明 Description" type="string" variable="tbhdperformance_description_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdperformance_构面 Perspective_perspective_1_enum_sbs_$$A" name="构面 Perspective" type="enum" variable="tbhdperformance_perspective_t00" required="true">
+        	<activiti:value id="财务及预算 Finance &amp; Budget" name="财务及预算 Finance &amp; Budget"></activiti:value>
+        	<activiti:value id="创新及专业 Innovation &amp; Profession" name="创新及专业 Innovation &amp; Profession"></activiti:value>
+        	<activiti:value id="客户及服务 Customer &amp; Service" name="客户及服务 Customer &amp; Service"></activiti:value>
+        	<activiti:value id="流程及改进 Procedure inprovement" name="流程及改进 Procedure inprovement"></activiti:value>
+        	<activiti:value id="学习与成长 Learning &amp; Development" name="学习与成长 Learning &amp; Development"></activiti:value>
+        </activiti:formProperty>
+
+        <activiti:formProperty id="tbhdperformance_说明 Description_description_2_string_t1_$$A" name="说明 Description" type="string" variable="tbhdperformance_description_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhdperformance_目标 Objective_objective_3_string_t1_$$A" name="目标 Objective" type="string" variable="tbhdperformance_objective_t00" required="true"></activiti:formProperty>
         <activiti:formProperty id="tbhdperformance_绩效指标 KPI_kpi_4_string_t1_$$A" name="绩效指标 KPI" type="string" variable="tbhdperformance_kpi_t00" required="true"></activiti:formProperty>
         <activiti:formProperty id="tbhdperformance_权重 Weighting(%)_weighting_5_string_t1_$$A" name="权重 Weighting(%)" type="string" variable="tbhdperformance_weighting_t00" required="true"></activiti:formProperty>
@@ -73,7 +80,7 @@
     					def execution = task.getExecution()
     					
     					def tbhdperformance_item_str = """
-						{"rows":[["财务及预算 Finance & Budget","销售收入/利润/费用管控/预算控制/人力编制控制Revenue/ Expense & Budget Control / Product Volume/ Headcount Control ","","","","N/A","","≥","","","","",null,null,null,null],["创新及专业 Innovation & Profession","创新/工作技能提高 Innovation/ Knowledge & Skill & Technology Demonstration","","","","%",null,"≥","","","","",null,null,null,null],["客户及服务 Customer & Service","内外部客户满意度/质量/及时性/责任/合作关系建立/团队合作 Internal & External Customer Satisfaction/ Quality/ Timely Act & Response/ Partnership Building / Teamwork","","","","%",null,"≥","","","","",null,null,null,null],["流程及改进 Procedure inprovement","标化作业流程是否严格执行/工作手册的更新及优化 SOP /Procedure/Handbook updating and improvement","","","","Nr.",null,"≥","","","","",null,null,null,null],["学习与成长 Learning & Development","Training/ Workshop","learning on the job, sharing,draw lessons from the past","48","N/A","hrs",null,"≥","12","12","12","12",null,null,null,null]],"headers":[{"block":"A","controlType":"t1","datePattern":null,"enumValues":[],"fieldType":"string","id":"tbhdperformance_构面 Perspective_perspective_1_string_t1_\$\$A","name":"构面 Perspective","readable":true,"seq":1,"type":"string","writable":true},{"block":"A","controlType":"t2","datePattern":null,"enumValues":[],"fieldType":"string","id":"tbhdperformance_说明 Description_description_2_string_t1_\$\$A","name":"说明 Description","readable":true,"seq":2,"type":"string","writable":true},{"block":"A","controlType":"t1","datePattern":null,"enumValues":[],"fieldType":"string","id":"tbhdperformance_目标 Objective_objective_3_string_t1_\$\$A","name":"目标 Objective","readable":true,"seq":3,"type":"string","writable":true},{"block":"A","controlType":"t1","datePattern":null,"enumValues":[],"fieldType":"string","id":"tbhdperformance_绩效指标 KPI_kpi_4_string_t1_\$\$A","name":"绩效指标 KPI","readable":true,"seq":4,"type":"string","writable":true},{"block":"A","controlType":"t1","datePattern":null,"enumValues":[],"fieldType":"string","id":"tbhdperformance_权重 Weighting(%)_weighting_5_string_t1_\$\$A","name":"权重 Weighting(%)","readable":true,"seq":5,"type":"string","writable":true},{"block":"A","controlType":"t1","datePattern":null,"enumValues":[],"fieldType":"string","id":"tbhdperformance_单位 Unit_unit_6_string_t1_\$\$A","name":"单位 Unit","readable":true,"seq":6,"type":"string","writable":true},{"block":"A","controlType":"t1","datePattern":null,"enumValues":[],"fieldType":"string","id":"tbhdperformance_上年度实际 Actual last year_actual_7_string_t1_\$\$A","name":"上年度实际 Actual last year","readable":true,"seq":7,"type":"string","writable":true},{"block":"A","controlType":"t1","datePattern":null,"enumValues":[],"fieldType":"string","id":"tbhdperformance_指标属性 KPI achievement measurement(Fill in ≥ or ≤)_kpiattribute_8_string_t1_\$\$A","name":"指标属性 KPI achievement measurement(Fill in ≥ or ≤)","readable":true,"seq":8,"type":"string","writable":true},{"block":"A","controlType":"t1","datePattern":null,"enumValues":[],"fieldType":"string","id":"tbhdperformance_Plan Q1_planq1_9_string_t1_\$\$A","name":"Plan Q1","readable":true,"seq":9,"type":"string","writable":true},{"block":"A","controlType":"t1","datePattern":null,"enumValues":[],"fieldType":"string","id":"tbhdperformance_Plan Q2_planq2_10_string_t1_\$\$A","name":"Plan Q2","readable":true,"seq":10,"type":"string","writable":true},{"block":"A","controlType":"t1","datePattern":null,"enumValues":[],"fieldType":"string","id":"tbhdperformance_Plan Q3_planq3_11_string_t1_\$\$A","name":"Plan Q3","readable":true,"seq":11,"type":"string","writable":true},{"block":"A","controlType":"t1","datePattern":null,"enumValues":[],"fieldType":"string","id":"tbhdperformance_Plan Q4_planq4_12_string_t1_\$\$A","name":"Plan Q4","readable":true,"seq":12,"type":"string","writable":true},{"block":"HA","controlType":"t1","datePattern":null,"enumValues":[],"fieldType":"string","id":"tbhdperformance_Actual Q1_actualq1_13_string_t1_\$\$HA","name":"Actual Q1","readable":true,"seq":13,"type":"string","writable":true},{"block":"HA","controlType":"t1","datePattern":null,"enumValues":[],"fieldType":"string","id":"tbhdperformance_Actual Q2_actualq2_14_string_t1_\$\$HA","name":"Actual Q2","readable":true,"seq":14,"type":"string","writable":true},{"block":"HA","controlType":"t1","datePattern":null,"enumValues":[],"fieldType":"string","id":"tbhdperformance_Actual Q3_actualq3_15_string_t1_\$\$HA","name":"Actual Q3","readable":true,"seq":15,"type":"string","writable":true},{"block":"HA","controlType":"t1","datePattern":null,"enumValues":[],"fieldType":"string","id":"tbhdperformance_Actual Q4_actualq4_16_string_t1_\$\$HA","name":"Actual Q4","readable":true,"seq":16,"type":"string","writable":true}],"tableName":"tbhdperformance"}
+						{"rows":[["财务及预算 Finance & Budget","销售收入/利润/费用管控/预算控制/人力编制控制Revenue/ Expense & Budget Control / Product Volume/ Headcount Control ","","","","N/A","","≥","","","","",null,null,null,null],["创新及专业 Innovation & Profession","创新/工作技能提高 Innovation/ Knowledge & Skill & Technology Demonstration","","","","%",null,"≥","","","","",null,null,null,null],["客户及服务 Customer & Service","内外部客户满意度/质量/及时性/责任/合作关系建立/团队合作 Internal & External Customer Satisfaction/ Quality/ Timely Act & Response/ Partnership Building / Teamwork","","","","%",null,"≥","","","","",null,null,null,null],["流程及改进 Procedure inprovement","标化作业流程是否严格执行/工作手册的更新及优化 SOP /Procedure/Handbook updating and improvement","","","","Nr.",null,"≥","","","","",null,null,null,null],["学习与成长 Learning & Development","Training/ Workshop","learning on the job, sharing,draw lessons from the past","48","N/A","hrs",null,"≥","12","12","12","12",null,null,null,null]],"headers":[{"block":"A","controlType":"sbs","datePattern":null,"enumValues":[{"id":"财务及预算 Finance & Budget","name":"财务及预算 Finance & Budget"},{"id":"创新及专业 Innovation & Profession","name":"创新及专业 Innovation & Profession"},{"id":"客户及服务 Customer & Service","name":"客户及服务 Customer & Service"},{"id":"流程及改进 Procedure inprovement","name":"流程及改进 Procedure inprovement"},{"id":"学习与成长 Learning & Development","name":"学习与成长 Learning & Development"}],"fieldType":"enum","id":"tbhdperformance_构面 Perspective_perspective_1_enum_sbs_\$\$A","name":"构面 Perspective","readable":true,"seq":1,"type":"enum","writable":true},{"block":"A","controlType":"t2","datePattern":null,"enumValues":[],"fieldType":"string","id":"tbhdperformance_说明 Description_description_2_string_t1_\$\$A","name":"说明 Description","readable":true,"seq":2,"type":"string","writable":true},{"block":"A","controlType":"t1","datePattern":null,"enumValues":[],"fieldType":"string","id":"tbhdperformance_目标 Objective_objective_3_string_t1_\$\$A","name":"目标 Objective","readable":true,"seq":3,"type":"string","writable":true},{"block":"A","controlType":"t1","datePattern":null,"enumValues":[],"fieldType":"string","id":"tbhdperformance_绩效指标 KPI_kpi_4_string_t1_\$\$A","name":"绩效指标 KPI","readable":true,"seq":4,"type":"string","writable":true},{"block":"A","controlType":"t1","datePattern":null,"enumValues":[],"fieldType":"string","id":"tbhdperformance_权重 Weighting(%)_weighting_5_string_t1_\$\$A","name":"权重 Weighting(%)","readable":true,"seq":5,"type":"string","writable":true},{"block":"A","controlType":"t1","datePattern":null,"enumValues":[],"fieldType":"string","id":"tbhdperformance_单位 Unit_unit_6_string_t1_\$\$A","name":"单位 Unit","readable":true,"seq":6,"type":"string","writable":true},{"block":"A","controlType":"t1","datePattern":null,"enumValues":[],"fieldType":"string","id":"tbhdperformance_上年度实际 Actual last year_actual_7_string_t1_\$\$A","name":"上年度实际 Actual last year","readable":true,"seq":7,"type":"string","writable":true},{"block":"A","controlType":"t1","datePattern":null,"enumValues":[],"fieldType":"string","id":"tbhdperformance_指标属性 KPI achievement measurement(Fill in ≥ or ≤)_kpiattribute_8_string_t1_\$\$A","name":"指标属性 KPI achievement measurement(Fill in ≥ or ≤)","readable":true,"seq":8,"type":"string","writable":true},{"block":"A","controlType":"t1","datePattern":null,"enumValues":[],"fieldType":"string","id":"tbhdperformance_Plan Q1_planq1_9_string_t1_\$\$A","name":"Plan Q1","readable":true,"seq":9,"type":"string","writable":true},{"block":"A","controlType":"t1","datePattern":null,"enumValues":[],"fieldType":"string","id":"tbhdperformance_Plan Q2_planq2_10_string_t1_\$\$A","name":"Plan Q2","readable":true,"seq":10,"type":"string","writable":true},{"block":"A","controlType":"t1","datePattern":null,"enumValues":[],"fieldType":"string","id":"tbhdperformance_Plan Q3_planq3_11_string_t1_\$\$A","name":"Plan Q3","readable":true,"seq":11,"type":"string","writable":true},{"block":"A","controlType":"t1","datePattern":null,"enumValues":[],"fieldType":"string","id":"tbhdperformance_Plan Q4_planq4_12_string_t1_\$\$A","name":"Plan Q4","readable":true,"seq":12,"type":"string","writable":true},{"block":"HA","controlType":"t1","datePattern":null,"enumValues":[],"fieldType":"string","id":"tbhdperformance_Actual Q1_actualq1_13_string_t1_\$\$HA","name":"Actual Q1","readable":true,"seq":13,"type":"string","writable":true},{"block":"HA","controlType":"t1","datePattern":null,"enumValues":[],"fieldType":"string","id":"tbhdperformance_Actual Q2_actualq2_14_string_t1_\$\$HA","name":"Actual Q2","readable":true,"seq":14,"type":"string","writable":true},{"block":"HA","controlType":"t1","datePattern":null,"enumValues":[],"fieldType":"string","id":"tbhdperformance_Actual Q3_actualq3_15_string_t1_\$\$HA","name":"Actual Q3","readable":true,"seq":15,"type":"string","writable":true},{"block":"HA","controlType":"t1","datePattern":null,"enumValues":[],"fieldType":"string","id":"tbhdperformance_Actual Q4_actualq4_16_string_t1_\$\$HA","name":"Actual Q4","readable":true,"seq":16,"type":"string","writable":true}],"tableName":"tbhdperformance"}
 						"""
 						
 						execution.setVariable('tbhdperformance_item',tbhdperformance_item_str)
@@ -138,7 +145,14 @@
           <activiti:value id="教务" name="教务 Academic affairs"></activiti:value>
         </activiti:formProperty>
         <activiti:formProperty id="tbhdperformance_item" name="绩效考核表 Performance appraisal table" type="string" variable="tbhdperformance_item" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_构面 Perspective_perspective_1_string_t1_$$A" name="构面 Perspective" type="string" variable="tbhdperformance_perspective_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdperformance_构面 Perspective_perspective_1_enum_sbs_$$A" name="构面 Perspective" type="enum" variable="tbhdperformance_perspective_t00" required="true">
+        	<activiti:value id="财务及预算 Finance &amp; Budget" name="财务及预算 Finance &amp; Budget"></activiti:value>
+        	<activiti:value id="创新及专业 Innovation &amp; Profession" name="创新及专业 Innovation &amp; Profession"></activiti:value>
+        	<activiti:value id="客户及服务 Customer &amp; Service" name="客户及服务 Customer &amp; Service"></activiti:value>
+        	<activiti:value id="流程及改进 Procedure inprovement" name="流程及改进 Procedure inprovement"></activiti:value>
+        	<activiti:value id="学习与成长 Learning &amp; Development" name="学习与成长 Learning &amp; Development"></activiti:value>
+        </activiti:formProperty>
+
         <activiti:formProperty id="tbhdperformance_说明 Description_description_2_string_t1_$$A" name="说明 Description" type="string" variable="tbhdperformance_description_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhdperformance_目标 Objective_objective_3_string_t1_$$A" name="目标 Objective" type="string" variable="tbhdperformance_objective_t00" required="true"></activiti:formProperty>
         <activiti:formProperty id="tbhdperformance_绩效指标 KPI_kpi_4_string_t1_$$A" name="绩效指标 KPI" type="string" variable="tbhdperformance_kpi_t00" required="true"></activiti:formProperty>
@@ -286,8 +300,9 @@
           <activiti:value id="18.控制安排Controlling" name="控制安排Controlling"></activiti:value>
           <activiti:value id="19.商业意识Cemmercial Awareness" name="商业意识Cemmercial Awareness"></activiti:value>
           <activiti:value id="20.激励他人Motivationg Others" name="激励他人Motivationg Others"></activiti:value>
+          <activiti:value id="21.其他Or Others" name="其他Or Others"></activiti:value>
         </activiti:formProperty>
-        <activiti:formProperty id="competencies2q1_选择做的好的胜任力 Choose competency_1_enum_sbs_$$C" name="选择做的好的胜任力 Choose competency as employee's advantage" type="enum" variable="competencies2q1">
+        <activiti:formProperty id="competencies2q1_选择做的好的胜任力 Choose competency_2_enum_sbs_$$B" name="选择做的好的胜任力 Choose competency as employee's advantage" type="enum" variable="competencies2q1">
           <activiti:value id="1.追求品质&amp;目标导向Quality Driven &amp; result go-getter" name="追求品质&amp;目标导向Quality Driven &amp; result go-getter"></activiti:value>
           <activiti:value id="2.工作态度Work Attitude" name="工作态度Work Attitude"></activiti:value>
           <activiti:value id="3.客户满意度Customer Satisfaction" name="客户满意度Customer Satisfaction"></activiti:value>
@@ -308,9 +323,66 @@
           <activiti:value id="18.控制安排Controlling" name="控制安排Controlling"></activiti:value>
           <activiti:value id="19.商业意识Cemmercial Awareness" name="商业意识Cemmercial Awareness"></activiti:value>
           <activiti:value id="20.激励他人Motivationg Others" name="激励他人Motivationg Others"></activiti:value>
+          <activiti:value id="21.其他Or Others" name="其他Or Others"></activiti:value>
         </activiti:formProperty>
+        <activiti:formProperty id="uncompetencies1q1_选择欠缺的胜任力 Choose lack of competency_1_enum_sbs_$$C" name="选择欠缺的胜任力 Choose competency for employee's futrue improvement" type="enum" variable="uncompetencies1q1" required="true">
+          <activiti:value id="1.追求品质&amp;目标导向Quality Driven &amp; result go-getter" name="追求品质&amp;目标导向Quality Driven &amp; result go-getter"></activiti:value>
+          <activiti:value id="2.工作态度Work Attitude" name="工作态度Work Attitude"></activiti:value>
+          <activiti:value id="3.客户满意度Customer Satisfaction" name="客户满意度Customer Satisfaction"></activiti:value>
+          <activiti:value id="4.团队合作 &amp; 关系建立Team Work &amp; relationship building" name="团队合作 &amp; 关系建立Team Work &amp; relationship building"></activiti:value>
+          <activiti:value id="5.执行及解决问题的能力Execution &amp; puzzle solving" name="执行及解决问题的能力Execution &amp; puzzle solving"></activiti:value>
+          <activiti:value id="6.说服沟通Persuasive Communication" name="说服沟通Persuasive Communication"></activiti:value>
+          <activiti:value id="7.创新改进Innovation &amp; Improvement" name="创新改进Innovation &amp; Improvement"></activiti:value>
+          <activiti:value id="8.销售意识Sales Orientation" name="销售意识Sales Orientation"></activiti:value>
+          <activiti:value id="9.学习能力Learning Ability" name="学习能力Learning Ability"></activiti:value>
+          <activiti:value id="10.服务导向Service Orientation" name="服务导向Service Orientation"></activiti:value>
+          <activiti:value id="11.承受压力Stress Tolerance" name="承受压力Stress Tolerance"></activiti:value>
+          <activiti:value id="12.自我认知Self-assessment" name="自我认知Self-assessment"></activiti:value>
+          <activiti:value id="13.逻辑推理Logical Reasoning" name="逻辑推理Logical Reasoning"></activiti:value>
+          <activiti:value id="14.领导与授权Leadership &amp; Delegation" name="领导与授权Leadership &amp; Delegation"></activiti:value>
+          <activiti:value id="15.培养人才Talent Development" name="培养人才Talent Development"></activiti:value>
+          <activiti:value id="16.组织规划Organizing and Planning" name="组织规划Organizing and Planning"></activiti:value>
+          <activiti:value id="17.决断能力Decisive &amp; Decision making" name="决断能力Decisive &amp; Decision making"></activiti:value>
+          <activiti:value id="18.控制安排Controlling" name="控制安排Controlling"></activiti:value>
+          <activiti:value id="19.商业意识Cemmercial Awareness" name="商业意识Cemmercial Awareness"></activiti:value>
+          <activiti:value id="20.激励他人Motivationg Others" name="激励他人Motivationg Others"></activiti:value>
+          <activiti:value id="21.其他Or Others" name="其他Or Others"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="uncompetencies2q1_选择欠缺的胜任力 Choose lack of competency_2_enum_sbs_$$C" name="选择欠缺的胜任力 Choose competency for employee's futrue improvement" type="enum" variable="uncompetencies2q1">
+          <activiti:value id="1.追求品质&amp;目标导向Quality Driven &amp; result go-getter" name="追求品质&amp;目标导向Quality Driven &amp; result go-getter"></activiti:value>
+          <activiti:value id="2.工作态度Work Attitude" name="工作态度Work Attitude"></activiti:value>
+          <activiti:value id="3.客户满意度Customer Satisfaction" name="客户满意度Customer Satisfaction"></activiti:value>
+          <activiti:value id="4.团队合作 &amp; 关系建立Team Work &amp; relationship building" name="团队合作 &amp; 关系建立Team Work &amp; relationship building"></activiti:value>
+          <activiti:value id="5.执行及解决问题的能力Execution &amp; puzzle solving" name="执行及解决问题的能力Execution &amp; puzzle solving"></activiti:value>
+          <activiti:value id="6.说服沟通Persuasive Communication" name="说服沟通Persuasive Communication"></activiti:value>
+          <activiti:value id="7.创新改进Innovation &amp; Improvement" name="创新改进Innovation &amp; Improvement"></activiti:value>
+          <activiti:value id="8.销售意识Sales Orientation" name="销售意识Sales Orientation"></activiti:value>
+          <activiti:value id="9.学习能力Learning Ability" name="学习能力Learning Ability"></activiti:value>
+          <activiti:value id="10.服务导向Service Orientation" name="服务导向Service Orientation"></activiti:value>
+          <activiti:value id="11.承受压力Stress Tolerance" name="承受压力Stress Tolerance"></activiti:value>
+          <activiti:value id="12.自我认知Self-assessment" name="自我认知Self-assessment"></activiti:value>
+          <activiti:value id="13.逻辑推理Logical Reasoning" name="逻辑推理Logical Reasoning"></activiti:value>
+          <activiti:value id="14.领导与授权Leadership &amp; Delegation" name="领导与授权Leadership &amp; Delegation"></activiti:value>
+          <activiti:value id="15.培养人才Talent Development" name="培养人才Talent Development"></activiti:value>
+          <activiti:value id="16.组织规划Organizing and Planning" name="组织规划Organizing and Planning"></activiti:value>
+          <activiti:value id="17.决断能力Decisive &amp; Decision making" name="决断能力Decisive &amp; Decision making"></activiti:value>
+          <activiti:value id="18.控制安排Controlling" name="控制安排Controlling"></activiti:value>
+          <activiti:value id="19.商业意识Cemmercial Awareness" name="商业意识Cemmercial Awareness"></activiti:value>
+          <activiti:value id="20.激励他人Motivationg Others" name="激励他人Motivationg Others"></activiti:value>
+          <activiti:value id="21.其他Or Others" name="其他Or Others"></activiti:value>
+        </activiti:formProperty>
+        
+        <activiti:formProperty id="memoq1_备注 Memo_1_string_t2_$$D" name="备注 Memo" type="string" variable="memoq1"/>       
+        
         <activiti:formProperty id="tbhdperformance_item" name="绩效考核表 Performance appraisal table" type="string" variable="tbhdperformance_item" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_构面 Perspective_perspective_1_string_t1_$$VA" name="构面 Perspective" type="string" variable="tbhdperformance_perspective_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdperformance_构面 Perspective_perspective_1_enum_sbs_$$VA" name="构面 Perspective" type="enum" variable="tbhdperformance_perspective_t00" required="true">
+        	<activiti:value id="财务及预算 Finance &amp; Budget" name="财务及预算 Finance &amp; Budget"></activiti:value>
+        	<activiti:value id="创新及专业 Innovation &amp; Profession" name="创新及专业 Innovation &amp; Profession"></activiti:value>
+        	<activiti:value id="客户及服务 Customer &amp; Service" name="客户及服务 Customer &amp; Service"></activiti:value>
+        	<activiti:value id="流程及改进 Procedure inprovement" name="流程及改进 Procedure inprovement"></activiti:value>
+        	<activiti:value id="学习与成长 Learning &amp; Development" name="学习与成长 Learning &amp; Development"></activiti:value>
+        </activiti:formProperty>
+
         <activiti:formProperty id="tbhdperformance_说明 Description_description_2_string_t1_$$VA" name="说明 Description" type="string" variable="tbhdperformance_description_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhdperformance_目标 Objective_objective_3_string_t1_$$VA" name="目标 Objective" type="string" variable="tbhdperformance_objective_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhdperformance_绩效指标 KPI_kpi_4_string_t1_$$VA" name="绩效指标 KPI" type="string" variable="tbhdperformance_kpi_t00"></activiti:formProperty>
@@ -318,10 +390,10 @@
         <activiti:formProperty id="tbhdperformance_单位 Unit_unit_6_string_t1_$$VA" name="单位 Unit" type="string" variable="tbhdperformance_unit_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhdperformance_上年度实际 Actual last year_actual_7_string_t1_$$VA" name="上年度实际 Actual last year" type="string" variable="tbhdperformance_actual_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhdperformance_指标属性 KPI achievement measurement(Fill in ≥ or ≤)_kpiattribute_8_string_t1_$$VA" name="指标属性 KPI achievement measurement(Fill in ≥ or ≤)" type="string" variable="tbhdperformance_kpiattribute_t00"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_Plan Q1_planq1_9_string_t1_$$VA" name="Plan Q1" type="string" variable="tbhdperformance_planq1_t00"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_Plan Q2_planq2_10_string_t1_$$HA" name="Plan Q2" type="string" variable="tbhdperformance_planq2_t00"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_Plan Q3_planq3_11_string_t1_$$HA" name="Plan Q3" type="string" variable="tbhdperformance_planq3_t00"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_Plan Q4_planq4_12_string_t1_$$HA" name="Plan Q4" type="string" variable="tbhdperformance_planq4_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdperformance_Plan Q1_planq1_9_string_t1_$$A" name="Plan Q1" type="string" variable="tbhdperformance_planq1_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdperformance_Plan Q2_planq2_10_string_t1_$$HA" name="Plan Q2" type="string" variable="tbhdperformance_planq2_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdperformance_Plan Q3_planq3_11_string_t1_$$HA" name="Plan Q3" type="string" variable="tbhdperformance_planq3_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdperformance_Plan Q4_planq4_12_string_t1_$$HA" name="Plan Q4" type="string" variable="tbhdperformance_planq4_t00" required="true"></activiti:formProperty>
         <activiti:formProperty id="tbhdperformance_Actual Q1_actualq1_13_string_t1_$$A" name="Actual Q1" type="string" variable="tbhdperformance_actualq1_t00" required="true"></activiti:formProperty>
         <activiti:formProperty id="tbhdperformance_Actual Q2_actualq2_14_string_t1_$$HA" name="Actual Q2" type="string" variable="tbhdperformance_actualq2_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhdperformance_Actual Q3_actualq3_15_string_t1_$$HA" name="Actual Q3" type="string" variable="tbhdperformance_actualq3_t00"></activiti:formProperty>
@@ -379,6 +451,9 @@
 						dataMap.put('competencies1', execution.getVariable('competencies1q1')?:'')
 						dataMap.put('competencies2',execution.getVariable('competencies2q1')?:'')
 						dataMap.put('managerName', execution.getVariable('managerName')?:'')
+						dataMap.put('uncompetencies1', execution.getVariable('uncompetencies1q1')?:'')
+						dataMap.put('uncompetencies2', execution.getVariable('uncompetencies2q1')?:'')
+						dataMap.put('memo',execution.getVariable('memoq1')?:'')
 						
 						def employee = execution.getVariable('employee')
 						detailMap.put("from", "notice@dipont.com")
@@ -449,8 +524,9 @@
           <activiti:value id="18.控制安排Controlling" name="控制安排Controlling"></activiti:value>
           <activiti:value id="19.商业意识Cemmercial Awareness" name="商业意识Cemmercial Awareness"></activiti:value>
           <activiti:value id="20.激励他人Motivationg Others" name="激励他人Motivationg Others"></activiti:value>
+          <activiti:value id="21.其他Or Others" name="其他Or Others"></activiti:value>
         </activiti:formProperty>
-        <activiti:formProperty id="competencies2q2_选择做的好的胜任力 Choose competency_1_enum_sbs_$$C" name="选择做的好的胜任力 Choose competency as employee's advantage" type="enum" variable="competencies2q2">
+        <activiti:formProperty id="competencies2q2_选择做的好的胜任力 Choose competency_2_enum_sbs_$$B" name="选择做的好的胜任力 Choose competency as employee's advantage" type="enum" variable="competencies2q2">
           <activiti:value id="1.追求品质&amp;目标导向Quality Driven &amp; result go-getter" name="追求品质&amp;目标导向Quality Driven &amp; result go-getter"></activiti:value>
           <activiti:value id="2.工作态度Work Attitude" name="工作态度Work Attitude"></activiti:value>
           <activiti:value id="3.客户满意度Customer Satisfaction" name="客户满意度Customer Satisfaction"></activiti:value>
@@ -471,24 +547,81 @@
           <activiti:value id="18.控制安排Controlling" name="控制安排Controlling"></activiti:value>
           <activiti:value id="19.商业意识Cemmercial Awareness" name="商业意识Cemmercial Awareness"></activiti:value>
           <activiti:value id="20.激励他人Motivationg Others" name="激励他人Motivationg Others"></activiti:value>
+          <activiti:value id="21.其他Or Others" name="其他Or Others"></activiti:value>
         </activiti:formProperty>
-        <activiti:formProperty id="keepworkq2_你愿意下一阶段选择他/她继续在你的团队工作吗 Do you want to he/her work in your team in next stage_1_enum_sbs_$$D" name="你愿意下一阶段选择他/她继续在你的团队工作吗 Do you want to he/her work in your team in next stage" type="enum" variable="keepworkq2" required="true">
+        <activiti:formProperty id="uncompetencies1q2_选择欠缺的胜任力 Choose lack of competency_1_enum_sbs_$$C" name="选择欠缺的胜任力 Choose competency for employee's futrue improvement" type="enum" variable="uncompetencies1q2" required="true">
+          <activiti:value id="1.追求品质&amp;目标导向Quality Driven &amp; result go-getter" name="追求品质&amp;目标导向Quality Driven &amp; result go-getter"></activiti:value>
+          <activiti:value id="2.工作态度Work Attitude" name="工作态度Work Attitude"></activiti:value>
+          <activiti:value id="3.客户满意度Customer Satisfaction" name="客户满意度Customer Satisfaction"></activiti:value>
+          <activiti:value id="4.团队合作 &amp; 关系建立Team Work &amp; relationship building" name="团队合作 &amp; 关系建立Team Work &amp; relationship building"></activiti:value>
+          <activiti:value id="5.执行及解决问题的能力Execution &amp; puzzle solving" name="执行及解决问题的能力Execution &amp; puzzle solving"></activiti:value>
+          <activiti:value id="6.说服沟通Persuasive Communication" name="说服沟通Persuasive Communication"></activiti:value>
+          <activiti:value id="7.创新改进Innovation &amp; Improvement" name="创新改进Innovation &amp; Improvement"></activiti:value>
+          <activiti:value id="8.销售意识Sales Orientation" name="销售意识Sales Orientation"></activiti:value>
+          <activiti:value id="9.学习能力Learning Ability" name="学习能力Learning Ability"></activiti:value>
+          <activiti:value id="10.服务导向Service Orientation" name="服务导向Service Orientation"></activiti:value>
+          <activiti:value id="11.承受压力Stress Tolerance" name="承受压力Stress Tolerance"></activiti:value>
+          <activiti:value id="12.自我认知Self-assessment" name="自我认知Self-assessment"></activiti:value>
+          <activiti:value id="13.逻辑推理Logical Reasoning" name="逻辑推理Logical Reasoning"></activiti:value>
+          <activiti:value id="14.领导与授权Leadership &amp; Delegation" name="领导与授权Leadership &amp; Delegation"></activiti:value>
+          <activiti:value id="15.培养人才Talent Development" name="培养人才Talent Development"></activiti:value>
+          <activiti:value id="16.组织规划Organizing and Planning" name="组织规划Organizing and Planning"></activiti:value>
+          <activiti:value id="17.决断能力Decisive &amp; Decision making" name="决断能力Decisive &amp; Decision making"></activiti:value>
+          <activiti:value id="18.控制安排Controlling" name="控制安排Controlling"></activiti:value>
+          <activiti:value id="19.商业意识Cemmercial Awareness" name="商业意识Cemmercial Awareness"></activiti:value>
+          <activiti:value id="20.激励他人Motivationg Others" name="激励他人Motivationg Others"></activiti:value>
+          <activiti:value id="21.其他Or Others" name="其他Or Others"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="uncompetencies2q2_选择欠缺的胜任力 Choose lack of competency_2_enum_sbs_$$C" name="选择欠缺的胜任力 Choose competency for employee's futrue improvement" type="enum" variable="uncompetencies2q2">
+          <activiti:value id="1.追求品质&amp;目标导向Quality Driven &amp; result go-getter" name="追求品质&amp;目标导向Quality Driven &amp; result go-getter"></activiti:value>
+          <activiti:value id="2.工作态度Work Attitude" name="工作态度Work Attitude"></activiti:value>
+          <activiti:value id="3.客户满意度Customer Satisfaction" name="客户满意度Customer Satisfaction"></activiti:value>
+          <activiti:value id="4.团队合作 &amp; 关系建立Team Work &amp; relationship building" name="团队合作 &amp; 关系建立Team Work &amp; relationship building"></activiti:value>
+          <activiti:value id="5.执行及解决问题的能力Execution &amp; puzzle solving" name="执行及解决问题的能力Execution &amp; puzzle solving"></activiti:value>
+          <activiti:value id="6.说服沟通Persuasive Communication" name="说服沟通Persuasive Communication"></activiti:value>
+          <activiti:value id="7.创新改进Innovation &amp; Improvement" name="创新改进Innovation &amp; Improvement"></activiti:value>
+          <activiti:value id="8.销售意识Sales Orientation" name="销售意识Sales Orientation"></activiti:value>
+          <activiti:value id="9.学习能力Learning Ability" name="学习能力Learning Ability"></activiti:value>
+          <activiti:value id="10.服务导向Service Orientation" name="服务导向Service Orientation"></activiti:value>
+          <activiti:value id="11.承受压力Stress Tolerance" name="承受压力Stress Tolerance"></activiti:value>
+          <activiti:value id="12.自我认知Self-assessment" name="自我认知Self-assessment"></activiti:value>
+          <activiti:value id="13.逻辑推理Logical Reasoning" name="逻辑推理Logical Reasoning"></activiti:value>
+          <activiti:value id="14.领导与授权Leadership &amp; Delegation" name="领导与授权Leadership &amp; Delegation"></activiti:value>
+          <activiti:value id="15.培养人才Talent Development" name="培养人才Talent Development"></activiti:value>
+          <activiti:value id="16.组织规划Organizing and Planning" name="组织规划Organizing and Planning"></activiti:value>
+          <activiti:value id="17.决断能力Decisive &amp; Decision making" name="决断能力Decisive &amp; Decision making"></activiti:value>
+          <activiti:value id="18.控制安排Controlling" name="控制安排Controlling"></activiti:value>
+          <activiti:value id="19.商业意识Cemmercial Awareness" name="商业意识Cemmercial Awareness"></activiti:value>
+          <activiti:value id="20.激励他人Motivationg Others" name="激励他人Motivationg Others"></activiti:value>
+          <activiti:value id="21.其他Or Others" name="其他Or Others"></activiti:value>
+        </activiti:formProperty>
+        
+        <activiti:formProperty id="memoq2_备注 Memo_1_string_t2_$$D" name="备注 Memo" type="string" variable="memoq2"/>            
+        
+        <activiti:formProperty id="keepworkq2_你愿意下一阶段选择他/她继续在你的团队工作吗 Do you want to he/her work in your team in next stage_1_enum_sbs_$$E" name="你愿意下一阶段选择他/她继续在你的团队工作吗 Do you want to he/her work in your team in next stage" type="enum" variable="keepworkq2" required="true">
           <activiti:value id="Yes" name="✔"></activiti:value>
           <activiti:value id="No" name="❌"></activiti:value>
           <activiti:value id="Wait and see" name="⭕"></activiti:value>
         </activiti:formProperty>
-        <activiti:formProperty id="salaryincq2_你愿意为他/她申请加薪吗 Do you want to apply for salary increasing for him/her_1_enum_sbs_$$E" name="你愿意为他/她申请加薪吗 Do you want to apply for salary increasing for him/her" type="enum" variable="salaryincq2" required="true">
+        <activiti:formProperty id="salaryincq2_你愿意为他/她申请加薪吗 Do you want to apply for salary increasing for him/her_1_enum_sbs_$$F" name="你愿意为他/她申请加薪吗 Do you want to apply for salary increasing for him/her" type="enum" variable="salaryincq2" required="true">
           <activiti:value id="Yes" name="✔"></activiti:value>
           <activiti:value id="No" name="❌"></activiti:value>
           <activiti:value id="Wait and see" name="⭕"></activiti:value>
         </activiti:formProperty>
-        <activiti:formProperty id="promotionq2_你愿意为他/她申请晋升吗 Do you think he/she is ready for promotion and taking more responsibility_1_enum_sbs_$$F" name="你愿意为他/她申请晋升吗 Do you think he/she is ready for promotion and taking more responsibility" type="enum" variable="promotionq2" required="true">
+        <activiti:formProperty id="promotionq2_你愿意为他/她申请晋升吗 Do you think he/she is ready for promotion and taking more responsibility_1_enum_sbs_$$G" name="你愿意为他/她申请晋升吗 Do you think he/she is ready for promotion and taking more responsibility" type="enum" variable="promotionq2" required="true">
           <activiti:value id="Yes" name="✔"></activiti:value>
           <activiti:value id="No" name="❌"></activiti:value>
           <activiti:value id="Wait and see" name="⭕"></activiti:value>
         </activiti:formProperty>
         <activiti:formProperty id="tbhdperformance_item" name="绩效考核表 Performance appraisal table" type="string" variable="tbhdperformance_item" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_构面 Perspective_perspective_1_string_t1_$$VA" name="构面 Perspective" type="string" variable="tbhdperformance_perspective_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdperformance_构面 Perspective_perspective_1_enum_sbs_$$VA" name="构面 Perspective" type="enum" variable="tbhdperformance_perspective_t00" required="true">
+        	<activiti:value id="财务及预算 Finance &amp; Budget" name="财务及预算 Finance &amp; Budget"></activiti:value>
+        	<activiti:value id="创新及专业 Innovation &amp; Profession" name="创新及专业 Innovation &amp; Profession"></activiti:value>
+        	<activiti:value id="客户及服务 Customer &amp; Service" name="客户及服务 Customer &amp; Service"></activiti:value>
+        	<activiti:value id="流程及改进 Procedure inprovement" name="流程及改进 Procedure inprovement"></activiti:value>
+        	<activiti:value id="学习与成长 Learning &amp; Development" name="学习与成长 Learning &amp; Development"></activiti:value>
+        </activiti:formProperty>
+
         <activiti:formProperty id="tbhdperformance_说明 Description_description_2_string_t1_$$VA" name="说明 Description" type="string" variable="tbhdperformance_description_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhdperformance_目标 Objective_objective_3_string_t1_$$VA" name="目标 Objective" type="string" variable="tbhdperformance_objective_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhdperformance_绩效指标 KPI_kpi_4_string_t1_$$VA" name="绩效指标 KPI" type="string" variable="tbhdperformance_kpi_t00"></activiti:formProperty>
@@ -496,10 +629,10 @@
         <activiti:formProperty id="tbhdperformance_单位 Unit_unit_6_string_t1_$$VA" name="单位 Unit" type="string" variable="tbhdperformance_unit_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhdperformance_上年度实际 Actual last year_actual_7_string_t1_$$VA" name="上年度实际 Actual last year" type="string" variable="tbhdperformance_actual_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhdperformance_指标属性 KPI achievement measurement(Fill in ≥ or ≤)_kpiattribute_8_string_t1_$$VA" name="指标属性 KPI achievement measurement(Fill in ≥ or ≤)" type="string" variable="tbhdperformance_kpiattribute_t00"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_Plan Q1_planq1_9_string_t1_$$HA" name="Plan Q1" type="string" variable="tbhdperformance_planq1_t00"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_Plan Q2_planq2_10_string_t1_$$VA" name="Plan Q2" type="string" variable="tbhdperformance_planq2_t00"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_Plan Q3_planq3_11_string_t1_$$HA" name="Plan Q3" type="string" variable="tbhdperformance_planq3_t00"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_Plan Q4_planq4_12_string_t1_$$HA" name="Plan Q4" type="string" variable="tbhdperformance_planq4_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdperformance_Plan Q1_planq1_9_string_t1_$$HA" name="Plan Q1" type="string" variable="tbhdperformance_planq1_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdperformance_Plan Q2_planq2_10_string_t1_$$A" name="Plan Q2" type="string" variable="tbhdperformance_planq2_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdperformance_Plan Q3_planq3_11_string_t1_$$HA" name="Plan Q3" type="string" variable="tbhdperformance_planq3_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdperformance_Plan Q4_planq4_12_string_t1_$$HA" name="Plan Q4" type="string" variable="tbhdperformance_planq4_t00" required="true"></activiti:formProperty>
         <activiti:formProperty id="tbhdperformance_Actual Q1_actualq1_13_string_t1_$$HA" name="Actual Q1" type="string" variable="tbhdperformance_actualq1_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhdperformance_Actual Q2_actualq2_14_string_t1_$$A" name="Actual Q2" type="string" variable="tbhdperformance_actualq2_t00" required="true"></activiti:formProperty>
         <activiti:formProperty id="tbhdperformance_Actual Q3_actualq3_15_string_t1_$$HA" name="Actual Q3" type="string" variable="tbhdperformance_actualq3_t00"></activiti:formProperty>
@@ -557,6 +690,9 @@
 						dataMap.put('competencies1', execution.getVariable('competencies1q2')?:'')
 						dataMap.put('competencies2', execution.getVariable('competencies2q2')?:'')
 						dataMap.put('managerName', execution.getVariable('managerName')?:'')
+						dataMap.put('uncompetencies1', execution.getVariable('uncompetencies1q2')?:'')
+						dataMap.put('uncompetencies2', execution.getVariable('uncompetencies2q2')?:'')
+						dataMap.put('memo', execution.getVariable('memoq2')?:'')
 						
 						def employee = execution.getVariable('employee')
 						detailMap.put("from", "notice@dipont.com")
@@ -627,8 +763,9 @@
           <activiti:value id="18.控制安排Controlling" name="控制安排Controlling"></activiti:value>
           <activiti:value id="19.商业意识Cemmercial Awareness" name="商业意识Cemmercial Awareness"></activiti:value>
           <activiti:value id="20.激励他人Motivationg Others" name="激励他人Motivationg Others"></activiti:value>
+          <activiti:value id="21.其他Or Others" name="其他Or Others"></activiti:value>
         </activiti:formProperty>
-        <activiti:formProperty id="competencies2q3_选择做的好的胜任力 Choose competency_1_enum_sbs_$$C" name="选择做的好的胜任力 Choose competency as employee's advantage" type="enum" variable="competencies2q3">
+        <activiti:formProperty id="competencies2q3_选择做的好的胜任力 Choose competency_2_enum_sbs_$$B" name="选择做的好的胜任力 Choose competency as employee's advantage" type="enum" variable="competencies2q3">
           <activiti:value id="1.追求品质&amp;目标导向Quality Driven &amp; result go-getter" name="追求品质&amp;目标导向Quality Driven &amp; result go-getter"></activiti:value>
           <activiti:value id="2.工作态度Work Attitude" name="工作态度Work Attitude"></activiti:value>
           <activiti:value id="3.客户满意度Customer Satisfaction" name="客户满意度Customer Satisfaction"></activiti:value>
@@ -649,9 +786,66 @@
           <activiti:value id="18.控制安排Controlling" name="控制安排Controlling"></activiti:value>
           <activiti:value id="19.商业意识Cemmercial Awareness" name="商业意识Cemmercial Awareness"></activiti:value>
           <activiti:value id="20.激励他人Motivationg Others" name="激励他人Motivationg Others"></activiti:value>
+          <activiti:value id="21.其他Or Others" name="其他Or Others"></activiti:value>
         </activiti:formProperty>
+        <activiti:formProperty id="uncompetencies1q3_选择欠缺的胜任力 Choose lack of competency_1_enum_sbs_$$C" name="选择欠缺的胜任力 Choose competency for employee's futrue improvement" type="enum" variable="uncompetencies1q3" required="true">
+          <activiti:value id="1.追求品质&amp;目标导向Quality Driven &amp; result go-getter" name="追求品质&amp;目标导向Quality Driven &amp; result go-getter"></activiti:value>
+          <activiti:value id="2.工作态度Work Attitude" name="工作态度Work Attitude"></activiti:value>
+          <activiti:value id="3.客户满意度Customer Satisfaction" name="客户满意度Customer Satisfaction"></activiti:value>
+          <activiti:value id="4.团队合作 &amp; 关系建立Team Work &amp; relationship building" name="团队合作 &amp; 关系建立Team Work &amp; relationship building"></activiti:value>
+          <activiti:value id="5.执行及解决问题的能力Execution &amp; puzzle solving" name="执行及解决问题的能力Execution &amp; puzzle solving"></activiti:value>
+          <activiti:value id="6.说服沟通Persuasive Communication" name="说服沟通Persuasive Communication"></activiti:value>
+          <activiti:value id="7.创新改进Innovation &amp; Improvement" name="创新改进Innovation &amp; Improvement"></activiti:value>
+          <activiti:value id="8.销售意识Sales Orientation" name="销售意识Sales Orientation"></activiti:value>
+          <activiti:value id="9.学习能力Learning Ability" name="学习能力Learning Ability"></activiti:value>
+          <activiti:value id="10.服务导向Service Orientation" name="服务导向Service Orientation"></activiti:value>
+          <activiti:value id="11.承受压力Stress Tolerance" name="承受压力Stress Tolerance"></activiti:value>
+          <activiti:value id="12.自我认知Self-assessment" name="自我认知Self-assessment"></activiti:value>
+          <activiti:value id="13.逻辑推理Logical Reasoning" name="逻辑推理Logical Reasoning"></activiti:value>
+          <activiti:value id="14.领导与授权Leadership &amp; Delegation" name="领导与授权Leadership &amp; Delegation"></activiti:value>
+          <activiti:value id="15.培养人才Talent Development" name="培养人才Talent Development"></activiti:value>
+          <activiti:value id="16.组织规划Organizing and Planning" name="组织规划Organizing and Planning"></activiti:value>
+          <activiti:value id="17.决断能力Decisive &amp; Decision making" name="决断能力Decisive &amp; Decision making"></activiti:value>
+          <activiti:value id="18.控制安排Controlling" name="控制安排Controlling"></activiti:value>
+          <activiti:value id="19.商业意识Cemmercial Awareness" name="商业意识Cemmercial Awareness"></activiti:value>
+          <activiti:value id="20.激励他人Motivationg Others" name="激励他人Motivationg Others"></activiti:value>
+          <activiti:value id="21.其他Or Others" name="其他Or Others"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="uncompetencies2q3_选择欠缺的胜任力 Choose lack of competency_2_enum_sbs_$$C" name="选择欠缺的胜任力 Choose competency for employee's futrue improvement" type="enum" variable="uncompetencies2q3">
+          <activiti:value id="1.追求品质&amp;目标导向Quality Driven &amp; result go-getter" name="追求品质&amp;目标导向Quality Driven &amp; result go-getter"></activiti:value>
+          <activiti:value id="2.工作态度Work Attitude" name="工作态度Work Attitude"></activiti:value>
+          <activiti:value id="3.客户满意度Customer Satisfaction" name="客户满意度Customer Satisfaction"></activiti:value>
+          <activiti:value id="4.团队合作 &amp; 关系建立Team Work &amp; relationship building" name="团队合作 &amp; 关系建立Team Work &amp; relationship building"></activiti:value>
+          <activiti:value id="5.执行及解决问题的能力Execution &amp; puzzle solving" name="执行及解决问题的能力Execution &amp; puzzle solving"></activiti:value>
+          <activiti:value id="6.说服沟通Persuasive Communication" name="说服沟通Persuasive Communication"></activiti:value>
+          <activiti:value id="7.创新改进Innovation &amp; Improvement" name="创新改进Innovation &amp; Improvement"></activiti:value>
+          <activiti:value id="8.销售意识Sales Orientation" name="销售意识Sales Orientation"></activiti:value>
+          <activiti:value id="9.学习能力Learning Ability" name="学习能力Learning Ability"></activiti:value>
+          <activiti:value id="10.服务导向Service Orientation" name="服务导向Service Orientation"></activiti:value>
+          <activiti:value id="11.承受压力Stress Tolerance" name="承受压力Stress Tolerance"></activiti:value>
+          <activiti:value id="12.自我认知Self-assessment" name="自我认知Self-assessment"></activiti:value>
+          <activiti:value id="13.逻辑推理Logical Reasoning" name="逻辑推理Logical Reasoning"></activiti:value>
+          <activiti:value id="14.领导与授权Leadership &amp; Delegation" name="领导与授权Leadership &amp; Delegation"></activiti:value>
+          <activiti:value id="15.培养人才Talent Development" name="培养人才Talent Development"></activiti:value>
+          <activiti:value id="16.组织规划Organizing and Planning" name="组织规划Organizing and Planning"></activiti:value>
+          <activiti:value id="17.决断能力Decisive &amp; Decision making" name="决断能力Decisive &amp; Decision making"></activiti:value>
+          <activiti:value id="18.控制安排Controlling" name="控制安排Controlling"></activiti:value>
+          <activiti:value id="19.商业意识Cemmercial Awareness" name="商业意识Cemmercial Awareness"></activiti:value>
+          <activiti:value id="20.激励他人Motivationg Others" name="激励他人Motivationg Others"></activiti:value>
+          <activiti:value id="21.其他Or Others" name="其他Or Others"></activiti:value>
+        </activiti:formProperty>    
+        
+        <activiti:formProperty id="memoq3_备注 Memo_1_string_t2_$$D" name="备注 Memo" type="string" variable="memoq3"/>                        
+        
         <activiti:formProperty id="tbhdperformance_item" name="绩效考核表 Performance appraisal table" type="string" variable="tbhdperformance_item" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_构面 Perspective_perspective_1_string_t1_$$VA" name="构面 Perspective" type="string" variable="tbhdperformance_perspective_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdperformance_构面 Perspective_perspective_1_enum_sbs_$$VA" name="构面 Perspective" type="enum" variable="tbhdperformance_perspective_t00" required="true">
+        	<activiti:value id="财务及预算 Finance &amp; Budget" name="财务及预算 Finance &amp; Budget"></activiti:value>
+        	<activiti:value id="创新及专业 Innovation &amp; Profession" name="创新及专业 Innovation &amp; Profession"></activiti:value>
+        	<activiti:value id="客户及服务 Customer &amp; Service" name="客户及服务 Customer &amp; Service"></activiti:value>
+        	<activiti:value id="流程及改进 Procedure inprovement" name="流程及改进 Procedure inprovement"></activiti:value>
+        	<activiti:value id="学习与成长 Learning &amp; Development" name="学习与成长 Learning &amp; Development"></activiti:value>
+        </activiti:formProperty>
+
         <activiti:formProperty id="tbhdperformance_说明 Description_description_2_string_t1_$$VA" name="说明 Description" type="string" variable="tbhdperformance_description_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhdperformance_目标 Objective_objective_3_string_t1_$$VA" name="目标 Objective" type="string" variable="tbhdperformance_objective_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhdperformance_绩效指标 KPI_kpi_4_string_t1_$$VA" name="绩效指标 KPI" type="string" variable="tbhdperformance_kpi_t00"></activiti:formProperty>
@@ -659,10 +853,10 @@
         <activiti:formProperty id="tbhdperformance_单位 Unit_unit_6_string_t1_$$VA" name="单位 Unit" type="string" variable="tbhdperformance_unit_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhdperformance_上年度实际 Actual last year_actual_7_string_t1_$$VA" name="上年度实际 Actual last year" type="string" variable="tbhdperformance_actual_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhdperformance_指标属性 KPI achievement measurement(Fill in ≥ or ≤)_kpiattribute_8_string_t1_$$VA" name="指标属性 KPI achievement measurement(Fill in ≥ or ≤)" type="string" variable="tbhdperformance_kpiattribute_t00"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_Plan Q1_planq1_9_string_t1_$$HA" name="Plan Q1" type="string" variable="tbhdperformance_planq1_t00"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_Plan Q2_planq2_10_string_t1_$$HA" name="Plan Q2" type="string" variable="tbhdperformance_planq2_t00"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_Plan Q3_planq3_11_string_t1_$$VA" name="Plan Q3" type="string" variable="tbhdperformance_planq3_t00"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_Plan Q4_planq4_12_string_t1_$$HA" name="Plan Q4" type="string" variable="tbhdperformance_planq4_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdperformance_Plan Q1_planq1_9_string_t1_$$HA" name="Plan Q1" type="string" variable="tbhdperformance_planq1_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdperformance_Plan Q2_planq2_10_string_t1_$$HA" name="Plan Q2" type="string" variable="tbhdperformance_planq2_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdperformance_Plan Q3_planq3_11_string_t1_$$A" name="Plan Q3" type="string" variable="tbhdperformance_planq3_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdperformance_Plan Q4_planq4_12_string_t1_$$HA" name="Plan Q4" type="string" variable="tbhdperformance_planq4_t00" required="true"></activiti:formProperty>
         <activiti:formProperty id="tbhdperformance_Actual Q1_actualq1_13_string_t1_$$HA" name="Actual Q1" type="string" variable="tbhdperformance_actualq1_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhdperformance_Actual Q2_actualq2_14_string_t1_$$HA" name="Actual Q2" type="string" variable="tbhdperformance_actualq2_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhdperformance_Actual Q3_actualq3_15_string_t1_$$A" name="Actual Q3" type="string" variable="tbhdperformance_actualq3_t00" required="true"></activiti:formProperty>
@@ -720,6 +914,9 @@
 						dataMap.put('competencies1', execution.getVariable('competencies1q3')?:'')
 						dataMap.put('competencies2', execution.getVariable('competencies2q3')?:'')
 						dataMap.put('managerName', execution.getVariable('managerName')?:'')
+						dataMap.put('uncompetencies1', execution.getVariable('uncompetencies1q3')?:'')
+						dataMap.put('uncompetencies2', execution.getVariable('uncompetencies1q3')?:'')
+						dataMap.put('memo', execution.getVariable('memoq3')?:'')
 						
 						def employee = execution.getVariable('employee')
 						detailMap.put("from", "notice@dipont.com")
@@ -790,8 +987,9 @@
           <activiti:value id="18.控制安排Controlling" name="控制安排Controlling"></activiti:value>
           <activiti:value id="19.商业意识Cemmercial Awareness" name="商业意识Cemmercial Awareness"></activiti:value>
           <activiti:value id="20.激励他人Motivationg Others" name="激励他人Motivationg Others"></activiti:value>
+          <activiti:value id="21.其他Or Others" name="其他Or Others"></activiti:value>          
         </activiti:formProperty>
-        <activiti:formProperty id="competencies2q4_选择做的好的胜任力 Choose competency_1_enum_sbs_$$C" name="选择做的好的胜任力 Choose competency as employee's advantage" type="enum" variable="competencies2q4">
+        <activiti:formProperty id="competencies2q4_选择做的好的胜任力 Choose competency_2_enum_sbs_$$B" name="选择做的好的胜任力 Choose competency as employee's advantage" type="enum" variable="competencies2q4">
           <activiti:value id="1.追求品质&amp;目标导向Quality Driven &amp; result go-getter" name="追求品质&amp;目标导向Quality Driven &amp; result go-getter"></activiti:value>
           <activiti:value id="2.工作态度Work Attitude" name="工作态度Work Attitude"></activiti:value>
           <activiti:value id="3.客户满意度Customer Satisfaction" name="客户满意度Customer Satisfaction"></activiti:value>
@@ -812,24 +1010,82 @@
           <activiti:value id="18.控制安排Controlling" name="控制安排Controlling"></activiti:value>
           <activiti:value id="19.商业意识Cemmercial Awareness" name="商业意识Cemmercial Awareness"></activiti:value>
           <activiti:value id="20.激励他人Motivationg Others" name="激励他人Motivationg Others"></activiti:value>
+          <activiti:value id="21.其他Or Others" name="其他Or Others"></activiti:value>
         </activiti:formProperty>
-        <activiti:formProperty id="keepworkq4_你愿意下一阶段选择他/她继续在你的团队工作吗 Do you want to he/her work in your team in next stage_1_enum_sbs_$$D" name="你愿意下一阶段选择他/她继续在你的团队工作吗 Do you want to he/her work in your team in next stage" type="enum" variable="keepworkq4" required="true">
+
+        <activiti:formProperty id="uncompetencies1q4_选择欠缺的胜任力 Choose lack of competency_1_enum_sbs_$$C" name="选择欠缺的胜任力 Choose competency for employee's futrue improvement" type="enum" variable="uncompetencies1q4" required="true">
+          <activiti:value id="1.追求品质&amp;目标导向Quality Driven &amp; result go-getter" name="追求品质&amp;目标导向Quality Driven &amp; result go-getter"></activiti:value>
+          <activiti:value id="2.工作态度Work Attitude" name="工作态度Work Attitude"></activiti:value>
+          <activiti:value id="3.客户满意度Customer Satisfaction" name="客户满意度Customer Satisfaction"></activiti:value>
+          <activiti:value id="4.团队合作 &amp; 关系建立Team Work &amp; relationship building" name="团队合作 &amp; 关系建立Team Work &amp; relationship building"></activiti:value>
+          <activiti:value id="5.执行及解决问题的能力Execution &amp; puzzle solving" name="执行及解决问题的能力Execution &amp; puzzle solving"></activiti:value>
+          <activiti:value id="6.说服沟通Persuasive Communication" name="说服沟通Persuasive Communication"></activiti:value>
+          <activiti:value id="7.创新改进Innovation &amp; Improvement" name="创新改进Innovation &amp; Improvement"></activiti:value>
+          <activiti:value id="8.销售意识Sales Orientation" name="销售意识Sales Orientation"></activiti:value>
+          <activiti:value id="9.学习能力Learning Ability" name="学习能力Learning Ability"></activiti:value>
+          <activiti:value id="10.服务导向Service Orientation" name="服务导向Service Orientation"></activiti:value>
+          <activiti:value id="11.承受压力Stress Tolerance" name="承受压力Stress Tolerance"></activiti:value>
+          <activiti:value id="12.自我认知Self-assessment" name="自我认知Self-assessment"></activiti:value>
+          <activiti:value id="13.逻辑推理Logical Reasoning" name="逻辑推理Logical Reasoning"></activiti:value>
+          <activiti:value id="14.领导与授权Leadership &amp; Delegation" name="领导与授权Leadership &amp; Delegation"></activiti:value>
+          <activiti:value id="15.培养人才Talent Development" name="培养人才Talent Development"></activiti:value>
+          <activiti:value id="16.组织规划Organizing and Planning" name="组织规划Organizing and Planning"></activiti:value>
+          <activiti:value id="17.决断能力Decisive &amp; Decision making" name="决断能力Decisive &amp; Decision making"></activiti:value>
+          <activiti:value id="18.控制安排Controlling" name="控制安排Controlling"></activiti:value>
+          <activiti:value id="19.商业意识Cemmercial Awareness" name="商业意识Cemmercial Awareness"></activiti:value>
+          <activiti:value id="20.激励他人Motivationg Others" name="激励他人Motivationg Others"></activiti:value>
+          <activiti:value id="21.其他Or Others" name="其他Or Others"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="uncompetencies2q4_选择欠缺的胜任力 Choose lack of competency_2_enum_sbs_$$C" name="选择欠缺的胜任力 Choose competency for employee's futrue improvement" type="enum" variable="uncompetencies2q4">
+          <activiti:value id="1.追求品质&amp;目标导向Quality Driven &amp; result go-getter" name="追求品质&amp;目标导向Quality Driven &amp; result go-getter"></activiti:value>
+          <activiti:value id="2.工作态度Work Attitude" name="工作态度Work Attitude"></activiti:value>
+          <activiti:value id="3.客户满意度Customer Satisfaction" name="客户满意度Customer Satisfaction"></activiti:value>
+          <activiti:value id="4.团队合作 &amp; 关系建立Team Work &amp; relationship building" name="团队合作 &amp; 关系建立Team Work &amp; relationship building"></activiti:value>
+          <activiti:value id="5.执行及解决问题的能力Execution &amp; puzzle solving" name="执行及解决问题的能力Execution &amp; puzzle solving"></activiti:value>
+          <activiti:value id="6.说服沟通Persuasive Communication" name="说服沟通Persuasive Communication"></activiti:value>
+          <activiti:value id="7.创新改进Innovation &amp; Improvement" name="创新改进Innovation &amp; Improvement"></activiti:value>
+          <activiti:value id="8.销售意识Sales Orientation" name="销售意识Sales Orientation"></activiti:value>
+          <activiti:value id="9.学习能力Learning Ability" name="学习能力Learning Ability"></activiti:value>
+          <activiti:value id="10.服务导向Service Orientation" name="服务导向Service Orientation"></activiti:value>
+          <activiti:value id="11.承受压力Stress Tolerance" name="承受压力Stress Tolerance"></activiti:value>
+          <activiti:value id="12.自我认知Self-assessment" name="自我认知Self-assessment"></activiti:value>
+          <activiti:value id="13.逻辑推理Logical Reasoning" name="逻辑推理Logical Reasoning"></activiti:value>
+          <activiti:value id="14.领导与授权Leadership &amp; Delegation" name="领导与授权Leadership &amp; Delegation"></activiti:value>
+          <activiti:value id="15.培养人才Talent Development" name="培养人才Talent Development"></activiti:value>
+          <activiti:value id="16.组织规划Organizing and Planning" name="组织规划Organizing and Planning"></activiti:value>
+          <activiti:value id="17.决断能力Decisive &amp; Decision making" name="决断能力Decisive &amp; Decision making"></activiti:value>
+          <activiti:value id="18.控制安排Controlling" name="控制安排Controlling"></activiti:value>
+          <activiti:value id="19.商业意识Cemmercial Awareness" name="商业意识Cemmercial Awareness"></activiti:value>
+          <activiti:value id="20.激励他人Motivationg Others" name="激励他人Motivationg Others"></activiti:value>
+          <activiti:value id="21.其他Or Others" name="其他Or Others"></activiti:value>
+        </activiti:formProperty>    
+        
+        <activiti:formProperty id="memoq4_备注 Memo_1_string_t2_$$D" name="备注 Memo" type="string" variable="memoq4"/>                        
+        
+        <activiti:formProperty id="keepworkq4_你愿意下一阶段选择他/她继续在你的团队工作吗 Do you want to he/her work in your team in next stage_1_enum_sbs_$$E" name="你愿意下一阶段选择他/她继续在你的团队工作吗 Do you want to he/her work in your team in next stage" type="enum" variable="keepworkq4" required="true">
           <activiti:value id="Yes" name="✔"></activiti:value>
           <activiti:value id="No" name="❌"></activiti:value>
           <activiti:value id="Wait and see" name="⭕"></activiti:value>
         </activiti:formProperty>
-        <activiti:formProperty id="salaryincq4_你愿意为他/她申请加薪吗 Do you want to apply for salary increasing for him/her_1_enum_sbs_$$E" name="你愿意为他/她申请加薪吗 Do you want to apply for salary increasing for him/her" type="enum" variable="salaryincq4" required="true">
+        <activiti:formProperty id="salaryincq4_你愿意为他/她申请加薪吗 Do you want to apply for salary increasing for him/her_1_enum_sbs_$$F" name="你愿意为他/她申请加薪吗 Do you want to apply for salary increasing for him/her" type="enum" variable="salaryincq4" required="true">
           <activiti:value id="Yes" name="✔"></activiti:value>
           <activiti:value id="No" name="❌"></activiti:value>
           <activiti:value id="Wait and see" name="⭕"></activiti:value>
         </activiti:formProperty>
-        <activiti:formProperty id="promotionq4_你愿意为他/她申请晋升吗 Do you think he/she is ready for promotion and taking more responsibility_1_enum_sbs_$$F" name="你愿意为他/她申请晋升吗 Do you think he/she is ready for promotion and taking more responsibility" type="enum" variable="promotionq4" required="true">
+        <activiti:formProperty id="promotionq4_你愿意为他/她申请晋升吗 Do you think he/she is ready for promotion and taking more responsibility_1_enum_sbs_$$G" name="你愿意为他/她申请晋升吗 Do you think he/she is ready for promotion and taking more responsibility" type="enum" variable="promotionq4" required="true">
           <activiti:value id="Yes" name="✔"></activiti:value>
           <activiti:value id="No" name="❌"></activiti:value>
           <activiti:value id="Wait and see" name="⭕"></activiti:value>
         </activiti:formProperty>
         <activiti:formProperty id="tbhdperformance_item" name="绩效考核表 Performance appraisal table" type="string" variable="tbhdperformance_item" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_构面 Perspective_perspective_1_string_t1_$$VA" name="构面 Perspective" type="string" variable="tbhdperformance_perspective_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdperformance_构面 Perspective_perspective_1_enum_sbs_$$VA" name="构面 Perspective" type="enum" variable="tbhdperformance_perspective_t00" required="true">
+        	<activiti:value id="财务及预算 Finance &amp; Budget" name="财务及预算 Finance &amp; Budget"></activiti:value>
+        	<activiti:value id="创新及专业 Innovation &amp; Profession" name="创新及专业 Innovation &amp; Profession"></activiti:value>
+        	<activiti:value id="客户及服务 Customer &amp; Service" name="客户及服务 Customer &amp; Service"></activiti:value>
+        	<activiti:value id="流程及改进 Procedure inprovement" name="流程及改进 Procedure inprovement"></activiti:value>
+        	<activiti:value id="学习与成长 Learning &amp; Development" name="学习与成长 Learning &amp; Development"></activiti:value>
+        </activiti:formProperty>
+
         <activiti:formProperty id="tbhdperformance_说明 Description_description_2_string_t1_$$VA" name="说明 Description" type="string" variable="tbhdperformance_description_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhdperformance_目标 Objective_objective_3_string_t1_$$VA" name="目标 Objective" type="string" variable="tbhdperformance_objective_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhdperformance_绩效指标 KPI_kpi_4_string_t1_$$VA" name="绩效指标 KPI" type="string" variable="tbhdperformance_kpi_t00"></activiti:formProperty>
@@ -837,10 +1093,10 @@
         <activiti:formProperty id="tbhdperformance_单位 Unit_unit_6_string_t1_$$VA" name="单位 Unit" type="string" variable="tbhdperformance_unit_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhdperformance_上年度实际 Actual last year_actual_7_string_t1_$$VA" name="上年度实际 Actual last year" type="string" variable="tbhdperformance_actual_t00" required="true"></activiti:formProperty>
         <activiti:formProperty id="tbhdperformance_指标属性 KPI achievement measurement(Fill in ≥ or ≤)_kpiattribute_8_string_t1_$$VA" name="指标属性 KPI achievement measurement(Fill in ≥ or ≤)" type="string" variable="tbhdperformance_kpiattribute_t00"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_Plan Q1_planq1_9_string_t1_$$HA" name="Plan Q1" type="string" variable="tbhdperformance_planq1_t00"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_Plan Q2_planq2_10_string_t1_$$HA" name="Plan Q2" type="string" variable="tbhdperformance_planq2_t00"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_Plan Q3_planq3_11_string_t1_$$HA" name="Plan Q3" type="string" variable="tbhdperformance_planq3_t00"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_Plan Q4_planq4_12_string_t1_$$VA" name="Plan Q4" type="string" variable="tbhdperformance_planq4_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdperformance_Plan Q1_planq1_9_string_t1_$$HA" name="Plan Q1" type="string" variable="tbhdperformance_planq1_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdperformance_Plan Q2_planq2_10_string_t1_$$HA" name="Plan Q2" type="string" variable="tbhdperformance_planq2_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdperformance_Plan Q3_planq3_11_string_t1_$$HA" name="Plan Q3" type="string" variable="tbhdperformance_planq3_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdperformance_Plan Q4_planq4_12_string_t1_$$A" name="Plan Q4" type="string" variable="tbhdperformance_planq4_t00" required="true"></activiti:formProperty>
         <activiti:formProperty id="tbhdperformance_Actual Q1_actualq1_13_string_t1_$$HA" name="Actual Q1" type="string" variable="tbhdperformance_actualq1_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhdperformance_Actual Q2_actualq2_14_string_t1_$$HA" name="Actual Q2" type="string" variable="tbhdperformance_actualq2_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhdperformance_Actual Q3_actualq3_15_string_t1_$$HA" name="Actual Q3" type="string" variable="tbhdperformance_actualq3_t00"></activiti:formProperty>
@@ -898,6 +1154,9 @@
 						dataMap.put('competencies1', execution.getVariable('competencies1q4')?:'')
 						dataMap.put('competencies2', execution.getVariable('competencies2q4')?:'')
 						dataMap.put('managerName', execution.getVariable('managerName')?:'')
+						dataMap.put('uncompetencies1', execution.getVariable('uncompetencies1q4')?:'')
+						dataMap.put('uncompetencies2', execution.getVariable('uncompetencies2q4')?:'')
+						dataMap.put('memo',execution.getVariable('memoq4')?:'')
 						
 						def employee = execution.getVariable('employee')
 						detailMap.put("from", "notice@dipont.com")
@@ -1070,6 +1329,9 @@
 			dataMap.put('keepwork', execution.getVariable('keepworkq1')?:'N/A')
 			dataMap.put('salaryinc', execution.getVariable('salaryincq1')?:'N/A')
 			dataMap.put('promotion', execution.getVariable('promotionq1')?:'N/A')
+			dataMap.put('uncompetencies1', execution.getVariable('uncompetencies1q1')?:'')
+			dataMap.put('uncompetencies2',execution.getVariable('uncompetencies2q1')?:'')
+			dataMap.put('memo',execution.getVariable('memoq1')?:'')
 			
 			def managerSn = execution.getVariable('managerSn')
 			detailMap.put("from", "notice@dipont.com")
@@ -1141,6 +1403,9 @@
 			dataMap.put('keepwork', execution.getVariable('keepworkq2')?:'')
 			dataMap.put('salaryinc', execution.getVariable('salaryincq2')?:'')
 			dataMap.put('promotion', execution.getVariable('promotionq2')?:'')
+			dataMap.put('uncompetencies1', execution.getVariable('uncompetencies1q2')?:'')
+			dataMap.put('uncompetencies2',execution.getVariable('uncompetencies2q2')?:'')
+			dataMap.put('memo',execution.getVariable('memoq2')?:'')
 			
 			def managerSn = execution.getVariable('managerSn')
 			detailMap.put("from", "notice@dipont.com")
@@ -1212,6 +1477,9 @@
 			dataMap.put('keepwork', execution.getVariable('keepworkq3')?:'N/A')
 			dataMap.put('salaryinc', execution.getVariable('salaryincq3')?:'N/A')
 			dataMap.put('promotion', execution.getVariable('promotionq3')?:'N/A')
+			dataMap.put('uncompetencies1', execution.getVariable('uncompetencies1q3')?:'')
+			dataMap.put('uncompetencies2',execution.getVariable('uncompetencies2q3')?:'')
+			dataMap.put('memo',execution.getVariable('memoq3')?:'')
 			
 			def managerSn = execution.getVariable('managerSn')
 			detailMap.put("from", "notice@dipont.com")
@@ -1283,6 +1551,9 @@
 			dataMap.put('keepwork', execution.getVariable('keepworkq4')?:'')
 			dataMap.put('salaryinc', execution.getVariable('salaryincq4')?:'')
 			dataMap.put('promotion', execution.getVariable('promotionq4')?:'')
+			dataMap.put('uncompetencies1', execution.getVariable('uncompetencies1q4')?:'')
+			dataMap.put('uncompetencies2',execution.getVariable('uncompetencies2q4')?:'')
+			dataMap.put('memo',execution.getVariable('memoq4')?:'')
 			
 			def managerSn = execution.getVariable('managerSn')
 			detailMap.put("from", "notice@dipont.com")

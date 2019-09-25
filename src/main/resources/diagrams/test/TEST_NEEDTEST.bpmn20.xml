@@ -3,11 +3,14 @@
   <process id="AAATEST" name="AAATEST" isExecutable="true" activiti:candidateStarterGroups="admin">
     <startEvent id="startevent1" name="Start">
     	<extensionElements>
-    		<activiti:formProperty id="tba_item" name="A表" type="string" variable="zhubiao"/>
-    		<activiti:formProperty id="tba_b_rel_1_string_join_$$A" name="关联" type="string" variable="rel"/>
-    		<activiti:formProperty id="tba-b_item" name="B表" type="string" variable="zibiao"/>
-    		<activiti:formProperty id="tba-b_字段_param_1_string_t1_$$A" name="字段" type="string" variable="param"/>
-    		<activiti:formProperty id="tba-b_join-key_key_2_string_t1_$$A" name="Key" type="string"/>
+    		<activiti:formProperty id="tbhdperformance_item" name="绩效考核表 Performance appraisal table" type="string" variable="tbhdperformance_item" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdperformance_构面 Perspective_perspective_1_enum_sbs_$$A" name="构面 Perspective" type="enum" variable="tbhdperformance_perspective_t00" required="true">
+        	<activiti:value id="财务及预算 Finance &amp; Budget" name="财务及预算 Finance &amp; Budget"></activiti:value>
+        	<activiti:value id="创新及专业 Innovation &amp; Profession" name="创新及专业 Innovation &amp; Profession"></activiti:value>
+        	<activiti:value id="客户及服务 Customer &amp; Service" name="客户及服务 Customer &amp; Service"></activiti:value>
+        	<activiti:value id="流程及改进 Procedure inprovement" name="流程及改进 Procedure inprovement"></activiti:value>
+        	<activiti:value id="学习与成长 Learning &amp; Development" name="学习与成长 Learning &amp; Development"></activiti:value>
+        </activiti:formProperty>
     	</extensionElements>
     </startEvent>
   </process>
