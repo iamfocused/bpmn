@@ -237,21 +237,25 @@
     <intermediateCatchEvent id="timerintermediatecatchevent1" name="TimerCatchEvent">
       <timerEventDefinition>
         <timeDuration>PT1M</timeDuration>
+        <!-- <timeDate>{execution.getVariable('q1DateTime')}</timeDate> -->
       </timerEventDefinition>
     </intermediateCatchEvent>
     <intermediateCatchEvent id="timerintermediatecatchevent2" name="TimerCatchEvent">
       <timerEventDefinition>
         <timeDuration>PT2M</timeDuration>
+        <!-- <timeDate>{execution.getVariable('q2DateTime')}</timeDate> -->
       </timerEventDefinition>
     </intermediateCatchEvent>
     <intermediateCatchEvent id="timerintermediatecatchevent3" name="TimerCatchEvent">
       <timerEventDefinition>
         <timeDuration>PT3M</timeDuration>
+        <!-- <timeDate>{execution.getVariable('q3DateTime')}</timeDate> -->
       </timerEventDefinition>
     </intermediateCatchEvent>
     <intermediateCatchEvent id="timerintermediatecatchevent4" name="TimerCatchEvent">
       <timerEventDefinition>
         <timeDuration>PT4M</timeDuration>
+        <!-- <timeDate>{execution.getVariable('q4DateTime')}</timeDate> -->
       </timerEventDefinition>
     </intermediateCatchEvent>
     <userTask id="usertask3" name="Q1 Task" activiti:assignee="${managerSn}" activiti:dueDate="P1D">

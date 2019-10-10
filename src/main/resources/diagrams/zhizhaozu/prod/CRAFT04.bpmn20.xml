@@ -1,57 +1,55 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/pur">
-  <process id="craftway0902" name="工艺方案流程测试" isExecutable="true" activiti:candidateStarterUsers="18616741835" activiti:candidateStarterGroups="admin,processplanning">
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/fin">
+  <process id="craftway04" name="工艺方案4" isExecutable="true" activiti:candidateStarterGroups="gongyi@@13@@,processadmin@@17@@,admin@@13@@,processadmin,gongyi,admin">
     <startEvent id="StartEvent_1" activiti:initiator="initiator">
       <extensionElements>
-        <activiti:formProperty id="processnumber_工艺编号_1_string_t1_$$A" name="工艺编号" type="string" variable="processnumber"></activiti:formProperty>
-        <activiti:formProperty id="processname_工艺名称_2_string_t1_$$A" name="工艺名称" type="string" variable="processname"></activiti:formProperty>
+        <activiti:formProperty id="processnumber_工艺编号_1_string_t1_$$A" name="工艺编号" type="string" variable="processnumber" required="true"></activiti:formProperty>
+        <activiti:formProperty id="processname_工艺名称_2_string_t1_$$A" name="工艺名称" type="string" variable="processname" required="true"></activiti:formProperty>
         <activiti:formProperty id="processdesc_工艺描述_3_string_t2_$$A" name="工艺描述" type="string" variable="processdesc"></activiti:formProperty>
-        <activiti:formProperty id="itemName_物料名称_4_string_auto_$$A" name="物料名称" type="string" variable="itemName"></activiti:formProperty>
-        <activiti:formProperty id="2dnumber_二维图号_7_string_t1_$$A" name="二维图号" type="string" variable="2dnumber"></activiti:formProperty>
-        <activiti:formProperty id="3dnumber_三维模型_8_string_t1_$$A" name="三维模型" type="string" variable="3dnumber"></activiti:formProperty>
-        <activiti:formProperty id="processeditor_工艺编制_9_string_t1_$$A" name="工艺编制" type="string" variable="processeditor"></activiti:formProperty>
-        <activiti:formProperty id="edittime_编制时间_10_string_t5_$$A" name="编制时间" type="string" variable="edittime"></activiti:formProperty>
-        <activiti:formProperty id="WORKDAY_工作天数（天/年）_13_string_t6_$$A" name="工作天数（天/年）" type="string" variable="WORKDAY" required="true"></activiti:formProperty>
-        <activiti:formProperty id="SHIFT_换班次数（班/天）_14_string_t6_$$A" name="换班次数（班/天）" type="string" variable="SHIFT" required="true"></activiti:formProperty>
-        <activiti:formProperty id="SHIFTH_单班工作时间（小时）_15_string_t6_$$A" name="单班工作时间（小时）" type="string" variable="SHIFTH" required="true"></activiti:formProperty>
-        <activiti:formProperty id="LINE_规划产线数_17_string_t6_$$A" name="规划产线数" type="string" variable="LINE" required="true"></activiti:formProperty>
+        <activiti:formProperty id="EAN_物料编号_4_string_auto_$$A" name="物料编号" type="string" variable="EAN" required="true"></activiti:formProperty>
+        <activiti:formProperty id="WORKDAY_工作天数（天/年）_13_string_t6_$$B" name="工作天数（天/年）" type="string" variable="WORKDAY"></activiti:formProperty>
+        <activiti:formProperty id="SHIFT_换班次数（班/天）_14_string_t6_$$B" name="换班次数（班/天）" type="string" variable="SHIFT"></activiti:formProperty>
+        <activiti:formProperty id="SHIFTH_单班工作时间（小时）_15_string_t6_$$B" name="单班工作时间（小时）" type="string" variable="SHIFTH"></activiti:formProperty>
+        <activiti:formProperty id="TMCYCLE_工艺节拍（秒）_16_string_t6_$$B" name="工艺节拍（秒）" type="string" variable="TMCYCLE"></activiti:formProperty>
+        <activiti:formProperty id="LINE_规划产线数_17_string_t6_$$B" name="规划产线数" type="string" variable="LINE"></activiti:formProperty>
+        <activiti:formProperty id="PROCAP_产能测算（件/年）_18_string_t6_$$B" name="产能测算（件/年）" type="string" variable="PROCAP"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879_item" name="工序表" type="string" variable="header1566744708879"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879_opnumber_工序编号_2_string_t1_$$A" name="工序编号" type="string" variable="opnumber" required="true"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879_opname_工序名称_3_string_t1_$$A" name="工序名称" type="string" variable="opname"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879_sendsectionnumber_分配工段编号_4_string_t1_$$HA" name="分配工段编号" type="string" variable="sendsectionnumber"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879_plannedstarttime_计划开始时间_5_string_t5_$$HA" name="计划开始时间" type="string" variable="plannedstarttime"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879_plannedendtime_计划结束时间_6_string_t5_$$HA" name="计划结束时间" type="string" variable="plannedendtime"></activiti:formProperty>
-        <activiti:formProperty id="tbheader1566744708879_optype_工序类型_7_enum_sbs_$$A" name="工序类型" type="enum" variable="optype">
+        <activiti:formProperty id="tbheader1566744708879_optype_工序类型_7_enum_sbs_$$HA" name="工序类型" type="enum" variable="optype">
           <activiti:value id="通用" name="通用"></activiti:value>
           <activiti:value id="车削" name="车削"></activiti:value>
           <activiti:value id="铣削" name="铣削"></activiti:value>
         </activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879_opdesc_工序描述_8_string_t2_$$A" name="工序描述" type="string" variable="opdesc"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879_eqpttypecode_设备型号_9_string_t1_$$A" name="设备型号" type="string" variable="eqpttypecode"></activiti:formProperty>
-        <activiti:formProperty id="tbheader1566744708879_NOFIX_装夹件数（件）_10_string_t6_$$A" name="装夹件数（件）" type="string" variable="NOFIX" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbheader1566744708879_TMHA_人员操作时间（秒）_11_string_t6_$$A" name="人员操作时间（秒）" type="string" variable="TMHA" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbheader1566744708879_TMQC_人工检测时间（秒）_12_string_t6_$$A" name="人工检测时间（秒）" type="string" variable="TMQC" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbheader1566744708879_TMNO_其它时间（秒）_13_string_t6_$$A" name="其它时间（秒）" type="string" variable="TMNO" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbheader1566744708879_TMMT_加工时间（秒）_14_string_t6_$$HA" name="加工时间（秒）" type="string" variable="TMMT"></activiti:formProperty>
-        <activiti:formProperty id="tbheader1566744708879_TMOP_工序时间（秒）_15_string_t6_$$HA" name="工序时间（秒）" type="string" variable="TMOP"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566744708879_NOFIX_装夹件数（件）_10_string_t6_$$A" name="装夹件数（件）" type="string" variable="NOFIX"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566744708879_TMHA_人员操作时间（秒）_11_string_t6_$$A" name="人员操作时间（秒）" type="string" variable="TMHA"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566744708879_TMQC_人工检测时间（秒）_12_string_t6_$$A" name="人工检测时间（秒）" type="string" variable="TMQC"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566744708879_TMNO_其它时间（秒）_13_string_t6_$$A" name="其它时间（秒）" type="string" variable="TMNO"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566744708879_TMMT_加工时间（秒）_14_string_t6_$$A" name="加工时间（秒）" type="string" variable="TMMT"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566744708879_TMOP_工序时间（秒）_15_string_t6_$$A" name="工序时间（秒）" type="string" variable="TMOP"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879_opsketch_工序简图_16_string_t9i_$$A" name="工序简图" type="string" variable="opsketch"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879_opprogram_加工程序_17_string_t9i_$$A" name="加工程序" type="string" variable="opprogram"></activiti:formProperty>
-        <activiti:formProperty id="tbheader1566744708879_header1566746042674_工序物料清单_18_string_join_$$A" name="工序物料清单" type="string" variable="join1566748354574"></activiti:formProperty>
-        <activiti:formProperty id="tbheader1566744708879_header-1566746045871_工序工具清单_19_string_join_$$A" name="工序工具清单" type="string" variable="join1566746045871"></activiti:formProperty>
-        <activiti:formProperty id="tbheader1566744708879_header-1566746045367_工序检验指标_20_string_join_$$A" name="工序检验指标" type="string" variable="join1566746045367"></activiti:formProperty>
-        <activiti:formProperty id="tbheader1566744708879_header-1566746044755_通用工步表_21_string_join_$$A" name="通用工步表" type="string" variable="join1566746044755"></activiti:formProperty>
-        <activiti:formProperty id="tbheader1566744708879_header-1566746165617_车削工步表_22_string_join_$$A" name="车削工步表" type="string" variable="join1566746165617"></activiti:formProperty>
-        <activiti:formProperty id="tbheader1566744708879_header-1566746163577_铣削工步表_23_string_join_$$A" name="铣削工步表" type="string" variable="join1566746163577"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566744708879_header1566746042674_工序物料清单_18_string_join_$$B" name="工序物料清单" type="string" variable="join1566748354574"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566744708879_header-1566746045871_工序工具清单_19_string_join_$$C" name="工序工具清单" type="string" variable="join1566746045871"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566744708879_header-1566746045367_工序检验指标_20_string_join_$$D" name="工序检验指标" type="string" variable="join1566746045367"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566744708879_header-1566746044755_通用工步表_21_string_join_$$E" name="通用工步表" type="string" variable="join1566746044755"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566744708879_header-1566746165617_车削工步表_22_string_join_$$E" name="车削工步表" type="string" variable="join1566746165617"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566744708879_header-1566746163577_铣削工步表_23_string_join_$$E" name="铣削工步表" type="string" variable="join1566746163577"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header1566746042674_item" name="工序物料清单" type="string" variable="header1566746042674"></activiti:formProperty>
-        <activiti:formProperty id="tbheader1566744708879-header1566746042674_itemname2_物料名称_2_string_t1_$$A" name="物料名称" type="string" variable="itemname2"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566744708879-header1566746042674_EAN2_物料编号_2_string_t1_$$A" name="物料编号" type="string" variable="EAN2"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header1566746042674_ORDCODE2_物料型号_3_string_t1_$$A" name="物料型号" type="string" variable="ORDCODE2"></activiti:formProperty>
-        <activiti:formProperty id="tbheader1566744708879-header1566746042674_EAN2_物料编号_4_string_t1_$$A" name="物料编号" type="string" variable="EAN2"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566744708879-header1566746042674_itemname2_物料名称_4_string_t1_$$A" name="物料名称" type="string" variable="itemname2"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header1566746042674_EANQTY_数量_5_string_t6_$$A" name="数量" type="string" variable="EANQTY"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header1566746042674_join-key_Key_10_string_t1_$$A" name="Key" type="string"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header-1566746045871_item" name="工序工具清单" type="string" variable="header1566746042674"></activiti:formProperty>
-        <activiti:formProperty id="tbheader1566744708879-header-1566746045871_toolname_工具名称_2_string_t1_$$A" name="工具名称" type="string" variable="toolname"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566744708879-header-1566746045871_toolnumber_工具编号_2_string_t1_$$A" name="工具编号" type="string" variable="toolnumber"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header-1566746045871_tooltypecode_工具型号_3_string_t1_$$A" name="工具型号" type="string" variable="tooltypecode"></activiti:formProperty>
-        <activiti:formProperty id="tbheader1566744708879-header-1566746045871_toolnumber_工具编号_4_string_t1_$$A" name="工具编号" type="string" variable="toolnumber"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566744708879-header-1566746045871_toolname_工具名称_4_string_t1_$$A" name="工具名称" type="string" variable="toolname"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header-1566746045871_toolqty_数量_5_string_t6_$$A" name="数量" type="string" variable="toolqty"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header-1566746045871_join-key_Key_10_string_t1_$$A" name="Key" type="string"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header-1566746045367_item" name="工序检验指标" type="string" variable="header1566746042674"></activiti:formProperty>
@@ -74,17 +72,17 @@
         <activiti:formProperty id="tbheader1566744708879-header-1566746165617_tsdesc_工步描述_5_string_t2_$$A" name="工步描述" type="string" variable="tsdesc"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header-1566746165617_tsVC_切削速度（m/min）_6_string_t6_$$A" name="切削速度（m/min）" type="string" variable="tsVC"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header-1566746165617_tsDCX_最大车削直径（mm）_7_string_t6_$$A" name="最大车削直径（mm）" type="string" variable="tsDCX"></activiti:formProperty>
-        <activiti:formProperty id="tbheader1566744708879-header-1566746165617_tsDCN_最小车削直径（mm）_8_string_t6_$$A" name="最小车削直径（mm）" type="string" variable="tsDCN" ></activiti:formProperty>
-        <activiti:formProperty id="tbheader1566744708879-header-1566746165617_tsFR_每转进给量（mm/rev）_9_string_t6_$$A" name="每转进给量（mm/rev）" type="string" variable="tsFR" ></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566744708879-header-1566746165617_tsDCN_最小车削直径（mm）_8_string_t6_$$A" name="最小车削直径（mm）" type="string" variable="tsDCN"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566744708879-header-1566746165617_tsFR_每转进给量（mm/rev）_9_string_t6_$$A" name="每转进给量（mm/rev）" type="string" variable="tsFR"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header-1566746165617_tsLC_切削长度（mm）_10_string_t6_$$A" name="切削长度（mm）" type="string" variable="tsLC"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header-1566746165617_tsNOC_切削次数（次）_11_string_t6_$$A" name="切削次数（次）" type="string" variable="tsNOC"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header-1566746165617_tsNOLIFE_刀具寿命（件）_12_string_t6_$$A" name="刀具寿命（件）" type="string" variable="tsNOLIFE"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header-1566746165617_tsRPMAVE_平均转速（rev/min）_13_string_t6_$$HA" name="平均转速（rev/min）" type="string" variable="tsRPMAVE"></activiti:formProperty>
-        <activiti:formProperty id="tbheader1566744708879-header-1566746165617_tsVF_进给速度（mm/min）_14_string_t6_$$HA" name="进给速度（mm/min）" type="string" variable="tsVF"></activiti:formProperty>
-        <activiti:formProperty id="tbheader1566744708879-header-1566746165617_tsTMENG_工进时间（秒）_15_string_t6_$$HA" name="工进时间（秒）" type="string" variable="tsTMENG"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566744708879-header-1566746165617_tsVF_进给速度（mm/min）_14_string_t6_$$A" name="进给速度（mm/min）" type="string" variable="tsVF"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566744708879-header-1566746165617_tsTMENG_工进时间（秒）_15_string_t6_$$A" name="工进时间（秒）" type="string" variable="tsTMENG"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header-1566746165617_tsTMTCT_换刀时间（秒）_16_string_t6_$$A" name="换刀时间（秒）" type="string" variable="tsTMTCT"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header-1566746165617_tsTMPOSS_单次定位时间（秒）_17_string_t6_$$A" name="单次定位时间（秒）" type="string" variable="tsTMPOSS"></activiti:formProperty>
-        <activiti:formProperty id="tbheader1566744708879-header-1566746165617_tsTMPOS_定位时间（秒）_18_string_t6_$$HA" name="定位时间（秒）" type="string" variable="tsTMPOS"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566744708879-header-1566746165617_tsTMPOS_定位时间（秒）_18_string_t6_$$A" name="定位时间（秒）" type="string" variable="tsTMPOS"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header-1566746165617_tsTMSUP_辅助时间（秒）_19_string_t6_$$A" name="辅助时间（秒）" type="string" variable="tsTMSUP"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header-1566746165617_join-key_Key_10_string_t1_$$A" name="Key" type="string"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header-1566746163577_item" name="铣削工步表" type="string" variable="header1566746163577"></activiti:formProperty>
@@ -99,12 +97,12 @@
         <activiti:formProperty id="tbheader1566744708879-header-1566746163577_msLC_切削长度（mm）_10_string_t6_$$A" name="切削长度（mm）" type="string" variable="msLC"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header-1566746163577_msNOC_切削次数（次）_11_string_t6_$$A" name="切削次数（次）" type="string" variable="msNOC"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header-1566746163577_msNOLIFE_刀具寿命（件）_12_string_t6_$$A" name="刀具寿命（件）" type="string" variable="msNOLIFE"></activiti:formProperty>
-        <activiti:formProperty id="tbheader1566744708879-header-1566746163577_msRPM_转速（rev/min）_13_string_t6_$$HA" name="转速（rev/min）" type="string" variable="msRPM"></activiti:formProperty>
-        <activiti:formProperty id="tbheader1566744708879-header-1566746163577_msVF_进给速度（mm/min）_14_string_t6_$$HA" name="进给速度（mm/min）" type="string" variable="msVF"></activiti:formProperty>
-        <activiti:formProperty id="tbheader1566744708879-header-1566746163577_msTMENG_工进时间（秒）_15_string_t6_$$HA" name="工进时间（秒）" type="string" variable="msTMENG"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566744708879-header-1566746163577_msRPM_转速（rev/min）_13_string_t6_$$A" name="转速（rev/min）" type="string" variable="msRPM"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566744708879-header-1566746163577_msVF_进给速度（mm/min）_14_string_t6_$$A" name="进给速度（mm/min）" type="string" variable="msVF"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566744708879-header-1566746163577_msTMENG_工进时间（秒）_15_string_t6_$$A" name="工进时间（秒）" type="string" variable="msTMENG"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header-1566746163577_msTMTCT_换刀时间（秒）_16_string_t6_$$A" name="换刀时间（秒）" type="string" variable="msTMTCT"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header-1566746163577_msTMPOSS_单次定位时间（秒）_17_string_t6_$$A" name="单次定位时间（秒）" type="string" variable="msTMPOSS"></activiti:formProperty>
-        <activiti:formProperty id="tbheader1566744708879-header-1566746163577_msTMPOS_定位时间（秒）_18_string_t6_$$HA" name="定位时间（秒）" type="string" variable="msTMPOS"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566744708879-header-1566746163577_msTMPOS_定位时间（秒）_18_string_t6_$$A" name="定位时间（秒）" type="string" variable="msTMPOS"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header-1566746163577_msTMSUP_辅助时间（秒）_19_string_t6_$$A" name="辅助时间（秒）" type="string" variable="msTMSUP"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header-1566746163577_join-key_Key_10_string_t1_$$A" name="Key" type="string"></activiti:formProperty>
       </extensionElements>
@@ -113,31 +111,26 @@
     <sequenceFlow id="SequenceFlow_0ukfcms" sourceRef="StartEvent_1" targetRef="scripttask1"></sequenceFlow>
     <userTask id="usertask1" name="循环修改任务" activiti:assignee="${initiator}">
       <extensionElements>
-        <activiti:formProperty id="processnumber_工艺编号_1_string_t1_$$A" name="工艺编号" type="string" variable="processnumber"></activiti:formProperty>
-        <activiti:formProperty id="processname_工艺名称_2_string_t1_$$A" name="工艺名称" type="string" variable="processname"></activiti:formProperty>
+        <activiti:formProperty id="processnumber_工艺编号_1_string_t1_$$A" name="工艺编号" type="string" variable="processnumber" required="true"></activiti:formProperty>
+        <activiti:formProperty id="processname_工艺名称_2_string_t1_$$A" name="工艺名称" type="string" variable="processname" required="true"></activiti:formProperty>
         <activiti:formProperty id="processdesc_工艺描述_3_string_t2_$$A" name="工艺描述" type="string" variable="processdesc"></activiti:formProperty>
-        <activiti:formProperty id="itemName_物料名称_1_string_auto_$$B" name="物料名称" type="string" variable="itemName"></activiti:formProperty>
-        <activiti:formProperty id="EAN_物料编号_4_string_t1_$$VA" name="物料编号" type="string" variable="EAN"></activiti:formProperty>
-        <activiti:formProperty id="ORDCODE_物料型号_5_string_t1_$$VA" name="物料型号" type="string" variable="ORDCODE"></activiti:formProperty>
+        <activiti:formProperty id="EAN_物料编号_1_string_auto_$$B" name="物料编号" type="string" variable="EAN"></activiti:formProperty>
+        <activiti:formProperty id="ORDCODE_物料型号_4_string_t1_$$VA" name="物料型号" type="string" variable="ORDCODE"></activiti:formProperty>
+        <activiti:formProperty id="itemName_物料名称_5_string_t1_$$VA" name="物料名称" type="string" variable="itemName"></activiti:formProperty>
         <activiti:formProperty id="mainmaterial_主要材料_6_string_t1_$$VA" name="主要材料" type="string" variable="mainmaterial"></activiti:formProperty>
-        <activiti:formProperty id="2dnumber_二维图号_7_string_t1_$$A" name="二维图号" type="string" variable="2dnumber"></activiti:formProperty>
-        <activiti:formProperty id="3dnumber_三维模型_8_string_t1_$$A" name="三维模型" type="string" variable="3dnumber"></activiti:formProperty>
-        <activiti:formProperty id="processeditor_工艺编制_9_string_t1_$$A" name="工艺编制" type="string" variable="processeditor"></activiti:formProperty>
-        <activiti:formProperty id="edittime_编制时间_10_string_t5_$$A" name="编制时间" type="string" variable="edittime"></activiti:formProperty>
-        <activiti:formProperty id="WORKDAY_工作天数（天/年）_13_string_t6_$$A" name="工作天数（天/年）" type="string" variable="WORKDAY" required="true"></activiti:formProperty>
-        <activiti:formProperty id="SHIFT_换班次数（班/天）_14_string_t6_$$A" name="换班次数（班/天）" type="string" variable="SHIFT" required="true"></activiti:formProperty>
-        <activiti:formProperty id="SHIFTH_单班工作时间（小时）_15_string_t6_$$A" name="单班工作时间（小时）" type="string" variable="SHIFTH" required="true"></activiti:formProperty>
+        <activiti:formProperty id="WORKDAY_工作天数（天/年）_13_string_t6_$$A" name="工作天数（天/年）" type="string" variable="WORKDAY"></activiti:formProperty>
+        <activiti:formProperty id="SHIFT_换班次数（班/天）_14_string_t6_$$A" name="换班次数（班/天）" type="string" variable="SHIFT"></activiti:formProperty>
+        <activiti:formProperty id="SHIFTH_单班工作时间（小时）_15_string_t6_$$A" name="单班工作时间（小时）" type="string" variable="SHIFTH"></activiti:formProperty>
         <activiti:formProperty id="TMCYCLE_工艺节拍（秒）_16_string_t6_$$A" name="工艺节拍（秒）" type="string" variable="TMCYCLE"></activiti:formProperty>
-        <activiti:formProperty id="LINE_规划产线数_17_string_t6_$$A" name="规划产线数" type="string" variable="LINE" required="true"></activiti:formProperty>
+        <activiti:formProperty id="LINE_规划产线数_17_string_t6_$$A" name="规划产线数" type="string" variable="LINE"></activiti:formProperty>
         <activiti:formProperty id="PROCAP_产能测算（件/年）_18_string_t6_$$A" name="产能测算（件/年）" type="string" variable="PROCAP"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879_item" name="工序表" type="string" variable="header1566744708879"></activiti:formProperty>
-        <activiti:formProperty id="tbheader1566744708879_opnumber_工序编号_2_string_t1_$$A" name="工序编号" type="string" variable="opnumber"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566744708879_opnumber_工序编号_2_string_t1_$$A" name="工序编号" type="string" variable="opnumber" required="true" ></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879_opname_工序名称_3_string_t1_$$A" name="工序名称" type="string" variable="opname"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879_sendsectionnumber_分配工段编号_4_string_t1_$$HA" name="分配工段编号" type="string" variable="sendsectionnumber"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879_plannedstarttime_计划开始时间_5_string_t5_$$HA" name="计划开始时间" type="string" variable="plannedstarttime"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879_plannedendtime_计划结束时间_6_string_t5_$$HA" name="计划结束时间" type="string" variable="plannedendtime"></activiti:formProperty>
-                
-        <activiti:formProperty id="tbheader1566744708879_optype_工序类型_7_enum_sbs_$$A" name="工序类型" type="enum" variable="optype">
+        <activiti:formProperty id="tbheader1566744708879_optype_工序类型_7_enum_sbs_$$HA" name="工序类型" type="enum" variable="optype">
           <activiti:value id="通用" name="通用"></activiti:value>
           <activiti:value id="车削" name="车削"></activiti:value>
           <activiti:value id="铣削" name="铣削"></activiti:value>
@@ -159,15 +152,15 @@
         <activiti:formProperty id="tbheader1566744708879_header-1566746165617_车削工步表_22_string_join_$$A" name="车削工步表" type="string" variable="join1566746165617"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879_header-1566746163577_铣削工步表_23_string_join_$$A" name="铣削工步表" type="string" variable="join1566746163577"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header1566746042674_item" name="工序物料清单" type="string" variable="header1566746042674"></activiti:formProperty>
-        <activiti:formProperty id="tbheader1566744708879-header1566746042674_itemname2_物料名称_2_string_t1_$$A" name="物料名称" type="string" variable="itemname2"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566744708879-header1566746042674_EAN2_物料编号_2_string_t1_$$A" name="物料编号" type="string" variable="EAN2"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header1566746042674_ORDCODE2_物料型号_3_string_t1_$$A" name="物料型号" type="string" variable="ORDCODE2"></activiti:formProperty>
-        <activiti:formProperty id="tbheader1566744708879-header1566746042674_EAN2_物料编号_4_string_t1_$$A" name="物料编号" type="string" variable="EAN2"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566744708879-header1566746042674_itemname2_物料名称_4_string_t1_$$A" name="物料名称" type="string" variable="itemname2"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header1566746042674_EANQTY_数量_5_string_t6_$$A" name="数量" type="string" variable="EANQTY"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header1566746042674_join-key_Key_10_string_t1_$$A" name="Key" type="string"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header-1566746045871_item" name="工序工具清单" type="string" variable="header1566746042674"></activiti:formProperty>
-        <activiti:formProperty id="tbheader1566744708879-header-1566746045871_toolname_工具名称_2_string_t1_$$A" name="工具名称" type="string" variable="toolname"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566744708879-header-1566746045871_toolnumber_工具编号_2_string_t1_$$A" name="工具编号" type="string" variable="toolnumber"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header-1566746045871_tooltypecode_工具型号_3_string_t1_$$A" name="工具型号" type="string" variable="tooltypecode"></activiti:formProperty>
-        <activiti:formProperty id="tbheader1566744708879-header-1566746045871_toolnumber_工具编号_4_string_t1_$$A" name="工具编号" type="string" variable="toolnumber"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566744708879-header-1566746045871_toolname_工具名称_4_string_t1_$$A" name="工具名称" type="string" variable="toolname"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header-1566746045871_toolqty_数量_5_string_t6_$$A" name="数量" type="string" variable="toolqty"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header-1566746045871_join-key_Key_10_string_t1_$$A" name="Key" type="string"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header-1566746045367_item" name="工序检验指标" type="string" variable="header1566746042674"></activiti:formProperty>
@@ -323,7 +316,7 @@
 			                def qxcd = cx.get('切削长度（mm）')?:'0'
 			                
 			                def tsTMENG =0.toBigDecimal()
-			                if(tsVF > 0) {
+			                if(tsVF &gt; 0) {
 			                	tsTMENG = qxcd.toBigDecimal().multiply(BigDecimal.valueOf(60)).multiply(cxcs.toBigDecimal()).multiply(gx[3].toBigDecimal()).divide(tsVF,2, RoundingMode.HALF_UP)
 			                }
 			                
@@ -379,7 +372,7 @@
 			                
 			                def qxcd = xx.get('切削长度（mm）')?:'0'
 			                def msTMENG = 0.toBigDecimal()
-			                if(msVF > 0){
+			                if(msVF &gt; 0){
 			                	msTMENG = qxcd.toBigDecimal().multiply(BigDecimal.valueOf(60)).multiply(qxcs.toBigDecimal()).multiply(gx[3].toBigDecimal()).divide(msVF,2, RoundingMode.HALF_UP)
 			                }
 			                xxItem.each {k,v -&gt;
@@ -478,30 +471,23 @@
         <activiti:formProperty id="processnumber_工艺编号_1_string_t1_$$VA" name="工艺编号" type="string" variable="processnumber"></activiti:formProperty>
         <activiti:formProperty id="processname_工艺名称_2_string_t1_$$VA" name="工艺名称" type="string" variable="processname"></activiti:formProperty>
         <activiti:formProperty id="processdesc_工艺描述_3_string_t2_$$VA" name="工艺描述" type="string" variable="processdesc"></activiti:formProperty>
-        <activiti:formProperty id="itemName_物料名称_1_string_auto_$$VB" name="物料名称" type="string" variable="itemName"></activiti:formProperty>
-        <activiti:formProperty id="EAN_物料编号_4_string_t1_$$VA" name="物料编号" type="string" variable="EAN"></activiti:formProperty>
-        <activiti:formProperty id="ORDCODE_物料型号_5_string_t1_$$VA" name="物料型号" type="string" variable="ORDCODE"></activiti:formProperty>
+        <activiti:formProperty id="EAN_物料编号_1_string_auto_$$B" name="物料编号" type="string" variable="EAN"></activiti:formProperty>
+        <activiti:formProperty id="ORDCODE_物料型号_4_string_t1_$$VA" name="物料型号" type="string" variable="ORDCODE"></activiti:formProperty>
+        <activiti:formProperty id="itemName_物料名称_5_string_t1_$$VA" name="物料名称" type="string" variable="itemName"></activiti:formProperty>
         <activiti:formProperty id="mainmaterial_主要材料_6_string_t1_$$VA" name="主要材料" type="string" variable="mainmaterial"></activiti:formProperty>
-        <activiti:formProperty id="2dnumber_二维图号_7_string_t1_$$VA" name="二维图号" type="string" variable="2dnumber"></activiti:formProperty>
-        <activiti:formProperty id="3dnumber_三维模型_8_string_t1_$$VA" name="三维模型" type="string" variable="3dnumber"></activiti:formProperty>
-        <activiti:formProperty id="processeditor_工艺编制_9_string_t1_$$VA" name="工艺编制" type="string" variable="processeditor"></activiti:formProperty>
-        <activiti:formProperty id="edittime_编制时间_10_string_t5_$$VA" name="编制时间" type="string" variable="edittime"></activiti:formProperty>
-        <activiti:formProperty id="processcheck_工艺审核_11_string_t1_$$A" name="工艺审核" type="string" variable="processcheck" required="true"></activiti:formProperty>
-        <activiti:formProperty id="checktime_审核时间_12_string_t5_$$A" name="审核时间" type="string" variable="checktime" required="true"></activiti:formProperty>
         <activiti:formProperty id="WORKDAY_工作天数（天/年）_13_string_t6_$$VA" name="工作天数（天/年）" type="string" variable="WORKDAY"></activiti:formProperty>
         <activiti:formProperty id="SHIFT_换班次数（班/天）_14_string_t6_$$VA" name="换班次数（班/天）" type="string" variable="SHIFT"></activiti:formProperty>
         <activiti:formProperty id="SHIFTH_单班工作时间（小时）_15_string_t6_$$VA" name="单班工作时间（小时）" type="string" variable="SHIFTH"></activiti:formProperty>
         <activiti:formProperty id="TMCYCLE_工艺节拍（秒）_16_string_t6_$$VA" name="工艺节拍（秒）" type="string" variable="TMCYCLE"></activiti:formProperty>
         <activiti:formProperty id="LINE_规划产线数_17_string_t6_$$VA" name="规划产线数" type="string" variable="LINE"></activiti:formProperty>
         <activiti:formProperty id="PROCAP_产能测算（件/年）_18_string_t6_$$VA" name="产能测算（件/年）" type="string" variable="PROCAP"></activiti:formProperty>
-        
         <activiti:formProperty id="tbheader1566744708879_item_$$VA" name="工序表" type="string" variable="header1566744708879"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879_opnumber_工序编号_2_string_t1_$$A" name="工序编号" type="string" variable="opnumber"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879_opname_工序名称_3_string_t1_$$A" name="工序名称" type="string" variable="opname"></activiti:formProperty>
-        <activiti:formProperty id="tbheader1566744708879_sendsectionnumber_分配工段编号_4_string_t1_$$A" name="分配工段编号" type="string" variable="sendsectionnumber"></activiti:formProperty>
-        <activiti:formProperty id="tbheader1566744708879_plannedstarttime_计划开始时间_5_string_t5_$$A" name="计划开始时间" type="string" variable="plannedstarttime"></activiti:formProperty>
-        <activiti:formProperty id="tbheader1566744708879_plannedendtime_计划结束时间_6_string_t5_$$A" name="计划结束时间" type="string" variable="plannedendtime"></activiti:formProperty>
-        <activiti:formProperty id="tbheader1566744708879_optype_工序类型_7_enum_sbs_$$A" name="工序类型" type="enum" variable="optype">
+        <activiti:formProperty id="tbheader1566744708879_sendsectionnumber_分配工段编号_4_string_t1_$$HA" name="分配工段编号" type="string" variable="sendsectionnumber"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566744708879_plannedstarttime_计划开始时间_5_string_t5_$$HA" name="计划开始时间" type="string" variable="plannedstarttime"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566744708879_plannedendtime_计划结束时间_6_string_t5_$$HA" name="计划结束时间" type="string" variable="plannedendtime"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566744708879_optype_工序类型_7_enum_sbs_$$HA" name="工序类型" type="enum" variable="optype">
           <activiti:value id="通用" name="通用"></activiti:value>
           <activiti:value id="车削" name="车削"></activiti:value>
           <activiti:value id="铣削" name="铣削"></activiti:value>
@@ -523,15 +509,15 @@
         <activiti:formProperty id="tbheader1566744708879_header-1566746165617_车削工步表_22_string_join_$$A" name="车削工步表" type="string" variable="join1566746165617"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879_header-1566746163577_铣削工步表_23_string_join_$$A" name="铣削工步表" type="string" variable="join1566746163577"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header1566746042674_item_$$VA" name="工序物料清单" type="string" variable="header1566746042674"></activiti:formProperty>
-        <activiti:formProperty id="tbheader1566744708879-header1566746042674_itemname2_物料名称_2_string_t1_$$A" name="物料名称" type="string" variable="itemname2"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566744708879-header1566746042674_EAN2_物料编号_2_string_t1_$$A" name="物料编号" type="string" variable="EAN2"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header1566746042674_ORDCODE2_物料型号_3_string_t1_$$A" name="物料型号" type="string" variable="ORDCODE2"></activiti:formProperty>
-        <activiti:formProperty id="tbheader1566744708879-header1566746042674_EAN2_物料编号_4_string_t1_$$A" name="物料编号" type="string" variable="EAN2"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566744708879-header1566746042674_itemname2_物料名称_4_string_t1_$$A" name="物料名称" type="string" variable="itemname2"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header1566746042674_EANQTY_数量_5_string_t6_$$A" name="数量" type="string" variable="EANQTY"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header1566746042674_join-key_Key_10_string_t1_$$A" name="Key" type="string"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header-1566746045871_item_$$VA" name="工序工具清单" type="string" variable="header1566746042674"></activiti:formProperty>
-        <activiti:formProperty id="tbheader1566744708879-header-1566746045871_toolname_工具名称_2_string_t1_$$A" name="工具名称" type="string" variable="toolname"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566744708879-header-1566746045871_toolnumber_工具编号_2_string_t1_$$A" name="工具编号" type="string" variable="toolnumber"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header-1566746045871_tooltypecode_工具型号_3_string_t1_$$A" name="工具型号" type="string" variable="tooltypecode"></activiti:formProperty>
-        <activiti:formProperty id="tbheader1566744708879-header-1566746045871_toolnumber_工具编号_4_string_t1_$$A" name="工具编号" type="string" variable="toolnumber"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566744708879-header-1566746045871_toolname_工具名称_4_string_t1_$$A" name="工具名称" type="string" variable="toolname"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header-1566746045871_toolqty_数量_5_string_t6_$$A" name="数量" type="string" variable="toolqty"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header-1566746045871_join-key_Key_10_string_t1_$$A" name="Key" type="string"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header-1566746045367_item_$$VA" name="工序检验指标" type="string" variable="header1566746042674"></activiti:formProperty>
@@ -587,30 +573,25 @@
         <activiti:formProperty id="tbheader1566744708879-header-1566746163577_msTMPOS_定位时间（秒）_18_string_t6_$$A" name="定位时间（秒）" type="string" variable="msTMPOS"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header-1566746163577_msTMSUP_辅助时间（秒）_19_string_t6_$$A" name="辅助时间（秒）" type="string" variable="msTMSUP"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header-1566746163577_join-key_Key_10_string_t1_$$A" name="Key" type="string"></activiti:formProperty>
-      
-      	<activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
-      		<activiti:field name="language">
-      			<activiti:string><![CDATA[groovy]]></activiti:string>
-      		</activiti:field>
-      		<activiti:field name="script">
-      			<activiti:string>
-      			<![CDATA[
-      				def execution = task.getExecution()
+        <activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+          <activiti:field name="language">
+            <activiti:string><![CDATA[groovy]]></activiti:string>
+          </activiti:field>
+          <activiti:field name="script">
+            <activiti:string><![CDATA[def execution = task.getExecution()
       				execution.setVariable('processcheck','')
-      				execution.setVariable('checktime','')
-      			]]>
-      			</activiti:string>
-      		</activiti:field>
-      	</activiti:taskListener>
+      				execution.setVariable('checktime','')]]></activiti:string>
+          </activiti:field>
+        </activiti:taskListener>
       </extensionElements>
     </userTask>
     <sequenceFlow id="flow3" sourceRef="usertask2" targetRef="exclusivegateway1"></sequenceFlow>
     <exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway"></exclusiveGateway>
     <sequenceFlow id="flow4" name="审核通过" sourceRef="exclusivegateway1" targetRef="usertask1">
-      <conditionExpression xsi:type="tFormalExpression">${execution.getVariable('coreaction') == '同意'}</conditionExpression>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('coreaction') == '同意'}]]></conditionExpression>
     </sequenceFlow>
     <sequenceFlow id="flow5" name="审核不通过" sourceRef="exclusivegateway1" targetRef="EndEvent_0kt0bir">
-      <conditionExpression xsi:type="tFormalExpression">${execution.getVariable('coreaction') == '拒绝'}</conditionExpression>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('coreaction') == '拒绝'}]]></conditionExpression>
     </sequenceFlow>
   </process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_craftway0902">
@@ -622,48 +603,48 @@
         <omgdc:Bounds height="36.0" width="36.0" x="700.0" y="314.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="usertask1" id="BPMNShape_usertask1">
-        <omgdc:Bounds height="55.0" width="105.0" x="460.0" y="150.0"></omgdc:Bounds>
+        <omgdc:Bounds height="72.0" width="105.0" x="460.0" y="140.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="scripttask1" id="BPMNShape_scripttask1">
-        <omgdc:Bounds height="55.0" width="105.0" x="280.0" y="150.0"></omgdc:Bounds>
+        <omgdc:Bounds height="71.0" width="105.0" x="280.0" y="140.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="usertask2" id="BPMNShape_usertask2">
-        <omgdc:Bounds height="55.0" width="105.0" x="280.0" y="304.0"></omgdc:Bounds>
+        <omgdc:Bounds height="67.0" width="105.0" x="280.0" y="304.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="exclusivegateway1" id="BPMNShape_exclusivegateway1">
         <omgdc:Bounds height="40.0" width="40.0" x="492.0" y="311.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge bpmnElement="SequenceFlow_0ukfcms" id="BPMNEdge_SequenceFlow_0ukfcms">
         <omgdi:waypoint x="186.0" y="178.0"></omgdi:waypoint>
-        <omgdi:waypoint x="280.0" y="177.0"></omgdi:waypoint>
+        <omgdi:waypoint x="280.0" y="175.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
-        <omgdi:waypoint x="512.0" y="150.0"></omgdi:waypoint>
+        <omgdi:waypoint x="512.0" y="140.0"></omgdi:waypoint>
         <omgdi:waypoint x="512.0" y="119.0"></omgdi:waypoint>
         <omgdi:waypoint x="512.0" y="53.0"></omgdi:waypoint>
         <omgdi:waypoint x="332.0" y="53.0"></omgdi:waypoint>
-        <omgdi:waypoint x="332.0" y="150.0"></omgdi:waypoint>
+        <omgdi:waypoint x="332.0" y="140.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
-        <omgdi:waypoint x="332.0" y="205.0"></omgdi:waypoint>
+        <omgdi:waypoint x="332.0" y="211.0"></omgdi:waypoint>
         <omgdi:waypoint x="332.0" y="304.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3">
-        <omgdi:waypoint x="385.0" y="331.0"></omgdi:waypoint>
+        <omgdi:waypoint x="385.0" y="337.0"></omgdi:waypoint>
         <omgdi:waypoint x="492.0" y="331.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow4" id="BPMNEdge_flow4">
         <omgdi:waypoint x="512.0" y="311.0"></omgdi:waypoint>
-        <omgdi:waypoint x="512.0" y="205.0"></omgdi:waypoint>
+        <omgdi:waypoint x="512.0" y="212.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="16.0" width="100.0" x="500.0" y="251.0"></omgdc:Bounds>
+          <omgdc:Bounds height="16.0" width="44.0" x="500.0" y="251.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow5" id="BPMNEdge_flow5">
         <omgdi:waypoint x="532.0" y="331.0"></omgdi:waypoint>
         <omgdi:waypoint x="700.0" y="332.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="16.0" width="100.0" x="563.0" y="311.0"></omgdc:Bounds>
+          <omgdc:Bounds height="16.0" width="55.0" x="563.0" y="311.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>

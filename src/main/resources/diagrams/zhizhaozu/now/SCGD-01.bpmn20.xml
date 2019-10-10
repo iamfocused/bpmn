@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/pur">
-  <process id="productionExecution" name="生产执行流程测试" isExecutable="true" activiti:candidateStarterGroups="admin,productionplanning">
-    <startEvent id="startevent1" name="生产执行启动事件" activiti:initiator="initiator">
+  <process id="productionExecution" name="生产工单" isExecutable="true" activiti:candidateStarterGroups="shengchan@@13@@,admin@@13@@,admin@@17@@,admin@@25@@,shengchan,admin">
+    <startEvent id="startevent1" name="Production execution begin" activiti:initiator="initiator">
     	<extensionElements>
     		<activiti:formProperty id="processNumber_工艺编号_1_string_auto_$$A" name="选择工艺编号" variable="processNumber" required="true"/>
     		<activiti:formProperty id="productionOrderNumber_生产加工单_2_string_t1_$$A" name="生产加工单" variable="productionOrderNumber" required="true"/>
@@ -103,7 +103,7 @@
     		</activiti:executionListener>
     	</extensionElements>
     </startEvent>
-    <userTask id="usertask1" name="制定时间分配组" activiti:assignee="${initiator}">
+    <userTask id="usertask1" name="Make a timeline" activiti:assignee="${initiator}">
     	<extensionElements>
     		<activiti:formProperty id="processcount1_工序数量_1_string_t6_$$A" name="工序数量" type="string" variable="processcount1" required="true"/>
     	
@@ -192,7 +192,7 @@
       		</activiti:executionListener>
       	</extensionElements>
       </startEvent>
-      <userTask id="usertask2" name="查看更新工序" activiti:candidateGroups="${group}">
+      <userTask id="usertask2" name="View update process" activiti:candidateGroups="${group}">
       	<extensionElements>
       		<activiti:formProperty id="completecount_完成数_1_string_t6_$$A" variable="completecount" name="完成数量" required="true"/>
       		<activiti:formProperty id="actualstarttime_实际开始时间_2_string_t3_$$A" variable="actualstarttime" name="开始时间" required="true"/>
@@ -289,7 +289,7 @@
 						        throw new RuntimeException("Invalid key exception while converting to HMacSHA256")
 						    }
 						}
-						def METABASE_SITE_URL = "http://www.zhizaozu.com:3000"
+						def METABASE_SITE_URL = "https://my.zhizaozu.com/metabase"
 						def METABASE_SECRET_KEY = "dad5c368f5c8d7926c3565ac1d71c53557a0bc5c1a1d8a639e95a4b6a67f60d7"
 						def header = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9"
 						def playloadString = '{"resource":{"question":4},"params":{"procInstId":\"'+ procInstId +'\","processNumber": \"'+processNumber+'\"}}'
@@ -348,11 +348,11 @@
       <sequenceFlow id="flow4" sourceRef="startevent2" targetRef="usertask2"></sequenceFlow>
       <exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway"></exclusiveGateway>
       <sequenceFlow id="flow5" sourceRef="usertask2" targetRef="exclusivegateway1"></sequenceFlow>
-      <sequenceFlow id="flow6" name="数量不为0" sourceRef="exclusivegateway1" targetRef="usertask2">
+      <sequenceFlow id="flow6" name="The quantity is not 0" sourceRef="exclusivegateway1" targetRef="usertask2">
       	<conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('count') > 0}]]></conditionExpression>
       </sequenceFlow>
       <endEvent id="endevent2" name="End"></endEvent>
-      <sequenceFlow id="flow7" name="数量为0" sourceRef="exclusivegateway1" targetRef="endevent2">
+      <sequenceFlow id="flow7" name="The quantity is 0" sourceRef="exclusivegateway1" targetRef="endevent2">
       	<conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('count') == 0}]]></conditionExpression>
       </sequenceFlow>
     </subProcess>

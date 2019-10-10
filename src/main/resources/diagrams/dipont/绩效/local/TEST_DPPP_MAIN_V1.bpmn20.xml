@@ -5,6 +5,7 @@
     	<extensionElements>
     		<activiti:formProperty id="tbhdaddemployees_item" name="指定员工列表 Designated employee list" type="string" variable="tbhdaddemployees_item"/>
     		<activiti:formProperty id="tbhdaddemployees_员工 Employee_employeesn_1_string_psbi_$$A" name="员工 Employee" type="string" variable="tbhdaddemployees_employeesn_t00"/>
+    		<activiti:formProperty id="tbhdaddemployees_汇报对象 Manager_managersn_2_string_psbi_$$A" name="汇报对象 Manager" type="string" variable="tbhdaddemployees_managersn_t00"/>
     	</extensionElements>
     </startEvent>
     <scriptTask id="scripttask1" name="人员查询 Query employee information" activiti:autoStoreVariables="false" scriptFormat="groovy">
@@ -16,13 +17,16 @@
     		
     		def std = jsonSlurper.parseText(execution.getVariable('tbhdaddemployees_item_std'))
     		def employees = []
+    		def map = new HashMap()
     		
     		if(std && std.size() > 0) {
     			std.each{
     				employees << it.employeesn
+    				map.put(it.employeesn, it.managersn)
     			}
     			execution.setVariable('employees', employees)
     			execution.setVariable('businessKey', execution.getBusinessKey())
+    			execution.setVariable('map', map)
     			return
     		}
     		
@@ -48,6 +52,7 @@
     	<extensionElements>
     		<activiti:in target="employee" sourceExpression="${employees[loopCounter]}"/>
     		<activiti:in sourceExpression="${businessKey}" target="businessKey"/>
+    		<activiti:in target="manager" sourceExpression="${map.get(employees[loopCounter])}"/>
     	</extensionElements>
     	<multiInstanceLoopCharacteristics>
     		<loopCardinality>${employees.size()}</loopCardinality>

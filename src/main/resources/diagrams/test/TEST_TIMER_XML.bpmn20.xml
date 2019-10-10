@@ -19,16 +19,25 @@
     		</activiti:executionListener>
     	</extensionElements>
     </startEvent>
-    <userTask id="usertask1" name="开始定时任务" activiti:assignee="${initiator}"></userTask>
+    <userTask id="usertask1" name="开始定时任务" activiti:assignee="${initiator}">
+       	<extensionElements>
+    		<activiti:formProperty id="yesorno_选择 Choose_1_enum_fs_$$A" name="选择 Choose" required="true" type="enum" variable="yesorno">
+    			<activiti:value id="否" name="否"/>
+    			<activiti:value id="是" name="是"/>
+    			<activiti:value id="其他" name="其他"/>
+    		</activiti:formProperty>
+    	</extensionElements>
+    </userTask>
     <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="timerintermediatecatchevent1"></sequenceFlow>
     <intermediateCatchEvent id="timerintermediatecatchevent1" name="TimerCatchEvent">
       <timerEventDefinition>
-		<timeDuration>PT1M</timeDuration>
+		<!-- <timeDuration>PT1M</timeDuration> -->
       	<!-- <timeCycle>0 43 10 5 9 ? *</timeCycle> -->
-      	<!-- <timeDate>${execution.getVariable('time')}</timeDate> -->
+      	<timeDate>${execution.getVariable('time')}</timeDate>
       </timerEventDefinition>
     </intermediateCatchEvent>
-    <sequenceFlow id="flow2" sourceRef="timerintermediatecatchevent1" targetRef="usertask1"></sequenceFlow>
+    <sequenceFlow id="flow2" sourceRef="timerintermediatecatchevent1" targetRef="usertask1">
+    </sequenceFlow>
     <endEvent id="endevent1" name="End"></endEvent>
     <sequenceFlow id="flow3" sourceRef="usertask1" targetRef="endevent1"></sequenceFlow>
   </process>

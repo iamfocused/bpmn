@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/frm">
+  <process id="changeApplicationDev" name="工程变更-开发阶段" isExecutable="true" activiti:candidateStarterGroups="admin">
+    <startEvent id="startevent1" name="Start" activiti:initiator="initiator">
+      <extensionElements>
+        <activiti:formProperty id="sourceOfChange_变更来源_1_enum_rbv_$$A" name="变更来源" type="enum" variable="sourceOfChange" required="true">
+          <activiti:value id="客户变更" name="客户变更"></activiti:value>
+          <activiti:value id="内部变更" name="内部变更"></activiti:value>
+          <activiti:value id="供应商变更" name="供应商变更"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="changeDate_日期_2_string_t3_$$B" name="日期" type="string" variable="changeDate" required="true"></activiti:formProperty>
+        <activiti:formProperty id="costcenter_成本中心_3_string_tree_$$B" name="成本中心" type="string" variable="department" required="true"></activiti:formProperty>
+        <activiti:formProperty id="customerSupplier_客户/供方_4_string_t1_$$B" name="客户/供方" type="string" variable="customerSupplier" required="true"></activiti:formProperty>
+        <activiti:formProperty id="productName_产品名称_5_string_t1_$$B" name="产品名称" type="string" variable="productName" required="true"></activiti:formProperty>
+        <activiti:formProperty id="ryProductType_日盈产品型号_6_string_t1_$$B" name="日盈产品型号" type="string" variable="ryProductType" required="true"></activiti:formProperty>
+        <activiti:formProperty id="ctProductType_客户产品型号_7_string_t1_$$B" name="客户产品型号" type="string" variable="ctProductType" required="true"></activiti:formProperty>
+        <activiti:formProperty id="customerSupplierContact_客户/供方联系人_8_string_t1_$$B" name="客户/供方联系人" type="string" variable="customerSupplierContact" required="true"></activiti:formProperty>
+        <activiti:formProperty id="changeLevel_变更等级_1_enum_rbv_$$C" name="变更等级" type="enum" variable="changeLevel" required="true">
+          <activiti:value id="H" name="H"></activiti:value>
+          <activiti:value id="M" name="M"></activiti:value>
+          <activiti:value id="L" name="L"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="changeType_变更类型_2_string_t1_$$C" name="变更类型" type="string" variable="changeType" required="true"></activiti:formProperty>
+        <activiti:formProperty id="dueDate_变更要求完成日期_3_string_t3_$$C" name="变更要求完成日期" type="string" variable="dueDate" required="true"></activiti:formProperty>
+        <activiti:formProperty id="changeBefore_变更前_4_string_t2_$$C" name="变更前" type="string" variable="changeBefore" required="true"></activiti:formProperty>
+        <activiti:formProperty id="changeAfter_变更后_5_string_t2_$$C" name="变更后" type="string" variable="changeAfter" required="true"></activiti:formProperty>
+        <activiti:formProperty id="changeReason_变更原因_6_string_t2_$$C" name="变更原因" type="string" variable="changeReason" required="true"></activiti:formProperty>
+        <activiti:executionListener event="end" class="org.activiti.engine.impl.bpmn.listener.ScriptExecutionListener">
+          <activiti:field name="language">
+            <activiti:string><![CDATA[groovy]]></activiti:string>
+          </activiti:field>
+          <activiti:field name="script">
+            <activiti:string><![CDATA[import groovy.json.JsonSlurper
+      				def jsonSlurper = new JsonSlurper()
+      				
+      				def changeApplicantSn = execution.getVariable('initiator')
+      				def changeApplicant = identityService.createUserQuery().userId(changeApplicantSn)?.singleResult()
+      				execution.setVariable('changeApplicant', changeApplicant.getLastName().toString() + "" + changeApplicant.getFirstName().toString())
+      				
+      				//drools查询部门经理
+      				def department = jsonSlurper.parseText(execution.getVariable('department'))
+      				
+					execution.setVariable("_http_method", "POST");
+					def headerMap = new java.util.HashMap<String,String>();
+					headerMap.put("Content-Type","application/json");				
+					execution.setVariable("_http_headers", headerMap);
+					def entitys = '[{"costcenter":"'+department.code +'", "amount":"1"'+ '}]';
+					execution.setVariable("_http_body", entitys);
+					execution.setVariable("_http_url", 'https://commonservices.eorionsolution.com/decisiontables/v1/fire/cc_verifier.xls');
+					execution.setVariable("_http_response_body", '');
+					execution.setVariable("_http_response_status_code", '');]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </startEvent>
+    <serviceTask id="servicetask1" name="Drools查询部门经理" activiti:class="com.eorionsolution.riying.bpms.javaservice.http.RestAPIService"></serviceTask>
+    <scriptTask id="scripttask1" name="查询结果解析" scriptFormat="groovy" activiti:autoStoreVariables="false">
+      <script>
+    	
+    		import groovy.json.JsonSlurper
+      		def jsonSlurper = new JsonSlurper()
+      		
+    		if(execution.getVariable('_http_response_status_code')!= 200){
+				throw new org.activiti.engine.ActivitiIllegalArgumentException("Drools调用异常请联系管理员")
+			}
+			
+			def responseBody = jsonSlurper.parseText(execution.getVariable('_http_response_body'))
+			def manager = responseBody[0].verifiersecond
+			
+			if(responseBody.size == 1 &amp;&amp; manager) {
+				execution.setVariable('manager', manager)
+				def managerObj = identityService.createUserQuery().userId(manager)?.singleResult()
+				execution.setVariable('managerName', managerObj.getLastName().toString() + "" + managerObj.getFirstName().toString())
+			} else {
+				throw new org.activiti.engine.ActivitiIllegalArgumentException("Drools文件中没有配置当前部门(成本中心)的部门经理")
+			}
+			
+      		execution.setVariable('processInstId', execution.getProcessInstanceId())
+      		execution.setVariable('changeOrderNumber', execution.getProcessInstanceId())
+    	
+    	</script>
+    </scriptTask>
+    <userTask id="usertask1" name="变更可行性评审" activiti:assignee="${manager}" activiti:dueDate="P1D">
+      <extensionElements>
+        <activiti:formProperty id="sourceOfChange_变更来源_1_enum_rbv_$$VA" name="变更来源" type="enum" variable="sourceOfChange" required="true">
+          <activiti:value id="客户变更" name="客户变更"></activiti:value>
+          <activiti:value id="内部变更" name="内部变更"></activiti:value>
+          <activiti:value id="供应商变更" name="供应商变更"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="changeOrderNumber_变更单号_2_string_t1_$$VA" name="变更单号" type="string" variable="changeOrderNumber" required="true"></activiti:formProperty>
+        <activiti:formProperty id="changeApplicant_变更申请人_1_string_t1_$$VB" name="变更申请人" type="string" variable="changeApplicant" required="true"></activiti:formProperty>
+        <activiti:formProperty id="changeDate_日期_2_string_t3_$$VB" name="日期" type="string" variable="changeDate" required="true"></activiti:formProperty>
+        <activiti:formProperty id="costcenter_成本中心_3_string_tree_$$VB" name="成本中心" type="string" variable="department" required="true"></activiti:formProperty>
+        <activiti:formProperty id="customerSupplier_客户/供方_4_string_t1_$$VB" name="客户/供方" type="string" variable="customerSupplier" required="true"></activiti:formProperty>
+        <activiti:formProperty id="productName_产品名称_5_string_t1_$$VB" name="产品名称" type="string" variable="productName" required="true"></activiti:formProperty>
+        <activiti:formProperty id="ryProductType_日盈产品型号_6_string_t1_$$VB" name="日盈产品型号" type="string" variable="ryProductType" required="true"></activiti:formProperty>
+        <activiti:formProperty id="ctProductType_客户产品型号_7_string_t1_$$VB" name="客户产品型号" type="string" variable="ctProductType" required="true"></activiti:formProperty>
+        <activiti:formProperty id="customerSupplierContact_客户/供方联系人_8_string_t1_$$VB" name="客户/供方联系人" type="string" variable="customerSupplierContact" required="true"></activiti:formProperty>
+        <activiti:formProperty id="changeLevel_变更等级_1_enum_rbv_$$VC" name="变更等级" type="enum" variable="changeLevel" required="true">
+          <activiti:value id="H" name="H"></activiti:value>
+          <activiti:value id="M" name="M"></activiti:value>
+          <activiti:value id="L" name="L"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="changeType_变更类型_2_string_t1_$$VC" name="变更类型" type="string" variable="changeType" required="true"></activiti:formProperty>
+        <activiti:formProperty id="dueDate_变更要求完成日期_3_string_t3_$$VC" name="变更要求完成日期" type="string" variable="dueDate" required="true"></activiti:formProperty>
+        <activiti:formProperty id="changeBefore_变更前_4_string_t2_$$VC" name="变更前" type="string" variable="changeBefore" required="true"></activiti:formProperty>
+        <activiti:formProperty id="changeAfter_变更后_5_string_t2_$$VC" name="变更后" type="string" variable="changeAfter" required="true"></activiti:formProperty>
+        <activiti:formProperty id="changeReason_变更原因_6_string_t2_$$VC" name="变更原因" type="string" variable="changeReason" required="true"></activiti:formProperty>
+
+        <activiti:formProperty id="coreaction_可行性评审_1_enum_rbv_$$A" name="可行性评审结论" type="enum" variable="coreaction_result" required="true">
+          <activiti:value id="同意变更" name="同意变更"></activiti:value>
+          <activiti:value id="拒绝变更" name="拒绝变更"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="corecomments_评审意见_2_string_t2_$$A" name="评审意见" type="string" variable="corecomments_result"></activiti:formProperty>
+        <activiti:formProperty id="verification_追加验证_3_enum_rbv_$$A" name="追加验证" type="enum" variable="verification">
+          <activiti:value id="需要追加验证" name="需要追加验证"></activiti:value>
+          <activiti:value id="不需要追加验证" name="不需要追加验证"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="verificationContent_验证内容_4_string_t2_$$A" name="验证内容" type="string" variable="verificationContent"></activiti:formProperty>
+        <activiti:formProperty id="performanceImpact_对产品性能的影响_1_string_t2_$$B" name="对产品性能的影响" type="string" variable="performanceImpact"></activiti:formProperty>
+        <activiti:formProperty id="costImpact_对成本的影响_1_string_t2_$$C" name="对成本的影响" type="string" variable="costImpact"></activiti:formProperty>
+        <activiti:formProperty id="cycleImpact_对周期的影响_1_string_t2_$$D" name="对周期的影响" type="string" variable="cycleImpact"></activiti:formProperty>
+        <activiti:formProperty id="environmentalImpact_对环境安全对影响_1_string_t2_$$E" name="对环境安全的影响" type="string" variable="environmentalImpact"></activiti:formProperty>
+        <activiti:formProperty id="otherImpact1_其他影响_1_string_t2_$$F" name="其他影响" type="string" variable="otherImpact1"></activiti:formProperty>
+        <activiti:formProperty id="otherImpact2_其他影响_1_string_t2_$$G" name="其他影响" type="string" variable="otherImpact2"></activiti:formProperty>
+        <activiti:formProperty id="otherImpact3_其他影响_1_string_t2_$$H" name="其他影响" type="string" variable="otherImpact3"></activiti:formProperty>
+      	
+        <activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+        	<activiti:field name="language">
+        		<activiti:string>
+        			<![CDATA[groovy]]>
+        		</activiti:string>
+        	</activiti:field>
+        	<activiti:field name="script">
+        		<activiti:string>
+        			<![CDATA[
+        				def execution = task.getExecution()
+        				execution.setVariable("bpms_printable",'{"processInstanceId":"'+execution.getProcessInstanceId()+'","templateName":"Change_App_Dev.yml","outputFileName":"Change Request Form - Mass Production Phase"}')
+        			]]>
+        		</activiti:string>
+        	</activiti:field>
+        </activiti:taskListener>      	
+      	
+      </extensionElements>
+    </userTask>
+    <exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway"></exclusiveGateway>
+    <userTask id="usertask2" name="上传附件" activiti:assignee="${initiator}" activiti:dueDate="P1D">
+      <extensionElements>
+        <activiti:formProperty id="sourceOfChange_变更来源_1_enum_rbv_$$VA" name="变更来源" type="enum" variable="sourceOfChange" required="true">
+          <activiti:value id="客户变更" name="客户变更"></activiti:value>
+          <activiti:value id="内部变更" name="内部变更"></activiti:value>
+          <activiti:value id="供应商变更" name="供应商变更"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="changeOrderNumber_变更单号_2_string_t1_$$VA" name="变更单号" type="string" variable="changeOrderNumber" required="true"></activiti:formProperty>
+        <activiti:formProperty id="changeApplicant_变更申请人_1_string_t1_$$VB" name="变更申请人" type="string" variable="changeApplicant" required="true"></activiti:formProperty>
+        <activiti:formProperty id="changeDate_日期_2_string_t3_$$VB" name="日期" type="string" variable="changeDate" required="true"></activiti:formProperty>
+        <activiti:formProperty id="costcenter_成本中心_3_string_tree_$$VB" name="成本中心" type="string" variable="department" required="true"></activiti:formProperty>
+        <activiti:formProperty id="customerSupplier_客户/供方_4_string_t1_$$VB" name="客户/供方" type="string" variable="customerSupplier" required="true"></activiti:formProperty>
+        <activiti:formProperty id="productName_产品名称_5_string_t1_$$VB" name="产品名称" type="string" variable="productName" required="true"></activiti:formProperty>
+        <activiti:formProperty id="ryProductType_日盈产品型号_6_string_t1_$$VB" name="日盈产品型号" type="string" variable="ryProductType" required="true"></activiti:formProperty>
+        <activiti:formProperty id="ctProductType_客户产品型号_7_string_t1_$$VB" name="客户产品型号" type="string" variable="ctProductType" required="true"></activiti:formProperty>
+        <activiti:formProperty id="customerSupplierContact_客户/供方联系人_8_string_t1_$$VB" name="客户/供方联系人" type="string" variable="customerSupplierContact" required="true"></activiti:formProperty>
+        <activiti:formProperty id="changeLevel_变更等级_1_enum_rbv_$$VC" name="变更等级" type="enum" variable="changeLevel" required="true">
+          <activiti:value id="H" name="H"></activiti:value>
+          <activiti:value id="M" name="M"></activiti:value>
+          <activiti:value id="L" name="L"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="changeType_变更类型_2_string_t1_$$VC" name="变更类型" type="string" variable="changeType" required="true"></activiti:formProperty>
+        <activiti:formProperty id="dueDate_变更要求完成日期_3_string_t3_$$VC" name="变更要求完成日期" type="string" variable="dueDate" required="true"></activiti:formProperty>
+        <activiti:formProperty id="changeBefore_变更前_4_string_t2_$$VC" name="变更前" type="string" variable="changeBefore" required="true"></activiti:formProperty>
+        <activiti:formProperty id="changeAfter_变更后_5_string_t2_$$VC" name="变更后" type="string" variable="changeAfter" required="true"></activiti:formProperty>
+        <activiti:formProperty id="changeReason_变更原因_6_string_t2_$$VC" name="变更原因" type="string" variable="changeReason" required="true"></activiti:formProperty>
+
+
+        <activiti:formProperty id="coreaction_可行性评审_1_enum_rbv_$$VD" name="可行性评审结论" type="enum" variable="coreaction_result" required="true">
+          <activiti:value id="同意变更" name="同意变更"></activiti:value>
+          <activiti:value id="拒绝变更" name="拒绝变更"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="corecomments_评审意见_2_string_t2_$$VD" name="评审意见" type="string" variable="corecomments_result"></activiti:formProperty>
+        <activiti:formProperty id="verification_追加验证_3_enum_rbv_$$VD" name="追加验证" type="enum" variable="verification">
+          <activiti:value id="需要追加验证" name="需要追加验证"></activiti:value>
+          <activiti:value id="不需要追加验证" name="不需要追加验证"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="verificationContent_验证内容_4_string_t2_$$VD" name="验证内容" type="string" variable="verificationContent"></activiti:formProperty>
+        <activiti:formProperty id="performanceImpact_对产品性能的影响_1_string_t2_$$VE" name="对产品性能的影响" type="string" variable="performanceImpact"></activiti:formProperty>
+        <activiti:formProperty id="costImpact_对成本的影响_1_string_t2_$$VF" name="对成本的影响" type="string" variable="costImpact"></activiti:formProperty>
+        <activiti:formProperty id="cycleImpact_对周期的影响_1_string_t2_$$VG" name="对周期的影响" type="string" variable="cycleImpact"></activiti:formProperty>
+        <activiti:formProperty id="environmentalImpact_对环境安全对影响_1_string_t2_$$VH" name="对环境安全的影响" type="string" variable="environmentalImpact"></activiti:formProperty>
+        <activiti:formProperty id="otherImpact1_其他影响_1_string_t2_$$VI" name="其他影响" type="string" variable="otherImpact1"></activiti:formProperty>
+        <activiti:formProperty id="otherImpact2_其他影响_1_string_t2_$$VJ" name="其他影响" type="string" variable="otherImpact2"></activiti:formProperty>
+        <activiti:formProperty id="otherImpact3_其他影响_1_string_t2_$$VK" name="其他影响" type="string" variable="otherImpact3"></activiti:formProperty>
+        <activiti:formProperty id="attachment_附件_1_string_t9i_$$A" name="上传附件" type="string" variable="attachment" required="true"></activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="servicetask1"></sequenceFlow>
+    <sequenceFlow id="flow2" sourceRef="servicetask1" targetRef="scripttask1"></sequenceFlow>
+    <sequenceFlow id="flow3" sourceRef="scripttask1" targetRef="usertask1"></sequenceFlow>
+    <sequenceFlow id="flow4" sourceRef="usertask1" targetRef="exclusivegateway1"></sequenceFlow>
+    <sequenceFlow id="flow5" name="评审同意" sourceRef="exclusivegateway1" targetRef="usertask2">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('coreaction_result') == '同意变更'}]]></conditionExpression>
+    </sequenceFlow>
+    <endEvent id="refuseEnd" name="RefuseEnd"></endEvent>
+    <sequenceFlow id="flow6" name="评审拒绝" sourceRef="exclusivegateway1" targetRef="refuseEnd">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('coreaction_result') == '拒绝变更'}]]></conditionExpression>
+    </sequenceFlow>
+    <endEvent id="agreeEnd" name="AgreeEnd"></endEvent>
+    <sequenceFlow id="flow7" sourceRef="usertask2" targetRef="agreeEnd"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_changeApplicationDev">
+    <bpmndi:BPMNPlane bpmnElement="changeApplicationDev" id="BPMNPlane_changeApplicationDev">
+      <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="30.0" y="180.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="servicetask1" id="BPMNShape_servicetask1">
+        <omgdc:Bounds height="61.0" width="105.0" x="130.0" y="167.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scripttask1" id="BPMNShape_scripttask1">
+        <omgdc:Bounds height="61.0" width="105.0" x="320.0" y="167.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask1" id="BPMNShape_usertask1">
+        <omgdc:Bounds height="61.0" width="105.0" x="520.0" y="167.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway1" id="BPMNShape_exclusivegateway1">
+        <omgdc:Bounds height="40.0" width="40.0" x="554.0" y="320.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask2" id="BPMNShape_usertask2">
+        <omgdc:Bounds height="61.0" width="105.0" x="320.0" y="310.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="refuseEnd" id="BPMNShape_refuseEnd">
+        <omgdc:Bounds height="35.0" width="35.0" x="639.0" y="323.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="agreeEnd" id="BPMNShape_agreeEnd">
+        <omgdc:Bounds height="35.0" width="35.0" x="219.0" y="323.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="65.0" y="197.0"></omgdi:waypoint>
+        <omgdi:waypoint x="130.0" y="197.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="235.0" y="197.0"></omgdi:waypoint>
+        <omgdi:waypoint x="320.0" y="197.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3">
+        <omgdi:waypoint x="425.0" y="197.0"></omgdi:waypoint>
+        <omgdi:waypoint x="520.0" y="197.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow4" id="BPMNEdge_flow4">
+        <omgdi:waypoint x="572.0" y="228.0"></omgdi:waypoint>
+        <omgdi:waypoint x="574.0" y="320.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow5" id="BPMNEdge_flow5">
+        <omgdi:waypoint x="554.0" y="340.0"></omgdi:waypoint>
+        <omgdi:waypoint x="425.0" y="340.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="44.0" x="441.0" y="340.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow6" id="BPMNEdge_flow6">
+        <omgdi:waypoint x="594.0" y="340.0"></omgdi:waypoint>
+        <omgdi:waypoint x="639.0" y="340.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="44.0" x="594.0" y="340.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow7" id="BPMNEdge_flow7">
+        <omgdi:waypoint x="320.0" y="340.0"></omgdi:waypoint>
+        <omgdi:waypoint x="254.0" y="340.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/pur">
-  <process id="productionExecution" name="生产执行流程测试" isExecutable="true" activiti:candidateStarterGroups="admin,productionplanning">
+  <process id="productionExecution" name="生产执行流程测试" isExecutable="true" activiti:candidateStarterGroups="shengchan@@13@@,admin@@13@@,shengchan,admin">
     <startEvent id="startevent1" name="生产执行启动事件" activiti:initiator="initiator">
     	<extensionElements>
     		<activiti:formProperty id="processNumber_工艺编号_1_string_auto_$$A" name="选择工艺编号" variable="processNumber" required="true"/>
@@ -289,7 +289,7 @@
 						        throw new RuntimeException("Invalid key exception while converting to HMacSHA256")
 						    }
 						}
-						def METABASE_SITE_URL = "http://www.zhizaozu.com:3000"
+						def METABASE_SITE_URL = "https://www.zhizaozu.com/metabase"
 						def METABASE_SECRET_KEY = "dad5c368f5c8d7926c3565ac1d71c53557a0bc5c1a1d8a639e95a4b6a67f60d7"
 						def header = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9"
 						def playloadString = '{"resource":{"question":4},"params":{"procInstId":\"'+ procInstId +'\","processNumber": \"'+processNumber+'\"}}'

@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/pur">
+  <process id="workshopinf0902" name="车间信息流程测试" isExecutable="true" activiti:candidateStarterUsers="18616741835" activiti:candidateStarterGroups="admin@@13@@,admin">
+    <startEvent id="StartEvent_1" activiti:initiator="initiator">
+      <extensionElements>
+        <activiti:formProperty id="workshopname_车间名称_1_string_t1_$$A" name="车间名称" type="string" variable="workshopname"></activiti:formProperty>
+        <activiti:formProperty id="workshopnumber_车间编码_2_string_t1_$$A" name="车间编码" type="string" variable="workshopnumber"></activiti:formProperty>
+        <activiti:formProperty id="workshoptype_车间类型_3_enum_sbs_$$A" name="车间类型" type="enum" variable="workshoptype">
+          <activiti:value id="1" name="数控车间"></activiti:value>
+          <activiti:value id="2" name="钣金车间"></activiti:value>
+          <activiti:value id="3" name="热表处理车间"></activiti:value>
+          <activiti:value id="4" name="铸造车间"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="workshopdesc_车间描述_4_string_t2_$$A" name="车间描述" type="string" variable="workshopdesc"></activiti:formProperty>
+        
+        <activiti:formProperty id="tbheader1566897130282_item" name="工段表" type="string" variable="header1566897130282"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566897130282_sectionname_工段名称_2_string_t1_$$A" name="工段名称" type="string" variable="sectionname"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566897130282_sectionnumber_工段编号_3_string_t1_$$A" name="工段编号" type="string" variable="sectionname"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566897130282_sectiondesc_工段描述_4_string_t2_$$A" name="工段描述" type="string" variable="sectiondesc"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566897130282_header1566897203859_工段设备详情_5_string_join_$$A" name="工段设备详情" type="string" variable="join1566897199790"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566897130282-header1566897203859_item" name="工段设备详情" type="string" variable="header1566897203859"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566897130282-header1566897203859_eqpttype_设备型号_2_string_t1_$$A" name="设备型号" type="string" variable="eqpttype"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566897130282-header1566897203859_eqptnumber_设备编码_3_string_t1_$$A" name="设备编码" type="string" variable="eqpttype"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566897130282-header1566897203859_join-key_Key_10_string_t1_$$A" name="Key" type="string"></activiti:formProperty>
+      </extensionElements>
+    </startEvent>
+    <endEvent id="EndEvent_059dm50">
+    </endEvent>
+    <sequenceFlow id="SequenceFlow_0ligx3i" sourceRef="StartEvent_1" targetRef="usertask1"></sequenceFlow>
+    <userTask id="usertask1" name="车间信息循环更新" activiti:assignee="${initiator}">
+      <extensionElements>
+        <activiti:formProperty id="workshopname_车间名称_1_string_t1_$$A" name="车间名称" type="string" variable="workshopname"></activiti:formProperty>
+        <activiti:formProperty id="workshopnumber_车间编码_2_string_t1_$$A" name="车间编码" type="string" variable="workshopnumber"></activiti:formProperty>
+        <activiti:formProperty id="workshoptype_车间类型_3_enum_sbs_$$A" name="车间类型" type="enum" variable="workshoptype">
+          <activiti:value id="1" name="数控车间"></activiti:value>
+          <activiti:value id="2" name="钣金车间"></activiti:value>
+          <activiti:value id="3" name="热表处理车间"></activiti:value>
+          <activiti:value id="4" name="铸造车间"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="workshopdesc_车间描述_4_string_t2_$$A" name="车间描述" type="string" variable="workshopdesc"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566897130282_item" name="工段表" type="string" variable="header1566897130282"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566897130282_sectionname_工段名称_2_string_t1_$$A" name="工段名称" type="string" variable="sectionname"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566897130282_sectionnumber_工段编号_3_string_t1_$$A" name="工段编号" type="string" variable="sectionname"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566897130282_sectiondesc_工段描述_4_string_t2_$$A" name="工段描述" type="string" variable="sectiondesc"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566897130282_header1566897203859_工段设备详情_5_string_join_$$A" name="工段设备详情" type="string" variable="join1566897199790"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566897130282-header1566897203859_item" name="工段设备详情" type="string" variable="header1566897203859"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566897130282-header1566897203859_eqpttype_设备型号_2_string_t1_$$A" name="设备型号" type="string" variable="eqpttype"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566897130282-header1566897203859_eqptnumber_设备编码_3_string_t1_$$A" name="设备编码" type="string" variable="eqpttype"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566897130282-header1566897203859_join-key_Key_10_string_t1_$$A" name="Key" type="string"></activiti:formProperty>
+      </extensionElements>    
+    </userTask>
+    <sequenceFlow id="flow1" sourceRef="usertask1" targetRef="usertask1"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_workshopinf0902">
+    <bpmndi:BPMNPlane bpmnElement="workshopinf0902" id="BPMNPlane_workshopinf0902">
+      <bpmndi:BPMNShape bpmnElement="StartEvent_1" id="BPMNShape_StartEvent_1">
+        <omgdc:Bounds height="36.0" width="36.0" x="300.0" y="170.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="EndEvent_059dm50" id="BPMNShape_EndEvent_059dm50">
+        <omgdc:Bounds height="36.0" width="36.0" x="498.0" y="50.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask1" id="BPMNShape_usertask1">
+        <omgdc:Bounds height="55.0" width="105.0" x="420.0" y="160.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="SequenceFlow_0ligx3i" id="BPMNEdge_SequenceFlow_0ligx3i">
+        <omgdi:waypoint x="336.0" y="188.0"></omgdi:waypoint>
+        <omgdi:waypoint x="420.0" y="187.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="525.0" y="187.0"></omgdi:waypoint>
+        <omgdi:waypoint x="553.0" y="186.0"></omgdi:waypoint>
+        <omgdi:waypoint x="553.0" y="121.0"></omgdi:waypoint>
+        <omgdi:waypoint x="472.0" y="121.0"></omgdi:waypoint>
+        <omgdi:waypoint x="472.0" y="160.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>
