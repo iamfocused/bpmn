@@ -105,6 +105,35 @@
         <activiti:formProperty id="tbheader1566744708879-header-1566746163577_msTMPOS_定位时间（秒）_18_string_t6_$$A" name="定位时间（秒）" type="string" variable="msTMPOS"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header-1566746163577_msTMSUP_辅助时间（秒）_19_string_t6_$$A" name="辅助时间（秒）" type="string" variable="msTMSUP"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header-1566746163577_join-key_Key_10_string_t1_$$A" name="Key" type="string"></activiti:formProperty>
+      
+      	<activiti:executionListener event="end" class="org.activiti.engine.impl.bpmn.listener.ScriptExecutionListener">
+      		<activiti:field name="language">
+      			<activiti:string>
+      				<![CDATA[groovy]]>
+      			</activiti:string>
+      		</activiti:field>
+      		<activiti:field name="script">
+      			<activiti:string>
+      				<![CDATA[
+      					import java.util.stream.Collectors
+      					
+      					def tenantId = execution.getTenantId()
+      					def processnumber = execution.getVariable('processnumber')
+      					
+      					def processInstances = historyService.createHistoricProcessInstanceQuery().processInstanceTenantId(tenantId).processDefinitionKey("craftway04").list()
+						def processnumbers = processInstances.stream().map({
+						            processInst ->
+						                historyService.createHistoricVariableInstanceQuery().processInstanceId(processInst.getId()).list().stream().filter({inst -> ("processnumber" == inst.getVariableName()) }).findFirst().map({ varInst -> varInst.getValue().toString()}).orElse("")
+						        }
+						).collect(Collectors.toList())
+      					
+      					if(processnumbers.contains(processnumber)){
+      						throw new org.activiti.engine.ActivitiIllegalArgumentException('工艺编号重复[' + processnumber + ']')
+      					}
+      				]]>
+      			</activiti:string>
+      		</activiti:field>
+      	</activiti:executionListener>
       </extensionElements>
     </startEvent>
     <endEvent id="EndEvent_0kt0bir"></endEvent>
@@ -302,16 +331,19 @@
 			        case '车削':li&lt;&lt; it.车削工步表;break
 			        default: throw new RuntimeException("找不到对应工序类型") ;break
 			    }
-			    li&lt;&lt;it.get('装夹件数（件）')?:'0'
-			    li&lt;&lt;it.get('人员操作时间（秒）')?:'0'
-			    li&lt;&lt;it.get('人工检测时间（秒）')?:'0'
-			    li&lt;&lt;it.get('其它时间（秒）')?:'0'
+			    li&lt;&lt;it.get('装夹件数（件）')?:'0'//3
+			    li&lt;&lt;it.get('人员操作时间（秒）')?:'0'//4
+			    li&lt;&lt;it.get('人工检测时间（秒）')?:'0'//5
+			    li&lt;&lt;it.get('其它时间（秒）')?:'0'//6
 			    
 			    li&lt;&lt;it.get('工序物料清单')//7
 			    li&lt;&lt;it.get('工序工具清单')//8
 			}).collect(Collectors.toList())
 			
-			list.each { gx -&gt;
+			list.any { gx -&gt;
+				if(gx[3]==null || gx[4] == null || gx[5] == null || gx[6] == null){
+					return
+				}
 			    switch (gx[1]){
 			        case '通用':
 			            def collect = tyStd.stream().filter({ ty -&gt; gx[2].split(",").contains(ty.Key) }).collect(Collectors.toList())
@@ -544,13 +576,23 @@
 			
 			
 			//工艺节拍
-			def tmcycle = totalStd.stream().mapToDouble({it.get('工序时间（秒）').toBigDecimal().divide(it.get('装夹件数（件）').toBigDecimal(),2, RoundingMode.HALF_UP).toDouble()}).max().orElse(0).toString()
+			def tmcycle = totalStd.stream().mapToDouble(
+			        {
+			            if(it.get('工序时间（秒）') &amp;&amp; it.get('装夹件数（件）')) {
+			                it.get('工序时间（秒）').toBigDecimal().divide(it.get('装夹件数（件）').toBigDecimal(), 2, RoundingMode.HALF_UP).toDouble()
+			            } else {
+			                Double.valueOf(0)
+			            }
+			        }
+			).max().orElse(0).toString()
 			execution.setVariable('TMCYCLE', tmcycle)
 			//产能测算
-			
-			def procap = BigDecimal.valueOf(3600).multiply(execution.getVariable('LINE').toBigDecimal()).multiply(execution.getVariable('WORKDAY').toBigDecimal()).multiply(execution.getVariable('SHIFT').toBigDecimal()).multiply(execution.getVariable('SHIFTH').toBigDecimal()).divide(execution.getVariable('TMCYCLE').toBigDecimal(),2, RoundingMode.HALF_UP).toString()
-			execution.setVariable('PROCAP',procap)
-
+			if(execution.getVariable('TMCYCLE')=='0' || execution.getVariable('LINE')==null || execution.getVariable('WORKDAY')==null || execution.getVariable('SHIFT')==null){
+				execution.setVariable('PROCAP','0')
+			} else{
+				def procap = BigDecimal.valueOf(3600).multiply(execution.getVariable('LINE').toBigDecimal()).multiply(execution.getVariable('WORKDAY').toBigDecimal()).multiply(execution.getVariable('SHIFT').toBigDecimal()).multiply(execution.getVariable('SHIFTH').toBigDecimal()).divide(execution.getVariable('TMCYCLE').toBigDecimal(),2, RoundingMode.HALF_UP).toString()
+				execution.setVariable('PROCAP',procap)
+			}
     	</script>
     </scriptTask>
     <sequenceFlow id="flow2" sourceRef="scripttask1" targetRef="usertask2"></sequenceFlow>

@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/pur">
+  <process id="materialinf0902" name="物料信息" isExecutable="true" activiti:candidateStarterGroups="admin@@13@@,processadmin@@17@@,admin,processadmin">
+    <startEvent id="StartEvent_1" activiti:initiator="initiator">
+      <extensionElements>
+        <activiti:formProperty id="itemname_物料名称_3_string_t1_$$A" name="物料名称" type="string" variable="itemname"></activiti:formProperty>
+        <activiti:formProperty id="ORDCODE_物料型号_4_string_t1_$$A" name="物料型号" type="string" variable="ORDCODE"></activiti:formProperty>
+        <activiti:formProperty id="itemnumber_物料编号_5_string_t1_$$A" name="物料编号" type="string" variable="itemnumber"></activiti:formProperty>
+        <activiti:formProperty id="itemgroup_产品类别_6_string_t1_$$A" name="产品组别" type="string" variable="itemgroup"></activiti:formProperty>
+        <activiti:formProperty id="mainmaterial_主要材料_7_string_t1_$$B" name="主要材料" type="string" variable="mainmaterial"></activiti:formProperty>
+        <activiti:formProperty id="materialtype_材料类别_8_string_t1_$$B" name="材料类别" type="string" variable="materialtype"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566810817138_item" name="物料清单" type="string" variable="header1566810817138"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566810817138_itemnumber2_物料编号_3_string_t1_$$A" name="物料编号" type="string" variable="itemnumber2"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566810817138_ORDCODE2_物料型号_4_string_t1_$$A" name="物料型号" type="string" variable="ORDCODE2"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566810817138_itemname2_物料名称_2_string_t1_$$A" name="物料名称" type="string" variable="itemname2"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566810817138_itemqty2_数量_5_string_t6_$$A" name="数量" type="string" variable="itemqty2"></activiti:formProperty>
+      </extensionElements>
+    </startEvent>
+    <sequenceFlow id="SequenceFlow_0xbt7m2" sourceRef="StartEvent_1" targetRef="scripttask1"></sequenceFlow>
+    <userTask id="usertask1" name="Cyclic update" activiti:assignee="${initiator}">
+      <extensionElements>
+        <activiti:formProperty id="itemname_物料名称_3_string_t1_$$A" name="物料名称" type="string" variable="itemname"></activiti:formProperty>
+        <activiti:formProperty id="ORDCODE_物料型号_4_string_t1_$$A" name="物料型号" type="string" variable="ORDCODE"></activiti:formProperty>
+        <activiti:formProperty id="itemnumber_物料编号_5_string_t1_$$A" name="物料编号" type="string" variable="itemnumber"></activiti:formProperty>
+        <activiti:formProperty id="itemgroup_产品类别_6_string_t1_$$A" name="产品组别" type="string" variable="itemgroup"></activiti:formProperty>
+        <activiti:formProperty id="mainmaterial_主要材料_7_string_t1_$$B" name="主要材料" type="string" variable="mainmaterial"></activiti:formProperty>
+        <activiti:formProperty id="materialtype_材料类别_8_string_t1_$$B" name="材料类别" type="string" variable="materialtype"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566810817138_item" name="物料清单" type="string" variable="header1566810817138"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566810817138_itemnumber2_物料编号_3_string_t1_$$A" name="物料编号" type="string" variable="itemnumber2"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566810817138_ORDCODE2_物料型号_4_string_t1_$$A" name="物料型号" type="string" variable="ORDCODE2"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566810817138_itemname2_物料名称_2_string_t1_$$A" name="物料名称" type="string" variable="itemname2"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566810817138_itemqty2_数量_5_string_t6_$$A" name="数量" type="string" variable="itemqty2"></activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <scriptTask id="scripttask1" name="check unique" scriptFormat="groovy" activiti:autoStoreVariables="false">
+		<script><![CDATA[
+import java.util.stream.Collectors;				
+def processInstanceList = runtimeService.createProcessInstanceQuery().processInstanceTenantId(execution.getTenantId()).processDefinitionKey("materialinf0902").list();
+//def processInstanceList = runtimeService.createProcessInstanceQuery().processDefinitionKey("materialinf0902").list();
+def a = processInstanceList.stream().map({x -> x.getProcessInstanceId()}).collect(Collectors.toList());
+execution.setVariable("a",a.toString());
+
+
+def variableList = historyService.createHistoricVariableInstanceQuery().variableValueEquals("itemnumber", execution.getVariable("itemnumber")).list();
+def b = variableList.stream().map({x ->x.getProcessInstanceId()}).collect(Collectors.toList());
+b.remove(execution.getProcessInstanceId());
+execution.setVariable("b",b.toString());
+if( ! a.disjoint(b)){
+	throw new org.activiti.engine.ActivitiIllegalArgumentException('物料编号重复');
+}
+
+
+
+				]]>
+		</script>
+    </scriptTask>
+    <sequenceFlow id="flow1" sourceRef="scripttask1" targetRef="usertask1"></sequenceFlow>
+    <sequenceFlow id="flow2" sourceRef="usertask1" targetRef="scripttask1"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_materialinf0902">
+    <bpmndi:BPMNPlane bpmnElement="materialinf0902" id="BPMNPlane_materialinf0902">
+      <bpmndi:BPMNShape bpmnElement="StartEvent_1" id="BPMNShape_StartEvent_1">
+        <omgdc:Bounds height="36.0" width="36.0" x="130.0" y="309.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask1" id="BPMNShape_usertask1">
+        <omgdc:Bounds height="55.0" width="105.0" x="320.0" y="156.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scripttask1" id="BPMNShape_scripttask1">
+        <omgdc:Bounds height="55.0" width="105.0" x="240.0" y="298.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="SequenceFlow_0xbt7m2" id="BPMNEdge_SequenceFlow_0xbt7m2">
+        <omgdi:waypoint x="166.0" y="327.0"></omgdi:waypoint>
+        <omgdi:waypoint x="240.0" y="325.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="345.0" y="325.0"></omgdi:waypoint>
+        <omgdi:waypoint x="372.0" y="324.0"></omgdi:waypoint>
+        <omgdi:waypoint x="372.0" y="211.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="320.0" y="183.0"></omgdi:waypoint>
+        <omgdi:waypoint x="293.0" y="186.0"></omgdi:waypoint>
+        <omgdi:waypoint x="292.0" y="298.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

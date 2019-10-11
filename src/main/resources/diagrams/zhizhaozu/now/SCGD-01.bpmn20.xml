@@ -11,7 +11,22 @@
     				<activiti:string>
     				<![CDATA[
     					import groovy.json.JsonSlurper
-    				
+    					import java.util.stream.Collectors
+    					
+      					def tenantId = execution.getTenantId()
+      					def productionOrderNumber = execution.getVariable('productionOrderNumber')
+      					
+      					def processInstances = historyService.createHistoricProcessInstanceQuery().processInstanceTenantId(tenantId).processDefinitionKey("productionExecution").list()
+						def productionOrderNumbers = processInstances.stream().map({
+						            processInst ->
+						                historyService.createHistoricVariableInstanceQuery().processInstanceId(processInst.getId()).list().stream().filter({inst -> ("productionOrderNumber" == inst.getVariableName()) }).findFirst().map({ varInst -> varInst.getValue().toString()}).orElse("")
+						        }
+						).collect(Collectors.toList())
+      					
+      					if(productionOrderNumbers.contains(productionOrderNumber)){
+      						throw new org.activiti.engine.ActivitiIllegalArgumentException('生产加工单重复[' + productionOrderNumber + ']')
+      					}    					
+    					
     					def jsonSlurper = new JsonSlurper()
     					def proInstId = jsonSlurper.parseText(execution.getVariable('processNumber')).code
     					execution.setVariable('proInstId', execution.getProcessInstanceId())
