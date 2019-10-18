@@ -20,12 +20,30 @@
           <activiti:value id="M" name="M"></activiti:value>
           <activiti:value id="L" name="L"></activiti:value>
         </activiti:formProperty>
-        <activiti:formProperty id="changeType_变更类型_2_string_t1_$$C" name="变更类型" type="string" variable="changeType" required="true"></activiti:formProperty>
+        <activiti:formProperty id="changeType_变更类型_2_enum_sbs_$$C" name="变更类型" type="enum" variable="changeType" required="true">
+          <activiti:value id="H-日盈产品生产场地变更" name="H-日盈产品生产场地变更"></activiti:value>
+          <activiti:value id="H-日盈BOM表内主料供应商变更" name="H-日盈BOM表内主料供应商变更"></activiti:value>
+          <activiti:value id="H-关键尺寸变更（模具）" name="H-关键尺寸变更（模具）"></activiti:value>
+          <activiti:value id="H-产品外观变更" name="H-产品外观变更"></activiti:value>
+          <activiti:value id="H-产品关键技术性能变更" name="H-产品关键技术性能变更"></activiti:value>
+          <activiti:value id="H-产品用软件变更" name="H-产品用软件变更"></activiti:value>
+          <activiti:value id="M-产品包装方式变更" name="M-产品包装方式变更"></activiti:value>
+          <activiti:value id="M-产品检验标准变更" name="M-产品检验标准变更"></activiti:value>
+          <activiti:value id="M-产品生产参数变更" name="M-产品生产参数变更"></activiti:value>
+          <activiti:value id="M-产品生产线(生产设备)变更" name="M-产品生产线(生产设备)变更"></activiti:value>
+          <activiti:value id="M-产品生产工装变更" name="M-产品生产工装变更"></activiti:value>
+          <activiti:value id="M-产品生产模具变更" name="M-产品生产模具变更"></activiti:value>
+          <activiti:value id="L-文档升级和修订（客户端）" name="L-文档升级和修订（客户端）"></activiti:value>
+          <activiti:value id="L-标准版本更新" name="L-标准版本更新"></activiti:value>
+          <activiti:value id="L-物流号变更" name="L-物流号变更"></activiti:value>          
+        </activiti:formProperty>
         <activiti:formProperty id="dueDate_变更要求完成日期_3_string_t3_$$C" name="变更要求完成日期" type="string" variable="dueDate" required="true"></activiti:formProperty>
-        <activiti:formProperty id="changeBefore_变更前_4_string_t2_$$C" name="变更前" type="string" variable="changeBefore" required="true"></activiti:formProperty>
-        <activiti:formProperty id="changeAfter_变更后_5_string_t2_$$C" name="变更后" type="string" variable="changeAfter" required="true"></activiti:formProperty>
-        <activiti:formProperty id="changeReason_变更原因_6_string_t2_$$C" name="变更原因" type="string" variable="changeReason" required="true"></activiti:formProperty>
+        <activiti:formProperty id="changeReason_变更原因_4_string_t2_$$C" name="变更原因" type="string" variable="changeReason" required="true"></activiti:formProperty>        
+        <activiti:formProperty id="changeBefore_变更前_1_string_t2_$$D" name="变更前" type="string" variable="changeBefore" required="true"></activiti:formProperty>
+        <activiti:formProperty id="changeAfter_变更后_2_string_t2_$$D" name="变更后" type="string" variable="changeAfter" required="true"></activiti:formProperty>
 
+		<activiti:formProperty id="attachmentback1_附件_1_string_t9_$$A" name="上传附件" type="string" variable="attachmentback1"></activiti:formProperty>
+		
         <activiti:executionListener event="end" class="org.activiti.engine.impl.bpmn.listener.ScriptExecutionListener">
           <activiti:field name="language">
             <activiti:string><![CDATA[groovy]]></activiti:string>
@@ -102,12 +120,28 @@
           <activiti:value id="M" name="M"></activiti:value>
           <activiti:value id="L" name="L"></activiti:value>
         </activiti:formProperty>
-        <activiti:formProperty id="changeType_变更类型_2_string_t1_$$VC" name="变更类型" type="string" variable="changeType" required="true"></activiti:formProperty>
+        <activiti:formProperty id="changeType_变更类型_2_enum_sbs_$$VC" name="变更类型" type="enum" variable="changeType" required="true">
+          <activiti:value id="H-日盈产品生产场地变更" name="H-日盈产品生产场地变更"></activiti:value>
+          <activiti:value id="H-日盈BOM表内主料供应商变更" name="H-日盈BOM表内主料供应商变更"></activiti:value>
+          <activiti:value id="H-关键尺寸变更（模具）" name="H-关键尺寸变更（模具）"></activiti:value>
+          <activiti:value id="H-产品外观变更" name="H-产品外观变更"></activiti:value>
+          <activiti:value id="H-产品关键技术性能变更" name="H-产品关键技术性能变更"></activiti:value>
+          <activiti:value id="H-产品用软件变更" name="H-产品用软件变更"></activiti:value>
+          <activiti:value id="M-产品包装方式变更" name="M-产品包装方式变更"></activiti:value>
+          <activiti:value id="M-产品检验标准变更" name="M-产品检验标准变更"></activiti:value>
+          <activiti:value id="M-产品生产参数变更" name="M-产品生产参数变更"></activiti:value>
+          <activiti:value id="M-产品生产线(生产设备)变更" name="M-产品生产线(生产设备)变更"></activiti:value>
+          <activiti:value id="M-产品生产工装变更" name="M-产品生产工装变更"></activiti:value>
+          <activiti:value id="M-产品生产模具变更" name="M-产品生产模具变更"></activiti:value>
+          <activiti:value id="L-文档升级和修订（客户端）" name="L-文档升级和修订（客户端）"></activiti:value>
+          <activiti:value id="L-标准版本更新" name="L-标准版本更新"></activiti:value>
+          <activiti:value id="L-物流号变更" name="L-物流号变更"></activiti:value>         
+        </activiti:formProperty>
         <activiti:formProperty id="dueDate_变更要求完成日期_3_string_t3_$$VC" name="变更要求完成日期" type="string" variable="dueDate" required="true"></activiti:formProperty>
-        <activiti:formProperty id="changeBefore_变更前_4_string_t2_$$VC" name="变更前" type="string" variable="changeBefore" required="true"></activiti:formProperty>
-        <activiti:formProperty id="changeAfter_变更后_5_string_t2_$$VC" name="变更后" type="string" variable="changeAfter" required="true"></activiti:formProperty>
-        <activiti:formProperty id="changeReason_变更原因_6_string_t2_$$VC" name="变更原因" type="string" variable="changeReason" required="true"></activiti:formProperty>
-        
+        <activiti:formProperty id="changeReason_变更原因_4_string_t2_$$VC" name="变更原因" type="string" variable="changeReason" required="true"></activiti:formProperty>        
+        <activiti:formProperty id="changeBefore_变更前_1_string_t2_$$VD" name="变更前" type="string" variable="changeBefore" required="true"></activiti:formProperty>
+        <activiti:formProperty id="changeAfter_变更后_2_string_t2_$$VD" name="变更后" type="string" variable="changeAfter" required="true"></activiti:formProperty>
+                
         <activiti:formProperty id="coreaction_可行性评审_1_enum_rbv_$$A" name="可行性评审结论" type="enum" variable="coreaction_result" required="true">
           <activiti:value id="同意变更" name="同意变更"></activiti:value>
           <activiti:value id="拒绝变更" name="拒绝变更"></activiti:value>
@@ -221,6 +255,10 @@
         <activiti:formProperty id="costcenter_成本中心_3_string_tree_$$O" name="评审部门" type="string" variable="approvalDept12"/>
         <activiti:formProperty id="approvalPerson12_评审人_4_string_psbn_$$O" name="评审人" type="string" variable="approvalPerson12"/>                                                                                        
         
+       	<activiti:formProperty id="attachmentback1_附件_1_string_t9_$$VA" name="上传附件" type="string" variable="attachmentback1"></activiti:formProperty>
+        
+		<activiti:formProperty id="attachmentback2_附件_1_string_t9_$$A" name="上传附件" type="string" variable="attachmentback2"></activiti:formProperty>
+        
         <activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
         	<activiti:field name="language">
         		<activiti:string>
@@ -249,7 +287,7 @@
         <activiti:formProperty id="changeOrderNumber_变更单号_2_string_t1_$$VA" name="变更单号" type="string" variable="changeOrderNumber" required="true"></activiti:formProperty>
         <activiti:formProperty id="changeApplicant_变更申请人_1_string_t1_$$VB" name="变更申请人" type="string" variable="changeApplicant" required="true"></activiti:formProperty>
         <activiti:formProperty id="changeDate_日期_2_string_t3_$$VB" name="日期" type="string" variable="changeDate" required="true"></activiti:formProperty>
-        <activiti:formProperty id="costcenter_成本中心_3_string_tree_$$VB" name="成本中心" type="string" variable="department" required="true"></activiti:formProperty>
+        <activiti:formProperty id="costcenter_成本中心_3_string_tree_$$VB" name="部门" type="string" variable="department" required="true"></activiti:formProperty>
         <activiti:formProperty id="customerSupplier_客户/供方_4_string_t1_$$VB" name="客户/供方" type="string" variable="customerSupplier" required="true"></activiti:formProperty>
         <activiti:formProperty id="productName_产品名称_5_string_t1_$$VB" name="产品名称" type="string" variable="productName" required="true"></activiti:formProperty>
         <activiti:formProperty id="ryProductType_日盈产品型号_6_string_t1_$$VB" name="日盈产品型号" type="string" variable="ryProductType" required="true"></activiti:formProperty>
@@ -260,11 +298,27 @@
           <activiti:value id="M" name="M"></activiti:value>
           <activiti:value id="L" name="L"></activiti:value>
         </activiti:formProperty>
-        <activiti:formProperty id="changeType_变更类型_2_string_t1_$$VC" name="变更类型" type="string" variable="changeType" required="true"></activiti:formProperty>
+        <activiti:formProperty id="changeType_变更类型_2_enum_sbs_$$VC" name="变更类型" type="enum" variable="changeType" required="true">
+          <activiti:value id="H-日盈产品生产场地变更" name="H-日盈产品生产场地变更"></activiti:value>
+          <activiti:value id="H-日盈BOM表内主料供应商变更" name="H-日盈BOM表内主料供应商变更"></activiti:value>
+          <activiti:value id="H-关键尺寸变更（模具）" name="H-关键尺寸变更（模具）"></activiti:value>
+          <activiti:value id="H-产品外观变更" name="H-产品外观变更"></activiti:value>
+          <activiti:value id="H-产品关键技术性能变更" name="H-产品关键技术性能变更"></activiti:value>
+          <activiti:value id="H-产品用软件变更" name="H-产品用软件变更"></activiti:value>
+          <activiti:value id="M-产品包装方式变更" name="M-产品包装方式变更"></activiti:value>
+          <activiti:value id="M-产品检验标准变更" name="M-产品检验标准变更"></activiti:value>
+          <activiti:value id="M-产品生产参数变更" name="M-产品生产参数变更"></activiti:value>
+          <activiti:value id="M-产品生产线(生产设备)变更" name="M-产品生产线(生产设备)变更"></activiti:value>
+          <activiti:value id="M-产品生产工装变更" name="M-产品生产工装变更"></activiti:value>
+          <activiti:value id="M-产品生产模具变更" name="M-产品生产模具变更"></activiti:value>
+          <activiti:value id="L-文档升级和修订（客户端）" name="L-文档升级和修订（客户端）"></activiti:value>
+          <activiti:value id="L-标准版本更新" name="L-标准版本更新"></activiti:value>
+          <activiti:value id="L-物流号变更" name="L-物流号变更"></activiti:value>         
+        </activiti:formProperty>
         <activiti:formProperty id="dueDate_变更要求完成日期_3_string_t3_$$VC" name="变更要求完成日期" type="string" variable="dueDate" required="true"></activiti:formProperty>
-        <activiti:formProperty id="changeBefore_变更前_4_string_t2_$$VC" name="变更前" type="string" variable="changeBefore" required="true"></activiti:formProperty>
+        <activiti:formProperty id="changeBefore_变更前_6_string_t2_$$VC" name="变更前" type="string" variable="changeBefore" required="true"></activiti:formProperty>
         <activiti:formProperty id="changeAfter_变更后_5_string_t2_$$VC" name="变更后" type="string" variable="changeAfter" required="true"></activiti:formProperty>
-        <activiti:formProperty id="changeReason_变更原因_6_string_t2_$$VC" name="变更原因" type="string" variable="changeReason" required="true"></activiti:formProperty>
+        <activiti:formProperty id="changeReason_变更原因_4_string_t2_$$VC" name="变更原因" type="string" variable="changeReason" required="true"></activiti:formProperty>
         
         <activiti:formProperty id="coreaction_可行性评审_1_enum_rbv_$$VD" name="可行性评审结论" type="enum" variable="coreaction_result" required="true">
           <activiti:value id="同意变更" name="同意变更"></activiti:value>
@@ -380,6 +434,9 @@
         <activiti:formProperty id="approvalPerson12_评审人_4_string_psbn_$$VR" name="评审人" type="string" variable="approvalPerson12"/>                                                                                        
         
         <activiti:formProperty id="attachment_附件_1_string_t9i_$$A" name="上传附件" type="string" variable="attachment" required="true"></activiti:formProperty>
+      
+		<activiti:formProperty id="attachmentback1_附件_1_string_t9_$$VA" name="上传附件" type="string" variable="attachmentback1"></activiti:formProperty>
+		<activiti:formProperty id="attachmentback2_附件_1_string_t9_$$VA" name="上传附件" type="string" variable="attachmentback2"></activiti:formProperty>      
       </extensionElements>
     </userTask>
     <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="servicetask1"></sequenceFlow>

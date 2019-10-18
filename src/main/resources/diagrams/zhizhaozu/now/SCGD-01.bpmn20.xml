@@ -149,6 +149,7 @@
     				def jsonSlurper = new JsonSlurper()
     				def execution = task.getExecution()
     				def items = jsonSlurper.parseText(execution.getVariable('tbheader1566744708879_item_std'))
+    				def processStd = jsonSlurper.parseText(execution.getVariable('processStd'))
     				
     				def count = execution.getVariable('processcount1')
     				if(count.toInteger() <= 0) {
@@ -167,10 +168,19 @@
     					
     					map.put(it.工序编号,li)
     					dList.add(JsonOutput.toJson(map))
+    					
+    					processStd.each{pro->
+    						if(pro.get('工序编号') == it.工序编号){
+    							pro.put('分配工段编号', it.工段名称.code)
+    							pro.put('计划开始时间', it.计划开始时间)
+    							pro.put('计划结束时间', it.计划结束时间)
+    						}
+    					}
     				}
     				
     				execution.setVariable('dList',dList)
     				
+    				execution.setVariable('processStd', JsonOutput.toJson(processStd))
     				]]>
     				</activiti:string>
     			</activiti:field>
@@ -325,6 +335,12 @@
 						secret =Base64.getUrlEncoder().encodeToString(hmac_sha256(METABASE_SECRET_KEY , header+'.'+playload))
 						url = METABASE_SITE_URL + "/embed/question/" + header+'.'+playload+'.'+secret + "#bordered=true&titled=true"
 						execution.setVariableLocal('BBOT_BI_JYZB',url)
+						
+						playloadString = '{"resource":{"question":33},"params":{"procInstId":\"'+ procInstId +'\","processNumber": \"'+processNumber+'\"}}'
+						playload = Base64.getUrlEncoder().encodeToString(playloadString.bytes)
+						secret =Base64.getUrlEncoder().encodeToString(hmac_sha256(METABASE_SECRET_KEY , header+'.'+playload))
+						url = METABASE_SITE_URL + "/embed/question/" + header+'.'+playload+'.'+secret + "#bordered=true&titled=true"
+						execution.setVariableLocal('BBOT_BI_GXZB',url)
       					
       					def processType = execution.getVariable('processType')
       					

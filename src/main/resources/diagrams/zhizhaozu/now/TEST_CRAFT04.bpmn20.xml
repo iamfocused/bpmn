@@ -6,7 +6,7 @@
         <activiti:formProperty id="processnumber_工艺编号_1_string_t1_$$A" name="工艺编号" type="string" variable="processnumber" required="true"></activiti:formProperty>
         <activiti:formProperty id="processname_工艺名称_2_string_t1_$$A" name="工艺名称" type="string" variable="processname" required="true"></activiti:formProperty>
         <activiti:formProperty id="processdesc_工艺描述_3_string_t2_$$A" name="工艺描述" type="string" variable="processdesc"></activiti:formProperty>
-        <activiti:formProperty id="EAN_物料编号_4_string_auto_$$A" name="物料编号" type="string" variable="EAN" required="true"></activiti:formProperty>
+        <activiti:formProperty id="ORDCODE_物料型号_4_string_auto_$$A" name="物料型号" type="string" variable="ORDCODE"></activiti:formProperty>
         <activiti:formProperty id="WORKDAY_工作天数（天/年）_13_string_t6_$$B" name="工作天数（天/年）" type="string" variable="WORKDAY"></activiti:formProperty>
         <activiti:formProperty id="SHIFT_换班次数（班/天）_14_string_t6_$$B" name="换班次数（班/天）" type="string" variable="SHIFT"></activiti:formProperty>
         <activiti:formProperty id="SHIFTH_单班工作时间（小时）_15_string_t6_$$B" name="单班工作时间（小时）" type="string" variable="SHIFTH"></activiti:formProperty>
@@ -41,14 +41,14 @@
         <activiti:formProperty id="tbheader1566744708879_header-1566746165617_车削工步表_22_string_join_$$E" name="车削工步表" type="string" variable="join1566746165617"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879_header-1566746163577_铣削工步表_23_string_join_$$E" name="铣削工步表" type="string" variable="join1566746163577"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header1566746042674_item" name="工序物料清单" type="string" variable="header1566746042674"></activiti:formProperty>
-        <activiti:formProperty id="tbheader1566744708879-header1566746042674_EAN2_物料编号_2_string_auto_$$A" name="物料编号" type="string" variable="EAN2"></activiti:formProperty>
-        <activiti:formProperty id="tbheader1566744708879-header1566746042674_ORDCODE2_物料型号_3_string_t1_$$HA" name="物料型号" type="string" variable="ORDCODE2"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566744708879-header1566746042674_ORDCODE2_物料型号_2_string_auto_$$A" name="物料型号" type="string" variable="ORDCODE2"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566744708879-header1566746042674_EAN2_物料编号_3_string_t1_$$HA" name="物料编号" type="string" variable="EAN2"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header1566746042674_itemname2_物料名称_4_string_t1_$$HA" name="物料名称" type="string" variable="itemname2"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header1566746042674_EANQTY_数量_5_string_t6_$$A" name="数量" type="string" variable="EANQTY"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header1566746042674_join-key_Key_10_string_t1_$$A" name="Key" type="string"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header-1566746045871_item" name="工序工具清单" type="string" variable="header1566746045871"></activiti:formProperty>
-        <activiti:formProperty id="tbheader1566744708879-header-1566746045871_toolnumber_工具编号_2_string_auto_$$A" name="工具编号" type="string" variable="toolnumber"></activiti:formProperty>
-        <activiti:formProperty id="tbheader1566744708879-header-1566746045871_tooltypecode_工具型号_3_string_t1_$$HA" name="工具型号" type="string" variable="tooltypecode"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566744708879-header-1566746045871_tooltypecode_工具型号_2_string_auto_$$A" name="工具型号" type="string" variable="tooltypecode"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566744708879-header-1566746045871_toolnumber_工具编号_3_string_t1_$$HA" name="工具编号" type="string" variable="toolnumber"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header-1566746045871_toolname_工具名称_4_string_t1_$$HA" name="工具名称" type="string" variable="toolname"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header-1566746045871_toolqty_数量_5_string_t6_$$A" name="数量" type="string" variable="toolqty"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header-1566746045871_join-key_Key_10_string_t1_$$A" name="Key" type="string"></activiti:formProperty>
@@ -143,10 +143,11 @@
         <activiti:formProperty id="processnumber_工艺编号_1_string_t1_$$A" name="工艺编号" type="string" variable="processnumber" required="true"></activiti:formProperty>
         <activiti:formProperty id="processname_工艺名称_2_string_t1_$$A" name="工艺名称" type="string" variable="processname" required="true"></activiti:formProperty>
         <activiti:formProperty id="processdesc_工艺描述_3_string_t2_$$A" name="工艺描述" type="string" variable="processdesc"></activiti:formProperty>
-        <activiti:formProperty id="EAN_物料编号_1_string_auto_$$B" name="物料编号" type="string" variable="EAN"></activiti:formProperty>
-        <activiti:formProperty id="ORDCODE_物料型号_4_string_t1_$$VA" name="物料型号" type="string" variable="ORDCODE"></activiti:formProperty>
-        <activiti:formProperty id="itemName_物料名称_5_string_t1_$$VA" name="物料名称" type="string" variable="itemName"></activiti:formProperty>
-        <activiti:formProperty id="mainmaterial_主要材料_6_string_t1_$$VA" name="主要材料" type="string" variable="mainmaterial"></activiti:formProperty>
+        <activiti:formProperty id="ORDCODE_物料型号_4_string_auto_$$A" name="物料型号" type="string" variable="ORDCODE"></activiti:formProperty>
+        
+        <activiti:formProperty id="EAN_物料编号_5_string_t1_$$VA" name="物料编号" type="string" variable="EAN"></activiti:formProperty>
+        <activiti:formProperty id="itemName_物料名称_6_string_t1_$$VA" name="物料名称" type="string" variable="itemName"></activiti:formProperty>
+        <activiti:formProperty id="mainmaterial_主要材料_7_string_t1_$$VA" name="主要材料" type="string" variable="mainmaterial"></activiti:formProperty>
         <activiti:formProperty id="WORKDAY_工作天数（天/年）_13_string_t6_$$A" name="工作天数（天/年）" type="string" variable="WORKDAY"></activiti:formProperty>
         <activiti:formProperty id="SHIFT_换班次数（班/天）_14_string_t6_$$A" name="换班次数（班/天）" type="string" variable="SHIFT"></activiti:formProperty>
         <activiti:formProperty id="SHIFTH_单班工作时间（小时）_15_string_t6_$$A" name="单班工作时间（小时）" type="string" variable="SHIFTH"></activiti:formProperty>
@@ -181,14 +182,14 @@
         <activiti:formProperty id="tbheader1566744708879_header-1566746165617_车削工步表_22_string_join_$$A" name="车削工步表" type="string" variable="join1566746165617"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879_header-1566746163577_铣削工步表_23_string_join_$$A" name="铣削工步表" type="string" variable="join1566746163577"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header1566746042674_item" name="工序物料清单" type="string" variable="header1566746042674"></activiti:formProperty>
-        <activiti:formProperty id="tbheader1566744708879-header1566746042674_EAN2_物料编号_2_string_auto_$$A" name="物料编号" type="string" variable="EAN2"></activiti:formProperty>
-        <activiti:formProperty id="tbheader1566744708879-header1566746042674_ORDCODE2_物料型号_3_string_t1_$$HA" name="物料型号" type="string" variable="ORDCODE2"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566744708879-header1566746042674_ORDCODE2_物料型号_2_string_auto_$$A" name="物料型号" type="string" variable="ORDCODE2"></activiti:formProperty>        
+        <activiti:formProperty id="tbheader1566744708879-header1566746042674_EAN2_物料编号_3_string_t1_$$HA" name="物料编号" type="string" variable="EAN2"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header1566746042674_itemname2_物料名称_4_string_t1_$$HA" name="物料名称" type="string" variable="itemname2"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header1566746042674_EANQTY_数量_5_string_t6_$$A" name="数量" type="string" variable="EANQTY"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header1566746042674_join-key_Key_10_string_t1_$$A" name="Key" type="string"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header-1566746045871_item" name="工序工具清单" type="string" variable="header1566746045871"></activiti:formProperty>
-        <activiti:formProperty id="tbheader1566744708879-header-1566746045871_toolnumber_工具编号_2_string_auto_$$A" name="工具编号" type="string" variable="toolnumber"></activiti:formProperty>
-        <activiti:formProperty id="tbheader1566744708879-header-1566746045871_tooltypecode_工具型号_3_string_t1_$$HA" name="工具型号" type="string" variable="tooltypecode"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566744708879-header-1566746045871_tooltypecode_工具型号_2_string_auto_$$A" name="工具型号" type="string" variable="tooltypecode"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566744708879-header-1566746045871_toolnumber_工具编号_3_string_t1_$$HA" name="工具编号" type="string" variable="toolnumber"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header-1566746045871_toolname_工具名称_4_string_t1_$$HA" name="工具名称" type="string" variable="toolname"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header-1566746045871_toolqty_数量_5_string_t6_$$A" name="数量" type="string" variable="toolqty"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header-1566746045871_join-key_Key_10_string_t1_$$A" name="Key" type="string"></activiti:formProperty>
@@ -257,8 +258,10 @@
 			import java.math.RoundingMode
 			import java.util.stream.Collectors
 			
+			execution.setVariable('coreaction','拒绝')//reset
+			
 			def jsonSlurper = new JsonSlurper()
-			def ean = jsonSlurper.parseText(execution.getVariable('EAN')).code.split('/')
+			def ean = jsonSlurper.parseText(execution.getVariable('ORDCODE')).code.split('/')
 			def proInstId = ean[0]
     				
 			def wlxh = 'ORDCODE'//物料型号
@@ -270,11 +273,11 @@
 			if(varInsts == null) {
 				throw new org.activiti.engine.ActivitiIllegalArgumentException('流程已删除,流程实例ID:' + proInstId)
 			}
-			def var1 = varInsts.stream().filter({x-&gt;x.getVariableName().equals(wlxh)}).findFirst().orElse(null)
+			def var1 = varInsts.stream().filter({x-&gt;x.getVariableName().equals(wlbh)}).findFirst().orElse(null)
 			if(var1) {
-				execution.setVariable('ORDCODE',var1.getValue())
+				execution.setVariable('itemnumber',var1.getValue())
 			} else {
-				throw new org.activiti.engine.ActivitiIllegalArgumentException('流程变量物料型号未找到,流程实例ID:' + proInstId)
+				throw new org.activiti.engine.ActivitiIllegalArgumentException('流程变量物料编号未找到,流程实例ID:' + proInstId)
 			}
 			
 			execution.setVariable('itemName', ean[1])
@@ -331,19 +334,17 @@
 			        case '车削':li&lt;&lt; it.车削工步表;break
 			        default: throw new RuntimeException("找不到对应工序类型") ;break
 			    }
-			    li&lt;&lt;it.get('装夹件数（件）')?:'0'//3
-			    li&lt;&lt;it.get('人员操作时间（秒）')?:'0'//4
-			    li&lt;&lt;it.get('人工检测时间（秒）')?:'0'//5
-			    li&lt;&lt;it.get('其它时间（秒）')?:'0'//6
+			    li&lt;&lt;(it.get('装夹件数（件）')?:'0')//3
+			    li&lt;&lt;(it.get('人员操作时间（秒）')?:'0')//4
+			    li&lt;&lt;(it.get('人工检测时间（秒）')?:'0')//5
+			    li&lt;&lt;(it.get('其它时间（秒）')?:'0')//6
 			    
 			    li&lt;&lt;it.get('工序物料清单')//7
 			    li&lt;&lt;it.get('工序工具清单')//8
 			}).collect(Collectors.toList())
 			
-			list.any { gx -&gt;
-				if(gx[3]==null || gx[4] == null || gx[5] == null || gx[6] == null){
-					return
-				}
+			list.each { gx -&gt;
+				
 			    switch (gx[1]){
 			        case '通用':
 			            def collect = tyStd.stream().filter({ ty -&gt; gx[2].split(",").contains(ty.Key) }).collect(Collectors.toList())
@@ -378,9 +379,12 @@
 			            def collect = cxStd.stream().filter({ cx -&gt; gx[2].split(",").contains(cx.Key) }).collect(Collectors.toList())
 			            def tmmt = collect.stream().mapToDouble({ cx-&gt;
 			            	def cxsd = cx.get('切削速度（m/min）')?:'0'
-			            	def zxcxzj = cx.get('最小车削直径（mm）')?:'1'
+			            	def zxcxzj = cx.get('最小车削直径（mm）')?:'0'
 			            	def zdcxzj = cx.get('最大车削直径（mm）')?:'0'
-			                def tsRPMAVE = cxsd.toBigDecimal().multiply(BigDecimal.valueOf(2000)).divide(Math.PI,2, RoundingMode.HALF_UP).divide(zxcxzj.toBigDecimal().add(zdcxzj.toBigDecimal()),2, RoundingMode.HALF_UP)
+			            	def tsRPMAVE = 0.toBigDecimal()
+			            	if(zxcxzj != '0'){
+			                	tsRPMAVE = cxsd.toBigDecimal().multiply(BigDecimal.valueOf(2000)).divide(Math.PI,2, RoundingMode.HALF_UP).divide(zxcxzj.toBigDecimal().add(zdcxzj.toBigDecimal()),2, RoundingMode.HALF_UP)
+			                }
 			                
 			                def mzjgl = cx.get('每转进给量（mm/rev）')?:'0'
 			                def tsVF = mzjgl.toBigDecimal().multiply(tsRPMAVE).toBigDecimal().setScale(2, RoundingMode.HALF_UP)
@@ -395,6 +399,12 @@
 			                	tsTMENG = qxcd.toBigDecimal().multiply(BigDecimal.valueOf(60)).multiply(cxcs.toBigDecimal()).multiply(gx[3].toBigDecimal()).divide(tsVF,2, RoundingMode.HALF_UP)
 			                }
 			                
+			                if(tsRPMAVE == 0) {
+			                	tsRPMAVE = null
+			                }
+			                if(tsVF == 0) {
+			                	tsVF = null
+			                }
 			                cxItem.each {k,v -&gt;
 			                    if(k == 'rows'){
 			                        v.each{
@@ -440,8 +450,11 @@
 			            def collect = xxStd.stream().filter({ xx -&gt; gx[2].split(",").contains(xx.Key) }).collect(Collectors.toList())
 			            def tmmt = collect.stream().mapToDouble({ xx -&gt;
 			            	def qxsd = xx.get('切削速度（m/min）')?:'0'
-			            	def qxzj = xx.get('切削直径（mm）')?:'1'
-			                def msRPM = qxsd.toBigDecimal().multiply(BigDecimal.valueOf(1000)).divide(Math.PI,2, RoundingMode.HALF_UP).divide(qxzj.toBigDecimal(),2, RoundingMode.HALF_UP)
+			            	def qxzj = xx.get('切削直径（mm）')?:'0'
+			            	def msRPM = 0.toBigDecimal()
+			            	if(qxzj != '0'){
+			                	msRPM = qxsd.toBigDecimal().multiply(BigDecimal.valueOf(1000)).divide(Math.PI,2, RoundingMode.HALF_UP).divide(qxzj.toBigDecimal(),2, RoundingMode.HALF_UP)
+			                }
 			                
 			                def mcjgl = xx.get('每齿进给量（mm/tooth）')?:'0'
 			                def yxcs = xx.get('有效齿数&amp;nbsp;')?:'0'
@@ -455,6 +468,14 @@
 			                def msTMENG = 0.toBigDecimal()
 			                if(msVF &gt; 0){
 			                	msTMENG = qxcd.toBigDecimal().multiply(BigDecimal.valueOf(60)).multiply(qxcs.toBigDecimal()).multiply(gx[3].toBigDecimal()).divide(msVF,2, RoundingMode.HALF_UP)
+			                }
+			                
+			                if(msRPM == 0) {
+			                	msRPM = null
+			                }
+			                
+			                if(msVF == 0) {
+			                	msVF = null
 			                }
 			                xxItem.each {k,v -&gt;
 			                    if(k == 'rows'){
@@ -505,18 +526,18 @@
 				    //物料
 				    def collect = wlStd.stream().filter({ xx -&gt; gx[7].split(",").contains(xx.Key) }).collect(Collectors.toList())
 					collect.each{wl1-&gt;
-						def wlObj = wl1.get('物料编号').code.split('/')
+						def wlObj = wl1.get('物料型号').code.split('/')
 						def findResult = historyService.createHistoricVariableInstanceQuery().processInstanceId(wlObj[0]).list()
 						if(findResult == null) {
 							throw new org.activiti.engine.ActivitiIllegalArgumentException('流程已删除,流程实例ID:' + wlObj[0])
 						}
-						def wlXh = findResult.stream().filter({x-&gt;x.getVariableName().equals('ORDCODE')}).findFirst().orElse(null)
+						def wlBh = findResult.stream().filter({x-&gt;x.getVariableName().equals('itemnumber')}).findFirst().orElse(null)
 						def wlName = wlObj[1]
 						wlItem.each{k,v -&gt;
 							if(k == 'rows'){
 								v.each{ item -&gt;
 			                        if(item[4] == wl1.Key){
-			                            item[1] = wlXh.getValue()
+			                            item[1] = wlBh.getValue()
 			                            item[2] = wlName
 			                        }
 			                    }
@@ -524,7 +545,7 @@
 						}
 						
 						wlStd1.stream().filter({c-&gt;c.Key==wl1.Key}).each{w1-&gt;
-		                	w1.put('物料型号',wlXh.getValue())
+		                	w1.put('物料编号',wlBh.getValue())
 		                	w1.put('物料名称',wlName)
 		                }							
 					}
@@ -536,18 +557,18 @@
 				    //工具
 				    def collect = gjStd.stream().filter({ xx -&gt; gx[8].split(",").contains(xx.Key) }).collect(Collectors.toList())
 					collect.each{gj1-&gt;
-						def gjObj = gj1.get('工具编号').code.split('/')
+						def gjObj = gj1.get('工具型号').code.split('/')
 						def findResult = historyService.createHistoricVariableInstanceQuery().processInstanceId(gjObj[0]).list()
 						if(findResult == null) {
 							throw new org.activiti.engine.ActivitiIllegalArgumentException('流程已删除,流程实例ID:' + gjObj[0])
 						}
-						def gjXh = findResult.stream().filter({x-&gt;x.getVariableName().equals('ORDCODE')}).findFirst().orElse(null)
+						def gjBh = findResult.stream().filter({x-&gt;x.getVariableName().equals('itemnumber')}).findFirst().orElse(null)
 						def gjName = gjObj[1]
 						gjItem.each{k,v -&gt;
 							if(k == 'rows'){
 								v.each{ item -&gt;
 			                        if(item[4] == gj1.Key){
-			                            item[1] = gjXh.getValue()
+			                            item[1] = gjBh.getValue()
 			                            item[2] = gjName
 			                        }
 			                    }
@@ -555,7 +576,7 @@
 						}
 						
 						gjStd1.stream().filter({g-&gt;g.Key==gj1.Key}).each{g1-&gt;
-		                	g1.put('工具型号',gjXh.getValue())
+		                	g1.put('工具编号',gjBh.getValue())
 		                	g1.put('工具名称',gjName)
 		                }	
 						
@@ -605,10 +626,10 @@
         <activiti:formProperty id="processnumber_工艺编号_1_string_t1_$$VA" name="工艺编号" type="string" variable="processnumber"></activiti:formProperty>
         <activiti:formProperty id="processname_工艺名称_2_string_t1_$$VA" name="工艺名称" type="string" variable="processname"></activiti:formProperty>
         <activiti:formProperty id="processdesc_工艺描述_3_string_t2_$$VA" name="工艺描述" type="string" variable="processdesc"></activiti:formProperty>
-        <activiti:formProperty id="EAN_物料编号_1_string_auto_$$VB" name="物料编号" type="string" variable="EAN"></activiti:formProperty>
-        <activiti:formProperty id="ORDCODE_物料型号_4_string_t1_$$VA" name="物料型号" type="string" variable="ORDCODE"></activiti:formProperty>
+        <activiti:formProperty id="ORDCODE_物料型号_4_string_auto_$$VA" name="物料型号" type="string" variable="ORDCODE"></activiti:formProperty>
         <activiti:formProperty id="itemName_物料名称_5_string_t1_$$VA" name="物料名称" type="string" variable="itemName"></activiti:formProperty>
         <activiti:formProperty id="mainmaterial_主要材料_6_string_t1_$$VA" name="主要材料" type="string" variable="mainmaterial"></activiti:formProperty>
+        <activiti:formProperty id="EAN_物料编号_7_string_t1_$$VA" name="物料编号" type="string" variable="EAN"></activiti:formProperty>        
         <activiti:formProperty id="WORKDAY_工作天数（天/年）_13_string_t6_$$VA" name="工作天数（天/年）" type="string" variable="WORKDAY"></activiti:formProperty>
         <activiti:formProperty id="SHIFT_换班次数（班/天）_14_string_t6_$$VA" name="换班次数（班/天）" type="string" variable="SHIFT"></activiti:formProperty>
         <activiti:formProperty id="SHIFTH_单班工作时间（小时）_15_string_t6_$$VA" name="单班工作时间（小时）" type="string" variable="SHIFTH"></activiti:formProperty>
@@ -643,14 +664,14 @@
         <activiti:formProperty id="tbheader1566744708879_header-1566746165617_车削工步表_22_string_join_$$A" name="车削工步表" type="string" variable="join1566746165617"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879_header-1566746163577_铣削工步表_23_string_join_$$A" name="铣削工步表" type="string" variable="join1566746163577"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header1566746042674_item_$$VA" name="工序物料清单" type="string" variable="header1566746042674"></activiti:formProperty>
-        <activiti:formProperty id="tbheader1566744708879-header1566746042674_EAN2_物料编号_2_string_auto_$$A" name="物料编号" type="string" variable="EAN2"></activiti:formProperty>
-        <activiti:formProperty id="tbheader1566744708879-header1566746042674_ORDCODE2_物料型号_3_string_t1_$$A" name="物料型号" type="string" variable="ORDCODE2"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566744708879-header1566746042674_ORDCODE2_物料型号_2_auto_auto_$$A" name="物料型号" type="string" variable="ORDCODE2"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566744708879-header1566746042674_EAN2_物料编号_3_string_t1_$$A" name="物料编号" type="string" variable="EAN2"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header1566746042674_itemname2_物料名称_4_string_t1_$$A" name="物料名称" type="string" variable="itemname2"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header1566746042674_EANQTY_数量_5_string_t6_$$A" name="数量" type="string" variable="EANQTY"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header1566746042674_join-key_Key_10_string_t1_$$A" name="Key" type="string"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header-1566746045871_item_$$VA" name="工序工具清单" type="string" variable="header1566746045871"></activiti:formProperty>
-        <activiti:formProperty id="tbheader1566744708879-header-1566746045871_toolnumber_工具编号_2_string_auto_$$A" name="工具编号" type="string" variable="toolnumber"></activiti:formProperty>
-        <activiti:formProperty id="tbheader1566744708879-header-1566746045871_tooltypecode_工具型号_3_string_t1_$$A" name="工具型号" type="string" variable="tooltypecode"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566744708879-header-1566746045871_tooltypecode_工具型号_2_string_auto_$$A" name="工具型号" type="string" variable="tooltypecode"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566744708879-header-1566746045871_toolnumber_工具编号_3_string_t1_$$A" name="工具编号" type="string" variable="toolnumber"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header-1566746045871_toolname_工具名称_4_string_t1_$$A" name="工具名称" type="string" variable="toolname"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header-1566746045871_toolqty_数量_5_string_t6_$$A" name="数量" type="string" variable="toolqty"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566744708879-header-1566746045871_join-key_Key_10_string_t1_$$A" name="Key" type="string"></activiti:formProperty>
