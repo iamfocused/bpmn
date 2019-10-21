@@ -2,55 +2,89 @@
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/pur">
   <process id="DemoProcess" name="DemoProcess" isExecutable="true" activiti:candidateStarterGroups="admin">
     <startEvent id="startevent1" name="Start" activiti:initiator="initiator">
-    	<extensionElements>
-    		<activiti:formProperty id="username_用户名_1_string_t1_$$A" name="用户名" type="string" variable="username"/>
-    		
-    		<activiti:formProperty id="tbtable1_item" name="表单" variable="tbtable1_item"/>
-    		<activiti:formProperty id="tbtable1_物品名称_goodsName_1_string_t1_$$A" name="物品名称" type="string" variable="tbtable1_goodsName_t00"/>
-    		<activiti:formProperty id="tbtable1_物品数量_goodsQty_2_string_t6_$$A" name="物品数量" type="string" variable="tbtable1_goodsQty_t00"/>
-    		<activiti:formProperty id="tbtable1_物品价格_goodsPrice_3_string_t11_$$A" name="物品价格" type="string" variable="tbtable1_goodsPrice_t00"/>
-    		<activiti:formProperty id="tbtable1_物品总价_goodsTotal_4_string_t11_$$HA" name="物品总价" type="string" variable="tbtable1_goodsTotal_t00"/>
-			
-			
-    	</extensionElements>
+      <extensionElements>
+        <activiti:formProperty id="username_用户名_1_string_t1_$$A" name="用户名" type="string" variable="username"></activiti:formProperty>
+        <activiti:formProperty id="tbtable1_item" name="表单" variable="tbtable1_item"></activiti:formProperty>
+        <activiti:formProperty id="tbtable1_物品名称_goodsName_1_string_t1_$$A" name="物品名称" type="string" variable="tbtable1_goodsName_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbtable1_物品数量_goodsQty_2_string_t6_$$A" name="物品数量" type="string" variable="tbtable1_goodsQty_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbtable1_物品价格_goodsPrice_3_string_t11_$$A" name="物品价格" type="string" variable="tbtable1_goodsPrice_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbtable1_物品总价_goodsTotal_4_string_t11_$$HA" name="物品总价" type="string" variable="tbtable1_goodsTotal_t00"></activiti:formProperty>
+      </extensionElements>
     </startEvent>
     <userTask id="usertask1" name="User Task" activiti:assignee="${initiator}">
-    	<extensionElements>
-    		<activiti:formProperty id="confirm_确认_1_enum_rbv_$$A" name="确认" type="enum" variable="confirm">
-    			<activiti:value id="确认" name="确认"/>
-    		</activiti:formProperty>
-    		<activiti:formProperty id="username_用户名_1_string_t1_$$VA" name="用户名" type="string" variable="username"/>
-    		
-    		<activiti:formProperty id="tbtable1_item_$$VA" name="表单" variable="tbtable1_item"/>
-    		<activiti:formProperty id="tbtable1_物品名称_goodsName_1_string_t1_$$A" name="物品名称" type="string" variable="tbtable1_goodsName_t00"/>
-    		<activiti:formProperty id="tbtable1_物品数量_goodsQty_2_string_t6_$$A" name="物品数量" type="string" variable="tbtable1_goodsQty_t00"/>
-    		<activiti:formProperty id="tbtable1_物品价格_goodsPrice_3_string_t11_$$A" name="物品价格" type="string" variable="tbtable1_goodsPrice_t00"/>
-    		<activiti:formProperty id="tbtable1_物品总价_goodsTotal_4_string_t11_$$A" name="物品总价" type="string" variable="tbtable1_goodsTotal_t00"/>
-
-    	</extensionElements>    
+      <extensionElements>
+        <activiti:formProperty id="confirm_确认_1_enum_rbv_$$A" name="确认" type="enum" variable="confirm">
+          <activiti:value id="确认" name="确认"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="username_用户名_1_string_t1_$$VA" name="用户名" type="string" variable="username"></activiti:formProperty>
+        <activiti:formProperty id="tbtable1_item_$$VA" name="表单" variable="tbtable1_item"></activiti:formProperty>
+        <activiti:formProperty id="tbtable1_物品名称_goodsName_1_string_t1_$$A" name="物品名称" type="string" variable="tbtable1_goodsName_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbtable1_物品数量_goodsQty_2_string_t6_$$A" name="物品数量" type="string" variable="tbtable1_goodsQty_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbtable1_物品价格_goodsPrice_3_string_t11_$$A" name="物品价格" type="string" variable="tbtable1_goodsPrice_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbtable1_物品总价_goodsTotal_4_string_t11_$$A" name="物品总价" type="string" variable="tbtable1_goodsTotal_t00"></activiti:formProperty>
+      </extensionElements>
     </userTask>
     <endEvent id="endevent1" name="End"></endEvent>
-    <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="usertask1"></sequenceFlow>
     <sequenceFlow id="flow2" sourceRef="usertask1" targetRef="endevent1"></sequenceFlow>
+    <boundaryEvent id="boundarytimer2" name="Timer" attachedToRef="usertask1" cancelActivity="false">
+      <timerEventDefinition>
+        <timeDuration>PT1M</timeDuration>
+      </timerEventDefinition>
+    </boundaryEvent>
+    <userTask id="usertask2" name="Timer Task" activiti:assignee="${initiator}">
+      <extensionElements>
+        <activiti:formProperty id="confirm_确认_1_enum_rbv_$$A" name="确认" type="enum" variable="confirm">
+          <activiti:value id="确认" name="确认"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="username_用户名_1_string_t1_$$VA" name="用户名" type="string" variable="username"></activiti:formProperty>
+        <activiti:formProperty id="tbtable1_item_$$VA" name="表单" variable="tbtable1_item"></activiti:formProperty>
+        <activiti:formProperty id="tbtable1_物品名称_goodsName_1_string_t1_$$A" name="物品名称" type="string" variable="tbtable1_goodsName_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbtable1_物品数量_goodsQty_2_string_t6_$$A" name="物品数量" type="string" variable="tbtable1_goodsQty_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbtable1_物品价格_goodsPrice_3_string_t11_$$A" name="物品价格" type="string" variable="tbtable1_goodsPrice_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbtable1_物品总价_goodsTotal_4_string_t11_$$A" name="物品总价" type="string" variable="tbtable1_goodsTotal_t00"></activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <sequenceFlow id="flow3" sourceRef="boundarytimer2" targetRef="usertask2"></sequenceFlow>
+    <endEvent id="endevent2" name="End"></endEvent>
+    <sequenceFlow id="flow4" sourceRef="usertask2" targetRef="endevent2"></sequenceFlow>
+    <sequenceFlow id="flow8" sourceRef="startevent1" targetRef="usertask1"></sequenceFlow>
   </process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_DemoProcess">
     <bpmndi:BPMNPlane bpmnElement="DemoProcess" id="BPMNPlane_DemoProcess">
       <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
-        <omgdc:Bounds height="35.0" width="35.0" x="90.0" y="190.0"></omgdc:Bounds>
+        <omgdc:Bounds height="35.0" width="35.0" x="20.0" y="190.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="usertask1" id="BPMNShape_usertask1">
         <omgdc:Bounds height="55.0" width="105.0" x="290.0" y="180.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="boundarytimer2" id="BPMNShape_boundarytimer2">
+        <omgdc:Bounds height="30.0" width="30.0" x="354.0" y="220.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
         <omgdc:Bounds height="35.0" width="35.0" x="550.0" y="190.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
-        <omgdi:waypoint x="125.0" y="207.0"></omgdi:waypoint>
-        <omgdi:waypoint x="290.0" y="207.0"></omgdi:waypoint>
-      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNShape bpmnElement="usertask2" id="BPMNShape_usertask2">
+        <omgdc:Bounds height="55.0" width="105.0" x="400.0" y="330.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent2" id="BPMNShape_endevent2">
+        <omgdc:Bounds height="35.0" width="35.0" x="550.0" y="340.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
         <omgdi:waypoint x="395.0" y="207.0"></omgdi:waypoint>
         <omgdi:waypoint x="550.0" y="207.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3">
+        <omgdi:waypoint x="369.0" y="250.0"></omgdi:waypoint>
+        <omgdi:waypoint x="368.0" y="356.0"></omgdi:waypoint>
+        <omgdi:waypoint x="400.0" y="357.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow4" id="BPMNEdge_flow4">
+        <omgdi:waypoint x="505.0" y="357.0"></omgdi:waypoint>
+        <omgdi:waypoint x="550.0" y="357.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow8" id="BPMNEdge_flow8">
+        <omgdi:waypoint x="55.0" y="207.0"></omgdi:waypoint>
+        <omgdi:waypoint x="290.0" y="207.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>

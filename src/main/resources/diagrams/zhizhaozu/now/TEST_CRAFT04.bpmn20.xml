@@ -6,7 +6,7 @@
         <activiti:formProperty id="processnumber_工艺编号_1_string_t1_$$A" name="工艺编号" type="string" variable="processnumber" required="true"></activiti:formProperty>
         <activiti:formProperty id="processname_工艺名称_2_string_t1_$$A" name="工艺名称" type="string" variable="processname" required="true"></activiti:formProperty>
         <activiti:formProperty id="processdesc_工艺描述_3_string_t2_$$A" name="工艺描述" type="string" variable="processdesc"></activiti:formProperty>
-        <activiti:formProperty id="ORDCODE_物料型号_4_string_auto_$$A" name="物料型号" type="string" variable="ORDCODE"></activiti:formProperty>
+        <activiti:formProperty id="ORDCODE_物料型号_4_string_auto_$$A" name="物料型号" type="string" variable="ORDCODE" required="true"></activiti:formProperty>
         <activiti:formProperty id="WORKDAY_工作天数（天/年）_13_string_t6_$$B" name="工作天数（天/年）" type="string" variable="WORKDAY"></activiti:formProperty>
         <activiti:formProperty id="SHIFT_换班次数（班/天）_14_string_t6_$$B" name="换班次数（班/天）" type="string" variable="SHIFT"></activiti:formProperty>
         <activiti:formProperty id="SHIFTH_单班工作时间（小时）_15_string_t6_$$B" name="单班工作时间（小时）" type="string" variable="SHIFTH"></activiti:formProperty>
@@ -329,9 +329,9 @@
 			    li&lt;&lt;it.工序编号
 			    li&lt;&lt;it.工序类型
 			    switch (it.工序类型){
-			        case '通用':li&lt;&lt;it.通用工步表;break
-			        case '铣削':li&lt;&lt;it.铣削工步表;break
-			        case '车削':li&lt;&lt; it.车削工步表;break
+			        case '通用':li&lt;&lt;it.通用工步表;if(!(it.通用工步表&amp;&amp;it.铣削工步表==null&amp;&amp;it.车削工步表==null)) throw new org.activiti.engine.ActivitiIllegalArgumentException('通用工序只能且必须填写通用工步子表');break
+			        case '铣削':li&lt;&lt;it.铣削工步表;if(!(it.通用工步表==null&amp;&amp;it.铣削工步表&amp;&amp;it.车削工步表==null)) throw new org.activiti.engine.ActivitiIllegalArgumentException('铣削工序只能且必须填写铣削工步子表');break
+			        case '车削':li&lt;&lt;it.车削工步表;if(!(it.通用工步表==null&amp;&amp;it.铣削工步表==null&amp;&amp;it.车削工步表)) throw new org.activiti.engine.ActivitiIllegalArgumentException('车削工序只能且必须填写车削工步子表');break
 			        default: throw new RuntimeException("找不到对应工序类型") ;break
 			    }
 			    li&lt;&lt;(it.get('装夹件数（件）')?:'0')//3
