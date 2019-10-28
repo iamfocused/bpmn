@@ -774,7 +774,7 @@
           </activiti:executionListener>
         </extensionElements>
       </startEvent>
-      <userTask id="usertask1" name="并发审批" activiti:candidateUsers="{approvers[0]}">
+      <userTask id="usertask1" name="并发审批" activiti:candidateUsers="${approvers[0]}">
         <extensionElements>
           <activiti:formProperty id="coreaction_审批结果 Approval_1_enum_rbv_$$A" name="审批结果 Approval" type="enum" variable="coreaction_level4" required="true">
             <activiti:value id="同意 Agree" name="同意 Agree"></activiti:value>

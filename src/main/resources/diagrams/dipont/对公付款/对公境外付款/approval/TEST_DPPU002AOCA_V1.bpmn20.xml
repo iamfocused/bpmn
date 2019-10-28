@@ -775,11 +775,11 @@
         </extensionElements>
       	
       </startEvent>
-      <userTask id="usertask1" name="并发审批" activiti:candidateUsers="{approvers[0]}">
+      <userTask id="usertask1" name="并发审批" activiti:candidateUsers="${approvers[0]}">
 	      <extensionElements>
 	        <activiti:formProperty id="coreaction_审批结果 Approval_1_enum_rbv_$$A" name="审批结果 Approval" type="enum" variable="coreaction_level4" required="true">
 	          <activiti:value id="同意 Agree" name="同意 Agree"/>
-	          <activiti:value id="拒绝 Refuse" name="拒绝 Refuse"/>>
+	          <activiti:value id="拒绝 Refuse" name="拒绝 Refuse"/>
 	        </activiti:formProperty>
 	        <activiti:formProperty id="corecomments_审批意见 Comments_1_string_t2_$$B" name="审批意见 Comments" type="string" variable="corecomments_level4"></activiti:formProperty>
 			<activiti:formProperty id="totalamount_总金额 Total Amount_0_string_cny_$$VA" name="总金额大写 Total Amount" type="string" variable="totalamount"></activiti:formProperty>
