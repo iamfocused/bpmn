@@ -1,0 +1,1257 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/processdef">
+  <process id="CA_DPPU002AO" name="CA_DPPU002AO各成本中心审批子流程 Purchase Payment Costcenter Approval" isExecutable="true">
+    <documentation>境外付款，明细中多成本中心拆分审批子流程 Purchase Payment Costcenter Approval</documentation>
+    <startEvent id="s1" name="s1" activiti:initiator="initiator">
+      <extensionElements>
+        <activiti:executionListener event="end" class="org.activiti.engine.impl.bpmn.listener.ScriptExecutionListener">
+          <activiti:field name="language">
+            <activiti:string><![CDATA[groovy]]></activiti:string>
+          </activiti:field>
+          <activiti:field name="script">
+            <activiti:string><![CDATA[import groovy.json.JsonSlurper;
+				import groovy.json.JsonOutput;
+				
+				//处理学科数组及成本中心报销金额
+				def tbhdpaymentpur002a_item = new JsonSlurper().parseText(execution.getVariable("tbhdpaymentpur002a_item"));
+				def totalamount = 0;
+				def discipline = [];
+				tbhdpaymentpur002a_item.each{
+					if (it.key=='rows') {
+						it.value =it.value.findAll { it[1].code == execution.getVariable("costCenter") }
+						it.value.each{
+							def amount = new java.math.BigDecimal(it[5]).setScale(2, java.math.RoundingMode.HALF_UP);
+							totalamount += amount;
+							discipline << it[7];
+						}
+					}
+				}
+				execution.setVariable("tbhdpaymentpur002a_item",JsonOutput.toJson(tbhdpaymentpur002a_item));
+				execution.setVariable("totalamount",totalamount+"");
+
+				
+				//设置成本中心审批人
+				def costCenterDrools = new JsonSlurper().parseText(execution.getVariable("costCenterDrools"));
+				def localcostCenterDrools = costCenterDrools.find { elem -> elem.costcenter == execution.getVariable("costCenter")}
+				def localVerifiers =[];
+				//设置一级二级三级审批人
+				localVerifiers << localcostCenterDrools.verifierfirst;
+				localVerifiers << localcostCenterDrools.verifiersecond;
+				localVerifiers << localcostCenterDrools.verifierthird;
+				//当一级审批人为报销人时，审批人替换成reverifierfirst，reverifierfirst配置成a,b,....  a为一级审批人，b为二级审批人,目前最多支持三级
+				if(localVerifiers[0] == execution.getVariable("claimsn")){
+					try{
+						if(localcostCenterDrools.reverifierfirst)
+							localVerifiers = localcostCenterDrools.reverifierfirst.split(",").toList();
+					}catch(Exception e) {
+						throw new org.activiti.engine.ActivitiIllegalArgumentException("成本中心审批人设置错误，请联系管理员 Invalid Costcenter Approver");
+					}
+				}
+				if(localVerifiers[1] == execution.getVariable("claimsn")){
+					try{
+						if(localcostCenterDrools.reverifiersecond)
+							localVerifiers = localcostCenterDrools.reverifiersecond.split(",").toList();
+					}catch(Exception e) {
+						throw new org.activiti.engine.ActivitiIllegalArgumentException("成本中心审批人设置错误，请联系管理员 Invalid Costcenter Approver");
+					}
+				}
+				if(localVerifiers[2] == execution.getVariable("claimsn")){
+					try{
+						if(localcostCenterDrools.reverifierthird)
+							localVerifiers = localcostCenterDrools.reverifierthird.split(",").toList();
+					}catch(Exception e) {
+						throw new org.activiti.engine.ActivitiIllegalArgumentException("成本中心审批人设置错误，请联系管理员 Invalid Costcenter Approver");
+					}
+				}
+				localVerifiers.removeAll([null, ""]);
+
+				execution.setVariable("level",localVerifiers.size());
+				execution.setVariable("verifiers",localVerifiers);
+
+				if(localcostCenterDrools.concurrent){
+					localVerifiers.clear();
+					localVerifiers << localcostCenterDrools.concurrent;
+					execution.setVariable("verifiers",localVerifiers);
+					execution.setVariable("level",99);
+					
+					//当并联审批人为报销人时，审批人替换成reverifierfirst，reverifierfirst配置成a,b,....  a为一级审批人，b为二级审批人,目前最多支持三级
+					if(localVerifiers[0].contains(execution.getVariable("claimsn"))){
+						try{
+							if(localcostCenterDrools.reverifierfirst) {
+								localVerifiers = localcostCenterDrools.reverifierfirst.split(",").toList();
+								execution.setVariable("level",localVerifiers.size());
+								execution.setVariable("verifiers",localVerifiers);
+							}
+						}catch(Exception e) {
+							throw new org.activiti.engine.ActivitiIllegalArgumentException("成本中心审批人设置错误，请联系管理员 Invalid Costcenter Approver");
+						}
+
+					}
+				}
+				
+				if(localVerifiers.size() == 0) {
+					throw new org.activiti.engine.ActivitiIllegalArgumentException("成本中心审批人不存在，请联系管理员 Invalid Costcenter Approver");
+				}
+								
+
+				//test
+				localVerifiers.clear();
+				localVerifiers << execution.getVariable("claimsn");
+				execution.setVariable("level",localVerifiers.size());
+				execution.setVariable("verifiers",localVerifiers);
+				execution.setVariable('special','N');
+				
+				//GATEWAY JUDGE
+				execution.setVariable('special',localcostCenterDrools.special)				
+				
+				
+				//SET BUSINESSKEY
+				runtimeService.updateBusinessKey(execution.getProcessInstanceId(),execution.getVariable("businessKey"));
+				
+				//JUDGE BUDGET
+				execution.setVariable("judgeBudget","无超标");
+				for (item in discipline.unique()) {
+					def c_d_budget = new JsonSlurper().parseText(execution.getVariable("allBudget")).find() { elem ->
+						(elem.costcenter == execution.getVariable("costCenter") && elem.discipline == item)
+					}
+					if ((c_d_budget ? c_d_budget.remain_amount > 0: true) == false){
+						execution.setVariable("judgeBudget","超标,详见报表");
+						break;
+					}
+				}
+				
+				//对公付款关联合同已支付金额
+				import javax.crypto.Mac;
+				import javax.crypto.spec.SecretKeySpec;
+				import java.security.InvalidKeyException;
+				import java.util.Base64;
+				def hmac_sha256(String secretKey, String data) {
+					try {
+						Mac mac = Mac.getInstance("HmacSHA256");
+						SecretKeySpec secretKeySpec = new SecretKeySpec(secretKey.getBytes(), "HmacSHA256");
+						mac.init(secretKeySpec);
+						byte[] digest = mac.doFinal(data.getBytes());
+						return digest;
+					} catch (InvalidKeyException e) {
+						throw new RuntimeException("Invalid key exception while converting to HMacSHA256");
+					}
+				}
+				
+				def METABASE_SITE_URL = "https://bpmmb.dipont.com";
+				def METABASE_SECRET_KEY = "3c7ece2c2a488065d255402e5bb1729b64ef5a4e37bc2dcbef6a2d327ad55275";
+				def header = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9";//Base64.getUrlEncoder().encodeToString('{"typ":"JWT","alg":"HS256"}'.bytes);
+				
+				//def playloadString = '{"resource":{"question":19},"params":{"contractnum":"'+new JsonSlurper().parseText(execution.getVariable("contract")).code+'"}}';
+				//def playload = Base64.getUrlEncoder().encodeToString(playloadString.bytes);
+				//def secret =Base64.getUrlEncoder().encodeToString(hmac_sha256(METABASE_SECRET_KEY , header+'.'+playload));
+				//def url = METABASE_SITE_URL + "/embed/question/" + header+'.'+playload+'.'+secret + "#bordered=true&titled=true";
+				//execution.setVariable("BBOT_BI_CONTRACTPAY",url);
+				
+				//BUDGET VIEW
+				def playloadString2 = '{"resource":{"question":11},"params":{"costcenter_code":"'+execution.getVariable("costCenter")+'","apply_time":'+execution.getVariable("verifydate")+'}}';
+				def playload2 = Base64.getUrlEncoder().encodeToString(playloadString2.bytes);
+
+				def secret2 =Base64.getUrlEncoder().encodeToString(hmac_sha256(METABASE_SECRET_KEY , header+'.'+playload2));
+				def url2 = METABASE_SITE_URL + "/embed/question/" + header+'.'+playload2+'.'+secret2 + "#bordered=true&titled=true";
+				execution.setVariable("BBOT_BI_BUDGET",url2);]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </startEvent>
+    <userTask id="UT1_1" name="成本中心1级审批 Costcenter Level1 Approval" activiti:assignee="${verifiers[0]}" activiti:dueDate="P1D" activiti:priority="8080">
+      <extensionElements>
+        <activiti:formProperty id="coreaction_审批结果 Approval_1_enum_rbv_$$A" name="审批结果 Approval" type="enum" variable="coreaction_level1_1" required="true">
+          <activiti:value id="同意 Agree" name="同意 Agree"></activiti:value>
+          <activiti:value id="拒绝 Refuse" name="拒绝 Refuse"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="corecomments_审批意见 Comments_1_string_t2_$$B" name="审批意见 Comments" type="string" variable="corecomments_level1_1"></activiti:formProperty>
+        <activiti:formProperty id="totalamount_总金额 Total Amount_0_string_cny_$$VA" name="总金额大写 Total Amount" type="string" variable="totalamount"></activiti:formProperty>
+        <activiti:formProperty id="totalamount_总金额 Total Amount_1_string_t11_$$VA" name="总金额 Total Amount" type="string" variable="totalamount"></activiti:formProperty>
+        <activiti:formProperty id="corp_实体 CorpID_2_string_tree_$$VA" name="所属实体 CorpID" type="string" variable="corp"></activiti:formProperty>
+        <activiti:formProperty id="reqdate_要求付款日期 Required Date_3_string_t3_$$VA" name="要求付款日期 Required Date" type="string" variable="reqdate"></activiti:formProperty>
+        <activiti:formProperty id="currency_货币 Currency_4_enum_sbs_$$VA" name="货币 Currency" type="string" variable="currency"></activiti:formProperty>
+        <activiti:formProperty id="vendoraccount_供应商 Supplier_1_string_auto_$$VB" name="供应商 Supplier" type="string" variable="vendor"></activiti:formProperty>
+        <activiti:formProperty id="borneby_手续费承担方 Bank fee bearer_9_enum_sbs_$$VB" name="手续费承担方 Bank fee bearer" type="string" variable="borneby"></activiti:formProperty>
+        <activiti:formProperty id="contractno_合同编号 Contract ID_1_string_t1_$$VC" name="合同编号 Contract ID" type="string" variable="contract"></activiti:formProperty>
+        <activiti:formProperty id="ifinvoice_是否提供发票 Invoice_2_enum_sbs_$$VC" name="是否提供发票 Invoice" type="string" variable="ifinvoice"></activiti:formProperty>
+        <activiti:formProperty id="remarks_摘要说明 Comments_1_string_t1_$$VD" name="摘要说明 Comments" type="string" variable="remarks"></activiti:formProperty>
+        <activiti:formProperty id="attachment_附件_1_string_t9_$$VF" name="附件" type="string" variable="attachment"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpaymentpur002a_item_$$VA" name="付款明细 Detail" type="string" variable="tbhdpaymentpur002a_item"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpaymentpur002a_收支项目 Payment item_ioitem_0_string_tree_$$VA" name="收支项目 Payment item" type="string" variable="tbhdpaymentpur002a_ioitem"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpaymentpur002a_成本中心 Costcenter_costcenter_1_string_tree_$$VA" name="成本中心 Costcenter" type="string" variable="tbhdpaymentpur002a_costcenter"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpaymentpur002a_项目 Project_project_2_string_tree_$$VA" name="项目 Project" type="string" variable="tbhdpaymentpur002a_project"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpaymentpur002a_采购项 Purchase item_puritem_3_string_t1_$$VA" name="采购项 Purchase item" type="string" variable="tbhdpaymentpur002a_puritem"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpaymentpur002a_采购数量 Qty_purquantity_4_string_t6_$$VA" name="采购数量 Qty" type="string" variable="tbhdpaymentpur002a_purquantity"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpaymentpur002a_采购金额 Amount_amount_5_string_cny_$$VA" name="采购金额 Amount" type="string" variable="tbhdpaymentpur002a_amount"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpaymentpur002a_设备类别 Equipment Type_category_6_string_tree_$$VA" name="设备类别 Equipment Type" type="string" variable="tbhdpaymentpur002a_category"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpaymentpur002a_学科 Subject_discipline_7_enum_sbs_$$VA" name="学科 Subject" type="string" variable="tbhdpaymentpur002a_discipline"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpaymentpur002a_说明 Note_expdetail_8_string_t1_$$VA" name="说明 Note" type="string" variable="tbhdpaymentpur002a_expdetail"></activiti:formProperty>
+        <activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+          <activiti:field name="language">
+            <activiti:string><![CDATA[groovy]]></activiti:string>
+          </activiti:field>
+          <activiti:field name="script">
+            <activiti:string><![CDATA[def superExecutionId = task.getExecution().getSuperExecutionId();											
+				def supeerExecution = runtimeService.createExecutionQuery().executionId(superExecutionId).singleResult();
+				supeerExecution.setVariable('coreaction', task.getExecution().getVariable('coreaction_level1_1'));
+				
+				
+				def user = identityService.createUserQuery().userId(task.getExecution().getVariable('verifiers')[0]).singleResult(); 
+				def username = user.getLastName() + " " + user.getFirstName();
+				supeerExecution.setVariable('costcentermemo', supeerExecution.getVariable('costcentermemo')+'/'+username);
+				task.getExecution().setVariable('verifiername_level1_1',username);]]></activiti:string>
+          </activiti:field>
+        </activiti:taskListener>
+      </extensionElements>
+    </userTask>
+    <userTask id="UT2_1" name="成本中心1级审批 Costcenter Level1 Approval" activiti:assignee="${verifiers[0]}" activiti:dueDate="P1D" activiti:priority="8080">
+      <extensionElements>
+        <activiti:formProperty id="coreaction_审批结果 Approval_1_enum_rbv_$$A" name="审批结果 Approval" type="enum" variable="coreaction_level2_1" required="true">
+          <activiti:value id="同意 Agree" name="同意 Agree"></activiti:value>
+          <activiti:value id="拒绝 Refuse" name="拒绝 Refuse"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="corecomments_审批意见 Comments_1_string_t2_$$B" name="审批意见 Comments" type="string" variable="corecomments_level2_1"></activiti:formProperty>
+        <activiti:formProperty id="totalamount_总金额 Total Amount_0_string_cny_$$VA" name="总金额大写 Total Amount" type="string" variable="totalamount"></activiti:formProperty>
+        <activiti:formProperty id="totalamount_总金额 Total Amount_1_string_t11_$$VA" name="总金额 Total Amount" type="string" variable="totalamount"></activiti:formProperty>
+        <activiti:formProperty id="corp_实体 CorpID_2_string_tree_$$VA" name="所属实体 CorpID" type="string" variable="corp"></activiti:formProperty>
+        <activiti:formProperty id="reqdate_要求付款日期 Required Date_3_string_t3_$$VA" name="要求付款日期 Required Date" type="string" variable="reqdate"></activiti:formProperty>
+        <activiti:formProperty id="currency_货币 Currency_4_enum_sbs_$$VA" name="货币 Currency" type="string" variable="currency"></activiti:formProperty>
+        <activiti:formProperty id="vendoraccount_供应商 Supplier_1_string_auto_$$VB" name="供应商 Supplier" type="string" variable="vendor"></activiti:formProperty>
+        <activiti:formProperty id="borneby_手续费承担方 Bank fee bearer_9_enum_sbs_$$VB" name="手续费承担方 Bank fee bearer" type="string" variable="borneby"></activiti:formProperty>
+        <activiti:formProperty id="contractno_合同编号 Contract ID_1_string_t1_$$VC" name="合同编号 Contract ID" type="string" variable="contract"></activiti:formProperty>
+        <activiti:formProperty id="ifinvoice_是否提供发票 Invoice_2_enum_sbs_$$VC" name="是否提供发票 Invoice" type="string" variable="ifinvoice"></activiti:formProperty>
+        <activiti:formProperty id="remarks_摘要说明 Comments_1_string_t1_$$VD" name="摘要说明 Comments" type="string" variable="remarks"></activiti:formProperty>
+        <activiti:formProperty id="attachment_附件_1_string_t9_$$VF" name="附件" type="string" variable="attachment"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpaymentpur002a_item_$$VA" name="付款明细 Detail" type="string" variable="tbhdpaymentpur002a_item"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpaymentpur002a_收支项目 Payment item_ioitem_0_string_tree_$$VA" name="收支项目 Payment item" type="string" variable="tbhdpaymentpur002a_ioitem"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpaymentpur002a_成本中心 Costcenter_costcenter_1_string_tree_$$VA" name="成本中心 Costcenter" type="string" variable="tbhdpaymentpur002a_costcenter"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpaymentpur002a_项目 Project_project_2_string_tree_$$VA" name="项目 Project" type="string" variable="tbhdpaymentpur002a_project"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpaymentpur002a_采购项 Purchase item_puritem_3_string_t1_$$VA" name="采购项 Purchase item" type="string" variable="tbhdpaymentpur002a_puritem"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpaymentpur002a_采购数量 Qty_purquantity_4_string_t6_$$VA" name="采购数量 Qty" type="string" variable="tbhdpaymentpur002a_purquantity"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpaymentpur002a_采购金额 Amount_amount_5_string_cny_$$VA" name="采购金额 Amount" type="string" variable="tbhdpaymentpur002a_amount"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpaymentpur002a_设备类别 Equipment Type_category_6_string_tree_$$VA" name="设备类别 Equipment Type" type="string" variable="tbhdpaymentpur002a_category"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpaymentpur002a_学科 Subject_discipline_7_enum_sbs_$$VA" name="学科 Subject" type="string" variable="tbhdpaymentpur002a_discipline"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpaymentpur002a_说明 Note_expdetail_8_string_t1_$$VA" name="说明 Note" type="string" variable="tbhdpaymentpur002a_expdetail"></activiti:formProperty>
+        <activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+          <activiti:field name="language">
+            <activiti:string><![CDATA[groovy]]></activiti:string>
+          </activiti:field>
+          <activiti:field name="script">
+            <activiti:string><![CDATA[def superExecutionId = task.getExecution().getSuperExecutionId();								
+				def supeerExecution =	runtimeService.createExecutionQuery().executionId(superExecutionId).singleResult(); 
+				supeerExecution.setVariable('coreaction', task.getExecution().getVariable('coreaction_level2_1'));
+				
+				def user = identityService.createUserQuery().userId(task.getExecution().getVariable('verifiers')[0]).singleResult(); 
+				def username = user.getLastName() + " " + user.getFirstName();
+				supeerExecution.setVariable('costcentermemo', supeerExecution.getVariable('costcentermemo')+'/'+username);
+				task.getExecution().setVariable('verifiername_level2_1',username);]]></activiti:string>
+          </activiti:field>
+        </activiti:taskListener>
+      </extensionElements>
+    </userTask>
+    <userTask id="UT2_2" name="成本中心2级审批 Costcenter Level2 Approval" activiti:assignee="${verifiers[1]}" activiti:dueDate="P1D" activiti:priority="8080">
+      <extensionElements>
+        <activiti:formProperty id="coreaction_审批结果 Approval_1_enum_rbv_$$A" name="审批结果 Approval" type="enum" variable="coreaction_level2_2" required="true">
+          <activiti:value id="同意 Agree" name="同意 Agree"></activiti:value>
+          <activiti:value id="拒绝 Refuse" name="拒绝 Refuse"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="corecomments_审批意见 Comments_1_string_t2_$$B" name="审批意见 Comments" type="string" variable="corecomments_level2_2"></activiti:formProperty>
+        <activiti:formProperty id="totalamount_总金额 Total Amount_0_string_cny_$$VA" name="总金额大写 Total Amount" type="string" variable="totalamount"></activiti:formProperty>
+        <activiti:formProperty id="totalamount_总金额 Total Amount_1_string_t11_$$VA" name="总金额 Total Amount" type="string" variable="totalamount"></activiti:formProperty>
+        <activiti:formProperty id="corp_实体 CorpID_2_string_tree_$$VA" name="所属实体 CorpID" type="string" variable="corp"></activiti:formProperty>
+        <activiti:formProperty id="reqdate_要求付款日期 Required Date_3_string_t3_$$VA" name="要求付款日期 Required Date" type="string" variable="reqdate"></activiti:formProperty>
+        <activiti:formProperty id="currency_货币 Currency_4_enum_sbs_$$VA" name="货币 Currency" type="string" variable="currency"></activiti:formProperty>
+        <activiti:formProperty id="vendoraccount_供应商 Supplier_1_string_auto_$$VB" name="供应商 Supplier" type="string" variable="vendor"></activiti:formProperty>
+        <activiti:formProperty id="borneby_手续费承担方 Bank fee bearer_9_enum_sbs_$$VB" name="手续费承担方 Bank fee bearer" type="string" variable="borneby"></activiti:formProperty>
+        <activiti:formProperty id="contractno_合同编号 Contract ID_1_string_t1_$$VC" name="合同编号 Contract ID" type="string" variable="contract"></activiti:formProperty>
+        <activiti:formProperty id="ifinvoice_是否提供发票 Invoice_2_enum_sbs_$$VC" name="是否提供发票 Invoice" type="string" variable="ifinvoice"></activiti:formProperty>
+        <activiti:formProperty id="remarks_摘要说明 Comments_1_string_t1_$$VD" name="摘要说明 Comments" type="string" variable="remarks"></activiti:formProperty>
+        <activiti:formProperty id="attachment_附件_1_string_t9_$$VF" name="附件" type="string" variable="attachment"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpaymentpur002a_item_$$VA" name="付款明细 Detail" type="string" variable="tbhdpaymentpur002a_item"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpaymentpur002a_收支项目 Payment item_ioitem_0_string_tree_$$VA" name="收支项目 Payment item" type="string" variable="tbhdpaymentpur002a_ioitem"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpaymentpur002a_成本中心 Costcenter_costcenter_1_string_tree_$$VA" name="成本中心 Costcenter" type="string" variable="tbhdpaymentpur002a_costcenter"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpaymentpur002a_项目 Project_project_2_string_tree_$$VA" name="项目 Project" type="string" variable="tbhdpaymentpur002a_project"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpaymentpur002a_采购项 Purchase item_puritem_3_string_t1_$$VA" name="采购项 Purchase item" type="string" variable="tbhdpaymentpur002a_puritem"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpaymentpur002a_采购数量 Qty_purquantity_4_string_t6_$$VA" name="采购数量 Qty" type="string" variable="tbhdpaymentpur002a_purquantity"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpaymentpur002a_采购金额 Amount_amount_5_string_cny_$$VA" name="采购金额 Amount" type="string" variable="tbhdpaymentpur002a_amount"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpaymentpur002a_设备类别 Equipment Type_category_6_string_tree_$$VA" name="设备类别 Equipment Type" type="string" variable="tbhdpaymentpur002a_category"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpaymentpur002a_学科 Subject_discipline_7_enum_sbs_$$VA" name="学科 Subject" type="string" variable="tbhdpaymentpur002a_discipline"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpaymentpur002a_说明 Note_expdetail_8_string_t1_$$VA" name="说明 Note" type="string" variable="tbhdpaymentpur002a_expdetail"></activiti:formProperty>
+        <activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+          <activiti:field name="language">
+            <activiti:string><![CDATA[groovy]]></activiti:string>
+          </activiti:field>
+          <activiti:field name="script">
+            <activiti:string><![CDATA[def superExecutionId = task.getExecution().getSuperExecutionId();							
+				def supeerExecution =	runtimeService.createExecutionQuery().executionId(superExecutionId).singleResult(); 
+				supeerExecution.setVariable('coreaction', task.getExecution().getVariable('coreaction_level2_2'));
+				
+				def user = identityService.createUserQuery().userId(task.getExecution().getVariable('verifiers')[1]).singleResult(); 
+				def username = user.getLastName() + " " + user.getFirstName();
+				supeerExecution.setVariable('costcentermemo', supeerExecution.getVariable('costcentermemo')+'/'+username);
+				task.getExecution().setVariable('verifiername_level2_2',username);]]></activiti:string>
+          </activiti:field>
+        </activiti:taskListener>
+      </extensionElements>
+    </userTask>
+    <userTask id="UT3_1" name="成本中心1级审批 Costcenter Level1 Approval" activiti:assignee="${verifiers[0]}" activiti:dueDate="P1D" activiti:priority="8080">
+      <extensionElements>
+        <activiti:formProperty id="coreaction_审批结果 Approval_1_enum_rbv_$$A" name="审批结果 Approval" type="enum" variable="coreaction_level3_1" required="true">
+          <activiti:value id="同意 Agree" name="同意 Agree"></activiti:value>
+          <activiti:value id="拒绝 Refuse" name="拒绝 Refuse"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="corecomments_审批意见 Comments_1_string_t2_$$B" name="审批意见 Comments" type="string" variable="corecomments_level3_1"></activiti:formProperty>
+        <activiti:formProperty id="totalamount_总金额 Total Amount_0_string_cny_$$VA" name="总金额大写 Total Amount" type="string" variable="totalamount"></activiti:formProperty>
+        <activiti:formProperty id="totalamount_总金额 Total Amount_1_string_t11_$$VA" name="总金额 Total Amount" type="string" variable="totalamount"></activiti:formProperty>
+        <activiti:formProperty id="corp_实体 CorpID_2_string_tree_$$VA" name="所属实体 CorpID" type="string" variable="corp"></activiti:formProperty>
+        <activiti:formProperty id="reqdate_要求付款日期 Required Date_3_string_t3_$$VA" name="要求付款日期 Required Date" type="string" variable="reqdate"></activiti:formProperty>
+        <activiti:formProperty id="currency_货币 Currency_4_enum_sbs_$$VA" name="货币 Currency" type="string" variable="currency"></activiti:formProperty>
+        <activiti:formProperty id="vendoraccount_供应商 Supplier_1_string_auto_$$VB" name="供应商 Supplier" type="string" variable="vendor"></activiti:formProperty>
+        <activiti:formProperty id="borneby_手续费承担方 Bank fee bearer_9_enum_sbs_$$VB" name="手续费承担方 Bank fee bearer" type="string" variable="borneby"></activiti:formProperty>
+        <activiti:formProperty id="contractno_合同编号 Contract ID_1_string_t1_$$VC" name="合同编号 Contract ID" type="string" variable="contract"></activiti:formProperty>
+        <activiti:formProperty id="ifinvoice_是否提供发票 Invoice_2_enum_sbs_$$VC" name="是否提供发票 Invoice" type="string" variable="ifinvoice"></activiti:formProperty>
+        <activiti:formProperty id="remarks_摘要说明 Comments_1_string_t1_$$VD" name="摘要说明 Comments" type="string" variable="remarks"></activiti:formProperty>
+        <activiti:formProperty id="attachment_附件_1_string_t9_$$VF" name="附件" type="string" variable="attachment"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpaymentpur002a_item_$$VA" name="付款明细 Detail" type="string" variable="tbhdpaymentpur002a_item"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpaymentpur002a_收支项目 Payment item_ioitem_0_string_tree_$$VA" name="收支项目 Payment item" type="string" variable="tbhdpaymentpur002a_ioitem"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpaymentpur002a_成本中心 Costcenter_costcenter_1_string_tree_$$VA" name="成本中心 Costcenter" type="string" variable="tbhdpaymentpur002a_costcenter"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpaymentpur002a_项目 Project_project_2_string_tree_$$VA" name="项目 Project" type="string" variable="tbhdpaymentpur002a_project"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpaymentpur002a_采购项 Purchase item_puritem_3_string_t1_$$VA" name="采购项 Purchase item" type="string" variable="tbhdpaymentpur002a_puritem"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpaymentpur002a_采购数量 Qty_purquantity_4_string_t6_$$VA" name="采购数量 Qty" type="string" variable="tbhdpaymentpur002a_purquantity"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpaymentpur002a_采购金额 Amount_amount_5_string_cny_$$VA" name="采购金额 Amount" type="string" variable="tbhdpaymentpur002a_amount"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpaymentpur002a_设备类别 Equipment Type_category_6_string_tree_$$VA" name="设备类别 Equipment Type" type="string" variable="tbhdpaymentpur002a_category"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpaymentpur002a_学科 Subject_discipline_7_enum_sbs_$$VA" name="学科 Subject" type="string" variable="tbhdpaymentpur002a_discipline"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpaymentpur002a_说明 Note_expdetail_8_string_t1_$$VA" name="说明 Note" type="string" variable="tbhdpaymentpur002a_expdetail"></activiti:formProperty>
+        <activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+          <activiti:field name="language">
+            <activiti:string><![CDATA[groovy]]></activiti:string>
+          </activiti:field>
+          <activiti:field name="script">
+            <activiti:string><![CDATA[def superExecutionId = task.getExecution().getSuperExecutionId();								
+				def supeerExecution =	runtimeService.createExecutionQuery().executionId(superExecutionId).singleResult(); 
+				supeerExecution.setVariable('coreaction', task.getExecution().getVariable('coreaction_level3_1'));
+				
+				def user = identityService.createUserQuery().userId(task.getExecution().getVariable('verifiers')[0]).singleResult(); 
+				def username = user.getLastName() + " " + user.getFirstName();
+				supeerExecution.setVariable('costcentermemo', supeerExecution.getVariable('costcentermemo')+'/'+username);
+				task.getExecution().setVariable('verifiername_level3_1',username);]]></activiti:string>
+          </activiti:field>
+        </activiti:taskListener>
+      </extensionElements>
+    </userTask>
+    <userTask id="UT3_2" name="成本中心2级审批 Costcenter Level2 Approval" activiti:assignee="${verifiers[1]}" activiti:dueDate="P1D" activiti:priority="8080">
+      <extensionElements>
+        <activiti:formProperty id="coreaction_审批结果 Approval_1_enum_rbv_$$A" name="审批结果 Approval" type="enum" variable="coreaction_level3_2" required="true">
+          <activiti:value id="同意 Agree" name="同意 Agree"></activiti:value>
+          <activiti:value id="拒绝 Refuse" name="拒绝 Refuse"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="corecomments_审批意见 Comments_1_string_t2_$$B" name="审批意见 Comments" type="string" variable="corecomments_level3_2"></activiti:formProperty>
+        <activiti:formProperty id="totalamount_总金额 Total Amount_0_string_cny_$$VA" name="总金额大写 Total Amount" type="string" variable="totalamount"></activiti:formProperty>
+        <activiti:formProperty id="totalamount_总金额 Total Amount_1_string_t11_$$VA" name="总金额 Total Amount" type="string" variable="totalamount"></activiti:formProperty>
+        <activiti:formProperty id="corp_实体 CorpID_2_string_tree_$$VA" name="所属实体 CorpID" type="string" variable="corp"></activiti:formProperty>
+        <activiti:formProperty id="reqdate_要求付款日期 Required Date_3_string_t3_$$VA" name="要求付款日期 Required Date" type="string" variable="reqdate"></activiti:formProperty>
+        <activiti:formProperty id="currency_货币 Currency_4_enum_sbs_$$VA" name="货币 Currency" type="string" variable="currency"></activiti:formProperty>
+        <activiti:formProperty id="vendoraccount_供应商 Supplier_1_string_auto_$$VB" name="供应商 Supplier" type="string" variable="vendor"></activiti:formProperty>
+        <activiti:formProperty id="borneby_手续费承担方 Bank fee bearer_9_enum_sbs_$$VB" name="手续费承担方 Bank fee bearer" type="string" variable="borneby"></activiti:formProperty>
+        <activiti:formProperty id="contractno_合同编号 Contract ID_1_string_t1_$$VC" name="合同编号 Contract ID" type="string" variable="contract"></activiti:formProperty>
+        <activiti:formProperty id="ifinvoice_是否提供发票 Invoice_2_enum_sbs_$$VC" name="是否提供发票 Invoice" type="string" variable="ifinvoice"></activiti:formProperty>
+        <activiti:formProperty id="remarks_摘要说明 Comments_1_string_t1_$$VD" name="摘要说明 Comments" type="string" variable="remarks"></activiti:formProperty>
+        <activiti:formProperty id="attachment_附件_1_string_t9_$$VF" name="附件" type="string" variable="attachment"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpaymentpur002a_item_$$VA" name="付款明细 Detail" type="string" variable="tbhdpaymentpur002a_item"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpaymentpur002a_收支项目 Payment item_ioitem_0_string_tree_$$VA" name="收支项目 Payment item" type="string" variable="tbhdpaymentpur002a_ioitem"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpaymentpur002a_成本中心 Costcenter_costcenter_1_string_tree_$$VA" name="成本中心 Costcenter" type="string" variable="tbhdpaymentpur002a_costcenter"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpaymentpur002a_项目 Project_project_2_string_tree_$$VA" name="项目 Project" type="string" variable="tbhdpaymentpur002a_project"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpaymentpur002a_采购项 Purchase item_puritem_3_string_t1_$$VA" name="采购项 Purchase item" type="string" variable="tbhdpaymentpur002a_puritem"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpaymentpur002a_采购数量 Qty_purquantity_4_string_t6_$$VA" name="采购数量 Qty" type="string" variable="tbhdpaymentpur002a_purquantity"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpaymentpur002a_采购金额 Amount_amount_5_string_cny_$$VA" name="采购金额 Amount" type="string" variable="tbhdpaymentpur002a_amount"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpaymentpur002a_设备类别 Equipment Type_category_6_string_tree_$$VA" name="设备类别 Equipment Type" type="string" variable="tbhdpaymentpur002a_category"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpaymentpur002a_学科 Subject_discipline_7_enum_sbs_$$VA" name="学科 Subject" type="string" variable="tbhdpaymentpur002a_discipline"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpaymentpur002a_说明 Note_expdetail_8_string_t1_$$VA" name="说明 Note" type="string" variable="tbhdpaymentpur002a_expdetail"></activiti:formProperty>
+        <activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+          <activiti:field name="language">
+            <activiti:string><![CDATA[groovy]]></activiti:string>
+          </activiti:field>
+          <activiti:field name="script">
+            <activiti:string><![CDATA[def superExecutionId = task.getExecution().getSuperExecutionId();								
+				def supeerExecution =	runtimeService.createExecutionQuery().executionId(superExecutionId).singleResult(); 
+				supeerExecution.setVariable('coreaction', task.getExecution().getVariable('coreaction_level3_2'));
+				
+				def user = identityService.createUserQuery().userId(task.getExecution().getVariable('verifiers')[1]).singleResult(); 
+				def username = user.getLastName() + " " + user.getFirstName();
+				supeerExecution.setVariable('costcentermemo', supeerExecution.getVariable('costcentermemo')+'/'+username);
+				task.getExecution().setVariable('verifiername_level3_2',username);]]></activiti:string>
+          </activiti:field>
+        </activiti:taskListener>
+      </extensionElements>
+    </userTask>
+    <userTask id="UT3_3" name="成本中心3级审批 Costcenter Level3 Approval" activiti:assignee="${verifiers[2]}" activiti:dueDate="P1D" activiti:priority="8080">
+      <extensionElements>
+        <activiti:formProperty id="coreaction_审批结果 Approval_1_enum_rbv_$$A" name="审批结果 Approval" type="enum" variable="coreaction_level3_3" required="true">
+          <activiti:value id="同意 Agree" name="同意 Agree"></activiti:value>
+          <activiti:value id="拒绝 Refuse" name="拒绝 Refuse"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="corecomments_审批意见 Comments_1_string_t2_$$B" name="审批意见 Comments" type="string" variable="corecomments_level3_3"></activiti:formProperty>
+        <activiti:formProperty id="totalamount_总金额 Total Amount_0_string_cny_$$VA" name="总金额大写 Total Amount" type="string" variable="totalamount"></activiti:formProperty>
+        <activiti:formProperty id="totalamount_总金额 Total Amount_1_string_t11_$$VA" name="总金额 Total Amount" type="string" variable="totalamount"></activiti:formProperty>
+        <activiti:formProperty id="corp_实体 CorpID_2_string_tree_$$VA" name="所属实体 CorpID" type="string" variable="corp"></activiti:formProperty>
+        <activiti:formProperty id="reqdate_要求付款日期 Required Date_3_string_t3_$$VA" name="要求付款日期 Required Date" type="string" variable="reqdate"></activiti:formProperty>
+        <activiti:formProperty id="currency_货币 Currency_4_enum_sbs_$$VA" name="货币 Currency" type="string" variable="currency"></activiti:formProperty>
+        <activiti:formProperty id="vendoraccount_供应商 Supplier_1_string_auto_$$VB" name="供应商 Supplier" type="string" variable="vendor"></activiti:formProperty>
+        <activiti:formProperty id="borneby_手续费承担方 Bank fee bearer_9_enum_sbs_$$VB" name="手续费承担方 Bank fee bearer" type="string" variable="borneby"></activiti:formProperty>
+        <activiti:formProperty id="contractno_合同编号 Contract ID_1_string_t1_$$VC" name="合同编号 Contract ID" type="string" variable="contract"></activiti:formProperty>
+        <activiti:formProperty id="ifinvoice_是否提供发票 Invoice_2_enum_sbs_$$VC" name="是否提供发票 Invoice" type="string" variable="ifinvoice"></activiti:formProperty>
+        <activiti:formProperty id="remarks_摘要说明 Comments_1_string_t1_$$VD" name="摘要说明 Comments" type="string" variable="remarks"></activiti:formProperty>
+        <activiti:formProperty id="attachment_附件_1_string_t9_$$VF" name="附件" type="string" variable="attachment"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpaymentpur002a_item_$$VA" name="付款明细 Detail" type="string" variable="tbhdpaymentpur002a_item"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpaymentpur002a_收支项目 Payment item_ioitem_0_string_tree_$$VA" name="收支项目 Payment item" type="string" variable="tbhdpaymentpur002a_ioitem"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpaymentpur002a_成本中心 Costcenter_costcenter_1_string_tree_$$VA" name="成本中心 Costcenter" type="string" variable="tbhdpaymentpur002a_costcenter"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpaymentpur002a_项目 Project_project_2_string_tree_$$VA" name="项目 Project" type="string" variable="tbhdpaymentpur002a_project"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpaymentpur002a_采购项 Purchase item_puritem_3_string_t1_$$VA" name="采购项 Purchase item" type="string" variable="tbhdpaymentpur002a_puritem"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpaymentpur002a_采购数量 Qty_purquantity_4_string_t6_$$VA" name="采购数量 Qty" type="string" variable="tbhdpaymentpur002a_purquantity"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpaymentpur002a_采购金额 Amount_amount_5_string_cny_$$VA" name="采购金额 Amount" type="string" variable="tbhdpaymentpur002a_amount"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpaymentpur002a_设备类别 Equipment Type_category_6_string_tree_$$VA" name="设备类别 Equipment Type" type="string" variable="tbhdpaymentpur002a_category"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpaymentpur002a_学科 Subject_discipline_7_enum_sbs_$$VA" name="学科 Subject" type="string" variable="tbhdpaymentpur002a_discipline"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpaymentpur002a_说明 Note_expdetail_8_string_t1_$$VA" name="说明 Note" type="string" variable="tbhdpaymentpur002a_expdetail"></activiti:formProperty>
+        <activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+          <activiti:field name="language">
+            <activiti:string><![CDATA[groovy]]></activiti:string>
+          </activiti:field>
+          <activiti:field name="script">
+            <activiti:string><![CDATA[def superExecutionId = task.getExecution().getSuperExecutionId();								
+				def supeerExecution =	runtimeService.createExecutionQuery().executionId(superExecutionId).singleResult(); 
+				supeerExecution.setVariable('coreaction', task.getExecution().getVariable('coreaction_level3_3'));
+				
+				def user = identityService.createUserQuery().userId(task.getExecution().getVariable('verifiers')[2]).singleResult(); 
+				def username = user.getLastName() + " " + user.getFirstName();
+				supeerExecution.setVariable('costcentermemo', supeerExecution.getVariable('costcentermemo')+'/'+username);
+				task.getExecution().setVariable('verifiername_level3_3',username);]]></activiti:string>
+          </activiti:field>
+        </activiti:taskListener>
+      </extensionElements>
+    </userTask>
+    <sequenceFlow id="sq1" name="1级" sourceRef="exclusivegateway1" targetRef="UT1_1">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('level') == 1}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="sq2" name="2级" sourceRef="exclusivegateway1" targetRef="UT2_1">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('level') == 2}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="sq3" name="3级" sourceRef="exclusivegateway1" targetRef="UT3_1">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('level') == 3}]]></conditionExpression>
+    </sequenceFlow>
+    <endEvent id="E1" name="E1"></endEvent>
+    <exclusiveGateway id="exclusivegateway1" name="g1"></exclusiveGateway>
+    <exclusiveGateway id="exclusivegateway3" name="Exclusive Gateway"></exclusiveGateway>
+    <sequenceFlow id="flow5" sourceRef="UT1_1" targetRef="exclusivegateway3"></sequenceFlow>
+    <endEvent id="END_LEVEL1_N" name="END_LEVEL1_N"></endEvent>
+    <sequenceFlow id="seq1_1_Y" name="同意" sourceRef="exclusivegateway3" targetRef="E1">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('coreaction_level1_1') == '同意 Agree'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="seq1_1_N" name="拒绝" sourceRef="exclusivegateway3" targetRef="END_LEVEL1_N">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('coreaction_level1_1') == '拒绝 Refuse'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="seq2_1_Y" name="同意" sourceRef="exclusivegateway4" targetRef="UT2_2">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('coreaction_level2_1') == '同意 Agree'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="seq2_2_Y" name="同意" sourceRef="exclusivegateway5" targetRef="E1">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('coreaction_level2_2') == '同意 Agree'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="seq2_1_N" name="拒绝" sourceRef="exclusivegateway4" targetRef="END_LEVEL2_N">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('coreaction_level2_1') == '拒绝 Refuse'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="seq2_2_N" name="拒绝" sourceRef="exclusivegateway5" targetRef="END_LEVEL2_N">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('coreaction_level2_2') == '拒绝 Refuse'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="seq3_1_Y" name="同意" sourceRef="exclusivegateway6" targetRef="UT3_2">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('coreaction_level3_1') == '同意 Agree'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="seq3_2_Y" name="同意" sourceRef="exclusivegateway7" targetRef="UT3_3">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('coreaction_level3_2') == '同意 Agree'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="seq3_3_Y" name="同意" sourceRef="exclusivegateway8" targetRef="E1">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('coreaction_level3_3') == '同意 Agree'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="seq3_1_N" name="拒绝" sourceRef="exclusivegateway6" targetRef="END_LEVEL3_N">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('coreaction_level3_1') == '拒绝 Refuse'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="seq3_2_N" name="拒绝" sourceRef="exclusivegateway7" targetRef="END_LEVEL3_N">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('coreaction_level3_2') == '拒绝 Refuse'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="seq3_3_N" name="拒绝" sourceRef="exclusivegateway8" targetRef="END_LEVEL3_N">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('coreaction_level3_3') == '拒绝 Refuse'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow17" name="并发" sourceRef="exclusivegateway1" targetRef="UT4">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('level') == 99}]]></conditionExpression>
+    </sequenceFlow>
+    <userTask id="UT4" name="并发审批" activiti:candidateUsers="${verifiers[0]}" activiti:dueDate="P1D" activiti:priority="8080">
+      <extensionElements>
+        <activiti:formProperty id="coreaction_审批结果 Approval_1_enum_rbv_$$A" name="审批结果 Approval" type="enum" variable="coreaction_level4" required="true">
+          <activiti:value id="同意 Agree" name="同意 Agree"></activiti:value>
+          <activiti:value id="拒绝 Refuse" name="拒绝 Refuse"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="corecomments_审批意见 Comments_1_string_t2_$$B" name="审批意见 Comments" type="string" variable="corecomments_level4"></activiti:formProperty>
+        <activiti:formProperty id="totalamount_总金额 Total Amount_0_string_cny_$$VA" name="总金额大写 Total Amount" type="string" variable="totalamount"></activiti:formProperty>
+        <activiti:formProperty id="totalamount_总金额 Total Amount_1_string_t11_$$VA" name="总金额 Total Amount" type="string" variable="totalamount"></activiti:formProperty>
+        <activiti:formProperty id="corp_实体 CorpID_2_string_tree_$$VA" name="所属实体 CorpID" type="string" variable="corp"></activiti:formProperty>
+        <activiti:formProperty id="reqdate_要求付款日期 Required Date_3_string_t3_$$VA" name="要求付款日期 Required Date" type="string" variable="reqdate"></activiti:formProperty>
+        <activiti:formProperty id="currency_货币 Currency_4_enum_sbs_$$VA" name="货币 Currency" type="string" variable="currency"></activiti:formProperty>
+        <activiti:formProperty id="vendoraccount_供应商 Supplier_1_string_auto_$$VB" name="供应商 Supplier" type="string" variable="vendor"></activiti:formProperty>
+        <activiti:formProperty id="borneby_手续费承担方 Bank fee bearer_9_enum_sbs_$$VB" name="手续费承担方 Bank fee bearer" type="string" variable="borneby"></activiti:formProperty>
+        <activiti:formProperty id="contractno_合同编号 Contract ID_1_string_t1_$$VC" name="合同编号 Contract ID" type="string" variable="contract"></activiti:formProperty>
+        <activiti:formProperty id="ifinvoice_是否提供发票 Invoice_2_enum_sbs_$$VC" name="是否提供发票 Invoice" type="string" variable="ifinvoice"></activiti:formProperty>
+        <activiti:formProperty id="remarks_摘要说明 Comments_1_string_t1_$$VD" name="摘要说明 Comments" type="string" variable="remarks"></activiti:formProperty>
+        <activiti:formProperty id="attachment_附件_1_string_t9_$$VF" name="附件" type="string" variable="attachment"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpaymentpur002a_item_$$VA" name="付款明细 Detail" type="string" variable="tbhdpaymentpur002a_item"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpaymentpur002a_收支项目 Payment item_ioitem_0_string_tree_$$VA" name="收支项目 Payment item" type="string" variable="tbhdpaymentpur002a_ioitem"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpaymentpur002a_成本中心 Costcenter_costcenter_1_string_tree_$$VA" name="成本中心 Costcenter" type="string" variable="tbhdpaymentpur002a_costcenter"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpaymentpur002a_项目 Project_project_2_string_tree_$$VA" name="项目 Project" type="string" variable="tbhdpaymentpur002a_project"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpaymentpur002a_采购项 Purchase item_puritem_3_string_t1_$$VA" name="采购项 Purchase item" type="string" variable="tbhdpaymentpur002a_puritem"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpaymentpur002a_采购数量 Qty_purquantity_4_string_t6_$$VA" name="采购数量 Qty" type="string" variable="tbhdpaymentpur002a_purquantity"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpaymentpur002a_采购金额 Amount_amount_5_string_cny_$$VA" name="采购金额 Amount" type="string" variable="tbhdpaymentpur002a_amount"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpaymentpur002a_设备类别 Equipment Type_category_6_string_tree_$$VA" name="设备类别 Equipment Type" type="string" variable="tbhdpaymentpur002a_category"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpaymentpur002a_学科 Subject_discipline_7_enum_sbs_$$VA" name="学科 Subject" type="string" variable="tbhdpaymentpur002a_discipline"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpaymentpur002a_说明 Note_expdetail_8_string_t1_$$VA" name="说明 Note" type="string" variable="tbhdpaymentpur002a_expdetail"></activiti:formProperty>
+        <activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+          <activiti:field name="language">
+            <activiti:string><![CDATA[groovy]]></activiti:string>
+          </activiti:field>
+          <activiti:field name="script">
+            <activiti:string><![CDATA[def superExecutionId = task.getExecution().getSuperExecutionId();								
+				def supeerExecution =	runtimeService.createExecutionQuery().executionId(superExecutionId).singleResult(); 
+				supeerExecution.setVariable('coreaction', task.getExecution().getVariable('coreaction_level4'));
+
+				def user = identityService.createUserQuery().userId(task.getAssignee()).singleResult();
+				def username = user.getLastName() + " " + user.getFirstName();
+				supeerExecution.setVariable('costcentermemo', supeerExecution.getVariable('costcentermemo')+'/'+username);
+				task.getExecution().setVariable('verifiername_level4',username);]]></activiti:string>
+          </activiti:field>
+        </activiti:taskListener>
+      </extensionElements>
+    </userTask>
+    <sequenceFlow id="seq4_N" name="拒绝" sourceRef="exclusivegateway9" targetRef="END_LEVEL4_N">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('coreaction_level4') == '拒绝 Refuse'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="seq4_Y" name="同意" sourceRef="exclusivegateway9" targetRef="E1">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('coreaction_level4') == '同意 Agree'}]]></conditionExpression>
+    </sequenceFlow>
+    <exclusiveGateway id="exclusivegateway4" name="Exclusive Gateway"></exclusiveGateway>
+    <sequenceFlow id="flow7" sourceRef="UT2_1" targetRef="exclusivegateway4"></sequenceFlow>
+    <exclusiveGateway id="exclusivegateway5" name="Exclusive Gateway"></exclusiveGateway>
+    <sequenceFlow id="flow8" sourceRef="UT2_2" targetRef="exclusivegateway5"></sequenceFlow>
+    <endEvent id="END_LEVEL2_N" name="END_LEVEL2_N"></endEvent>
+    <sequenceFlow id="flow9" sourceRef="s1" targetRef="exclusivegateway10"></sequenceFlow>
+    <exclusiveGateway id="exclusivegateway6" name="Exclusive Gateway"></exclusiveGateway>
+    <sequenceFlow id="flow11" sourceRef="UT3_1" targetRef="exclusivegateway6"></sequenceFlow>
+    <exclusiveGateway id="exclusivegateway7" name="Exclusive Gateway"></exclusiveGateway>
+    <sequenceFlow id="flow13" sourceRef="UT3_2" targetRef="exclusivegateway7"></sequenceFlow>
+    <endEvent id="END_LEVEL3_N" name="END_LEVEL3_N"></endEvent>
+    <exclusiveGateway id="exclusivegateway8" name="Exclusive Gateway"></exclusiveGateway>
+    <sequenceFlow id="flow16" sourceRef="UT3_3" targetRef="exclusivegateway8"></sequenceFlow>
+    <exclusiveGateway id="exclusivegateway9" name="Exclusive Gateway"></exclusiveGateway>
+    <sequenceFlow id="flow18" sourceRef="UT4" targetRef="exclusivegateway9"></sequenceFlow>
+    <endEvent id="END_LEVEL4_N" name="END_LEVEL4_N"></endEvent>
+    <exclusiveGateway id="exclusivegateway10" name="Exclusive Gateway"></exclusiveGateway>
+    <sequenceFlow id="flow19" name="正常审批" sourceRef="exclusivegateway10" targetRef="exclusivegateway1">
+    	<conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('special')!='Y'}]]></conditionExpression>
+    </sequenceFlow>
+    <scriptTask id="scripttask1" name="构造drools条件" activiti:autoStoreVariables="false" scriptFormat="groovy">
+      <script>
+    	
+    		import groovy.json.JsonOutput
+			import groovy.json.JsonSlurper
+			import java.util.stream.Collectors
+			
+			static List&lt;Map&lt;String, String&gt;&gt; constructDroolsCondition(List rows) {
+				def result = []
+			    //index 1:成本中心 2:项目 --- amount sum的维度
+			    def groupMap = rows.stream().collect(
+			            Collectors.groupingBy(
+			                    { "${it[1].code}-${it[2].code}" },//key
+			                    Collectors.mapping(
+			                            { it[5].toBigDecimal() },
+			                            Collectors.reducing(BigDecimal.ZERO, { a, b -&gt; a.add(b) })
+			                    )//value
+			            )
+			    )
+			    //drools规则多一个收支项目维度
+			    return groupMap.entrySet().stream().forEach({ x -&gt;
+			        def keyArr = x.key.split("-")
+			        def costcenter = keyArr[0]
+			        def project = keyArr[1]
+			        def ioitems = rows.stream().filter({it[1].code == costcenter &amp;&amp; it[2].code == project}).map({it[0].code}).collect(Collectors.toSet())
+			        ioitems.each {
+			            result &lt;&lt; ["ioitem": it, "costcenter": costcenter, "project": project, "amount": x.value]
+			        }
+			    })
+			    return result
+			}
+			
+			def jsonSlurper = new JsonSlurper()
+			def items = jsonSlurper.parseText(execution.getVariable('tbhdpaymentpur002a_item'))
+			def conditionList = JsonOutput.toJson(constructDroolsCondition(items.rows))
+			execution.setVariable('conditionList', conditionList)
+			
+			execution.setVariable("_http_method", "POST");
+			def headerMap = new java.util.HashMap&lt;String,String&gt;()
+			headerMap.put("Content-Type","application/json")			
+			execution.setVariable("_http_headers", headerMap)
+
+			execution.setVariable("_http_body", conditionList);
+			execution.setVariable("_http_url", 'https://commonservices.eorionsolution.com/decisiontables/v1/fire/ccpur002a_special.xls');
+			execution.setVariable("_http_response_body", '');
+		    execution.setVariable("_http_response_status_code", '');
+    	
+    	</script>    	
+    </scriptTask>
+    <serviceTask id="servicetask1" name="drools调用" activiti:class="com.eorionsolution.riying.bpms.javaservice.http.RestAPIService"></serviceTask>
+    <scriptTask id="scripttask2" name="结果解析" activiti:autoStoreVariables="false" scriptFormat="groovy">
+      <script>
+    	
+    		import groovy.json.JsonOutput
+			import groovy.json.JsonSlurper
+			import java.util.stream.Collectors
+			
+			static void checkCallStatus(def responseCode, def droolsResult){
+				if(responseCode != 200) {
+					throw new org.activiti.engine.ActivitiIllegalArgumentException("Drools调用查询审批人异常，请联系管理员！ Drools calls the query approver exception, please contact the administrator!")
+				}
+	  			droolsResult.each{
+	  				if(it.verifierfirst == null &amp;&amp; it.specialapproval == null &amp;&amp; it.concurrent == null) {
+	  					throw new org.activiti.engine.ActivitiIllegalArgumentException("成本中心：" + it.costcenter + " 项目：" + it.project + " 收支项目：" + it.ioitem + " 金额：" + it.amount + " 对应的审批人不存在！ The corresponding approver does not exist")
+	  				}
+	  			}
+			}
+			
+			static List&lt;Map&gt; handleDroolsResult(List&lt;Map&gt; droolsResult){
+			    def groupMap = droolsResult.stream().collect(Collectors.groupingBy({it.ruleno}))
+			    return groupMap.entrySet().stream().map({
+			        def map = it.value[0]
+			        def projectArr = it.value.stream().map({li -&gt; li.project}).collect(Collectors.toSet())
+			        def ioitemArr = it.value.stream().map({li -&gt; li.ioitem}).collect(Collectors.toSet())
+			        map.project = projectArr.join(",")
+			        map.ioitem = ioitemArr.join(",")
+			        return map
+			    }).collect(Collectors.toList())
+			}
+			
+			static List&lt;String&gt; putItems(List&lt;Map&gt; handleResult, String itemString, JsonSlurper jsonSlurper){
+			    handleResult.forEach({
+			        def ioitem = it.ioitem
+			        def project = it.project
+			        def costcenter = it.costcenter
+			        def items = jsonSlurper.parseText(itemString)
+			        items.each { item -&gt;
+			            if(item.key == 'rows') {
+			                item.value = item.value.findAll{ val -&gt;
+			                    ioitem.split(',').contains(val[0].code) &amp;&amp; val[1].code == costcenter &amp;&amp; project.split(',').contains(val[2].code)
+			                }
+			            }
+			        }
+			
+			        it.put("tbhd_items", items)
+			    })
+			    return handleResult.stream().map({JsonOutput.toJson(it)}).collect(Collectors.toList())
+			}
+			
+			def jsonSlurper = new JsonSlurper()
+			def responseCode = execution.getVariable('_http_response_status_code')
+			def droolsResult = jsonSlurper.parseText(execution.getVariable('_http_response_body'))
+			
+			checkCallStatus(responseCode, droolsResult)
+			
+			def handleResult = handleDroolsResult(droolsResult)		
+			def itemString = execution.getVariable('tbhdpaymentpur002a_item')
+			
+			def ruList = putItems(handleResult, itemString, jsonSlurper)
+			execution.setVariable('ruList', ruList)
+			
+			execution.setVariable('superExecutionId',execution.getSuperExecutionId())
+    	
+    	</script>    
+    </scriptTask>
+    <subProcess id="subprocess1" name="Sub Process">
+      <multiInstanceLoopCharacteristics isSequential="false" activiti:collection="ruList" activiti:elementVariable="ruDetail">
+        <completionCondition>${CurApprovalResults=="拒绝 Refuse"}</completionCondition>
+      </multiInstanceLoopCharacteristics>
+      <startEvent id="startevent1" name="Start">
+        <extensionElements>
+          <activiti:executionListener event="start" class="org.activiti.engine.impl.bpmn.listener.ScriptExecutionListener">
+            <activiti:field name="language">
+              <activiti:string><![CDATA[groovy]]></activiti:string>
+            </activiti:field>
+            <activiti:field name="script">
+              <activiti:string><![CDATA[import groovy.json.JsonSlurper;
+					import groovy.json.JsonOutput;
+					
+					def jsonSlurper = new JsonSlurper()
+            		def ruDetail = jsonSlurper.parseText(execution.getVariable('ruDetail'))
+            		
+            		//设置成本中心审批人
+            		def localVerifiers =[]
+            		localVerifiers << ruDetail.verifierfirst
+            		localVerifiers << ruDetail.verifiersecond
+            		localVerifiers << ruDetail.verifierthird
+            		
+            		//当一级审批人为报销人时，审批人替换成reverifierfirst，reverifierfirst配置成a,b,....  a为一级审批人，b为二级审批人,目前最多支持三级
+					if(localVerifiers[0] == execution.getVariable("claimsn")){
+						try{
+							if(ruDetail.reverifierfirst)
+								localVerifiers = ruDetail.reverifierfirst.split(",").toList()
+						}catch(Exception e) {
+							throw new org.activiti.engine.ActivitiIllegalArgumentException("成本中心审批人设置错误，请联系管理员 Invalid Costcenter Approver");
+						}
+					}
+					if(localVerifiers[1] == execution.getVariable("claimsn")){
+						try{
+							if(ruDetail.reverifiersecond)
+								localVerifiers = ruDetail.reverifiersecond.split(",").toList()
+						}catch(Exception e) {
+							throw new org.activiti.engine.ActivitiIllegalArgumentException("成本中心审批人设置错误，请联系管理员 Invalid Costcenter Approver");
+						}
+					}
+					if(localVerifiers[2] == execution.getVariable("claimsn")){
+						try{
+							if(ruDetail.reverifierthird)
+								localVerifiers = ruDetail.reverifierthird.split(",").toList()
+						}catch(Exception e) {
+							throw new org.activiti.engine.ActivitiIllegalArgumentException("成本中心审批人设置错误，请联系管理员 Invalid Costcenter Approver");
+						}
+					}
+					localVerifiers.removeAll([null, ""])				          		
+            		execution.setVariableLocal('approvers',localVerifiers)
+					execution.setVariableLocal("subLevel",localVerifiers.size())
+					
+					if(ruDetail.concurrent) {
+						localVerifiers.clear()
+						localVerifiers << ruDetail.concurrent
+						execution.setVariableLocal("approvers",localVerifiers);
+						execution.setVariableLocal("subLevel",99)
+						
+						//当并联审批人为报销人时，审批人替换成reverifierfirst，reverifierfirst配置成a,b,....  a为一级审批人，b为二级审批人,目前最多支持三级
+						if(localVerifiers[0].contains(execution.getVariable("claimsn"))) {
+							try {
+								localVerifiers = ruDetail.reverifierfirst.split(",").toList()
+								execution.setVariableLocal("subLevel",localVerifiers.size())
+								execution.setVariableLocal("approvers",localVerifiers)
+							} catch(Exception e) {
+								throw new org.activiti.engine.ActivitiIllegalArgumentException("成本中心审批人设置错误，请联系管理员 Invalid Costcenter Approver")
+							}
+						}
+					}
+					
+					if(localVerifiers.size() == 0) {
+						throw new org.activiti.engine.ActivitiIllegalArgumentException("成本中心审批人设置错误，请联系管理员 Invalid Costcenter Approver")	
+      				}
+      				
+      				def tbhdpaymentpur002a_item = ruDetail.tbhd_items
+					def totalamount = 0;
+					def discipline = [];
+					tbhdpaymentpur002a_item.each{
+						if (it.key=='rows') {
+							it.value.each{
+								def amount = new java.math.BigDecimal(it[5]).setScale(2, java.math.RoundingMode.HALF_UP);
+								totalamount += amount;
+								discipline << it[7];
+							}
+						}
+					}
+					execution.setVariableLocal('tbhdpaymentpur002a_item',JsonOutput.toJson(tbhdpaymentpur002a_item))
+					execution.setVariableLocal("totalamount",totalamount+"")
+					
+					//SET BUSINESSKEY
+					runtimeService.updateBusinessKey(execution.getProcessInstanceId(),execution.getVariable("businessKey"))
+					//JUDGE BUDGET
+					execution.setVariableLocal("judgeBudget","无超标");
+					for (item in discipline.unique()) {
+						def c_d_budget = new JsonSlurper().parseText(execution.getVariable("allBudget")).find() { elem ->
+							(elem.costcenter == execution.getVariable("costCenter") && elem.discipline == item)
+						}
+						if ((c_d_budget ? c_d_budget.remain_amount > 0: true) == false){
+							execution.setVariableLocal("judgeBudget","超标,详见报表");
+							break;
+						}
+					}]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+        </extensionElements>
+      	
+      </startEvent>
+      <userTask id="usertask1" name="并发审批" activiti:candidateUsers="{approvers[0]}">
+	      <extensionElements>
+	        <activiti:formProperty id="coreaction_审批结果 Approval_1_enum_rbv_$$A" name="审批结果 Approval" type="enum" variable="coreaction_level4" required="true">
+	          <activiti:value id="同意 Agree" name="同意 Agree"/>
+	          <activiti:value id="拒绝 Refuse" name="拒绝 Refuse"/>>
+	        </activiti:formProperty>
+	        <activiti:formProperty id="corecomments_审批意见 Comments_1_string_t2_$$B" name="审批意见 Comments" type="string" variable="corecomments_level4"></activiti:formProperty>
+			<activiti:formProperty id="totalamount_总金额 Total Amount_0_string_cny_$$VA" name="总金额大写 Total Amount" type="string" variable="totalamount"></activiti:formProperty>
+	        <activiti:formProperty id="totalamount_总金额 Total Amount_1_string_t11_$$VA" name="总金额 Total Amount" type="string" variable="totalamount"></activiti:formProperty>
+	        <activiti:formProperty id="corp_实体 CorpID_2_string_tree_$$VA" name="所属实体 CorpID" type="string" variable="corp"></activiti:formProperty>
+	        <activiti:formProperty id="reqdate_要求付款日期 Required Date_3_string_t3_$$VA" name="要求付款日期 Required Date" type="string" variable="reqdate"></activiti:formProperty>
+	        <activiti:formProperty id="currency_货币 Currency_4_enum_sbs_$$VA" name="货币 Currency" type="string" variable="currency"></activiti:formProperty>
+	        <activiti:formProperty id="vendoraccount_供应商 Supplier_1_string_auto_$$VB" name="供应商 Supplier" type="string" variable="vendor"></activiti:formProperty>
+			<activiti:formProperty id="borneby_手续费承担方 Bank fee bearer_9_enum_sbs_$$VB" name="手续费承担方 Bank fee bearer" type="string" variable="borneby"></activiti:formProperty>
+	        <activiti:formProperty id="contractno_合同编号 Contract ID_1_string_t1_$$VC" name="合同编号 Contract ID" type="string" variable="contract"></activiti:formProperty>
+	        <activiti:formProperty id="ifinvoice_是否提供发票 Invoice_2_enum_sbs_$$VC" name="是否提供发票 Invoice" type="string" variable="ifinvoice"></activiti:formProperty>
+	        <activiti:formProperty id="remarks_摘要说明 Comments_1_string_t1_$$VD" name="摘要说明 Comments" type="string" variable="remarks"></activiti:formProperty>
+			<activiti:formProperty id="attachment_附件_1_string_t9_$$VF" name="附件" type="string" variable="attachment"></activiti:formProperty>
+			<activiti:formProperty id="tbhdpaymentpur002a_item_$$VA" name="付款明细 Detail" type="string" variable="tbhdpaymentpur002a_item"></activiti:formProperty>
+	        <activiti:formProperty id="tbhdpaymentpur002a_收支项目 Payment item_ioitem_0_string_tree_$$VA" name="收支项目 Payment item" type="string" variable="tbhdpaymentpur002a_ioitem"></activiti:formProperty>
+	        <activiti:formProperty id="tbhdpaymentpur002a_成本中心 Costcenter_costcenter_1_string_tree_$$VA" name="成本中心 Costcenter" type="string" variable="tbhdpaymentpur002a_costcenter"></activiti:formProperty>
+	        <activiti:formProperty id="tbhdpaymentpur002a_项目 Project_project_2_string_tree_$$VA" name="项目 Project" type="string" variable="tbhdpaymentpur002a_project"></activiti:formProperty>
+	        <activiti:formProperty id="tbhdpaymentpur002a_采购项 Purchase item_puritem_3_string_t1_$$VA" name="采购项 Purchase item" type="string" variable="tbhdpaymentpur002a_puritem"></activiti:formProperty>
+	        <activiti:formProperty id="tbhdpaymentpur002a_采购数量 Qty_purquantity_4_string_t6_$$VA" name="采购数量 Qty" type="string" variable="tbhdpaymentpur002a_purquantity"></activiti:formProperty>
+	        <activiti:formProperty id="tbhdpaymentpur002a_采购金额 Amount_amount_5_string_cny_$$VA" name="采购金额 Amount" type="string" variable="tbhdpaymentpur002a_amount"></activiti:formProperty>
+	        <activiti:formProperty id="tbhdpaymentpur002a_设备类别 Equipment Type_category_6_string_tree_$$VA" name="设备类别 Equipment Type" type="string" variable="tbhdpaymentpur002a_category"></activiti:formProperty>
+	        <activiti:formProperty id="tbhdpaymentpur002a_学科 Subject_discipline_7_enum_sbs_$$VA" name="学科 Subject" type="string" variable="tbhdpaymentpur002a_discipline"></activiti:formProperty>
+	        <activiti:formProperty id="tbhdpaymentpur002a_说明 Note_expdetail_8_string_t1_$$VA" name="说明 Note" type="string" variable="tbhdpaymentpur002a_expdetail"></activiti:formProperty>
+	        <activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+	          <activiti:field name="language">
+	            <activiti:string><![CDATA[groovy]]></activiti:string>
+	          </activiti:field>
+	          <activiti:field name="script">
+	            <activiti:string><![CDATA[def execution = task.getExecution()
+		            	def superExecutionId = execution.getVariable('superExecutionId')								
+						def supeerExecution =	runtimeService.createExecutionQuery().executionId(superExecutionId).singleResult(); 
+						supeerExecution.setVariable('coreaction', execution.getVariable('coreaction_level4'));
+		
+						def user = identityService.createUserQuery().userId(task.getAssignee()).singleResult();
+						def username = user.getLastName() + " " + user.getFirstName();
+						supeerExecution.setVariable('costcentermemo', supeerExecution.getVariable('costcentermemo')+'/'+username);
+						execution.setVariable('verifiername_level4',username);
+						
+						execution.setVariable('CurApprovalResults', execution.getVariable('coreaction_level4'))
+						
+						execution.setVariableLocal('approvalResultsLocal', execution.getVariable('coreaction_level4'))
+						execution.setVariableLocal('approvalCommentsLocal', execution.getVariable('corecomments_level4'))
+						execution.setVariableLocal('approvalUser', username)]]></activiti:string>
+	          </activiti:field>
+	        </activiti:taskListener>
+	      </extensionElements>      
+      </userTask>
+      <userTask id="usertask2" name="成本中心审批 Cost center approval" activiti:assignee="${approver}">
+	      <extensionElements>
+	        <activiti:formProperty id="coreaction_审批结果 Approval_1_enum_rbv_$$A" name="审批结果 Approval" type="enum" variable="coreaction_result" required="true">
+	          <activiti:value id="同意 Agree" name="同意 Agree"/>
+	          <activiti:value id="拒绝 Refuse" name="拒绝 Refuse"/>
+	        </activiti:formProperty>
+	        <activiti:formProperty id="corecomments_审批意见 Comments_1_string_t2_$$B" name="审批意见 Comments" type="string" variable="corecomments_result"></activiti:formProperty>
+			<activiti:formProperty id="totalamount_总金额 Total Amount_0_string_cny_$$VA" name="总金额大写 Total Amount" type="string" variable="totalamount"></activiti:formProperty>
+	        <activiti:formProperty id="totalamount_总金额 Total Amount_1_string_t11_$$VA" name="总金额 Total Amount" type="string" variable="totalamount"></activiti:formProperty>
+	        <activiti:formProperty id="corp_实体 CorpID_2_string_tree_$$VA" name="所属实体 CorpID" type="string" variable="corp"></activiti:formProperty>
+	        <activiti:formProperty id="reqdate_要求付款日期 Required Date_3_string_t3_$$VA" name="要求付款日期 Required Date" type="string" variable="reqdate"></activiti:formProperty>
+	        <activiti:formProperty id="currency_货币 Currency_4_enum_sbs_$$VA" name="货币 Currency" type="string" variable="currency"></activiti:formProperty>
+	        <activiti:formProperty id="vendoraccount_供应商 Supplier_1_string_auto_$$VB" name="供应商 Supplier" type="string" variable="vendor"></activiti:formProperty>
+			<activiti:formProperty id="borneby_手续费承担方 Bank fee bearer_9_enum_sbs_$$VB" name="手续费承担方 Bank fee bearer" type="string" variable="borneby"></activiti:formProperty>
+	        <activiti:formProperty id="contractno_合同编号 Contract ID_1_string_t1_$$VC" name="合同编号 Contract ID" type="string" variable="contract"></activiti:formProperty>
+	        <activiti:formProperty id="ifinvoice_是否提供发票 Invoice_2_enum_sbs_$$VC" name="是否提供发票 Invoice" type="string" variable="ifinvoice"></activiti:formProperty>
+	        <activiti:formProperty id="remarks_摘要说明 Comments_1_string_t1_$$VD" name="摘要说明 Comments" type="string" variable="remarks"></activiti:formProperty>
+			<activiti:formProperty id="attachment_附件_1_string_t9_$$VF" name="附件" type="string" variable="attachment"></activiti:formProperty>
+			<activiti:formProperty id="tbhdpaymentpur002a_item_$$VA" name="付款明细 Detail" type="string" variable="tbhdpaymentpur002a_item"></activiti:formProperty>
+	        <activiti:formProperty id="tbhdpaymentpur002a_收支项目 Payment item_ioitem_0_string_tree_$$VA" name="收支项目 Payment item" type="string" variable="tbhdpaymentpur002a_ioitem"></activiti:formProperty>
+	        <activiti:formProperty id="tbhdpaymentpur002a_成本中心 Costcenter_costcenter_1_string_tree_$$VA" name="成本中心 Costcenter" type="string" variable="tbhdpaymentpur002a_costcenter"></activiti:formProperty>
+	        <activiti:formProperty id="tbhdpaymentpur002a_项目 Project_project_2_string_tree_$$VA" name="项目 Project" type="string" variable="tbhdpaymentpur002a_project"></activiti:formProperty>
+	        <activiti:formProperty id="tbhdpaymentpur002a_采购项 Purchase item_puritem_3_string_t1_$$VA" name="采购项 Purchase item" type="string" variable="tbhdpaymentpur002a_puritem"></activiti:formProperty>
+	        <activiti:formProperty id="tbhdpaymentpur002a_采购数量 Qty_purquantity_4_string_t6_$$VA" name="采购数量 Qty" type="string" variable="tbhdpaymentpur002a_purquantity"></activiti:formProperty>
+	        <activiti:formProperty id="tbhdpaymentpur002a_采购金额 Amount_amount_5_string_cny_$$VA" name="采购金额 Amount" type="string" variable="tbhdpaymentpur002a_amount"></activiti:formProperty>
+	        <activiti:formProperty id="tbhdpaymentpur002a_设备类别 Equipment Type_category_6_string_tree_$$VA" name="设备类别 Equipment Type" type="string" variable="tbhdpaymentpur002a_category"></activiti:formProperty>
+	        <activiti:formProperty id="tbhdpaymentpur002a_学科 Subject_discipline_7_enum_sbs_$$VA" name="学科 Subject" type="string" variable="tbhdpaymentpur002a_discipline"></activiti:formProperty>
+	        <activiti:formProperty id="tbhdpaymentpur002a_说明 Note_expdetail_8_string_t1_$$VA" name="说明 Note" type="string" variable="tbhdpaymentpur002a_expdetail"></activiti:formProperty>
+            <activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+              <activiti:field name="language">
+                <activiti:string><![CDATA[groovy]]></activiti:string>
+              </activiti:field>
+              <activiti:field name="script">
+                <activiti:string><![CDATA[def execution = task.getExecution()
+		      	  def superExecutionId = execution.getVariable('superExecutionId')
+		      	  def supeerExecution =	runtimeService.createExecutionQuery().executionId(superExecutionId).singleResult()
+		      	  supeerExecution.setVariable('coreaction', execution.getVariable('coreaction_result'))
+		      	  def user = identityService.createUserQuery().userId(task.getAssignee()).singleResult()
+		      	  def username = user.getLastName() + " " + user.getFirstName()
+		      	  supeerExecution.setVariable('costcentermemo', supeerExecution.getVariable('costcentermemo')+'/'+username)
+		      	
+		      	  execution.setVariableLocal('approvalUser', username)
+		      	  execution.setVariableLocal('approvalCommentsLocal', execution.getVariable('corecomments_result'))
+		      	  execution.setVariableLocal('approvalResultsLocal',execution.getVariable('coreaction_result'))
+		      	
+		      	  execution.setVariable('CurApprovalResults',execution.getVariable('coreaction_result'))]]></activiti:string>
+              </activiti:field>
+            </activiti:taskListener>
+            <activiti:taskListener event="create">
+              <activiti:field name="language">
+                <activiti:string><![CDATA[groovy]]></activiti:string>
+              </activiti:field>
+              <activiti:field name="script">
+                <activiti:string><![CDATA[def execution = task.getExecution()
+		    			execution.setVariableLocal('coreaction_result', '')
+		    			execution.setVariableLocal('corecomments_result', '')]]></activiti:string>
+              </activiti:field>
+            </activiti:taskListener>
+	      </extensionElements>
+        <multiInstanceLoopCharacteristics isSequential="true" activiti:collection="approvers" activiti:elementVariable="approver">
+          <completionCondition>${CurApprovalResults=='拒绝 Refuse'}</completionCondition>
+        </multiInstanceLoopCharacteristics>	      
+      </userTask>
+      <exclusiveGateway id="exclusivegateway11" name="Exclusive Gateway"></exclusiveGateway>
+      <exclusiveGateway id="exclusivegateway12" name="Exclusive Gateway"></exclusiveGateway>
+      <sequenceFlow id="flow25" sourceRef="startevent1" targetRef="exclusivegateway11"></sequenceFlow>
+      <sequenceFlow id="flow26" name="并发审批" sourceRef="exclusivegateway11" targetRef="usertask1">
+      	<conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('subLevel')==99}]]></conditionExpression>
+      </sequenceFlow>
+      <sequenceFlow id="flow27" name="串行审批" sourceRef="exclusivegateway11" targetRef="usertask2">
+      	<conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('subLevel')!=99}]]></conditionExpression>
+      </sequenceFlow>
+      <sequenceFlow id="flow28" sourceRef="usertask1" targetRef="exclusivegateway12"></sequenceFlow>
+      <sequenceFlow id="flow29" sourceRef="usertask2" targetRef="exclusivegateway12"></sequenceFlow>
+      <endEvent id="endevent1" name="End"></endEvent>
+      <sequenceFlow id="flow30" sourceRef="exclusivegateway12" targetRef="endevent1"></sequenceFlow>
+    </subProcess>
+    <sequenceFlow id="flow20" name="特殊审批" sourceRef="exclusivegateway10" targetRef="scripttask1">
+    	<conditionExpression xsi:type="tFormalExpression"><![CDATA[execution.getVariable('special')=='Y']]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow21" sourceRef="scripttask1" targetRef="servicetask1"></sequenceFlow>
+    <sequenceFlow id="flow22" sourceRef="servicetask1" targetRef="scripttask2"></sequenceFlow>
+    <sequenceFlow id="flow23" sourceRef="scripttask2" targetRef="subprocess1"></sequenceFlow>
+    <sequenceFlow id="flow24" sourceRef="subprocess1" targetRef="E1"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_CA_DPPU002AO">
+    <bpmndi:BPMNPlane bpmnElement="CA_DPPU002AO" id="BPMNPlane_CA_DPPU002AO">
+      <bpmndi:BPMNShape bpmnElement="s1" id="BPMNShape_s1">
+        <omgdc:Bounds height="35.0" width="35.0" x="1.0" y="272.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="UT1_1" id="BPMNShape_UT1_1">
+        <omgdc:Bounds height="75.0" width="105.0" x="403.0" y="120.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="UT2_1" id="BPMNShape_UT2_1">
+        <omgdc:Bounds height="67.0" width="105.0" x="403.0" y="256.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="UT2_2" id="BPMNShape_UT2_2">
+        <omgdc:Bounds height="67.0" width="105.0" x="620.0" y="256.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="UT3_1" id="BPMNShape_UT3_1">
+        <omgdc:Bounds height="71.0" width="105.0" x="403.0" y="383.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="UT3_2" id="BPMNShape_UT3_2">
+        <omgdc:Bounds height="71.0" width="105.0" x="612.0" y="383.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="UT3_3" id="BPMNShape_UT3_3">
+        <omgdc:Bounds height="71.0" width="105.0" x="812.0" y="384.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="E1" id="BPMNShape_E1">
+        <omgdc:Bounds height="35.0" width="35.0" x="1031.0" y="272.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway1" id="BPMNShape_exclusivegateway1">
+        <omgdc:Bounds height="40.0" width="40.0" x="261.0" y="269.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway3" id="BPMNShape_exclusivegateway3">
+        <omgdc:Bounds height="40.0" width="40.0" x="542.0" y="137.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="END_LEVEL1_N" id="BPMNShape_END_LEVEL1_N">
+        <omgdc:Bounds height="35.0" width="35.0" x="545.0" y="68.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="UT4" id="BPMNShape_UT4">
+        <omgdc:Bounds height="71.0" width="105.0" x="405.0" y="510.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway4" id="BPMNShape_exclusivegateway4">
+        <omgdc:Bounds height="40.0" width="40.0" x="551.0" y="269.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway5" id="BPMNShape_exclusivegateway5">
+        <omgdc:Bounds height="40.0" width="40.0" x="747.0" y="269.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="END_LEVEL2_N" id="BPMNShape_END_LEVEL2_N">
+        <omgdc:Bounds height="35.0" width="35.0" x="641.0" y="199.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway6" id="BPMNShape_exclusivegateway6">
+        <omgdc:Bounds height="40.0" width="40.0" x="551.0" y="398.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway7" id="BPMNShape_exclusivegateway7">
+        <omgdc:Bounds height="40.0" width="40.0" x="747.0" y="399.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="END_LEVEL3_N" id="BPMNShape_END_LEVEL3_N">
+        <omgdc:Bounds height="35.0" width="35.0" x="750.0" y="340.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway8" id="BPMNShape_exclusivegateway8">
+        <omgdc:Bounds height="40.0" width="40.0" x="951.0" y="399.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway9" id="BPMNShape_exclusivegateway9">
+        <omgdc:Bounds height="40.0" width="40.0" x="555.0" y="526.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="END_LEVEL4_N" id="BPMNShape_END_LEVEL4_N">
+        <omgdc:Bounds height="35.0" width="35.0" x="558.0" y="590.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway10" id="BPMNShape_exclusivegateway10">
+        <omgdc:Bounds height="40.0" width="40.0" x="101.0" y="269.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scripttask1" id="BPMNShape_scripttask1">
+        <omgdc:Bounds height="65.0" width="105.0" x="69.0" y="386.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="servicetask1" id="BPMNShape_servicetask1">
+        <omgdc:Bounds height="65.0" width="105.0" x="69.0" y="513.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scripttask2" id="BPMNShape_scripttask2">
+        <omgdc:Bounds height="65.0" width="105.0" x="69.0" y="660.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="subprocess1" id="BPMNShape_subprocess1">
+        <omgdc:Bounds height="235.0" width="631.0" x="301.0" y="740.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="331.0" y="839.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask1" id="BPMNShape_usertask1">
+        <omgdc:Bounds height="65.0" width="105.0" x="561.0" y="766.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask2" id="BPMNShape_usertask2">
+        <omgdc:Bounds height="65.0" width="105.0" x="561.0" y="900.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway11" id="BPMNShape_exclusivegateway11">
+        <omgdc:Bounds height="40.0" width="40.0" x="431.0" y="836.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway12" id="BPMNShape_exclusivegateway12">
+        <omgdc:Bounds height="40.0" width="40.0" x="751.0" y="836.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="836.0" y="839.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="sq1" id="BPMNEdge_sq1">
+        <omgdi:waypoint x="281.0" y="269.0"></omgdi:waypoint>
+        <omgdi:waypoint x="280.0" y="157.0"></omgdi:waypoint>
+        <omgdi:waypoint x="403.0" y="157.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="18.0" x="319.0" y="170.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sq2" id="BPMNEdge_sq2">
+        <omgdi:waypoint x="301.0" y="289.0"></omgdi:waypoint>
+        <omgdi:waypoint x="377.0" y="290.0"></omgdi:waypoint>
+        <omgdi:waypoint x="403.0" y="289.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="18.0" x="318.0" y="301.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sq3" id="BPMNEdge_sq3">
+        <omgdi:waypoint x="281.0" y="309.0"></omgdi:waypoint>
+        <omgdi:waypoint x="280.0" y="416.0"></omgdi:waypoint>
+        <omgdi:waypoint x="377.0" y="416.0"></omgdi:waypoint>
+        <omgdi:waypoint x="402.0" y="416.0"></omgdi:waypoint>
+        <omgdi:waypoint x="403.0" y="418.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="18.0" x="319.0" y="417.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow5" id="BPMNEdge_flow5">
+        <omgdi:waypoint x="508.0" y="157.0"></omgdi:waypoint>
+        <omgdi:waypoint x="542.0" y="157.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="seq1_1_Y" id="BPMNEdge_seq1_1_Y">
+        <omgdi:waypoint x="582.0" y="157.0"></omgdi:waypoint>
+        <omgdi:waypoint x="731.0" y="156.0"></omgdi:waypoint>
+        <omgdi:waypoint x="934.0" y="156.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1048.0" y="156.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1048.0" y="272.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="22.0" x="582.0" y="157.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="seq1_1_N" id="BPMNEdge_seq1_1_N">
+        <omgdi:waypoint x="562.0" y="137.0"></omgdi:waypoint>
+        <omgdi:waypoint x="562.0" y="103.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="22.0" x="567.0" y="111.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="seq2_1_Y" id="BPMNEdge_seq2_1_Y">
+        <omgdi:waypoint x="591.0" y="289.0"></omgdi:waypoint>
+        <omgdi:waypoint x="620.0" y="289.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="22.0" x="552.0" y="309.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="seq2_2_Y" id="BPMNEdge_seq2_2_Y">
+        <omgdi:waypoint x="787.0" y="289.0"></omgdi:waypoint>
+        <omgdi:waypoint x="938.0" y="288.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1031.0" y="288.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1066.0" y="289.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="22.0" x="787.0" y="289.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="seq2_1_N" id="BPMNEdge_seq2_1_N">
+        <omgdi:waypoint x="571.0" y="269.0"></omgdi:waypoint>
+        <omgdi:waypoint x="569.0" y="216.0"></omgdi:waypoint>
+        <omgdi:waypoint x="641.0" y="216.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="22.0" x="584.0" y="221.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="seq2_2_N" id="BPMNEdge_seq2_2_N">
+        <omgdi:waypoint x="767.0" y="269.0"></omgdi:waypoint>
+        <omgdi:waypoint x="765.0" y="216.0"></omgdi:waypoint>
+        <omgdi:waypoint x="676.0" y="216.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="22.0" x="708.0" y="217.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="seq3_1_Y" id="BPMNEdge_seq3_1_Y">
+        <omgdi:waypoint x="591.0" y="418.0"></omgdi:waypoint>
+        <omgdi:waypoint x="612.0" y="418.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="22.0" x="566.0" y="439.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="seq3_2_Y" id="BPMNEdge_seq3_2_Y">
+        <omgdi:waypoint x="787.0" y="419.0"></omgdi:waypoint>
+        <omgdi:waypoint x="812.0" y="419.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="22.0" x="760.0" y="439.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="seq3_3_Y" id="BPMNEdge_seq3_3_Y">
+        <omgdi:waypoint x="991.0" y="419.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1048.0" y="418.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1048.0" y="307.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="22.0" x="991.0" y="419.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="seq3_1_N" id="BPMNEdge_seq3_1_N">
+        <omgdi:waypoint x="571.0" y="398.0"></omgdi:waypoint>
+        <omgdi:waypoint x="571.0" y="357.0"></omgdi:waypoint>
+        <omgdi:waypoint x="750.0" y="357.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="22.0" x="583.0" y="362.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="seq3_2_N" id="BPMNEdge_seq3_2_N">
+        <omgdi:waypoint x="767.0" y="399.0"></omgdi:waypoint>
+        <omgdi:waypoint x="767.0" y="375.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="22.0" x="725.0" y="375.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="seq3_3_N" id="BPMNEdge_seq3_3_N">
+        <omgdi:waypoint x="971.0" y="399.0"></omgdi:waypoint>
+        <omgdi:waypoint x="970.0" y="357.0"></omgdi:waypoint>
+        <omgdi:waypoint x="785.0" y="357.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="22.0" x="853.0" y="341.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow17" id="BPMNEdge_flow17">
+        <omgdi:waypoint x="281.0" y="309.0"></omgdi:waypoint>
+        <omgdi:waypoint x="281.0" y="545.0"></omgdi:waypoint>
+        <omgdi:waypoint x="405.0" y="545.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="22.0" x="301.0" y="560.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="seq4_N" id="BPMNEdge_seq4_N">
+        <omgdi:waypoint x="575.0" y="566.0"></omgdi:waypoint>
+        <omgdi:waypoint x="575.0" y="590.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="22.0" x="575.0" y="566.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="seq4_Y" id="BPMNEdge_seq4_Y">
+        <omgdi:waypoint x="595.0" y="546.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1048.0" y="545.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1048.0" y="307.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="22.0" x="676.0" y="562.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow7" id="BPMNEdge_flow7">
+        <omgdi:waypoint x="508.0" y="289.0"></omgdi:waypoint>
+        <omgdi:waypoint x="551.0" y="289.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow8" id="BPMNEdge_flow8">
+        <omgdi:waypoint x="725.0" y="289.0"></omgdi:waypoint>
+        <omgdi:waypoint x="747.0" y="289.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow9" id="BPMNEdge_flow9">
+        <omgdi:waypoint x="36.0" y="289.0"></omgdi:waypoint>
+        <omgdi:waypoint x="101.0" y="289.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow11" id="BPMNEdge_flow11">
+        <omgdi:waypoint x="508.0" y="418.0"></omgdi:waypoint>
+        <omgdi:waypoint x="551.0" y="418.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow13" id="BPMNEdge_flow13">
+        <omgdi:waypoint x="717.0" y="418.0"></omgdi:waypoint>
+        <omgdi:waypoint x="717.0" y="418.0"></omgdi:waypoint>
+        <omgdi:waypoint x="747.0" y="419.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow16" id="BPMNEdge_flow16">
+        <omgdi:waypoint x="917.0" y="419.0"></omgdi:waypoint>
+        <omgdi:waypoint x="951.0" y="419.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow18" id="BPMNEdge_flow18">
+        <omgdi:waypoint x="510.0" y="545.0"></omgdi:waypoint>
+        <omgdi:waypoint x="555.0" y="546.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow19" id="BPMNEdge_flow19">
+        <omgdi:waypoint x="141.0" y="289.0"></omgdi:waypoint>
+        <omgdi:waypoint x="261.0" y="289.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="100.0" x="161.0" y="269.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow25" id="BPMNEdge_flow25">
+        <omgdi:waypoint x="366.0" y="856.0"></omgdi:waypoint>
+        <omgdi:waypoint x="431.0" y="856.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow26" id="BPMNEdge_flow26">
+        <omgdi:waypoint x="451.0" y="836.0"></omgdi:waypoint>
+        <omgdi:waypoint x="451.0" y="798.0"></omgdi:waypoint>
+        <omgdi:waypoint x="561.0" y="798.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="100.0" x="435.0" y="740.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow27" id="BPMNEdge_flow27">
+        <omgdi:waypoint x="451.0" y="876.0"></omgdi:waypoint>
+        <omgdi:waypoint x="451.0" y="932.0"></omgdi:waypoint>
+        <omgdi:waypoint x="561.0" y="932.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="100.0" x="446.0" y="900.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow28" id="BPMNEdge_flow28">
+        <omgdi:waypoint x="666.0" y="798.0"></omgdi:waypoint>
+        <omgdi:waypoint x="770.0" y="798.0"></omgdi:waypoint>
+        <omgdi:waypoint x="771.0" y="836.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow29" id="BPMNEdge_flow29">
+        <omgdi:waypoint x="666.0" y="932.0"></omgdi:waypoint>
+        <omgdi:waypoint x="770.0" y="932.0"></omgdi:waypoint>
+        <omgdi:waypoint x="771.0" y="876.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow30" id="BPMNEdge_flow30">
+        <omgdi:waypoint x="791.0" y="856.0"></omgdi:waypoint>
+        <omgdi:waypoint x="836.0" y="856.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow20" id="BPMNEdge_flow20">
+        <omgdi:waypoint x="121.0" y="309.0"></omgdi:waypoint>
+        <omgdi:waypoint x="121.0" y="386.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="100.0" x="121.0" y="309.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow21" id="BPMNEdge_flow21">
+        <omgdi:waypoint x="121.0" y="451.0"></omgdi:waypoint>
+        <omgdi:waypoint x="121.0" y="513.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow22" id="BPMNEdge_flow22">
+        <omgdi:waypoint x="121.0" y="578.0"></omgdi:waypoint>
+        <omgdi:waypoint x="121.0" y="660.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow23" id="BPMNEdge_flow23">
+        <omgdi:waypoint x="121.0" y="725.0"></omgdi:waypoint>
+        <omgdi:waypoint x="121.0" y="856.0"></omgdi:waypoint>
+        <omgdi:waypoint x="301.0" y="857.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow24" id="BPMNEdge_flow24">
+        <omgdi:waypoint x="932.0" y="857.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1048.0" y="859.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1048.0" y="307.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>
