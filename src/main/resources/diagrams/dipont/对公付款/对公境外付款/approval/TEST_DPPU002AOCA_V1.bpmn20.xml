@@ -99,10 +99,10 @@
 				localVerifiers << execution.getVariable("claimsn");
 				execution.setVariable("level",localVerifiers.size());
 				execution.setVariable("verifiers",localVerifiers);
-				execution.setVariable('special','N');
+				execution.setVariable('special','Y');
 				
 				//GATEWAY JUDGE
-				execution.setVariable('special',localcostCenterDrools.special)				
+				//execution.setVariable('special',localcostCenterDrools.special)				
 				
 				
 				//SET BUSINESSKEY
@@ -573,7 +573,7 @@
 			            )
 			    )
 			    //drools规则多一个收支项目维度
-			    return groupMap.entrySet().stream().forEach({ x -&gt;
+			    groupMap.entrySet().stream().forEach({ x -&gt;
 			        def keyArr = x.key.split("-")
 			        def costcenter = keyArr[0]
 			        def project = keyArr[1]
@@ -775,11 +775,11 @@
         </extensionElements>
       	
       </startEvent>
-      <userTask id="usertask1" name="并发审批" activiti:candidateUsers="{approvers[0]}">
+      <userTask id="usertask1" name="并发审批" activiti:candidateUsers="${approvers[0]}">
 	      <extensionElements>
 	        <activiti:formProperty id="coreaction_审批结果 Approval_1_enum_rbv_$$A" name="审批结果 Approval" type="enum" variable="coreaction_level4" required="true">
 	          <activiti:value id="同意 Agree" name="同意 Agree"/>
-	          <activiti:value id="拒绝 Refuse" name="拒绝 Refuse"/>>
+	          <activiti:value id="拒绝 Refuse" name="拒绝 Refuse"/>
 	        </activiti:formProperty>
 	        <activiti:formProperty id="corecomments_审批意见 Comments_1_string_t2_$$B" name="审批意见 Comments" type="string" variable="corecomments_level4"></activiti:formProperty>
 			<activiti:formProperty id="totalamount_总金额 Total Amount_0_string_cny_$$VA" name="总金额大写 Total Amount" type="string" variable="totalamount"></activiti:formProperty>
@@ -875,7 +875,7 @@
 		      	  execution.setVariable('CurApprovalResults',execution.getVariable('coreaction_result'))]]></activiti:string>
               </activiti:field>
             </activiti:taskListener>
-            <activiti:taskListener event="create">
+            <activiti:taskListener event="create" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
               <activiti:field name="language">
                 <activiti:string><![CDATA[groovy]]></activiti:string>
               </activiti:field>
@@ -894,10 +894,10 @@
       <exclusiveGateway id="exclusivegateway12" name="Exclusive Gateway"></exclusiveGateway>
       <sequenceFlow id="flow25" sourceRef="startevent1" targetRef="exclusivegateway11"></sequenceFlow>
       <sequenceFlow id="flow26" name="并发审批" sourceRef="exclusivegateway11" targetRef="usertask1">
-      	<conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('subLevel')==99}]]></conditionExpression>
+      	<conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('subLevel') == 99}]]></conditionExpression>      
       </sequenceFlow>
       <sequenceFlow id="flow27" name="串行审批" sourceRef="exclusivegateway11" targetRef="usertask2">
-      	<conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('subLevel')!=99}]]></conditionExpression>
+      	<conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('subLevel') != 99}]]></conditionExpression>      
       </sequenceFlow>
       <sequenceFlow id="flow28" sourceRef="usertask1" targetRef="exclusivegateway12"></sequenceFlow>
       <sequenceFlow id="flow29" sourceRef="usertask2" targetRef="exclusivegateway12"></sequenceFlow>
@@ -905,7 +905,7 @@
       <sequenceFlow id="flow30" sourceRef="exclusivegateway12" targetRef="endevent1"></sequenceFlow>
     </subProcess>
     <sequenceFlow id="flow20" name="特殊审批" sourceRef="exclusivegateway10" targetRef="scripttask1">
-    	<conditionExpression xsi:type="tFormalExpression"><![CDATA[execution.getVariable('special')=='Y']]></conditionExpression>
+    	<conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('special') == 'Y'}]]></conditionExpression>
     </sequenceFlow>
     <sequenceFlow id="flow21" sourceRef="scripttask1" targetRef="servicetask1"></sequenceFlow>
     <sequenceFlow id="flow22" sourceRef="servicetask1" targetRef="scripttask2"></sequenceFlow>
