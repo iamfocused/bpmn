@@ -1,0 +1,271 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/tl">
+  <process id="LPA_TL_PRD_LOCT2_1" name="LPA产线组长灯具及BZI审核问卷" isExecutable="true" activiti:candidateStarterGroups="LPAEXMU_A1,admin">
+    <startEvent id="S1" name="填写问卷" activiti:initiator="initiator">
+      <extensionElements>
+        
+<activiti:formProperty id="ckdate_填写日期_0_string_t3_$$0" name="填写日期" type="string" variable="ckdate_t01" writable="true" required="true"/>
+<activiti:formProperty id="ckshift_班别_0_enum_sbs_$$0" name="班别" type="enum" variable="ckshift_t01" writable="true" required="true">
+<activiti:value id="早班" name="早班"/>
+<activiti:value id="晚班" name="晚班"/>
+</activiti:formProperty>
+
+<activiti:formProperty id="question1_工站-检查员工对本站的不合格品有无及时记录并隔离?[Q]__enum_rbv_$$0" name="工站-检查员工对本站的不合格品有无及时记录并隔离?[Q]" type="enum" variable="question1_t01" writable="true" required="true"><activiti:value id=" " name="未选择"></activiti:value><activiti:value id="通过" name="通过"></activiti:value><activiti:value id="存在问题" name="存在问题"></activiti:value><activiti:value id="na" name="na"></activiti:value></activiti:formProperty>
+<activiti:formProperty id="question2_工站-检查产线安全防护措施是否有效？（记录检查内容）[S]__enum_rbv_$$1" name="工站-检查产线安全防护措施是否有效？（记录检查内容）[S]" type="enum" variable="question2_t01" writable="true" required="true"><activiti:value id=" " name="未选择"></activiti:value><activiti:value id="通过" name="通过"></activiti:value><activiti:value id="存在问题" name="存在问题"></activiti:value><activiti:value id="na" name="na"></activiti:value></activiti:formProperty>
+<activiti:formProperty id="question3_工站-产线上的不合格品有无及时判定及标识?[Q]__enum_rbv_$$2" name="工站-产线上的不合格品有无及时判定及标识?[Q]" type="enum" variable="question3_t01" writable="true" required="true"><activiti:value id=" " name="未选择"></activiti:value><activiti:value id="通过" name="通过"></activiti:value><activiti:value id="存在问题" name="存在问题"></activiti:value><activiti:value id="na" name="na"></activiti:value></activiti:formProperty>
+<activiti:formProperty id="question4_零件产品-注塑产品的塑料粒子牌号正确[Q]__enum_rbv_$$3" name="零件产品-注塑产品的塑料粒子牌号正确[Q]" type="enum" variable="question4_t01" writable="true" required="true"><activiti:value id=" " name="未选择"></activiti:value><activiti:value id="通过" name="通过"></activiti:value><activiti:value id="存在问题" name="存在问题"></activiti:value><activiti:value id="na" name="na"></activiti:value></activiti:formProperty>
+<activiti:formProperty id="question5_零件产品-检查焊接工站确认焊接参数在WI规定范围内（任抽一项，记录检查内容）[Q]__enum_rbv_$$4" name="零件产品-检查焊接工站确认焊接参数在WI规定范围内（任抽一项，记录检查内容）[Q]" type="enum" variable="question5_t01" writable="true" required="true"><activiti:value id=" " name="未选择"></activiti:value><activiti:value id="通过" name="通过"></activiti:value><activiti:value id="存在问题" name="存在问题"></activiti:value><activiti:value id="na" name="na"></activiti:value></activiti:formProperty>
+<activiti:formProperty id="question6_零件产品-检查镜壳实配工站确认镜壳实配参数在WI规定范围内（任抽一项，记录检查内容）[Q]__enum_rbv_$$5" name="零件产品-检查镜壳实配工站确认镜壳实配参数在WI规定范围内（任抽一项，记录检查内容）[Q]" type="enum" variable="question6_t01" writable="true" required="true"><activiti:value id=" " name="未选择"></activiti:value><activiti:value id="通过" name="通过"></activiti:value><activiti:value id="存在问题" name="存在问题"></activiti:value><activiti:value id="na" name="na"></activiti:value></activiti:formProperty>
+<activiti:formProperty id="question7_零件产品-检查烘箱工站确认烘箱参数在WI规定范围内（任抽一项，记录检查内容）[Q]__enum_rbv_$$6" name="零件产品-检查烘箱工站确认烘箱参数在WI规定范围内（任抽一项，记录检查内容）[Q]" type="enum" variable="question7_t01" writable="true" required="true"><activiti:value id=" " name="未选择"></activiti:value><activiti:value id="通过" name="通过"></activiti:value><activiti:value id="存在问题" name="存在问题"></activiti:value><activiti:value id="na" name="na"></activiti:value></activiti:formProperty>
+<activiti:formProperty id="question8_零件产品-检查热铆工站确认热铆参数在WI规定范围内（任抽一项，记录检查内容）[Q]__enum_rbv_$$7" name="零件产品-检查热铆工站确认热铆参数在WI规定范围内（任抽一项，记录检查内容）[Q]" type="enum" variable="question8_t01" writable="true" required="true"><activiti:value id=" " name="未选择"></activiti:value><activiti:value id="通过" name="通过"></activiti:value><activiti:value id="存在问题" name="存在问题"></activiti:value><activiti:value id="na" name="na"></activiti:value></activiti:formProperty>
+<activiti:formProperty id="question9_零件产品-检查灌胶工站确认灌胶参数在WI规定范围内（任抽一项，记录检查内容）[Q]__enum_rbv_$$8" name="零件产品-检查灌胶工站确认灌胶参数在WI规定范围内（任抽一项，记录检查内容）[Q]" type="enum" variable="question9_t01" writable="true" required="true"><activiti:value id=" " name="未选择"></activiti:value><activiti:value id="通过" name="通过"></activiti:value><activiti:value id="存在问题" name="存在问题"></activiti:value><activiti:value id="na" name="na"></activiti:value></activiti:formProperty>
+<activiti:formProperty id="question10_零件产品-检查电性能测试工站确认电性能参数在WI规定范围内（任抽一项，记录检查内容）[Q]__enum_rbv_$$9" name="零件产品-检查电性能测试工站确认电性能参数在WI规定范围内（任抽一项，记录检查内容）[Q]" type="enum" variable="question10_t01" writable="true" required="true"><activiti:value id=" " name="未选择"></activiti:value><activiti:value id="通过" name="通过"></activiti:value><activiti:value id="存在问题" name="存在问题"></activiti:value><activiti:value id="na" name="na"></activiti:value></activiti:formProperty>
+<activiti:formProperty id="question11_零件产品-检查气密测试工站确认气密参数在WI规定范围内（任抽一项，记录检查内容）[Q]__enum_rbv_$$A" name="零件产品-检查气密测试工站确认气密参数在WI规定范围内（任抽一项，记录检查内容）[Q]" type="enum" variable="question11_t01" writable="true" required="true"><activiti:value id=" " name="未选择"></activiti:value><activiti:value id="通过" name="通过"></activiti:value><activiti:value id="存在问题" name="存在问题"></activiti:value><activiti:value id="na" name="na"></activiti:value></activiti:formProperty>
+<activiti:formProperty id="question12_零件产品-确认注塑产品重量在WI规定范围内（记录检查内容）[Q]__enum_rbv_$$B" name="零件产品-确认注塑产品重量在WI规定范围内（记录检查内容）[Q]" type="enum" variable="question12_t01" writable="true" required="true"><activiti:value id=" " name="未选择"></activiti:value><activiti:value id="通过" name="通过"></activiti:value><activiti:value id="存在问题" name="存在问题"></activiti:value><activiti:value id="na" name="na"></activiti:value></activiti:formProperty>
+<activiti:formProperty id="question13_零件产品-检查镀铝工站的参数在WI规定范围内（任抽一项，记录检查内容）[Q]__enum_rbv_$$C" name="零件产品-检查镀铝工站的参数在WI规定范围内（任抽一项，记录检查内容）[Q]" type="enum" variable="question13_t01" writable="true" required="true"><activiti:value id=" " name="未选择"></activiti:value><activiti:value id="通过" name="通过"></activiti:value><activiti:value id="存在问题" name="存在问题"></activiti:value><activiti:value id="na" name="na"></activiti:value></activiti:formProperty>
+<activiti:formProperty id="question14_零件产品-镀铝产品表面光洁,无黑点，无指印脏污等不良[Q]__enum_rbv_$$D" name="零件产品-镀铝产品表面光洁,无黑点，无指印脏污等不良[Q]" type="enum" variable="question14_t01" writable="true" required="true"><activiti:value id=" " name="未选择"></activiti:value><activiti:value id="通过" name="通过"></activiti:value><activiti:value id="存在问题" name="存在问题"></activiti:value><activiti:value id="na" name="na"></activiti:value></activiti:formProperty>
+<activiti:formProperty id="question15_零件产品-抽查1-2名员工是否有上岗资格，培训资料是否齐备？连续作业3PCS的作业手法是否与WI一致？（记录工号/工站/WI编号）[M]__enum_rbv_$$E" name="零件产品-抽查1-2名员工是否有上岗资格，培训资料是否齐备？连续作业3PCS的作业手法是否与WI一致？（记录工号/工站/WI编号）[M]" type="enum" variable="question15_t01" writable="true" required="true"><activiti:value id=" " name="未选择"></activiti:value><activiti:value id="通过" name="通过"></activiti:value><activiti:value id="存在问题" name="存在问题"></activiti:value><activiti:value id="na" name="na"></activiti:value></activiti:formProperty>
+<activiti:formProperty id="question16_零件产品-抽查某工站员工对WI的质量控制点及本站的其他标识是否了解？（记录工号/工站）[M]__enum_rbv_$$F" name="零件产品-抽查某工站员工对WI的质量控制点及本站的其他标识是否了解？（记录工号/工站）[M]" type="enum" variable="question16_t01" writable="true" required="true"><activiti:value id=" " name="未选择"></activiti:value><activiti:value id="通过" name="通过"></activiti:value><activiti:value id="存在问题" name="存在问题"></activiti:value><activiti:value id="na" name="na"></activiti:value></activiti:formProperty>
+<activiti:formProperty id="question17_过程零件关键特性-抽1-2个极限样品检测是否能通过验证？（记录样品编号/工站）[Q]__enum_rbv_$$G" name="过程零件关键特性-抽1-2个极限样品检测是否能通过验证？（记录样品编号/工站）[Q]" type="enum" variable="question17_t01" writable="true" required="true"><activiti:value id=" " name="未选择"></activiti:value><activiti:value id="通过" name="通过"></activiti:value><activiti:value id="存在问题" name="存在问题"></activiti:value><activiti:value id="na" name="na"></activiti:value></activiti:formProperty>
+<activiti:formProperty id="question18_过程零件关键特性-检查终检是否按WI要求作业？如有不良品，记录其处理结果。[Q]__enum_rbv_$$H" name="过程零件关键特性-检查终检是否按WI要求作业？如有不良品，记录其处理结果。[Q]" type="enum" variable="question18_t01" writable="true" required="true"><activiti:value id=" " name="未选择"></activiti:value><activiti:value id="通过" name="通过"></activiti:value><activiti:value id="存在问题" name="存在问题"></activiti:value><activiti:value id="na" name="na"></activiti:value></activiti:formProperty>
+<activiti:formProperty id="question19_过程零件关键特性-抽查产线某检具或检测设备、极限样品有被校验且在有效期。（记录编号）[Q]__enum_rbv_$$I" name="过程零件关键特性-抽查产线某检具或检测设备、极限样品有被校验且在有效期。（记录编号）[Q]" type="enum" variable="question19_t01" writable="true" required="true"><activiti:value id=" " name="未选择"></activiti:value><activiti:value id="通过" name="通过"></activiti:value><activiti:value id="存在问题" name="存在问题"></activiti:value><activiti:value id="na" name="na"></activiti:value></activiti:formProperty>
+<activiti:formProperty id="question20_过程零件关键特性-抽查产线某工站WI是否有可操作性并按规定发行且在有效期内？（记录WI编号）[Q]__enum_rbv_$$J" name="过程零件关键特性-抽查产线某工站WI是否有可操作性并按规定发行且在有效期内？（记录WI编号）[Q]" type="enum" variable="question20_t01" writable="true" required="true"><activiti:value id=" " name="未选择"></activiti:value><activiti:value id="通过" name="通过"></activiti:value><activiti:value id="存在问题" name="存在问题"></activiti:value><activiti:value id="na" name="na"></activiti:value></activiti:formProperty>
+<activiti:formProperty id="question21_过程零件关键特性-检查上线物料、半成品与料盒标识、流转单、BOM、WI是否一致？是否按照FIFO执行？（抽查任意2项以上并记录检查内容）[M]__enum_rbv_$$K" name="过程零件关键特性-检查上线物料、半成品与料盒标识、流转单、BOM、WI是否一致？是否按照FIFO执行？（抽查任意2项以上并记录检查内容）[M]" type="enum" variable="question21_t01" writable="true" required="true"><activiti:value id=" " name="未选择"></activiti:value><activiti:value id="通过" name="通过"></activiti:value><activiti:value id="存在问题" name="存在问题"></activiti:value><activiti:value id="na" name="na"></activiti:value></activiti:formProperty>
+<activiti:formProperty id="question22_过程零件关键特性-检查外箱标签与成品料号是否一致？（无标签，禁止生产） [Q]__enum_rbv_$$L" name="过程零件关键特性-检查外箱标签与成品料号是否一致？（无标签，禁止生产） [Q]" type="enum" variable="question22_t01" writable="true" required="true"><activiti:value id=" " name="未选择"></activiti:value><activiti:value id="通过" name="通过"></activiti:value><activiti:value id="存在问题" name="存在问题"></activiti:value><activiti:value id="na" name="na"></activiti:value></activiti:formProperty>
+<activiti:formProperty id="question23_过程零件关键特性-验证产品符合性。列出首件检验报告中的特性项目并记录规格和结果[Q]__enum_rbv_$$M" name="过程零件关键特性-验证产品符合性。列出首件检验报告中的特性项目并记录规格和结果[Q]" type="enum" variable="question23_t01" writable="true" required="true"><activiti:value id=" " name="未选择"></activiti:value><activiti:value id="通过" name="通过"></activiti:value><activiti:value id="存在问题" name="存在问题"></activiti:value><activiti:value id="na" name="na"></activiti:value></activiti:formProperty>
+<activiti:formProperty id="question24_过程零件关键特性-ASP2.1PL检查盖板孔是否磨损，保养计划中已加入1年检查一次，是否按期保养[Q]__enum_rbv_$$N" name="过程零件关键特性-ASP2.1PL检查盖板孔是否磨损，保养计划中已加入1年检查一次，是否按期保养[Q]" type="enum" variable="question24_t01" writable="true" required="true"><activiti:value id=" " name="未选择"></activiti:value><activiti:value id="通过" name="通过"></activiti:value><activiti:value id="存在问题" name="存在问题"></activiti:value><activiti:value id="na" name="na"></activiti:value></activiti:formProperty>
+<activiti:formProperty id="question25_过程零件关键特性-ASP2.1PL检查员工装配过程不可触碰LED[Q]__enum_rbv_$$O" name="过程零件关键特性-ASP2.1PL检查员工装配过程不可触碰LED[Q]" type="enum" variable="question25_t01" writable="true" required="true"><activiti:value id=" " name="未选择"></activiti:value><activiti:value id="通过" name="通过"></activiti:value><activiti:value id="存在问题" name="存在问题"></activiti:value><activiti:value id="na" name="na"></activiti:value></activiti:formProperty>
+<activiti:formProperty id="question26_客户呼声-依据终检WI检验项目，抽查3pcs产品，确认各检验点项是否合格[Q]__enum_rbv_$$P" name="客户呼声-依据终检WI检验项目，抽查3pcs产品，确认各检验点项是否合格[Q]" type="enum" variable="question26_t01" writable="true" required="true"><activiti:value id=" " name="未选择"></activiti:value><activiti:value id="通过" name="通过"></activiti:value><activiti:value id="存在问题" name="存在问题"></activiti:value><activiti:value id="na" name="na"></activiti:value></activiti:formProperty>
+<activiti:formProperty id="question27_客户呼声-质量警报是否在生产车间发布并可见，便于遏制问题？[Q]__enum_rbv_$$Q" name="客户呼声-质量警报是否在生产车间发布并可见，便于遏制问题？[Q]" type="enum" variable="question27_t01" writable="true" required="true"><activiti:value id=" " name="未选择"></activiti:value><activiti:value id="通过" name="通过"></activiti:value><activiti:value id="存在问题" name="存在问题"></activiti:value><activiti:value id="na" name="na"></activiti:value></activiti:formProperty>
+<activiti:formProperty id="question28_该项目是否有客户投诉?;问题分析?纠正措施? 预防措施?相关文件是否更新？（控制计划、PFMEA、WI等）?；相关员工是否了解并按要求执行？（记录工号）[Q]__enum_rbv_$$R" name="该项目是否有客户投诉?;问题分析?纠正措施? 预防措施?相关文件是否更新？（控制计划、PFMEA、WI等）?；相关员工是否了解并按要求执行？（记录工号）[Q]" type="enum" variable="question28_t01" writable="true" required="true"><activiti:value id=" " name="未选择"></activiti:value><activiti:value id="通过" name="通过"></activiti:value><activiti:value id="存在问题" name="存在问题"></activiti:value><activiti:value id="na" name="na"></activiti:value></activiti:formProperty>
+<activiti:formProperty id="question29_系统Bypass-检查产线看板内容是否为最新状态?[M]__enum_rbv_$$S" name="系统Bypass-检查产线看板内容是否为最新状态?[M]" type="enum" variable="question29_t01" writable="true" required="true"><activiti:value id=" " name="未选择"></activiti:value><activiti:value id="通过" name="通过"></activiti:value><activiti:value id="存在问题" name="存在问题"></activiti:value><activiti:value id="na" name="na"></activiti:value></activiti:formProperty>
+<activiti:formProperty id="question30_系统Bypass-查产线最近的变化点是否体现在《4M管理变化点》记录表上？[M]__enum_rbv_$$T" name="系统Bypass-查产线最近的变化点是否体现在《4M管理变化点》记录表上？[M]" type="enum" variable="question30_t01" writable="true" required="true"><activiti:value id=" " name="未选择"></activiti:value><activiti:value id="通过" name="通过"></activiti:value><activiti:value id="存在问题" name="存在问题"></activiti:value><activiti:value id="na" name="na"></activiti:value></activiti:formProperty>
+<activiti:formProperty id="question31_系统Bypass-检查产线所有表单填写是否及时及正确?(生产线日常点检表、首件检验报告、过程抽检记录等).[Q]__enum_rbv_$$U" name="系统Bypass-检查产线所有表单填写是否及时及正确?(生产线日常点检表、首件检验报告、过程抽检记录等).[Q]" type="enum" variable="question31_t01" writable="true" required="true"><activiti:value id=" " name="未选择"></activiti:value><activiti:value id="通过" name="通过"></activiti:value><activiti:value id="存在问题" name="存在问题"></activiti:value><activiti:value id="na" name="na"></activiti:value></activiti:formProperty>
+<activiti:formProperty id="question32_系统Bypass-检查某工站的《设备日常点检表》及《预防性维护计划》是否按要求执行？（记录工站）[M]__enum_rbv_$$W" name="系统Bypass-检查某工站的《设备日常点检表》及《预防性维护计划》是否按要求执行？（记录工站）[M]" type="enum" variable="question32_t01" writable="true" required="true"><activiti:value id=" " name="未选择"></activiti:value><activiti:value id="通过" name="通过"></activiti:value><activiti:value id="存在问题" name="存在问题"></activiti:value><activiti:value id="na" name="na"></activiti:value></activiti:formProperty>
+<activiti:formProperty id="question33_系统Bypass-检查产线是否有返工作业？如有，是否有相关WI及返工的标识记录？返工人员是否有被培训且持有相关的培训记录？[Q]__enum_rbv_$$X" name="系统Bypass-检查产线是否有返工作业？如有，是否有相关WI及返工的标识记录？返工人员是否有被培训且持有相关的培训记录？[Q]" type="enum" variable="question33_t01" writable="true" required="true"><activiti:value id=" " name="未选择"></activiti:value><activiti:value id="通过" name="通过"></activiti:value><activiti:value id="存在问题" name="存在问题"></activiti:value><activiti:value id="na" name="na"></activiti:value></activiti:formProperty>
+
+		
+<activiti:formProperty id="questioncomments1_问题描述_2_string_t1_$$0" name="问题描述" type="string" variable="questioncomments1_t01" writable="true" required="false"/>
+<activiti:formProperty id="questioncomments2_问题描述_2_string_t1_$$1" name="问题描述" type="string" variable="questioncomments2_t01" writable="true" required="false"/>
+<activiti:formProperty id="questioncomments3_问题描述_2_string_t1_$$2" name="问题描述" type="string" variable="questioncomments3_t01" writable="true" required="false"/>
+<activiti:formProperty id="questioncomments4_问题描述_2_string_t1_$$3" name="问题描述" type="string" variable="questioncomments4_t01" writable="true" required="false"/>
+<activiti:formProperty id="questioncomments5_问题描述_2_string_t1_$$4" name="问题描述" type="string" variable="questioncomments5_t01" writable="true" required="false"/>
+<activiti:formProperty id="questioncomments6_问题描述_2_string_t1_$$5" name="问题描述" type="string" variable="questioncomments6_t01" writable="true" required="false"/>
+<activiti:formProperty id="questioncomments7_问题描述_2_string_t1_$$6" name="问题描述" type="string" variable="questioncomments7_t01" writable="true" required="false"/>
+<activiti:formProperty id="questioncomments8_问题描述_2_string_t1_$$7" name="问题描述" type="string" variable="questioncomments8_t01" writable="true" required="false"/>
+<activiti:formProperty id="questioncomments9_问题描述_2_string_t1_$$8" name="问题描述" type="string" variable="questioncomments9_t01" writable="true" required="false"/>
+<activiti:formProperty id="questioncomments10_问题描述_2_string_t1_$$9" name="问题描述" type="string" variable="questioncomments10_t01" writable="true" required="false"/>
+<activiti:formProperty id="questioncomments11_问题描述_2_string_t1_$$A" name="问题描述" type="string" variable="questioncomments11_t01" writable="true" required="false"/>
+<activiti:formProperty id="questioncomments12_问题描述_2_string_t1_$$B" name="问题描述" type="string" variable="questioncomments12_t01" writable="true" required="false"/>
+<activiti:formProperty id="questioncomments13_问题描述_2_string_t1_$$C" name="问题描述" type="string" variable="questioncomments13_t01" writable="true" required="false"/>
+<activiti:formProperty id="questioncomments14_问题描述_2_string_t1_$$D" name="问题描述" type="string" variable="questioncomments14_t01" writable="true" required="false"/>
+<activiti:formProperty id="questioncomments15_问题描述_2_string_t1_$$E" name="问题描述" type="string" variable="questioncomments15_t01" writable="true" required="false"/>
+<activiti:formProperty id="questioncomments16_问题描述_2_string_t1_$$F" name="问题描述" type="string" variable="questioncomments16_t01" writable="true" required="false"/>
+<activiti:formProperty id="questioncomments17_问题描述_2_string_t1_$$G" name="问题描述" type="string" variable="questioncomments17_t01" writable="true" required="false"/>
+<activiti:formProperty id="questioncomments18_问题描述_2_string_t1_$$H" name="问题描述" type="string" variable="questioncomments18_t01" writable="true" required="false"/>
+<activiti:formProperty id="questioncomments19_问题描述_2_string_t1_$$I" name="问题描述" type="string" variable="questioncomments19_t01" writable="true" required="false"/>
+<activiti:formProperty id="questioncomments20_问题描述_2_string_t1_$$J" name="问题描述" type="string" variable="questioncomments20_t01" writable="true" required="false"/>
+<activiti:formProperty id="questioncomments21_问题描述_2_string_t1_$$K" name="问题描述" type="string" variable="questioncomments21_t01" writable="true" required="false"/>
+<activiti:formProperty id="questioncomments22_问题描述_2_string_t1_$$L" name="问题描述" type="string" variable="questioncomments22_t01" writable="true" required="false"/>
+<activiti:formProperty id="questioncomments23_问题描述_2_string_t1_$$M" name="问题描述" type="string" variable="questioncomments23_t01" writable="true" required="false"/>
+<activiti:formProperty id="questioncomments24_问题描述_2_string_t1_$$N" name="问题描述" type="string" variable="questioncomments24_t01" writable="true" required="false"/>
+<activiti:formProperty id="questioncomments25_问题描述_2_string_t1_$$O" name="问题描述" type="string" variable="questioncomments25_t01" writable="true" required="false"/>
+<activiti:formProperty id="questioncomments26_问题描述_2_string_t1_$$P" name="问题描述" type="string" variable="questioncomments26_t01" writable="true" required="false"/>
+<activiti:formProperty id="questioncomments27_问题描述_2_string_t1_$$Q" name="问题描述" type="string" variable="questioncomments27_t01" writable="true" required="false"/>
+<activiti:formProperty id="questioncomments28_问题描述_2_string_t1_$$R" name="问题描述" type="string" variable="questioncomments28_t01" writable="true" required="false"/>
+<activiti:formProperty id="questioncomments29_问题描述_2_string_t1_$$S" name="问题描述" type="string" variable="questioncomments29_t01" writable="true" required="false"/>
+<activiti:formProperty id="questioncomments30_问题描述_2_string_t1_$$T" name="问题描述" type="string" variable="questioncomments30_t01" writable="true" required="false"/>
+<activiti:formProperty id="questioncomments31_问题描述_2_string_t1_$$U" name="问题描述" type="string" variable="questioncomments31_t01" writable="true" required="false"/>
+<activiti:formProperty id="questioncomments32_问题描述_2_string_t1_$$W" name="问题描述" type="string" variable="questioncomments32_t01" writable="true" required="false"/>
+<activiti:formProperty id="questioncomments33_问题描述_2_string_t1_$$X" name="问题描述" type="string" variable="questioncomments33_t01" writable="true" required="false"/>
+
+
+
+<activiti:formProperty id="attachmentdep1_问题附件_3_string_t9i_$$0" name="问题附件" type="string" variable="attachmentdep1_t01" writable="true" required="false"/>
+<activiti:formProperty id="attachmentdep2_问题附件_3_string_t9i_$$1" name="问题附件" type="string" variable="attachmentdep2_t01" writable="true" required="false"/>
+<activiti:formProperty id="attachmentdep3_问题附件_3_string_t9i_$$2" name="问题附件" type="string" variable="attachmentdep3_t01" writable="true" required="false"/>
+<activiti:formProperty id="attachmentdep4_问题附件_3_string_t9i_$$3" name="问题附件" type="string" variable="attachmentdep4_t01" writable="true" required="false"/>
+<activiti:formProperty id="attachmentdep5_问题附件_3_string_t9i_$$4" name="问题附件" type="string" variable="attachmentdep5_t01" writable="true" required="false"/>
+<activiti:formProperty id="attachmentdep6_问题附件_3_string_t9i_$$5" name="问题附件" type="string" variable="attachmentdep6_t01" writable="true" required="false"/>
+<activiti:formProperty id="attachmentdep7_问题附件_3_string_t9i_$$6" name="问题附件" type="string" variable="attachmentdep7_t01" writable="true" required="false"/>
+<activiti:formProperty id="attachmentdep8_问题附件_3_string_t9i_$$7" name="问题附件" type="string" variable="attachmentdep8_t01" writable="true" required="false"/>
+<activiti:formProperty id="attachmentdep9_问题附件_3_string_t9i_$$8" name="问题附件" type="string" variable="attachmentdep9_t01" writable="true" required="false"/>
+<activiti:formProperty id="attachmentdep10_问题附件_3_string_t9i_$$9" name="问题附件" type="string" variable="attachmentdep10_t01" writable="true" required="false"/>
+<activiti:formProperty id="attachmentdep11_问题附件_3_string_t9i_$$A" name="问题附件" type="string" variable="attachmentdep11_t01" writable="true" required="false"/>
+<activiti:formProperty id="attachmentdep12_问题附件_3_string_t9i_$$B" name="问题附件" type="string" variable="attachmentdep12_t01" writable="true" required="false"/>
+<activiti:formProperty id="attachmentdep13_问题附件_3_string_t9i_$$C" name="问题附件" type="string" variable="attachmentdep13_t01" writable="true" required="false"/>
+<activiti:formProperty id="attachmentdep14_问题附件_3_string_t9i_$$D" name="问题附件" type="string" variable="attachmentdep14_t01" writable="true" required="false"/>
+<activiti:formProperty id="attachmentdep15_问题附件_3_string_t9i_$$E" name="问题附件" type="string" variable="attachmentdep15_t01" writable="true" required="false"/>
+<activiti:formProperty id="attachmentdep16_问题附件_3_string_t9i_$$F" name="问题附件" type="string" variable="attachmentdep16_t01" writable="true" required="false"/>
+<activiti:formProperty id="attachmentdep17_问题附件_3_string_t9i_$$G" name="问题附件" type="string" variable="attachmentdep17_t01" writable="true" required="false"/>
+<activiti:formProperty id="attachmentdep18_问题附件_3_string_t9i_$$H" name="问题附件" type="string" variable="attachmentdep18_t01" writable="true" required="false"/>
+<activiti:formProperty id="attachmentdep19_问题附件_3_string_t9i_$$I" name="问题附件" type="string" variable="attachmentdep19_t01" writable="true" required="false"/>
+<activiti:formProperty id="attachmentdep20_问题附件_3_string_t9i_$$J" name="问题附件" type="string" variable="attachmentdep20_t01" writable="true" required="false"/>
+<activiti:formProperty id="attachmentdep21_问题附件_3_string_t9i_$$K" name="问题附件" type="string" variable="attachmentdep21_t01" writable="true" required="false"/>
+<activiti:formProperty id="attachmentdep22_问题附件_3_string_t9i_$$L" name="问题附件" type="string" variable="attachmentdep22_t01" writable="true" required="false"/>
+<activiti:formProperty id="attachmentdep23_问题附件_3_string_t9i_$$M" name="问题附件" type="string" variable="attachmentdep23_t01" writable="true" required="false"/>
+<activiti:formProperty id="attachmentdep24_问题附件_3_string_t9i_$$N" name="问题附件" type="string" variable="attachmentdep24_t01" writable="true" required="false"/>
+<activiti:formProperty id="attachmentdep25_问题附件_3_string_t9i_$$O" name="问题附件" type="string" variable="attachmentdep25_t01" writable="true" required="false"/>
+<activiti:formProperty id="attachmentdep26_问题附件_3_string_t9i_$$P" name="问题附件" type="string" variable="attachmentdep26_t01" writable="true" required="false"/>
+<activiti:formProperty id="attachmentdep27_问题附件_3_string_t9i_$$Q" name="问题附件" type="string" variable="attachmentdep27_t01" writable="true" required="false"/>
+<activiti:formProperty id="attachmentdep28_问题附件_3_string_t9i_$$R" name="问题附件" type="string" variable="attachmentdep28_t01" writable="true" required="false"/>
+<activiti:formProperty id="attachmentdep29_问题附件_3_string_t9i_$$S" name="问题附件" type="string" variable="attachmentdep29_t01" writable="true" required="false"/>
+<activiti:formProperty id="attachmentdep30_问题附件_3_string_t9i_$$T" name="问题附件" type="string" variable="attachmentdep30_t01" writable="true" required="false"/>
+<activiti:formProperty id="attachmentdep31_问题附件_3_string_t9i_$$U" name="问题附件" type="string" variable="attachmentdep31_t01" writable="true" required="false"/>
+<activiti:formProperty id="attachmentdep32_问题附件_3_string_t9i_$$W" name="问题附件" type="string" variable="attachmentdep32_t01" writable="true" required="false"/>
+<activiti:formProperty id="attachmentdep33_问题附件_3_string_t9i_$$X" name="问题附件" type="string" variable="attachmentdep33_t01" writable="true" required="false"/>
+
+
+
+<activiti:formProperty id="assignto1_问题指派给_4_enum_sbs_$$0" name="问题指派给" type="enum" variable="assignto1_t01" writable="true" required="true"><activiti:value id="63@未定义责任组" name="未定义责任组"></activiti:value><activiti:value id="7@MU经理组" name="MU经理组"></activiti:value><activiti:value id="9@PL经理组" name="PL经理组"></activiti:value><activiti:value id="78@ES经理组" name="ES经理组"></activiti:value></activiti:formProperty>
+<activiti:formProperty id="assignto2_问题指派给_4_enum_sbs_$$1" name="问题指派给" type="enum" variable="assignto2_t01" writable="true" required="true"><activiti:value id="63@未定义责任组" name="未定义责任组"></activiti:value><activiti:value id="7@MU经理组" name="MU经理组"></activiti:value><activiti:value id="9@PL经理组" name="PL经理组"></activiti:value><activiti:value id="78@ES经理组" name="ES经理组"></activiti:value></activiti:formProperty>
+<activiti:formProperty id="assignto3_问题指派给_4_enum_sbs_$$2" name="问题指派给" type="enum" variable="assignto3_t01" writable="true" required="true"><activiti:value id="63@未定义责任组" name="未定义责任组"></activiti:value><activiti:value id="7@MU经理组" name="MU经理组"></activiti:value><activiti:value id="9@PL经理组" name="PL经理组"></activiti:value><activiti:value id="78@ES经理组" name="ES经理组"></activiti:value></activiti:formProperty>
+<activiti:formProperty id="assignto4_问题指派给_4_enum_sbs_$$3" name="问题指派给" type="enum" variable="assignto4_t01" writable="true" required="true"><activiti:value id="63@未定义责任组" name="未定义责任组"></activiti:value><activiti:value id="7@MU经理组" name="MU经理组"></activiti:value><activiti:value id="9@PL经理组" name="PL经理组"></activiti:value><activiti:value id="78@ES经理组" name="ES经理组"></activiti:value></activiti:formProperty>
+<activiti:formProperty id="assignto5_问题指派给_4_enum_sbs_$$4" name="问题指派给" type="enum" variable="assignto5_t01" writable="true" required="true"><activiti:value id="63@未定义责任组" name="未定义责任组"></activiti:value><activiti:value id="7@MU经理组" name="MU经理组"></activiti:value><activiti:value id="9@PL经理组" name="PL经理组"></activiti:value><activiti:value id="78@ES经理组" name="ES经理组"></activiti:value></activiti:formProperty>
+<activiti:formProperty id="assignto6_问题指派给_4_enum_sbs_$$5" name="问题指派给" type="enum" variable="assignto6_t01" writable="true" required="true"><activiti:value id="63@未定义责任组" name="未定义责任组"></activiti:value><activiti:value id="7@MU经理组" name="MU经理组"></activiti:value><activiti:value id="9@PL经理组" name="PL经理组"></activiti:value><activiti:value id="78@ES经理组" name="ES经理组"></activiti:value></activiti:formProperty>
+<activiti:formProperty id="assignto7_问题指派给_4_enum_sbs_$$6" name="问题指派给" type="enum" variable="assignto7_t01" writable="true" required="true"><activiti:value id="63@未定义责任组" name="未定义责任组"></activiti:value><activiti:value id="7@MU经理组" name="MU经理组"></activiti:value><activiti:value id="9@PL经理组" name="PL经理组"></activiti:value><activiti:value id="78@ES经理组" name="ES经理组"></activiti:value></activiti:formProperty>
+<activiti:formProperty id="assignto8_问题指派给_4_enum_sbs_$$7" name="问题指派给" type="enum" variable="assignto8_t01" writable="true" required="true"><activiti:value id="63@未定义责任组" name="未定义责任组"></activiti:value><activiti:value id="7@MU经理组" name="MU经理组"></activiti:value><activiti:value id="9@PL经理组" name="PL经理组"></activiti:value><activiti:value id="78@ES经理组" name="ES经理组"></activiti:value></activiti:formProperty>
+<activiti:formProperty id="assignto9_问题指派给_4_enum_sbs_$$8" name="问题指派给" type="enum" variable="assignto9_t01" writable="true" required="true"><activiti:value id="63@未定义责任组" name="未定义责任组"></activiti:value><activiti:value id="7@MU经理组" name="MU经理组"></activiti:value><activiti:value id="9@PL经理组" name="PL经理组"></activiti:value><activiti:value id="78@ES经理组" name="ES经理组"></activiti:value></activiti:formProperty>
+<activiti:formProperty id="assignto10_问题指派给_4_enum_sbs_$$9" name="问题指派给" type="enum" variable="assignto10_t01" writable="true" required="true"><activiti:value id="63@未定义责任组" name="未定义责任组"></activiti:value><activiti:value id="7@MU经理组" name="MU经理组"></activiti:value><activiti:value id="9@PL经理组" name="PL经理组"></activiti:value><activiti:value id="78@ES经理组" name="ES经理组"></activiti:value></activiti:formProperty>
+<activiti:formProperty id="assignto11_问题指派给_4_enum_sbs_$$A" name="问题指派给" type="enum" variable="assignto11_t01" writable="true" required="true"><activiti:value id="63@未定义责任组" name="未定义责任组"></activiti:value><activiti:value id="7@MU经理组" name="MU经理组"></activiti:value><activiti:value id="9@PL经理组" name="PL经理组"></activiti:value><activiti:value id="78@ES经理组" name="ES经理组"></activiti:value></activiti:formProperty>
+<activiti:formProperty id="assignto12_问题指派给_4_enum_sbs_$$B" name="问题指派给" type="enum" variable="assignto12_t01" writable="true" required="true"><activiti:value id="63@未定义责任组" name="未定义责任组"></activiti:value><activiti:value id="7@MU经理组" name="MU经理组"></activiti:value><activiti:value id="9@PL经理组" name="PL经理组"></activiti:value><activiti:value id="78@ES经理组" name="ES经理组"></activiti:value></activiti:formProperty>
+<activiti:formProperty id="assignto13_问题指派给_4_enum_sbs_$$C" name="问题指派给" type="enum" variable="assignto13_t01" writable="true" required="true"><activiti:value id="63@未定义责任组" name="未定义责任组"></activiti:value><activiti:value id="7@MU经理组" name="MU经理组"></activiti:value><activiti:value id="9@PL经理组" name="PL经理组"></activiti:value><activiti:value id="78@ES经理组" name="ES经理组"></activiti:value></activiti:formProperty>
+<activiti:formProperty id="assignto14_问题指派给_4_enum_sbs_$$D" name="问题指派给" type="enum" variable="assignto14_t01" writable="true" required="true"><activiti:value id="63@未定义责任组" name="未定义责任组"></activiti:value><activiti:value id="7@MU经理组" name="MU经理组"></activiti:value><activiti:value id="9@PL经理组" name="PL经理组"></activiti:value><activiti:value id="78@ES经理组" name="ES经理组"></activiti:value></activiti:formProperty>
+<activiti:formProperty id="assignto15_问题指派给_4_enum_sbs_$$E" name="问题指派给" type="enum" variable="assignto15_t01" writable="true" required="true"><activiti:value id="63@未定义责任组" name="未定义责任组"></activiti:value><activiti:value id="7@MU经理组" name="MU经理组"></activiti:value><activiti:value id="9@PL经理组" name="PL经理组"></activiti:value><activiti:value id="78@ES经理组" name="ES经理组"></activiti:value></activiti:formProperty>
+<activiti:formProperty id="assignto16_问题指派给_4_enum_sbs_$$F" name="问题指派给" type="enum" variable="assignto16_t01" writable="true" required="true"><activiti:value id="63@未定义责任组" name="未定义责任组"></activiti:value><activiti:value id="7@MU经理组" name="MU经理组"></activiti:value><activiti:value id="9@PL经理组" name="PL经理组"></activiti:value><activiti:value id="78@ES经理组" name="ES经理组"></activiti:value></activiti:formProperty>
+<activiti:formProperty id="assignto17_问题指派给_4_enum_sbs_$$G" name="问题指派给" type="enum" variable="assignto17_t01" writable="true" required="true"><activiti:value id="63@未定义责任组" name="未定义责任组"></activiti:value><activiti:value id="7@MU经理组" name="MU经理组"></activiti:value><activiti:value id="9@PL经理组" name="PL经理组"></activiti:value><activiti:value id="78@ES经理组" name="ES经理组"></activiti:value></activiti:formProperty>
+<activiti:formProperty id="assignto18_问题指派给_4_enum_sbs_$$H" name="问题指派给" type="enum" variable="assignto18_t01" writable="true" required="true"><activiti:value id="63@未定义责任组" name="未定义责任组"></activiti:value><activiti:value id="7@MU经理组" name="MU经理组"></activiti:value><activiti:value id="9@PL经理组" name="PL经理组"></activiti:value><activiti:value id="78@ES经理组" name="ES经理组"></activiti:value></activiti:formProperty>
+<activiti:formProperty id="assignto19_问题指派给_4_enum_sbs_$$I" name="问题指派给" type="enum" variable="assignto19_t01" writable="true" required="true"><activiti:value id="63@未定义责任组" name="未定义责任组"></activiti:value><activiti:value id="7@MU经理组" name="MU经理组"></activiti:value><activiti:value id="9@PL经理组" name="PL经理组"></activiti:value><activiti:value id="78@ES经理组" name="ES经理组"></activiti:value></activiti:formProperty>
+<activiti:formProperty id="assignto20_问题指派给_4_enum_sbs_$$J" name="问题指派给" type="enum" variable="assignto20_t01" writable="true" required="true"><activiti:value id="63@未定义责任组" name="未定义责任组"></activiti:value><activiti:value id="7@MU经理组" name="MU经理组"></activiti:value><activiti:value id="9@PL经理组" name="PL经理组"></activiti:value><activiti:value id="78@ES经理组" name="ES经理组"></activiti:value></activiti:formProperty>
+<activiti:formProperty id="assignto21_问题指派给_4_enum_sbs_$$K" name="问题指派给" type="enum" variable="assignto21_t01" writable="true" required="true"><activiti:value id="63@未定义责任组" name="未定义责任组"></activiti:value><activiti:value id="7@MU经理组" name="MU经理组"></activiti:value><activiti:value id="9@PL经理组" name="PL经理组"></activiti:value><activiti:value id="78@ES经理组" name="ES经理组"></activiti:value></activiti:formProperty>
+<activiti:formProperty id="assignto22_问题指派给_4_enum_sbs_$$L" name="问题指派给" type="enum" variable="assignto22_t01" writable="true" required="true"><activiti:value id="63@未定义责任组" name="未定义责任组"></activiti:value><activiti:value id="7@MU经理组" name="MU经理组"></activiti:value><activiti:value id="9@PL经理组" name="PL经理组"></activiti:value><activiti:value id="78@ES经理组" name="ES经理组"></activiti:value></activiti:formProperty>
+<activiti:formProperty id="assignto23_问题指派给_4_enum_sbs_$$M" name="问题指派给" type="enum" variable="assignto23_t01" writable="true" required="true"><activiti:value id="63@未定义责任组" name="未定义责任组"></activiti:value><activiti:value id="7@MU经理组" name="MU经理组"></activiti:value><activiti:value id="9@PL经理组" name="PL经理组"></activiti:value><activiti:value id="78@ES经理组" name="ES经理组"></activiti:value></activiti:formProperty>
+<activiti:formProperty id="assignto24_问题指派给_4_enum_sbs_$$N" name="问题指派给" type="enum" variable="assignto24_t01" writable="true" required="true"><activiti:value id="63@未定义责任组" name="未定义责任组"></activiti:value><activiti:value id="7@MU经理组" name="MU经理组"></activiti:value><activiti:value id="9@PL经理组" name="PL经理组"></activiti:value><activiti:value id="78@ES经理组" name="ES经理组"></activiti:value></activiti:formProperty>
+<activiti:formProperty id="assignto25_问题指派给_4_enum_sbs_$$O" name="问题指派给" type="enum" variable="assignto25_t01" writable="true" required="true"><activiti:value id="63@未定义责任组" name="未定义责任组"></activiti:value><activiti:value id="7@MU经理组" name="MU经理组"></activiti:value><activiti:value id="9@PL经理组" name="PL经理组"></activiti:value><activiti:value id="78@ES经理组" name="ES经理组"></activiti:value></activiti:formProperty>
+<activiti:formProperty id="assignto26_问题指派给_4_enum_sbs_$$P" name="问题指派给" type="enum" variable="assignto26_t01" writable="true" required="true"><activiti:value id="63@未定义责任组" name="未定义责任组"></activiti:value><activiti:value id="7@MU经理组" name="MU经理组"></activiti:value><activiti:value id="9@PL经理组" name="PL经理组"></activiti:value><activiti:value id="78@ES经理组" name="ES经理组"></activiti:value></activiti:formProperty>
+<activiti:formProperty id="assignto27_问题指派给_4_enum_sbs_$$Q" name="问题指派给" type="enum" variable="assignto27_t01" writable="true" required="true"><activiti:value id="63@未定义责任组" name="未定义责任组"></activiti:value><activiti:value id="7@MU经理组" name="MU经理组"></activiti:value><activiti:value id="9@PL经理组" name="PL经理组"></activiti:value><activiti:value id="78@ES经理组" name="ES经理组"></activiti:value></activiti:formProperty>
+<activiti:formProperty id="assignto28_问题指派给_4_enum_sbs_$$R" name="问题指派给" type="enum" variable="assignto28_t01" writable="true" required="true"><activiti:value id="63@未定义责任组" name="未定义责任组"></activiti:value><activiti:value id="7@MU经理组" name="MU经理组"></activiti:value><activiti:value id="9@PL经理组" name="PL经理组"></activiti:value><activiti:value id="78@ES经理组" name="ES经理组"></activiti:value></activiti:formProperty>
+<activiti:formProperty id="assignto29_问题指派给_4_enum_sbs_$$S" name="问题指派给" type="enum" variable="assignto29_t01" writable="true" required="true"><activiti:value id="63@未定义责任组" name="未定义责任组"></activiti:value><activiti:value id="7@MU经理组" name="MU经理组"></activiti:value><activiti:value id="9@PL经理组" name="PL经理组"></activiti:value><activiti:value id="78@ES经理组" name="ES经理组"></activiti:value></activiti:formProperty>
+<activiti:formProperty id="assignto30_问题指派给_4_enum_sbs_$$T" name="问题指派给" type="enum" variable="assignto30_t01" writable="true" required="true"><activiti:value id="63@未定义责任组" name="未定义责任组"></activiti:value><activiti:value id="7@MU经理组" name="MU经理组"></activiti:value><activiti:value id="9@PL经理组" name="PL经理组"></activiti:value><activiti:value id="78@ES经理组" name="ES经理组"></activiti:value></activiti:formProperty>
+<activiti:formProperty id="assignto31_问题指派给_4_enum_sbs_$$U" name="问题指派给" type="enum" variable="assignto31_t01" writable="true" required="true"><activiti:value id="63@未定义责任组" name="未定义责任组"></activiti:value><activiti:value id="7@MU经理组" name="MU经理组"></activiti:value><activiti:value id="9@PL经理组" name="PL经理组"></activiti:value><activiti:value id="78@ES经理组" name="ES经理组"></activiti:value></activiti:formProperty>
+<activiti:formProperty id="assignto32_问题指派给_4_enum_sbs_$$W" name="问题指派给" type="enum" variable="assignto32_t01" writable="true" required="true"><activiti:value id="63@未定义责任组" name="未定义责任组"></activiti:value><activiti:value id="7@MU经理组" name="MU经理组"></activiti:value><activiti:value id="9@PL经理组" name="PL经理组"></activiti:value><activiti:value id="78@ES经理组" name="ES经理组"></activiti:value></activiti:formProperty>
+<activiti:formProperty id="assignto33_问题指派给_4_enum_sbs_$$X" name="问题指派给" type="enum" variable="assignto33_t01" writable="true" required="true"><activiti:value id="63@未定义责任组" name="未定义责任组"></activiti:value><activiti:value id="7@MU经理组" name="MU经理组"></activiti:value><activiti:value id="9@PL经理组" name="PL经理组"></activiti:value><activiti:value id="78@ES经理组" name="ES经理组"></activiti:value></activiti:formProperty>
+	
+		
+		 <activiti:executionListener event="end" class="org.activiti.engine.impl.bpmn.listener.ScriptExecutionListener">
+          <activiti:field name="language" stringValue="groovy"/>
+          <activiti:field name="script">
+            <activiti:string>
+              <![CDATA[def user = identityService.createUserQuery().userId(initiator).singleResult();
+                def mail = user.getEmail();
+                def initiatorFirstName = user.getFirstName();
+                def initiatorLastName = user.getLastName();
+                execution.setVariable('initiator_email', mail);
+                execution.setVariable('initiator_name', initiatorLastName + " " + initiatorFirstName);
+               
+				def timeStampString = new java.text.SimpleDateFormat("yyyy-MM-dd").format(new java.sql.Timestamp(java.lang.Long.parseLong(ckdate_t01))); execution.setVariable('timeStampString', timeStampString);
+			    execution.setVariable('datenshift', timeStampString + "-" + ckshift_t01);
+				
+                ]]>
+            </activiti:string>
+          </activiti:field>
+          <activiti:field name="resultVariable" stringValue="process_instance_id"/>
+        </activiti:executionListener>
+		
+		
+      </extensionElements>
+    </startEvent>
+    <serviceTask id="M1" name="RM接口" activiti:async="true" activiti:exclusive="false" activiti:type="mail">
+
+	      <extensionElements>
+        <activiti:field name="to">
+          <activiti:string><![CDATA[esbredmineissue@mail.magna.local]]></activiti:string>
+        </activiti:field>
+        <activiti:field name="from">
+          <activiti:string><![CDATA[bpmsesbmail@mail.magna.local]]></activiti:string>
+        </activiti:field>
+        <activiti:field name="subject">
+          <activiti:string><![CDATA[lpaissue]]></activiti:string>
+        </activiti:field>
+        <activiti:field name="text">
+          <activiti:expression><![CDATA[{
+		  "project_id":"52",
+		  "track_id":"4",
+		  "status_id":"1",
+		  "reviewer":"${initiator_name}",
+		  "taskname":"产线组长灯具及BZI_LPA审核问卷-${datenshift}",
+		  "data":
+		  [
+
+{"subject":"工站-检查员工对本站的不合格品有无及时记录并隔离?[Q]", "value":"${question1_t01}","description":"${questioncomments1_t01}","assigned_to":"${assignto1_t01}","attachments":${attachmentdep1_t01}},
+{"subject":"工站-检查产线安全防护措施是否有效？（记录检查内容）[S]", "value":"${question2_t01}","description":"${questioncomments2_t01}","assigned_to":"${assignto2_t01}","attachments":${attachmentdep2_t01}},
+{"subject":"工站-产线上的不合格品有无及时判定及标识?[Q]", "value":"${question3_t01}","description":"${questioncomments3_t01}","assigned_to":"${assignto3_t01}","attachments":${attachmentdep3_t01}},
+{"subject":"零件产品-注塑产品的塑料粒子牌号正确[Q]", "value":"${question4_t01}","description":"${questioncomments4_t01}","assigned_to":"${assignto4_t01}","attachments":${attachmentdep4_t01}},
+{"subject":"零件产品-检查焊接工站确认焊接参数在WI规定范围内（任抽一项，记录检查内容）[Q]", "value":"${question5_t01}","description":"${questioncomments5_t01}","assigned_to":"${assignto5_t01}","attachments":${attachmentdep5_t01}},
+{"subject":"零件产品-检查镜壳实配工站确认镜壳实配参数在WI规定范围内（任抽一项，记录检查内容）[Q]", "value":"${question6_t01}","description":"${questioncomments6_t01}","assigned_to":"${assignto6_t01}","attachments":${attachmentdep6_t01}},
+{"subject":"零件产品-检查烘箱工站确认烘箱参数在WI规定范围内（任抽一项，记录检查内容）[Q]", "value":"${question7_t01}","description":"${questioncomments7_t01}","assigned_to":"${assignto7_t01}","attachments":${attachmentdep7_t01}},
+{"subject":"零件产品-检查热铆工站确认热铆参数在WI规定范围内（任抽一项，记录检查内容）[Q]", "value":"${question8_t01}","description":"${questioncomments8_t01}","assigned_to":"${assignto8_t01}","attachments":${attachmentdep8_t01}},
+{"subject":"零件产品-检查灌胶工站确认灌胶参数在WI规定范围内（任抽一项，记录检查内容）[Q]", "value":"${question9_t01}","description":"${questioncomments9_t01}","assigned_to":"${assignto9_t01}","attachments":${attachmentdep9_t01}},
+{"subject":"零件产品-检查电性能测试工站确认电性能参数在WI规定范围内（任抽一项，记录检查内容）[Q]", "value":"${question10_t01}","description":"${questioncomments10_t01}","assigned_to":"${assignto10_t01}","attachments":${attachmentdep10_t01}},
+{"subject":"零件产品-检查气密测试工站确认气密参数在WI规定范围内（任抽一项，记录检查内容）[Q]", "value":"${question11_t01}","description":"${questioncomments11_t01}","assigned_to":"${assignto11_t01}","attachments":${attachmentdep11_t01}},
+{"subject":"零件产品-确认注塑产品重量在WI规定范围内（记录检查内容）[Q]", "value":"${question12_t01}","description":"${questioncomments12_t01}","assigned_to":"${assignto12_t01}","attachments":${attachmentdep12_t01}},
+{"subject":"零件产品-检查镀铝工站的参数在WI规定范围内（任抽一项，记录检查内容）[Q]", "value":"${question13_t01}","description":"${questioncomments13_t01}","assigned_to":"${assignto13_t01}","attachments":${attachmentdep13_t01}},
+{"subject":"零件产品-镀铝产品表面光洁,无黑点，无指印脏污等不良[Q]", "value":"${question14_t01}","description":"${questioncomments14_t01}","assigned_to":"${assignto14_t01}","attachments":${attachmentdep14_t01}},
+{"subject":"零件产品-抽查1-2名员工是否有上岗资格，培训资料是否齐备？连续作业3PCS的作业手法是否与WI一致？（记录工号/工站/WI编号）[M]", "value":"${question15_t01}","description":"${questioncomments15_t01}","assigned_to":"${assignto15_t01}","attachments":${attachmentdep15_t01}},
+{"subject":"零件产品-抽查某工站员工对WI的质量控制点及本站的其他标识是否了解？（记录工号/工站）[M]", "value":"${question16_t01}","description":"${questioncomments16_t01}","assigned_to":"${assignto16_t01}","attachments":${attachmentdep16_t01}},
+{"subject":"过程零件关键特性-抽1-2个极限样品检测是否能通过验证？（记录样品编号/工站）[Q]", "value":"${question17_t01}","description":"${questioncomments17_t01}","assigned_to":"${assignto17_t01}","attachments":${attachmentdep17_t01}},
+{"subject":"过程零件关键特性-检查终检是否按WI要求作业？如有不良品，记录其处理结果。[Q]", "value":"${question18_t01}","description":"${questioncomments18_t01}","assigned_to":"${assignto18_t01}","attachments":${attachmentdep18_t01}},
+{"subject":"过程零件关键特性-抽查产线某检具或检测设备、极限样品有被校验且在有效期。（记录编号）[Q]", "value":"${question19_t01}","description":"${questioncomments19_t01}","assigned_to":"${assignto19_t01}","attachments":${attachmentdep19_t01}},
+{"subject":"过程零件关键特性-抽查产线某工站WI是否有可操作性并按规定发行且在有效期内？（记录WI编号）[Q]", "value":"${question20_t01}","description":"${questioncomments20_t01}","assigned_to":"${assignto20_t01}","attachments":${attachmentdep20_t01}},
+{"subject":"过程零件关键特性-检查上线物料、半成品与料盒标识、流转单、BOM、WI是否一致？是否按照FIFO执行？（抽查任意2项以上并记录检查内容）[M]", "value":"${question21_t01}","description":"${questioncomments21_t01}","assigned_to":"${assignto21_t01}","attachments":${attachmentdep21_t01}},
+{"subject":"过程零件关键特性-检查外箱标签与成品料号是否一致？（无标签，禁止生产） [Q]", "value":"${question22_t01}","description":"${questioncomments22_t01}","assigned_to":"${assignto22_t01}","attachments":${attachmentdep22_t01}},
+{"subject":"过程零件关键特性-验证产品符合性。列出首件检验报告中的特性项目并记录规格和结果[Q]", "value":"${question23_t01}","description":"${questioncomments23_t01}","assigned_to":"${assignto23_t01}","attachments":${attachmentdep23_t01}},
+{"subject":"过程零件关键特性-ASP2.1PL检查盖板孔是否磨损，保养计划中已加入1年检查一次，是否按期保养[Q]", "value":"${question24_t01}","description":"${questioncomments24_t01}","assigned_to":"${assignto24_t01}","attachments":${attachmentdep24_t01}},
+{"subject":"过程零件关键特性-ASP2.1PL检查员工装配过程不可触碰LED[Q]", "value":"${question25_t01}","description":"${questioncomments25_t01}","assigned_to":"${assignto25_t01}","attachments":${attachmentdep25_t01}},
+{"subject":"客户呼声-依据终检WI检验项目，抽查3pcs产品，确认各检验点项是否合格[Q]", "value":"${question26_t01}","description":"${questioncomments26_t01}","assigned_to":"${assignto26_t01}","attachments":${attachmentdep26_t01}},
+{"subject":"客户呼声-质量警报是否在生产车间发布并可见，便于遏制问题？[Q]", "value":"${question27_t01}","description":"${questioncomments27_t01}","assigned_to":"${assignto27_t01}","attachments":${attachmentdep27_t01}},
+{"subject":"该项目是否有客户投诉?;问题分析?纠正措施? 预防措施?相关文件是否更新？（控制计划、PFMEA、WI等）?；相关员工是否了解并按要求执行？（记录工号）[Q]", "value":"${question28_t01}","description":"${questioncomments28_t01}","assigned_to":"${assignto28_t01}","attachments":${attachmentdep28_t01}},
+{"subject":"系统Bypass-检查产线看板内容是否为最新状态?[M]", "value":"${question29_t01}","description":"${questioncomments29_t01}","assigned_to":"${assignto29_t01}","attachments":${attachmentdep29_t01}},
+{"subject":"系统Bypass-查产线最近的变化点是否体现在《4M管理变化点》记录表上？[M]", "value":"${question30_t01}","description":"${questioncomments30_t01}","assigned_to":"${assignto30_t01}","attachments":${attachmentdep30_t01}},
+{"subject":"系统Bypass-检查产线所有表单填写是否及时及正确?(生产线日常点检表、首件检验报告、过程抽检记录等).[Q]", "value":"${question31_t01}","description":"${questioncomments31_t01}","assigned_to":"${assignto31_t01}","attachments":${attachmentdep31_t01}},
+{"subject":"系统Bypass-检查某工站的《设备日常点检表》及《预防性维护计划》是否按要求执行？（记录工站）[M]", "value":"${question32_t01}","description":"${questioncomments32_t01}","assigned_to":"${assignto32_t01}","attachments":${attachmentdep32_t01}},
+{"subject":"系统Bypass-检查产线是否有返工作业？如有，是否有相关WI及返工的标识记录？返工人员是否有被培训且持有相关的培训记录？[Q]", "value":"${question33_t01}","description":"${questioncomments33_t01}","assigned_to":"${assignto33_t01}","attachments":${attachmentdep33_t01}}
+
+		  
+		  ]
+		  }]]></activiti:expression>
+        </activiti:field>
+        <activiti:field name="charset">
+          <activiti:string><![CDATA[UTF-8]]></activiti:string>
+        </activiti:field>
+      </extensionElements>
+	
+	
+	
+    </serviceTask>
+    <sequenceFlow id="sid-DE9A4E9A-40E5-4115-A873-101694552FB6" sourceRef="S1" targetRef="M1"/>
+    <endEvent id="ES" name="结束"/>
+    <sequenceFlow id="sid-4704C12D-3DFD-48A5-8105-ACE838D210BB" sourceRef="M1" targetRef="ES"/>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_LPATLTP1LOC1">
+    <bpmndi:BPMNPlane bpmnElement="LPATLTP1LOC1" id="BPMNPlane_LPATLTP1LOC1">
+      <bpmndi:BPMNShape bpmnElement="S1" id="BPMNShape_S1">
+        <omgdc:Bounds height="30.0" width="30.0" x="45.0" y="45.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="M1" id="BPMNShape_M1">
+        <omgdc:Bounds height="80.0" width="100.0" x="195.0" y="20.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="ES" id="BPMNShape_ES">
+        <omgdc:Bounds height="28.0" width="28.0" x="390.0" y="46.0"/>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="sid-DE9A4E9A-40E5-4115-A873-101694552FB6" id="BPMNEdge_sid-DE9A4E9A-40E5-4115-A873-101694552FB6">
+        <omgdi:waypoint x="75.0" y="60.0"/>
+        <omgdi:waypoint x="195.0" y="60.0"/>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="sid-4704C12D-3DFD-48A5-8105-ACE838D210BB" id="BPMNEdge_sid-4704C12D-3DFD-48A5-8105-ACE838D210BB">
+        <omgdi:waypoint x="295.0" y="60.0"/>
+        <omgdi:waypoint x="390.0" y="60.0"/>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

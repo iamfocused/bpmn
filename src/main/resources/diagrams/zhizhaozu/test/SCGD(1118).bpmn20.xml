@@ -1,17 +1,32 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/pur">
-  <process id="productionExecution" name="生产执行流程测试" isExecutable="true" activiti:candidateStarterGroups="shengchan@@13@@,admin@@13@@,shengchan,admin">
-    <startEvent id="startevent1" name="生产执行启动事件" activiti:initiator="initiator">
-    	<extensionElements>
-    		<activiti:formProperty id="processNumber_工艺编号_1_string_auto_$$A" name="选择工艺编号" variable="processNumber" required="true"/>
-    		<activiti:formProperty id="productionOrderNumber_生产加工单_2_string_t1_$$A" name="生产加工单" variable="productionOrderNumber" required="true"/>
-    		<activiti:executionListener event="end" class="org.activiti.engine.impl.bpmn.listener.ScriptExecutionListener">
-    			<activiti:field name="language"><activiti:string><![CDATA[groovy]]></activiti:string></activiti:field>
-    			<activiti:field name="script">
-    				<activiti:string>
-    				<![CDATA[
-    					import groovy.json.JsonSlurper
-    				
+  <process id="operation" name="生产工单" isExecutable="true" activiti:candidateStarterGroups="admin,admin@@17@@,admin@@67@@,admin@@100@@">
+    <startEvent id="startevent1" name="Production execution begin" activiti:initiator="initiator">
+      <extensionElements>
+        <activiti:formProperty id="processNumber_工艺编号_1_string_auto_$$A" name="选择工艺编号" variable="processNumber" required="true"></activiti:formProperty>
+        <activiti:formProperty id="productionOrderNumber_生产加工单_2_string_t1_$$A" name="生产加工单" variable="productionOrderNumber" required="true"></activiti:formProperty>
+        <activiti:executionListener event="end" class="org.activiti.engine.impl.bpmn.listener.ScriptExecutionListener">
+          <activiti:field name="language">
+            <activiti:string><![CDATA[groovy]]></activiti:string>
+          </activiti:field>
+          <activiti:field name="script">
+            <activiti:string><![CDATA[import groovy.json.JsonSlurper
+    					import java.util.stream.Collectors
+    					
+      					def tenantId = execution.getTenantId()
+      					def productionOrderNumber = execution.getVariable('productionOrderNumber')
+      					
+      					def processInstances = historyService.createHistoricProcessInstanceQuery().processInstanceTenantId(tenantId).processDefinitionKey("operation").list()
+						def productionOrderNumbers = processInstances.stream().map({
+						            processInst ->
+						                historyService.createHistoricVariableInstanceQuery().processInstanceId(processInst.getId()).list().stream().filter({inst -> ("productionOrderNumber" == inst.getVariableName()) }).findFirst().map({ varInst -> varInst.getValue().toString()}).orElse("")
+						        }
+						).collect(Collectors.toList())
+      					
+      					if(productionOrderNumbers.contains(productionOrderNumber)){
+      						throw new org.activiti.engine.ActivitiIllegalArgumentException('生产加工单重复[' + productionOrderNumber + ']')
+      					}    					
+    					
     					def jsonSlurper = new JsonSlurper()
     					def proInstId = jsonSlurper.parseText(execution.getVariable('processNumber')).code
     					execution.setVariable('proInstId', execution.getProcessInstanceId())
@@ -96,44 +111,38 @@
     					def var8 = list.stream().filter({x->x.getVariableName().equals('processname')}).findFirst().orElse(null)
     					if(var8) {
     						execution.setVariable('processname',var8.getValue())
-    					}
-    				]]>
-    				</activiti:string>
-    			</activiti:field>
-    		</activiti:executionListener>
-    	</extensionElements>
+    					}]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
     </startEvent>
-    <userTask id="usertask1" name="制定时间分配组" activiti:assignee="${initiator}">
-    	<extensionElements>
-    		<activiti:formProperty id="processcount1_工序数量_1_string_t6_$$A" name="工序数量" type="string" variable="processcount1" required="true"/>
-    	
-    		<activiti:formProperty id="productionOrderNumber_生产加工单_1_string_t1_$$VA" name="生产加工单" variable="productionOrderNumber" required="true"/>    		
-    		<activiti:formProperty id="tbheader1566744708879_item" name="工序表" type="string" variable="header1566744708879" writable="true" required="false" />
-	        <activiti:formProperty id="tbheader1566744708879_opnumber_工序编号_2_string_t1_$$A" name="工序编号" type="string" variable="opnumber"></activiti:formProperty>
-	        <activiti:formProperty id="tbheader1566744708879_opname_工序名称_3_string_t1_$$A" name="工序名称" type="string" variable="opnumber"></activiti:formProperty>
-	        <activiti:formProperty id="tbheader1566744708879_plannedstarttime_计划开始时间_5_string_t5_$$A" name="计划开始时间" type="string" variable="plannedstarttime" required="true"></activiti:formProperty>
-	        <activiti:formProperty id="tbheader1566744708879_plannedendtime_计划结束时间_6_string_t5_$$A" name="计划结束时间" type="string" variable="plannedstarttime" required="true"></activiti:formProperty>
-	        <activiti:formProperty id="tbheader1566744708879_optype_工序类型_7_enum_sbs_$$A" name="工序类型" type="enum" variable="optype">
-	          <activiti:value id="通用" name="通用"></activiti:value>
-	          <activiti:value id="车削" name="车削"></activiti:value>
-	          <activiti:value id="铣削" name="铣削"></activiti:value>
-	        </activiti:formProperty>
-	        
-   			<activiti:formProperty id="tbheader1566744708879_subprocessgroup_工段名称_24_string_tree_$$A" name="工段名称" type="string" variable="subprocessgroup" required="true"/>
-    	
-    		<activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
-    			<activiti:field name="language">
-            		<activiti:string><![CDATA[groovy]]></activiti:string>
-    			</activiti:field>
-    			<activiti:field name="script">
-    				<activiti:string>
-    				<![CDATA[
-    				import groovy.json.JsonSlurper
+    <userTask id="usertask1" name="制定时间表" activiti:assignee="${initiator}">
+      <extensionElements>
+        <activiti:formProperty id="processcount1_工序数量_1_string_t6_$$A" name="工序数量" type="string" variable="processcount1" required="true"></activiti:formProperty>
+        <activiti:formProperty id="productionOrderNumber_生产加工单_1_string_t1_$$VA" name="生产加工单" variable="productionOrderNumber" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566744708879_item" name="工序表" type="string" variable="header1566744708879"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566744708879_opnumber_工序编号_2_string_t1_$$A" name="工序编号" type="string" variable="opnumber"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566744708879_opname_工序名称_3_string_t1_$$A" name="工序名称" type="string" variable="opnumber"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566744708879_plannedstarttime_计划开始时间_5_string_t5_$$A" name="计划开始时间" type="string" variable="plannedstarttime" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566744708879_plannedendtime_计划结束时间_6_string_t5_$$A" name="计划结束时间" type="string" variable="plannedstarttime" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566744708879_optype_工序类型_7_enum_sbs_$$A" name="工序类型" type="enum" variable="optype">
+          <activiti:value id="通用" name="通用"></activiti:value>
+          <activiti:value id="车削" name="车削"></activiti:value>
+          <activiti:value id="铣削" name="铣削"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="tbheader1566744708879_subprocessgroup_工段名称_24_string_tree_$$A" name="工段名称" type="string" variable="subprocessgroup" required="true"></activiti:formProperty>
+        <activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+          <activiti:field name="language">
+            <activiti:string><![CDATA[groovy]]></activiti:string>
+          </activiti:field>
+          <activiti:field name="script">
+            <activiti:string><![CDATA[import groovy.json.JsonSlurper
     				import groovy.json.JsonOutput
     				
     				def jsonSlurper = new JsonSlurper()
     				def execution = task.getExecution()
     				def items = jsonSlurper.parseText(execution.getVariable('tbheader1566744708879_item_std'))
+    				def processStd = jsonSlurper.parseText(execution.getVariable('processStd'))
     				
     				def count = execution.getVariable('processcount1')
     				if(count.toInteger() <= 0) {
@@ -152,28 +161,35 @@
     					
     					map.put(it.工序编号,li)
     					dList.add(JsonOutput.toJson(map))
+    					
+    					processStd.each{pro->
+    						if(pro.get('工序编号') == it.工序编号){
+    							pro.put('分配工段编号', it.工段名称.code)
+    							pro.put('计划开始时间', it.计划开始时间)
+    							pro.put('计划结束时间', it.计划结束时间)
+    						}
+    					}
     				}
     				
     				execution.setVariable('dList',dList)
     				
-    				]]>
-    				</activiti:string>
-    			</activiti:field>
-    		</activiti:taskListener>
-    	</extensionElements>
+    				execution.setVariable('processStd', JsonOutput.toJson(processStd))]]></activiti:string>
+          </activiti:field>
+        </activiti:taskListener>
+      </extensionElements>
     </userTask>
     <subProcess id="subprocess1" name="Sub Process">
       <multiInstanceLoopCharacteristics isSequential="false" activiti:collection="dList" activiti:elementVariable="map">
-      	<completionCondition>${nrOfCompletedInstances/nrOfInstances == 1}</completionCondition>
+        <completionCondition>${nrOfCompletedInstances/nrOfInstances == 1}</completionCondition>
       </multiInstanceLoopCharacteristics>
       <startEvent id="startevent2" name="Start">
-      	<extensionElements>
-      		<activiti:executionListener event="start" class="org.activiti.engine.impl.bpmn.listener.ScriptExecutionListener">
-      			<activiti:field name="language"><activiti:string><![CDATA[groovy]]></activiti:string></activiti:field>
-      			<activiti:field name="script">
-      				<activiti:string>
-      				<![CDATA[
-      				import groovy.json.JsonSlurper
+        <extensionElements>
+          <activiti:executionListener event="start" class="org.activiti.engine.impl.bpmn.listener.ScriptExecutionListener">
+            <activiti:field name="language">
+              <activiti:string><![CDATA[groovy]]></activiti:string>
+            </activiti:field>
+            <activiti:field name="script">
+              <activiti:string><![CDATA[import groovy.json.JsonSlurper
       				
       				def jsonSlurper = new JsonSlurper()
       				def map = jsonSlurper.parseText(execution.getVariable('map'))//key:工序编号 value:[分配组,分配数量,工序类型,工序名称,计划开始时间,计划结束时间]
@@ -185,29 +201,25 @@
       				execution.setVariableLocal('gxProcessName',map.get(key)[3])
       				execution.setVariableLocal('planStart',map.get(key)[4])
       				execution.setVariableLocal('planEnd',map.get(key)[5])
-      				execution.setVariableLocal('processNumber1', key)
-      				]]>
-      				</activiti:string>
-      			</activiti:field>
-      		</activiti:executionListener>
-      	</extensionElements>
+      				execution.setVariableLocal('processNumber1', key)]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+        </extensionElements>
       </startEvent>
-      <userTask id="usertask2" name="查看更新工序" activiti:candidateGroups="${group}">
-      	<extensionElements>
-      		<activiti:formProperty id="completecount_完成数_1_string_t6_$$A" variable="completecount" name="完成数量" required="true"/>
-      		<activiti:formProperty id="actualstarttime_实际开始时间_2_string_t3_$$A" variable="actualstarttime" name="开始时间" required="true"/>
-      		<activiti:formProperty id="completetime_完成时间_2_string_t3_$$A" variable="completetime" name="完成时间" required="true"/>
-      	
-      		<activiti:formProperty id="lave_剩余数量_1_string_t1_$$VA" variable="lave" name="剩余数量"/>
-      		<activiti:formProperty id="processname_工艺名称_2_string_t1_$$VA" name="工艺名称" type="string" variable="processname"/>
-      		<activiti:formProperty id="gxProcessName_工序名称_3_string_t1_$$VA" name="工序名称" type="string" variable="gxProcessName"/>
-
-      		<activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
-      			<activiti:field name="language"><activiti:string><![CDATA[groovy]]></activiti:string></activiti:field>
-      			<activiti:field name="script">
-      				<activiti:string>
-      				<![CDATA[
-      					import groovy.json.JsonSlurper
+      <userTask id="usertask2" name="查看更新过程" activiti:candidateGroups="${group}">
+        <extensionElements>
+          <activiti:formProperty id="completecount_完成数_1_string_t6_$$A" name="完成数量" variable="completecount" required="true"></activiti:formProperty>
+          <activiti:formProperty id="actualstarttime_实际开始时间_2_string_t5_$$A" name="开始时间" variable="actualstarttime" required="true"></activiti:formProperty>
+          <activiti:formProperty id="completetime_完成时间_2_string_t5_$$A" name="完成时间" variable="completetime" required="true"></activiti:formProperty>
+          <activiti:formProperty id="lave_剩余数量_1_string_t1_$$VA" name="剩余数量" variable="lave"></activiti:formProperty>
+          <activiti:formProperty id="processname_工艺名称_2_string_t1_$$VA" name="工艺名称" type="string" variable="processname"></activiti:formProperty>
+          <activiti:formProperty id="gxProcessName_工序名称_3_string_t1_$$VA" name="工序名称" type="string" variable="gxProcessName"></activiti:formProperty>
+          <activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+            <activiti:field name="language">
+              <activiti:string><![CDATA[groovy]]></activiti:string>
+            </activiti:field>
+            <activiti:field name="script">
+              <activiti:string><![CDATA[import groovy.json.JsonSlurper
 						import groovy.json.JsonOutput
       					
       					def jsonSlurper = new JsonSlurper()
@@ -255,17 +267,15 @@
       					
       					proProgress<<curPro
       					
-      					execution.setVariable('proProgress',JsonOutput.toJson(proProgress))
-      				]]>
-      				</activiti:string>
-      			</activiti:field>
-      		</activiti:taskListener>
-      		<activiti:taskListener event="create" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
-      			<activiti:field name="language"><activiti:string><![CDATA[groovy]]></activiti:string></activiti:field>
-      			<activiti:field name="script">
-      				<activiti:string>
-      				<![CDATA[
-	      				import javax.crypto.Mac
+      					execution.setVariable('proProgress',JsonOutput.toJson(proProgress))]]></activiti:string>
+            </activiti:field>
+          </activiti:taskListener>
+          <activiti:taskListener event="create" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+            <activiti:field name="language">
+              <activiti:string><![CDATA[groovy]]></activiti:string>
+            </activiti:field>
+            <activiti:field name="script">
+              <activiti:string><![CDATA[import javax.crypto.Mac
 						import javax.crypto.spec.SecretKeySpec
 						import java.security.InvalidKeyException
 						
@@ -289,47 +299,53 @@
 						        throw new RuntimeException("Invalid key exception while converting to HMacSHA256")
 						    }
 						}
-						def METABASE_SITE_URL = "https://www.zhizaozu.com/metabase"
-						def METABASE_SECRET_KEY = "dad5c368f5c8d7926c3565ac1d71c53557a0bc5c1a1d8a639e95a4b6a67f60d7"
+						def METABASE_SITE_URL = "http://101.251.68.164/metabase"
+						def METABASE_SECRET_KEY = "cc3449face6b5ed4b36b453c9dbf9b7c3aab1c5f54ec486641b2672d1a751115"
 						def header = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9"
-						def playloadString = '{"resource":{"question":4},"params":{"procInstId":\"'+ procInstId +'\","processNumber": \"'+processNumber+'\"}}'
+						def playloadString = '{"resource":{"question":37},"params":{"procInstId":\"'+ procInstId +'\","processNumber": \"'+processNumber+'\"}}'
 						def playload = Base64.getUrlEncoder().encodeToString(playloadString.bytes)
 						
 						def secret =Base64.getUrlEncoder().encodeToString(hmac_sha256(METABASE_SECRET_KEY , header+'.'+playload))
 						def url = METABASE_SITE_URL + "/embed/question/" + header+'.'+playload+'.'+secret + "#bordered=true&titled=true"
       					execution.setVariableLocal('BBOT_BI_GXWL',url)
       					
-      					playloadString = '{"resource":{"question":3},"params":{"procInstId":\"'+ procInstId +'\","processNumber": \"'+processNumber+'\"}}'
+      					playloadString = '{"resource":{"question":35},"params":{"procInstId":\"'+ procInstId +'\","processNumber": \"'+processNumber+'\"}}'
 						playload = Base64.getUrlEncoder().encodeToString(playloadString.bytes)
 						secret =Base64.getUrlEncoder().encodeToString(hmac_sha256(METABASE_SECRET_KEY , header+'.'+playload))
 						url = METABASE_SITE_URL + "/embed/question/" + header+'.'+playload+'.'+secret + "#bordered=true&titled=true"
 						execution.setVariableLocal('BBOT_BI_GJ',url)
 						
-						playloadString = '{"resource":{"question":5},"params":{"procInstId":\"'+ procInstId +'\","processNumber": \"'+processNumber+'\"}}'
+						playloadString = '{"resource":{"question":39},"params":{"procInstId":\"'+ procInstId +'\","processNumber": \"'+processNumber+'\"}}'
 						playload = Base64.getUrlEncoder().encodeToString(playloadString.bytes)
 						secret =Base64.getUrlEncoder().encodeToString(hmac_sha256(METABASE_SECRET_KEY , header+'.'+playload))
 						url = METABASE_SITE_URL + "/embed/question/" + header+'.'+playload+'.'+secret + "#bordered=true&titled=true"
 						execution.setVariableLocal('BBOT_BI_JYZB',url)
+						
+						playloadString = '{"resource":{"question":38},"params":{"procInstId":\"'+ procInstId +'\","processNumber": \"'+processNumber+'\"}}'
+						playload = Base64.getUrlEncoder().encodeToString(playloadString.bytes)
+						secret =Base64.getUrlEncoder().encodeToString(hmac_sha256(METABASE_SECRET_KEY , header+'.'+playload))
+						url = METABASE_SITE_URL + "/embed/question/" + header+'.'+playload+'.'+secret + "#bordered=true&titled=true"
+						execution.setVariableLocal('BBOT_BI_GXZB',url)
       					
       					def processType = execution.getVariable('processType')
       					
       					switch(processType){
       						case '通用':
-      							playloadString = '{"resource":{"question":6},"params":{"procInstId":\"'+ procInstId +'\","processNumber": \"'+processNumber+'\"}}'
+      							playloadString = '{"resource":{"question":42},"params":{"procInstId":\"'+ procInstId +'\","processNumber": \"'+processNumber+'\"}}'
       							playload = Base64.getUrlEncoder().encodeToString(playloadString.bytes)
       							secret =Base64.getUrlEncoder().encodeToString(hmac_sha256(METABASE_SECRET_KEY , header+'.'+playload))
       							url = METABASE_SITE_URL + "/embed/question/" + header+'.'+playload+'.'+secret + "#bordered=true&titled=true"
       							execution.setVariableLocal('BBOT_BI_TYGB',url)
       						break;
       						case '铣削':
-      							playloadString = '{"resource":{"question":7},"params":{"procInstId":\"'+ procInstId +'\","processNumber": \"'+processNumber+'\"}}'
+      							playloadString = '{"resource":{"question":43},"params":{"procInstId":\"'+ procInstId +'\","processNumber": \"'+processNumber+'\"}}'
       							playload = Base64.getUrlEncoder().encodeToString(playloadString.bytes)
       							secret =Base64.getUrlEncoder().encodeToString(hmac_sha256(METABASE_SECRET_KEY , header+'.'+playload))
       							url = METABASE_SITE_URL + "/embed/question/" + header+'.'+playload+'.'+secret + "#bordered=true&titled=true"
       							execution.setVariableLocal('BBOT_BI_XXGB',url)
       						break;
       						case '车削':
-      							playloadString = '{"resource":{"question":8},"params":{"procInstId":\"'+ procInstId +'\","processNumber": \"'+processNumber+'\"}}'
+      							playloadString = '{"resource":{"question":41},"params":{"procInstId":\"'+ procInstId +'\","processNumber": \"'+processNumber+'\"}}'
       							playload = Base64.getUrlEncoder().encodeToString(playloadString.bytes)
       							secret =Base64.getUrlEncoder().encodeToString(hmac_sha256(METABASE_SECRET_KEY , header+'.'+playload))
       							url = METABASE_SITE_URL + "/embed/question/" + header+'.'+playload+'.'+secret + "#bordered=true&titled=true"
@@ -338,22 +354,20 @@
       						default:
       							throw new org.activiti.engine.ActivitiIllegalArgumentException('工序类型报表未找到！')
       						break
-      					}
-      				]]>
-      				</activiti:string>
-      			</activiti:field>
-      		</activiti:taskListener>
-      	</extensionElements>
+      					}]]></activiti:string>
+            </activiti:field>
+          </activiti:taskListener>
+        </extensionElements>
       </userTask>
       <sequenceFlow id="flow4" sourceRef="startevent2" targetRef="usertask2"></sequenceFlow>
       <exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway"></exclusiveGateway>
       <sequenceFlow id="flow5" sourceRef="usertask2" targetRef="exclusivegateway1"></sequenceFlow>
-      <sequenceFlow id="flow6" name="数量不为0" sourceRef="exclusivegateway1" targetRef="usertask2">
-      	<conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('count') > 0}]]></conditionExpression>
+      <sequenceFlow id="flow6" name="The quantity is not 0" sourceRef="exclusivegateway1" targetRef="usertask2">
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('count') > 0}]]></conditionExpression>
       </sequenceFlow>
       <endEvent id="endevent2" name="End"></endEvent>
-      <sequenceFlow id="flow7" name="数量为0" sourceRef="exclusivegateway1" targetRef="endevent2">
-      	<conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('count') == 0}]]></conditionExpression>
+      <sequenceFlow id="flow7" name="The quantity is 0" sourceRef="exclusivegateway1" targetRef="endevent2">
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable('count') == 0}]]></conditionExpression>
       </sequenceFlow>
     </subProcess>
     <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="usertask1"></sequenceFlow>
@@ -401,14 +415,14 @@
         <omgdi:waypoint x="421.0" y="257.0"></omgdi:waypoint>
         <omgdi:waypoint x="422.0" y="229.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="16.0" width="100.0" x="410.0" y="269.0"></omgdc:Bounds>
+          <omgdc:Bounds height="14.0" width="97.0" x="410.0" y="269.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow7" id="BPMNEdge_flow7">
         <omgdi:waypoint x="560.0" y="198.0"></omgdi:waypoint>
         <omgdi:waypoint x="605.0" y="198.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="16.0" width="100.0" x="550.0" y="198.0"></omgdc:Bounds>
+          <omgdc:Bounds height="14.0" width="79.0" x="550.0" y="198.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">

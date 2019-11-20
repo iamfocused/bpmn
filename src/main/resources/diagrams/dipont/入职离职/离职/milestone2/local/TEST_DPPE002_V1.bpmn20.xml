@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/frm">
+  <process id="DPPE002" name="离职流程" isExecutable="true" activiti:candidateStarterGroups="admin">
+    <documentation>员工离职流程</documentation>
+    <startEvent id="STEVENT" name="流程启动事件" activiti:initiator="initiator">
+      <documentation>流程启动，填写离职信息</documentation>
+      <extensionElements>
+        <activiti:formProperty id="sn_员工邮箱_1_string_psbi_$$A" name="员工邮箱" type="string" variable="sn" required="true"></activiti:formProperty>
+        <activiti:formProperty id="leavetype_离职类型_2_enum_rbv_$$B" name="离职类型" type="enum" variable="leavetype" required="true">
+          <activiti:value id="员工主动" name="员工主动"></activiti:value>
+          <activiti:value id="公司主动" name="公司主动"></activiti:value>
+          <activiti:value id="协商一致" name="协商一致"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="cutofdate_截至日期_1_string_t3_$$C" name="截至日期" type="string" variable="cutofdate" required="true"></activiti:formProperty>
+        <activiti:formProperty id="overage_剩余年休假_2_string_t6_$$C" name="剩余年休假" type="string" variable="overage" required="true"></activiti:formProperty>
+        <activiti:formProperty id="vacation_剩余调休小时数_3_string_t6_$$C" name="剩余调休小时数" type="string" variable="vacation" required="true"></activiti:formProperty>
+        <activiti:formProperty id="joindate_入职日期_1_string_t3_$$D" name="入职日期" type="string" variable="joindate" required="true"></activiti:formProperty>
+        <activiti:formProperty id="lastworkingdate_最后工作日_2_string_t3_$$D" name="最后工作日" type="string" variable="lastworkingdate" required="true"></activiti:formProperty>
+        <activiti:formProperty id="lasthiredate_最后雇佣日_3_string_t3_$$D" name="最后雇佣日" type="string" variable="lasthiredate" required="true"></activiti:formProperty>
+        <activiti:formProperty id="mailRetentionTime_邮箱保留时间_1_string_t3_$$E" name="邮箱保留时间" type="string" variable="mailRetentionTime" required="true"></activiti:formProperty>
+        <activiti:formProperty id="bpmsRetentionTime_BPMS账号保留时间_2_string_t3_$$E" name="BPMS账号保留时间" type="string" variable="bpmsRetentionTime" required="true"></activiti:formProperty>
+        <activiti:formProperty id="computerRetentionTime_电脑保留时间_3_string_t3_$$E" name="电脑保留时间" type="string" variable="computerRetentionTime" required="true"></activiti:formProperty>
+        <activiti:formProperty id="cutofprovidentfund_社保公积金缴纳至_4_string_t3_$$E" name="社会保险及住房公积金将缴纳至" type="string" variable="cutofprovidentfund" required="true"></activiti:formProperty>
+        <activiti:formProperty id="financeSn_财务对接人_1_string_psbi_$$F" name="财务对接人" type="string" variable="financeSn" required="true"></activiti:formProperty>
+        <activiti:formProperty id="itSn_IT对接人_2_string_psbi_$$F" name="IT对接人" type="string" variable="itSn" required="true"></activiti:formProperty>
+        <activiti:formProperty id="adminSn_行政对接人_3_string_psbi_$$F" name="行政对接人" type="string" variable="adminSn" required="true"></activiti:formProperty>
+        <activiti:formProperty id="leavereason_离职原因_1_string_t2_$$G" name="离职原因" type="string" variable="leavereason"></activiti:formProperty>
+        <activiti:formProperty id="leaveDate_离职日期_1_string_t3_$$H" name="离职日期" type="string" variable="leaveDate" required="true"></activiti:formProperty>
+        <activiti:executionListener event="end" class="org.activiti.engine.impl.bpmn.listener.ScriptExecutionListener">
+          <activiti:field name="language">
+            <activiti:string><![CDATA[groovy]]></activiti:string>
+          </activiti:field>
+          <activiti:field name="script">
+            <activiti:string><![CDATA[import groovy.json.JsonOutput
+				import groovy.json.JsonSlurper
+				
+				def sn = execution.getVariable('sn')
+            	
+            	execution.setVariable("_http_method", "GET");
+				def headerMap = new java.util.HashMap<String,String>();			
+				execution.setVariable("_http_headers", headerMap);
+				execution.setVariable("_http_body", '');
+				def param=java.net.URLEncoder.encode('[{"type":"category","target":["variable",["template-tag","param"]],"value":\"'+ sn+ '\"}]', "UTF-8");
+				execution.setVariable("_http_url", 'https://metabase.eorionsolution.com/public/question/2c5a9a8b-9bf4-4260-8060-0ee2cafb8b28.json?parameters='+param);
+				execution.setVariable("_http_response_body", '');
+				execution.setVariable("_http_response_status_code", '');]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </startEvent>
+    <scriptTask id="DEPARTMAIL" name="相关部门邮件构造" scriptFormat="groovy" activiti:autoStoreVariables="false">
+      <script>
+      		
+      		def employeeName = execution.getVariable('employeeName')?:'' 
+      		
+      		def jsonSlurper = new groovy.json.JsonSlurper()
+			def bodyMap = new HashMap()
+			def detailMap = new HashMap()
+			def dataMap = new HashMap()
+			
+			def to = ['baocaixue@eorionsolution.com']
+			
+			detailMap.put("from","develop@eorionsolution.com")
+			detailMap.put("to", to)
+			def subjectName = employeeName + "-离职通知"
+			detailMap.put("subject", subjectName)
+			detailMap.put("templateName", "leave-notification-all-template")
+			
+			dataMap.put("commitLeave", "1")//标记
+			dataMap.put("employeeName", execution.getVariable("employeeName"))
+			def department = jsonSlurper.parseText(execution.getVariable("department"))			
+			dataMap.put("department", department.name)
+			def corp = jsonSlurper.parseText(execution.getVariable("legalCorp"))
+			dataMap.put("legalCorp", corp.name)
+			dataMap.put("ncCode", execution.getVariable("ncCode"))
+			dataMap.put("position", execution.getVariable("position"))
+			def cutofdate = java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd").format(java.time.LocalDateTime.ofInstant(java.time.Instant.ofEpochMilli(execution.getVariable("cutofdate").toLong()), java.time.ZoneId.systemDefault()))			
+			dataMap.put("cutofdate", cutofdate)
+			dataMap.put("overage", execution.getVariable("overage"))
+			def joindate = java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd").format(java.time.LocalDateTime.ofInstant(java.time.Instant.ofEpochMilli(execution.getVariable("joindate").toLong()), java.time.ZoneId.systemDefault()))						
+			dataMap.put("joindate", joindate)
+			def lastworkingdate = java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd").format(java.time.LocalDateTime.ofInstant(java.time.Instant.ofEpochMilli(execution.getVariable("lastworkingdate").toLong()), java.time.ZoneId.systemDefault()))									
+			dataMap.put("lastworkingdate", lastworkingdate)
+			dataMap.put("phone", execution.getVariable("phone"))
+			dataMap.put("place", execution.getVariable("place"))
+			def mailRetentionTime = java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd").format(java.time.LocalDateTime.ofInstant(java.time.Instant.ofEpochMilli(execution.getVariable("mailRetentionTime").toLong()), java.time.ZoneId.systemDefault()))												
+			dataMap.put("mailRetentionTime", mailRetentionTime)
+			def computerRetentionTime = java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd").format(java.time.LocalDateTime.ofInstant(java.time.Instant.ofEpochMilli(execution.getVariable("computerRetentionTime").toLong()), java.time.ZoneId.systemDefault()))															
+			dataMap.put("computerRetentionTime", computerRetentionTime)
+			def cutofprovidentfund = java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd").format(java.time.LocalDateTime.ofInstant(java.time.Instant.ofEpochMilli(execution.getVariable("cutofprovidentfund").toLong()), java.time.ZoneId.systemDefault()))																		
+			dataMap.put("cutofprovidentfund", cutofprovidentfund)
+			
+			dataMap.put("vacation", execution.getVariable('vacation'))
+			def lasthiredate = java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd").format(java.time.LocalDateTime.ofInstant(java.time.Instant.ofEpochMilli(execution.getVariable("lasthiredate").toLong()), java.time.ZoneId.systemDefault()))
+			dataMap.put('lasthiredate', lasthiredate)
+			def bpmsRetentionTime = java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd").format(java.time.LocalDateTime.ofInstant(java.time.Instant.ofEpochMilli(execution.getVariable("bpmsRetentionTime").toLong()), java.time.ZoneId.systemDefault()))
+			dataMap.put('bpmsRetentionTime', bpmsRetentionTime)
+			
+			detailMap.put("templateData",dataMap)
+			bodyMap.put("mail", detailMap)
+			def body = groovy.json.JsonOutput.toJson(bodyMap)
+           	//send request
+			execution.setVariable("_http_method", "POST")
+			def headerMap = new HashMap()
+			headerMap.put("Content-Type","application/json")
+			execution.setVariable("_http_headers", headerMap)
+			execution.setVariable("_http_body", body)
+			execution.setVariable('deptsMailBody', body)
+			execution.setVariable("_http_url", 'https://commonservices.eorionsolution.com/mailsender/mail/v2/mail')
+			execution.setVariable("_http_response_body", '')
+			execution.setVariable("_http_response_status_code", '')
+			
+    	</script>
+    </scriptTask>
+    <serviceTask id="DEPARTMAILSEND" name="相关部门邮件发送" activiti:class="com.eorionsolution.riying.bpms.javaservice.http.RestAPIService"></serviceTask>
+    <sequenceFlow id="flow4" sourceRef="DEPARTMAIL" targetRef="DEPARTMAILSEND"></sequenceFlow>
+    <serviceTask id="EIMCHANGE" name="更改在职状态" activiti:class="com.eorionsolution.riying.bpms.javaservice.http.RestAPIService"></serviceTask>
+    <scriptTask id="scripttask1" name="状态更新结果解析" scriptFormat="groovy" activiti:autoStoreVariables="false">
+      <script>
+      
+		if(execution.getVariable('_http_response_status_code') != 200) {
+			throw new org.activiti.engine.ActivitiIllegalArgumentException("调用离职接口异常");
+		}
+      
+	  </script>
+    </scriptTask>
+    <sequenceFlow id="flow22" sourceRef="EIMCHANGE" targetRef="scripttask1"></sequenceFlow>
+    <scriptTask id="COMPELETEVAR" name="填充字段" scriptFormat="groovy" activiti:autoStoreVariables="false">
+      <script>
+    		import groovy.json.JsonOutput
+				import groovy.json.JsonSlurper
+				
+    			def responseCode = execution.getVariable("_http_response_status_code")
+    			if (responseCode != 200) {
+					throw new org.activiti.engine.ActivitiIllegalArgumentException('METABASE调用失败');
+				}
+				def jsonSlurper = new JsonSlurper()
+				def responseBody = execution.getVariable('_http_response_body')
+				def employeeList = jsonSlurper.parseText(responseBody)
+				if(employeeList.size() != 1) {
+					throw new org.activiti.engine.ActivitiIllegalArgumentException('数据库数据异常，不能填充员工字段');
+				}
+				def employee = employeeList[0]
+				execution.setVariable('employeeName', employee.NAME_?:"")
+				def department = ['code':employee.DEP_SN_?:"",'name':employee.DEP_NAME_?:""]
+				execution.setVariable('department', JsonOutput.toJson(department))
+				def corp = ['code': employee.CORP_SN_?:"", 'name':employee.CORP_NAME_?:""]
+				execution.setVariable('legalCorp', JsonOutput.toJson(corp))
+				execution.setVariable('ncCode', employee.NC_CODE_?:"")
+				execution.setVariable('position',employee.ROLE_?.replaceAll("[\\[\\]]","")?:"")
+				def homeAddr = employee.HOME_ADDRESS_?:""
+				def pold = employee.PLACE_OF_LEGAL_DOC?:""
+				execution.setVariable('place', homeAddr + "/" + pold)
+				execution.setVariable('phone', employee.MOBILE_PHONE_?:"")
+				
+				def sn = execution.getVariable('sn')
+				def leaveDate = execution.getVariable('leaveDate') 
+				def bodyObj = new HashMap()
+				bodyObj.put('sn', sn)
+				bodyObj.put('dimissionTime',leaveDate)
+				
+				def body = JsonOutput.toJson(bodyObj)
+				//send request
+				execution.setVariable("_http_method", "PUT")
+				def headerMap = new HashMap()
+				headerMap.put("Content-Type","application/json")
+				execution.setVariable("_http_headers", headerMap)
+				execution.setVariable("_http_body", body)
+				execution.setVariable("_http_url", 'https://bpms.eorionsolution.com/neo-hr-api/v2/employee/withoutauth/leave')
+				execution.setVariable("_http_response_body", '')
+				execution.setVariable("_http_response_status_code", '')
+				
+    	</script>
+    </scriptTask>
+    <serviceTask id="METABASEST" name="访问metabase" activiti:class="com.eorionsolution.riying.bpms.javaservice.http.RestAPIService"></serviceTask>
+    <sequenceFlow id="flow35" sourceRef="STEVENT" targetRef="METABASEST"></sequenceFlow>
+    <sequenceFlow id="flow36" sourceRef="METABASEST" targetRef="COMPELETEVAR"></sequenceFlow>
+    <sequenceFlow id="flow37" sourceRef="COMPELETEVAR" targetRef="EIMCHANGE"></sequenceFlow>
+    <endEvent id="endevent1" name="End"></endEvent>
+    <sequenceFlow id="flow39" sourceRef="scripttask1" targetRef="DEPARTMAIL"></sequenceFlow>
+    <sequenceFlow id="flow40" sourceRef="DEPARTMAILSEND" targetRef="endevent1"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_DPPE002">
+    <bpmndi:BPMNPlane bpmnElement="DPPE002" id="BPMNPlane_DPPE002">
+      <bpmndi:BPMNShape bpmnElement="STEVENT" id="BPMNShape_STEVENT">
+        <omgdc:Bounds height="35.0" width="35.0" x="40.0" y="235.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="DEPARTMAIL" id="BPMNShape_DEPARTMAIL">
+        <omgdc:Bounds height="55.0" width="121.0" x="530.0" y="335.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="DEPARTMAILSEND" id="BPMNShape_DEPARTMAILSEND">
+        <omgdc:Bounds height="61.0" width="121.0" x="350.0" y="332.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="EIMCHANGE" id="BPMNShape_EIMCHANGE">
+        <omgdc:Bounds height="61.0" width="112.0" x="390.0" y="222.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scripttask1" id="BPMNShape_scripttask1">
+        <omgdc:Bounds height="61.0" width="114.0" x="534.0" y="222.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="COMPELETEVAR" id="BPMNShape_COMPELETEVAR">
+        <omgdc:Bounds height="55.0" width="105.0" x="250.0" y="225.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="METABASEST" id="BPMNShape_METABASEST">
+        <omgdc:Bounds height="55.0" width="105.0" x="110.0" y="225.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="270.0" y="345.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow4" id="BPMNEdge_flow4">
+        <omgdi:waypoint x="530.0" y="362.0"></omgdi:waypoint>
+        <omgdi:waypoint x="471.0" y="362.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow22" id="BPMNEdge_flow22">
+        <omgdi:waypoint x="502.0" y="252.0"></omgdi:waypoint>
+        <omgdi:waypoint x="534.0" y="252.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow35" id="BPMNEdge_flow35">
+        <omgdi:waypoint x="75.0" y="252.0"></omgdi:waypoint>
+        <omgdi:waypoint x="110.0" y="252.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow36" id="BPMNEdge_flow36">
+        <omgdi:waypoint x="215.0" y="252.0"></omgdi:waypoint>
+        <omgdi:waypoint x="250.0" y="252.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow37" id="BPMNEdge_flow37">
+        <omgdi:waypoint x="355.0" y="252.0"></omgdi:waypoint>
+        <omgdi:waypoint x="390.0" y="252.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow39" id="BPMNEdge_flow39">
+        <omgdi:waypoint x="591.0" y="283.0"></omgdi:waypoint>
+        <omgdi:waypoint x="590.0" y="335.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow40" id="BPMNEdge_flow40">
+        <omgdi:waypoint x="350.0" y="362.0"></omgdi:waypoint>
+        <omgdi:waypoint x="305.0" y="362.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

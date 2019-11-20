@@ -1,48 +1,48 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/pur">
-  <process id="materialinf0902" name="物料信息" isExecutable="true" activiti:candidateStarterGroups="admin@@13@@,processadmin@@17@@,admin,processadmin">
+  <process id="material" name="物料信息" isExecutable="true" activiti:candidateStarterGroups="admin@@67@@,admin@@100@@,admin">
     <startEvent id="StartEvent_1" activiti:initiator="initiator">
       <extensionElements>
-        <activiti:formProperty id="itemname_物料名称_3_string_t1_$$A" name="物料名称" type="string" variable="itemname"></activiti:formProperty>
-        <activiti:formProperty id="ORDCODE_物料型号_4_string_t1_$$A" name="物料型号" type="string" variable="ORDCODE"></activiti:formProperty>
-        <activiti:formProperty id="itemnumber_物料编号_5_string_t1_$$A" name="物料编号" type="string" variable="itemnumber"></activiti:formProperty>
-        <activiti:formProperty id="itemgroup_产品类别_6_string_t1_$$A" name="产品组别" type="string" variable="itemgroup"></activiti:formProperty>
+        <activiti:formProperty id="itemname_物料名称_5_string_t1_$$A" name="物料名称" type="string" variable="itemname"></activiti:formProperty>
+        <activiti:formProperty id="ORDCODE_物料型号_3_string_t1_$$A" name="物料型号" type="string" variable="ORDCODE"></activiti:formProperty>
+        <activiti:formProperty id="itemnumber_物料编号_4_string_t1_$$A" name="物料编号" type="string" variable="itemnumber"></activiti:formProperty>
+        <activiti:formProperty id="itemgroup_产品类别_6_string_t1_$$B" name="产品组别" type="string" variable="itemgroup"></activiti:formProperty>
         <activiti:formProperty id="mainmaterial_主要材料_7_string_t1_$$B" name="主要材料" type="string" variable="mainmaterial"></activiti:formProperty>
         <activiti:formProperty id="materialtype_材料类别_8_string_t1_$$B" name="材料类别" type="string" variable="materialtype"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566810817138_item" name="物料清单" type="string" variable="header1566810817138"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566810817138_itemnumber2_物料编号_3_string_t1_$$A" name="物料编号" type="string" variable="itemnumber2"></activiti:formProperty>
-        <activiti:formProperty id="tbheader1566810817138_ORDCODE2_物料型号_4_string_t1_$$A" name="物料型号" type="string" variable="ORDCODE2"></activiti:formProperty>
-        <activiti:formProperty id="tbheader1566810817138_itemname2_物料名称_2_string_t1_$$A" name="物料名称" type="string" variable="itemname2"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566810817138_ORDCODE2_物料型号_2_string_t1_$$A" name="物料型号" type="string" variable="ORDCODE2"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566810817138_itemname2_物料名称_4_string_t1_$$A" name="物料名称" type="string" variable="itemname2"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566810817138_itemqty2_数量_5_string_t6_$$A" name="数量" type="string" variable="itemqty2"></activiti:formProperty>
       </extensionElements>
     </startEvent>
     <sequenceFlow id="SequenceFlow_0xbt7m2" sourceRef="StartEvent_1" targetRef="scripttask1"></sequenceFlow>
-    <userTask id="usertask1" name="Cyclic update" activiti:assignee="${initiator}">
+    <userTask id="usertask1" name="循环更新" activiti:assignee="${initiator}">
       <extensionElements>
-        <activiti:formProperty id="itemname_物料名称_3_string_t1_$$A" name="物料名称" type="string" variable="itemname"></activiti:formProperty>
-        <activiti:formProperty id="ORDCODE_物料型号_4_string_t1_$$A" name="物料型号" type="string" variable="ORDCODE"></activiti:formProperty>
-        <activiti:formProperty id="itemnumber_物料编号_5_string_t1_$$A" name="物料编号" type="string" variable="itemnumber"></activiti:formProperty>
+        <activiti:formProperty id="itemname_物料名称_5_string_t1_$$A" name="物料名称" type="string" variable="itemname"></activiti:formProperty>
+        <activiti:formProperty id="ORDCODE_物料型号_3_string_t1_$$A" name="物料型号" type="string" variable="ORDCODE"></activiti:formProperty>
+        <activiti:formProperty id="itemnumber_物料编号_4_string_t1_$$A" name="物料编号" type="string" variable="itemnumber"></activiti:formProperty>
         <activiti:formProperty id="itemgroup_产品类别_6_string_t1_$$A" name="产品组别" type="string" variable="itemgroup"></activiti:formProperty>
         <activiti:formProperty id="mainmaterial_主要材料_7_string_t1_$$B" name="主要材料" type="string" variable="mainmaterial"></activiti:formProperty>
         <activiti:formProperty id="materialtype_材料类别_8_string_t1_$$B" name="材料类别" type="string" variable="materialtype"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566810817138_item" name="物料清单" type="string" variable="header1566810817138"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566810817138_itemnumber2_物料编号_3_string_t1_$$A" name="物料编号" type="string" variable="itemnumber2"></activiti:formProperty>
-        <activiti:formProperty id="tbheader1566810817138_ORDCODE2_物料型号_4_string_t1_$$A" name="物料型号" type="string" variable="ORDCODE2"></activiti:formProperty>
-        <activiti:formProperty id="tbheader1566810817138_itemname2_物料名称_2_string_t1_$$A" name="物料名称" type="string" variable="itemname2"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566810817138_ORDCODE2_物料型号_2_string_t1_$$A" name="物料型号" type="string" variable="ORDCODE2"></activiti:formProperty>
+        <activiti:formProperty id="tbheader1566810817138_itemname2_物料名称_4_string_t1_$$A" name="物料名称" type="string" variable="itemname2"></activiti:formProperty>
         <activiti:formProperty id="tbheader1566810817138_itemqty2_数量_5_string_t6_$$A" name="数量" type="string" variable="itemqty2"></activiti:formProperty>
       </extensionElements>
     </userTask>
-    <scriptTask id="scripttask1" name="check unique" scriptFormat="groovy" activiti:autoStoreVariables="false">
-		<script><![CDATA[
+    <scriptTask id="scripttask1" name="检查唯一性" scriptFormat="groovy" activiti:autoStoreVariables="false">
+      <script>
 import java.util.stream.Collectors;				
 def processInstanceList = runtimeService.createProcessInstanceQuery().processInstanceTenantId(execution.getTenantId()).processDefinitionKey("materialinf0902").list();
-//def processInstanceList = runtimeService.createProcessInstanceQuery().processDefinitionKey("materialinf0902").list();
-def a = processInstanceList.stream().map({x -> x.getProcessInstanceId()}).collect(Collectors.toList());
+//def processInstanceList = runtimeService.createProcessInstanceQuery().processDefinitionKey("material").list();
+def a = processInstanceList.stream().map({x -&gt; x.getProcessInstanceId()}).collect(Collectors.toList());
 execution.setVariable("a",a.toString());
 
 
 def variableList = historyService.createHistoricVariableInstanceQuery().variableValueEquals("itemnumber", execution.getVariable("itemnumber")).list();
-def b = variableList.stream().map({x ->x.getProcessInstanceId()}).collect(Collectors.toList());
+def b = variableList.stream().map({x -&gt;x.getProcessInstanceId()}).collect(Collectors.toList());
 b.remove(execution.getProcessInstanceId());
 execution.setVariable("b",b.toString());
 if( ! a.disjoint(b)){
@@ -51,7 +51,7 @@ if( ! a.disjoint(b)){
 
 
 
-				]]>
+				
 		</script>
     </scriptTask>
     <sequenceFlow id="flow1" sourceRef="scripttask1" targetRef="usertask1"></sequenceFlow>

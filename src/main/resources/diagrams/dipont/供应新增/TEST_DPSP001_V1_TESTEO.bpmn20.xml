@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/pur">
+  <process id="DPSP001" name="测试练习DPSP001供应商新增 New Supplier" isExecutable="true" activiti:candidateStarterGroups="_testdemo,admin">
+    <startEvent id="S1" name="S1" activiti:initiator="initiator">
+      <extensionElements>
+        <activiti:formProperty id="spname_供应商名称 Supplier Name_1_string_t1_$$A" name="供应商名称 Supplier Name" type="string" variable="spname" required="true"></activiti:formProperty>
+        <activiti:formProperty id="sptype_供应商类别 Supplier Category_2_string_tree_$$A" name="供应商类别 Supplier Category" type="string" variable="sptype" required="true"></activiti:formProperty>
+        <activiti:formProperty id="comments_备注 Remarks_1_string_t1_$$B" name="备注 Remarks" type="string" variable="comments"></activiti:formProperty>
+		
+
+        <activiti:executionListener event="end" class="org.activiti.engine.impl.bpmn.listener.ScriptExecutionListener">
+          <activiti:field name="language">
+            <activiti:string><![CDATA[groovy]]></activiti:string>
+          </activiti:field>
+          <activiti:field name="script">
+            <activiti:string><![CDATA[
+			
+				def vendorname = execution.getVariable("spname")
+				//查询供应商详细的参数设置
+				execution.setVariable("_http_method", "GET");
+				def headerMap = new java.util.HashMap<String,String>();			
+				execution.setVariable("_http_headers", headerMap);
+				execution.setVariable("_http_body", '');
+				def param=java.net.URLEncoder.encode('[{"type":"category","target":["variable",["template-tag","name"]],"value":"'+vendorname+'"}]', "UTF-8");
+				execution.setVariable("_http_url", 'https://bpmmb.dipont.com/public/question/892f6b2e-2872-4a39-b63b-a1beb31926f9.json?parameters='+param);
+				execution.setVariable("_http_response_body", '');
+				execution.setVariable("_http_response_status_code", '');			
+				]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </startEvent>
+	
+	<serviceTask id="st01" name="查重" activiti:class="com.eorionsolution.riying.bpms.javaservice.http.RestAPIService"></serviceTask>
+    <scriptTask id="st02" name="数据处理" scriptFormat="groovy" activiti:autoStoreVariables="false">
+	<script><![CDATA[
+				//保存供应商相应信息
+				def venderList = new groovy.json.JsonSlurper().parseText(execution.getVariable('_http_response_body'));
+				if (venderList.size() > 0)
+					throw new org.activiti.engine.ActivitiIllegalArgumentException("供应商名称重复！The supplier name is duplicated!");
+
+					
+				execution.setVariable("businessKey",execution.getBusinessKey());
+				def insert_supplier_time = new Date().getTime();
+				def generator = { String alphabet, int n ->
+				  new Random().with {
+					(1..n).collect { alphabet[ nextInt( alphabet.length() ) ] }.join()
+				  }
+				}
+
+				def Id = "2001"+insert_supplier_time+generator( (('A'..'Z')+('0'..'9')).join(), 3 );//id和code
+				def name = execution.getVariable("spname");
+				def type = new groovy.json.JsonSlurper().parseText(execution.getVariable("sptype")).code;
+				def insert_supplier_sql = """
+BEGIN
+	COMMIT;
+	SET TRANSACTION NAME 'insert_supplier';
+	insert into NCDB.bd_supplier(pk_supplier,code,name,pk_group,pk_org,pk_supplierclass,supprop,supstate,enablestate,pk_timezone,creationtime,ts)
+values
+('${Id}','${Id}','${name}','0001B1100000000002FT','0001B1100000000002FT',(select pk_supplierclass from NCDB.bd_supplierclass where CODE = '${type}'),0,1,2,'0001Z010000000079U2P',to_char(sysdate,'yyyy-MM-dd HH24:mi:ss'),to_char(sysdate,'yyyy-MM-dd HH24:mi:ss'));
+
+
+INSERT INTO NCDB.bd_cust_supplier (pk_cust_sup,code,name,pk_group,pk_org,custsupprop,custsuptype,custenablestate,supenablestate,pk_custclass,pk_supplierclass,ts) 
+VALUES 
+('${Id}','${Id}','${name}','0001B1100000000002FT','0001B1100000000002FT',0,3,2,2,(select PK_CUSTCLASS from NCDB.bd_custclass where CODE = '${type}'),(select pk_supplierclass from NCDB.bd_supplierclass where CODE = '${type}'),to_char(sysdate,'yyyy-MM-dd HH24:mi:ss'));
+	COMMIT;
+EXCEPTION WHEN OTHERS THEN
+    ROLLBACK;
+    RAISE; 
+END;
+/
+exit
+""";
+				
+
+				execution.setVariable("type",type);
+				execution.setVariable("supplier_id",Id);
+				execution.setVariable("supplier_name",name);
+				execution.setVariable("instanceId",execution.getProcessInstanceId());
+				execution.setVariable("insert_supplier_time",insert_supplier_time);
+				execution.setVariable("insert_supplier_sql",insert_supplier_sql.toString());					
+				]]></script>
+    </scriptTask>
+	
+	
+	
+    <sequenceFlow id="flow1" sourceRef="S1" targetRef="st01"></sequenceFlow>
+    <sequenceFlow id="flow2" sourceRef="insert_supplier" targetRef="ut01"></sequenceFlow>
+    <serviceTask id="insert_supplier" name="供应商新增" activiti:type="camel">
+      <extensionElements>
+        <activiti:field name="camelContext">
+          <activiti:string><![CDATA[camelContext]]></activiti:string>
+        </activiti:field>
+      </extensionElements>
+    </serviceTask>
+    <userTask id="ut01" name="新增供应商账号信息 Add supplier account information" activiti:assignee="${initiator}" activiti:dueDate="P1D" activiti:priority="8080">
+      <extensionElements>
+        <activiti:formProperty id="tbhdaccount_item" name="供应商账户明细 Account Detail" type="string" variable="tbhdaccount_item" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdaccount_境内/境外 domestic/overseas_type_0_enum_sbs_$$VA" name="境内/境外 domestic/overseas" type="enum" variable="tbhdaccount_type_t00">
+		  <activiti:value id="" name=""></activiti:value>
+          <activiti:value id="domestic" name="境内 domestic"></activiti:value>
+		  <activiti:value id="overseas" name="境外 overseas"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="tbhdaccount_账户名称 Account Name_accountname_1_string_t1_$$A" name="账户名称 Account Name" type="string" variable="tbhdaccount_accountname_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdaccount_账号 Account No_accountno_2_string_t1_$$A" name="账号 Account No" type="string" variable="tbhdaccount_accountno_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdaccount_开户银行 Bank_depositbank_3_string_t1_$$A" name="开户银行 Bank" type="string" variable="tbhdaccount_depositbank_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdaccount_开户支行 Bank Branch_subbank_4_string_t1_$$A" name="开户支行 Bank Branch" type="string" variable="tbhdaccount_subbank_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdaccount_银行所在省（市）Bank Province_bankprovince_5_string_t1_$$A" name="银行所在省（市） Bank Province" type="string" variable="tbhdaccount_bankprovince_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdaccount_银行所在市（区）Bank City_bankcity_6_string_t1_$$A" name="银行所在市（区） Bank City" type="string" variable="tbhdaccount_bankcity_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdaccount_银行地址 Bank Address_bankaddress_7_string_t1_$$A" name="银行地址 Bank Address" type="string" variable="tbhdaccount_bankaddress_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdaccount_收款人名称 Beneficiary‘s Name_payeename_8_string_t1_$$A" name="收款人名称 Beneficiary‘s Name" type="string" variable="tbhdaccount_payeename_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdaccount_收款人地址 Beneficiary‘s Address_beneaddress_9_string_t1_$$A" name="收款人地址 Beneficiary‘s Address" type="string" variable="tbhdaccount_beneaddress_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdaccount_IBAN 账号/SWIFT Code/其他代码 IBAN Code/SWIFT Code/Other Code_swiftcode_10_string_t1_$$A" name="IBAN 账号/SWIFT Code/其他代码 IBAN Code/SWIFT Code/Other Code" type="string" variable="tbhdaccount_swiftcode_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdaccount_收款人常驻国家 Resident Country_benecountary_11_string_t1_$$A" name="收款人常驻国家 Resident Country" type="string" variable="tbhdaccount_benecountary_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdaccount_代理行名称 Proxy bank name_corrbankname_12_string_t1_$$A" name="代理行名称 Proxy bank name" type="string" variable="tbhdaccount_corrbankname_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdaccount_代理行地址 Proxy bank address_corrbankaddress_13_string_t1_$$A" name="代理行地址 Proxy bank address" type="string" variable="tbhdaccount_corrbankaddress_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdaccount_启用状态_enablestate_14_enum_sbs_$$A" name="启用状态 Enabled state" type="enum" variable="tbhdaccount_enablestate_t00">
+          <activiti:value id="启用" name="启用 Y"></activiti:value>
+        </activiti:formProperty>
+        <activiti:taskListener event="create" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+          <activiti:field name="language">
+            <activiti:string><![CDATA[groovy]]></activiti:string>
+          </activiti:field>
+          <activiti:field name="script">
+            <activiti:string><![CDATA[if(task.getExecution().getVariable('camelBody').contains('exec failed') || task.getExecution().getVariable('camelBody').contains('Error'))
+					throw new org.activiti.engine.ActivitiIllegalArgumentException(task.getExecution().getVariable('camelBody'));]]></activiti:string>
+          </activiti:field>
+        </activiti:taskListener>
+        <activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+          <activiti:field name="language">
+            <activiti:string><![CDATA[groovy]]></activiti:string>
+          </activiti:field>
+          <activiti:field name="script">
+            <activiti:string><![CDATA[def type = task.getExecution().getVariable("type");
+				def supplier_id = task.getExecution().getVariable("supplier_id");
+				def supplier_name = task.getExecution().getVariable("supplier_name");	
+				def initiator = initiator;	
+				def rowList = [];
+				def tbhdaccount_item_std= new groovy.json.JsonSlurper().parseText(task.getExecution().getVariable("tbhdaccount_item_std"));
+				tbhdaccount_item_std.each{ item ->
+				rowList << """('${item.accountname}','${item.accountno}','${item.depositbank}','${item.subbank}','${item.bankprovince}','${item.bankcity}','${item.bankaddress}','${item.payeename}','${item.beneaddress}','${item.swiftcode}','${item.benecountary}','${item.corrbankname}','${item.corrbankaddress}','${item.enablestate}','${type}','${supplier_id}','${supplier_name}',now(),now(),'${initiator}','${item.type}')"""
+				}			
+			
+				def insert_account_time = new Date().getTime();
+
+				def insert_account_sql ='use dipont;insert into DP_SUPPLIER_ACCOUNT(ACCOUNT_NAME_,ACCOUNT_NO_,DEPOSIT_BANK_,SUB_BANK_,BANK_PROVINCE_,BANK_CITY_,BANK_ADDRESS_,PAYEE_NAME_,BENE_ADDRESS_,SWIFT_CODE_,BENE_COUNTARY_,CORR_BANK_NAME_,CORR_BANK_ADDRESS_,ENABLESTATE_,SUPPLIER_TYPE_,SUPPLIER_CODE_,SUPPLIER_NAME_,CRDEAT_AT_,UPDATE_AT_,UPDATE_BY_,TYPE_) values '+rowList.join(',')+';';
+
+				task.getExecution().setVariable("insert_account_time",insert_account_time);
+				task.getExecution().setVariable("insert_account_sql",insert_account_sql);]]></activiti:string>
+          </activiti:field>
+        </activiti:taskListener>
+      </extensionElements>
+    </userTask>
+    <serviceTask id="insert_account" name="供应商账号新增" activiti:type="camel">
+      <extensionElements>
+        <activiti:field name="camelContext">
+          <activiti:string><![CDATA[camelContext]]></activiti:string>
+        </activiti:field>
+      </extensionElements>
+    </serviceTask>
+    <endEvent id="E1" name="E1">
+      <extensionElements>
+        <activiti:executionListener event="end" class="org.activiti.engine.impl.bpmn.listener.ScriptExecutionListener">
+          <activiti:field name="language">
+            <activiti:string><![CDATA[groovy]]></activiti:string>
+          </activiti:field>
+          <activiti:field name="script">
+            <activiti:string><![CDATA[if(execution.getVariable('camelBody').contains('exec failed'))
+					throw new org.activiti.engine.ActivitiIllegalArgumentException(execution.getVariable('camelBody'));]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </endEvent>
+    <sequenceFlow id="flow3" sourceRef="ut01" targetRef="insert_account"></sequenceFlow>
+    <sequenceFlow id="flow4" sourceRef="insert_account" targetRef="E1"></sequenceFlow>
+
+    <sequenceFlow id="flow5" sourceRef="st01" targetRef="st02"></sequenceFlow>
+    <sequenceFlow id="flow6" sourceRef="st02" targetRef="insert_supplier"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_DPSP001">
+    <bpmndi:BPMNPlane bpmnElement="DPSP001" id="BPMNPlane_DPSP001">
+      <bpmndi:BPMNShape bpmnElement="S1" id="BPMNShape_S1">
+        <omgdc:Bounds height="35.0" width="35.0" x="60.0" y="198.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="insert_supplier" id="BPMNShape_insert_supplier">
+        <omgdc:Bounds height="71.0" width="105.0" x="380.0" y="180.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="ut01" id="BPMNShape_ut01">
+        <omgdc:Bounds height="71.0" width="105.0" x="510.0" y="180.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="insert_account" id="BPMNShape_insert_account">
+        <omgdc:Bounds height="71.0" width="105.0" x="640.0" y="180.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="E1" id="BPMNShape_E1">
+        <omgdc:Bounds height="35.0" width="35.0" x="790.0" y="198.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="st01" id="BPMNShape_st01">
+        <omgdc:Bounds height="71.0" width="105.0" x="120.0" y="180.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="st02" id="BPMNShape_st02">
+        <omgdc:Bounds height="71.0" width="105.0" x="250.0" y="180.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="95.0" y="215.0"></omgdi:waypoint>
+        <omgdi:waypoint x="120.0" y="215.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="485.0" y="215.0"></omgdi:waypoint>
+        <omgdi:waypoint x="510.0" y="215.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3">
+        <omgdi:waypoint x="615.0" y="215.0"></omgdi:waypoint>
+        <omgdi:waypoint x="640.0" y="215.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow4" id="BPMNEdge_flow4">
+        <omgdi:waypoint x="745.0" y="215.0"></omgdi:waypoint>
+        <omgdi:waypoint x="790.0" y="215.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow5" id="BPMNEdge_flow5">
+        <omgdi:waypoint x="225.0" y="215.0"></omgdi:waypoint>
+        <omgdi:waypoint x="250.0" y="215.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow6" id="BPMNEdge_flow6">
+        <omgdi:waypoint x="355.0" y="215.0"></omgdi:waypoint>
+        <omgdi:waypoint x="380.0" y="215.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>
