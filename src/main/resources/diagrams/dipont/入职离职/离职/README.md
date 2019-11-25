@@ -13,3 +13,10 @@
 - milestone2   
 	- BPMS账号保留时间、剩余年休假、剩余调休小时数、最后雇佣日、财务行政IT对接人   
 	- 社保公积金选填  其他那些字段选填   
+
+- 部署过程
+	- STEVENT metabase调用，获取个人信息的url
+	- COMPELETEVAR metabase调用，查询财务url
+	- scripttask2 metabase调用，查询行政、人事的drools url
+	- scripttask3 eim接口url
+	- DEPARTMAIL 邮件：修改接受人、发送邮箱、url

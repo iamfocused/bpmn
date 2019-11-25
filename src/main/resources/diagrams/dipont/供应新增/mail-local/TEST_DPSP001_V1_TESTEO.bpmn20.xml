@@ -171,17 +171,20 @@ exit
 		import groovy.json.JsonSlurper
 		
 		def jsonSlurper = new JsonSlurper()
-		def sptype = jsonSlurper.parseText(sptype)
+		def sptype = jsonSlurper.parseText(sptype?:"""{"name":""}""")
+		def comments = comments?:''
 		def mailBodyStr = """
+		def employeeOpt = Optional.ofNullable(identityService.createUserQuery().userId(initiator).singleResult())
+		def employeename = employeeOpt.map({u ->  u.getLastName() + u.getFirstName()}).orElse('')
 		{
 		    "mail":{
-		        "templateName":"template",
+		        "templateName":"add_supplier",
 		        "subject":"供应商新增提醒",
 		        "templateData":{
 		            "spname":"$spname",
 		            "sptype":"$sptype.name",
 		            "comments":"$comments",
-		            "initiator":"$initiator"
+		            "initiator":"$employeename"
 		        },
 		        "from":"develop@eorionsolution.com",
 		        "to":[

@@ -1,0 +1,338 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/frm">
+  <process id="DPPE002" name="离职流程" isExecutable="true" activiti:candidateStarterGroups="_dplzfq">
+    <documentation>员工离职流程</documentation>
+    <startEvent id="STEVENT" name="流程启动事件" activiti:initiator="initiator">
+      <documentation>流程启动，填写离职信息</documentation>
+      <extensionElements>
+        <activiti:formProperty id="sn_员工邮箱_1_string_psbi_$$A" name="员工邮箱" type="string" variable="sn" required="true"></activiti:formProperty>
+        <activiti:formProperty id="leavetype_离职类型_2_enum_rbv_$$A" name="离职类型" type="enum" variable="leavetype" required="true">
+          <activiti:value id="员工主动" name="员工主动"></activiti:value>
+          <activiti:value id="公司主动" name="公司主动"></activiti:value>
+          <activiti:value id="协商一致" name="协商一致"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="mailRetentionTime_邮箱保留时间_3_string_t3_$$A" name="邮箱保留时间" type="string" variable="mailRetentionTime" required="true"></activiti:formProperty>
+        <activiti:formProperty id="bpmsRetentionTime_BPMS报销账号保留时间_4_string_t3_$$A" name="BPMS报销账号保留时间" type="string" variable="bpmsRetentionTime" required="true"></activiti:formProperty>
+        <activiti:formProperty id="computerRetentionTime_电脑保留时间_5_string_t3_$$A" name="电脑保留时间" type="string" variable="computerRetentionTime" required="true"></activiti:formProperty>
+        <activiti:formProperty id="leavereason_离职原因_6_string_t2_$$A" name="离职原因" type="string" variable="leavereason"></activiti:formProperty>
+        <activiti:formProperty id="leaveDate_离职日期_7_string_t3_$$A" name="离职日期" type="string" variable="leaveDate" required="true"></activiti:formProperty>
+        <activiti:formProperty id="managersn_部门负责人邮箱_8_string_psbi_$$A" name="部门负责人邮箱" type="string" variable="managersn"/>
+        <activiti:executionListener event="end" class="org.activiti.engine.impl.bpmn.listener.ScriptExecutionListener">
+          <activiti:field name="language">
+            <activiti:string><![CDATA[groovy]]></activiti:string>
+          </activiti:field>
+          <activiti:field name="script">
+            <activiti:string><![CDATA[import groovy.json.JsonOutput
+				import groovy.json.JsonSlurper
+				
+				def sn = execution.getVariable('sn')
+            	
+            	execution.setVariable("_http_method", "GET");
+				def headerMap = new java.util.HashMap<String,String>();			
+				execution.setVariable("_http_headers", headerMap);
+				execution.setVariable("_http_body", '');
+				def param=java.net.URLEncoder.encode('[{"type":"category","target":["variable",["template-tag","param"]],"value":\"'+ sn+ '\"}]', "UTF-8");
+				execution.setVariable("_http_url", 'https://bpmmb.dipont.com/public/question/83c8362c-b3fa-4045-92c5-a62062ce33ec.json?parameters='+param);
+				execution.setVariable("_http_response_body", '');
+				execution.setVariable("_http_response_status_code", '');]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </startEvent>
+    <scriptTask id="DEPARTMAIL" name="相关部门邮件构造" scriptFormat="groovy" activiti:autoStoreVariables="false">
+      <script>
+      	<![CDATA[
+      		import groovy.json.JsonOutput
+			import groovy.json.JsonSlurper
+      		
+      		def jsonSlurper = new groovy.json.JsonSlurper()
+      		def leaveDate = java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd").format(java.time.LocalDateTime.ofInstant(java.time.Instant.ofEpochMilli(leaveDate.toLong()), java.time.ZoneId.systemDefault()))
+			def bpmsRetentionTime = java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd").format(java.time.LocalDateTime.ofInstant(java.time.Instant.ofEpochMilli(bpmsRetentionTime.toLong()), java.time.ZoneId.systemDefault()))
+			def computerRetentionTime = java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd").format(java.time.LocalDateTime.ofInstant(java.time.Instant.ofEpochMilli(computerRetentionTime.toLong()), java.time.ZoneId.systemDefault()))
+			def mailRetentionTime = java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd").format(java.time.LocalDateTime.ofInstant(java.time.Instant.ofEpochMilli(mailRetentionTime.toLong()), java.time.ZoneId.systemDefault()))
+			
+			def toList = new HashSet()
+			toList.add(initiator)//启动者
+			toList.addAll(hrSns)//hr抄送
+			toList.addAll(adminSns)//行政
+			toList.addAll(finSns)//财务
+			if(managersn){
+				toList.add(managersn)
+			}
+			//def toList1 = new HashSet()
+			//toList1.add("baocaixue@eorionsolution.com")
+			def to = JsonOutput.toJson(toList)
+			
+			def mailBodyStr = """
+{
+  "mail": {
+    "templateName": "leave-notification-all-template",
+    "subject": "$employeeName 离职通知",
+    "templateData": {
+      "commitLeave": "1",
+      "legalCorp": "$legalCorp.name",
+      "employeeName": "$employeeName",
+      "leaveDate": "$leaveDate",
+      "department": "$department",
+      "ncCode": "$ncCode",
+      "position": "$position",
+      "mailRetentionTime": "$mailRetentionTime",
+      "computerRetentionTime": "$computerRetentionTime",
+      "bpmsRetentionTime": "$bpmsRetentionTime",
+      "costcenter":$costcenter
+    },
+    "from": "notice@dipont.com",
+    "to": $to
+  }
+}
+"""
+			def bodyFormat = jsonSlurper.parseText(mailBodyStr)
+			def body = JsonOutput.toJson(bodyFormat)
+           	//send request
+			execution.setVariable("_http_method", "POST")
+			def headerMap = new HashMap()
+			headerMap.put("Content-Type","application/json")
+			execution.setVariable("_http_headers", headerMap)
+			execution.setVariable("_http_body", body)
+			execution.setVariable('deptsMailBody', body)
+			execution.setVariable("_http_url", 'https://bpmcs.dipont.com/mail/v2/mail')
+			execution.setVariable("_http_response_body", '')
+			execution.setVariable("_http_response_status_code", '')
+		]]>	
+    	</script>
+    </scriptTask>
+    <serviceTask id="DEPARTMAILSEND" name="相关部门邮件发送" activiti:class="com.eorionsolution.riying.bpms.javaservice.http.RestAPIService"></serviceTask>
+    <sequenceFlow id="flow10" sourceRef="DEPARTMAIL" targetRef="DEPARTMAILSEND"></sequenceFlow>
+    <serviceTask id="EIMCHANGE" name="更改在职状态" activiti:class="com.eorionsolution.riying.bpms.javaservice.http.RestAPIService"></serviceTask>
+    <scriptTask id="scripttask1" name="状态更新结果解析" scriptFormat="groovy" activiti:autoStoreVariables="false">
+      <script>
+      
+		if(execution.getVariable('_http_response_status_code') != 200) {
+			throw new org.activiti.engine.ActivitiIllegalArgumentException("调用离职接口异常");
+		}
+      
+	  </script>
+    </scriptTask>
+    <sequenceFlow id="flow8" sourceRef="EIMCHANGE" targetRef="scripttask1"></sequenceFlow>
+    <scriptTask id="COMPELETEVAR" name="填充字段" scriptFormat="groovy" activiti:autoStoreVariables="false">
+      <script>
+      <![CDATA[
+    			import groovy.json.JsonOutput
+				import groovy.json.JsonSlurper
+				
+    			def responseCode = execution.getVariable("_http_response_status_code")
+    			if (responseCode != 200) {
+					throw new org.activiti.engine.ActivitiIllegalArgumentException('METABASE查询员工信息调用失败');
+				}
+				def jsonSlurper = new JsonSlurper()
+				def responseBody = execution.getVariable('_http_response_body')
+				def employeeList = jsonSlurper.parseText(responseBody)
+				if(employeeList.size() != 1) {
+					throw new org.activiti.engine.ActivitiIllegalArgumentException('数据库数据异常，员工信息不止1条或无信息');
+				}
+				def employee = employeeList[0]
+				if (!employee.CORP_SN_ || employee.CORP_SN_.trim()=='') {
+					throw new org.activiti.engine.ActivitiIllegalArgumentException('数据库数据异常，实体为空');
+				}
+				def corp = ['code': employee.CORP_SN_?:"", 'name':employee.CORP_NAME_?:""]
+				def costcenter = jsonSlurper.parseText(employee.COSTCENTER_?:"[]")
+				if (costcenter.size == 0 || costcenter.findAll{it.code==null}.size() != 0) {
+					throw new org.activiti.engine.ActivitiIllegalArgumentException('数据库数据异常，成本中心为空');
+				}
+				execution.setVariable('employeeName', employee.NAME_?:"")
+				execution.setVariable('legalCorp', corp)
+				execution.setVariable('ncCode', employee.NC_CODE_?:"")
+				execution.setVariable('position',employee.ROLE_?.replaceAll("[\\[\\]]","")?:"")
+				execution.setVariable('costcenter',JsonOutput.toJson(costcenter))
+				execution.setVariable('department',employee.DEP_NAME_?:"")
+				
+				//call metabase get all financial recipients
+				execution.setVariable("_http_method", "GET");
+				def headerMap = new java.util.HashMap<String,String>();			
+				execution.setVariable("_http_headers", headerMap);
+				execution.setVariable("_http_body", '');
+				def param=java.net.URLEncoder.encode('[{"type":"category","target":["variable",["template-tag","entityCode"]],"value":\"'+ corp.code + '\"}]', "UTF-8");
+				execution.setVariable("_http_url", 'https://bpmmb.dipont.com/public/question/64476893-cfa3-4ff5-9475-8c6c9d5c8857.json?parameters='+param);
+				execution.setVariable("_http_response_body", '');
+				execution.setVariable("_http_response_status_code", '');
+		]]>		
+    	</script>
+    </scriptTask>
+    <serviceTask id="METABASEST" name="访问metabase" activiti:class="com.eorionsolution.riying.bpms.javaservice.http.RestAPIService"></serviceTask>
+    <sequenceFlow id="flow1" sourceRef="STEVENT" targetRef="METABASEST"></sequenceFlow>
+    <sequenceFlow id="flow2" sourceRef="METABASEST" targetRef="COMPELETEVAR"></sequenceFlow>
+    <sequenceFlow id="flow3" sourceRef="COMPELETEVAR" targetRef="servicetask1"></sequenceFlow>
+    <endEvent id="endevent1" name="End"></endEvent>
+    <sequenceFlow id="flow9" sourceRef="scripttask1" targetRef="DEPARTMAIL"></sequenceFlow>
+    <sequenceFlow id="flow11" sourceRef="DEPARTMAILSEND" targetRef="endevent1"></sequenceFlow>
+    <serviceTask id="servicetask1" name="财务收件人查询" activiti:class="com.eorionsolution.riying.bpms.javaservice.http.RestAPIService"></serviceTask>
+    <scriptTask id="scripttask2" name="财务收件人结果保存" activiti:autoStoreVariables="false" scriptFormat="groovy">
+    	<script>
+    	<![CDATA[
+    		import groovy.json.JsonOutput
+			import groovy.json.JsonSlurper
+			
+    		if (_http_response_status_code != 200) {
+    			throw new org.activiti.engine.ActivitiIllegalArgumentException('METABASE查询财务邮件收件人失败')
+    		}
+    		
+    		def jsonSlurper = new JsonSlurper()
+			def finList = jsonSlurper.parseText(_http_response_body)
+			if (finList.size() == 0) {
+				throw new org.activiti.engine.ActivitiIllegalArgumentException(corp + '实体下未找到财务收件人')
+			}
+			
+			execution.setVariable('finSns', new HashSet(finList.collect {it.sn}))
+			
+			//call drools find all admins and hrs
+			def costcenter = jsonSlurper.parseText(costcenter)
+			def body = JsonOutput.toJson(costcenter.collect{['costcenter':it.code]})
+			execution.setVariable("_http_method", "POST");
+			def headerMap = new java.util.HashMap();
+			headerMap.put("Content-Type","application/json");				
+			execution.setVariable("_http_headers", headerMap);
+			
+			execution.setVariable("_http_body", body);
+			execution.setVariable("_http_url", 'https://bpmcs.dipont.com/decisiontables/v1/fire/buyer.xls');
+			execution.setVariable("_http_response_body", '');
+		    execution.setVariable("_http_response_status_code", '');
+    	]]>
+    	</script>
+    </scriptTask>
+    <sequenceFlow id="flow4" sourceRef="servicetask1" targetRef="scripttask2"></sequenceFlow>
+    <serviceTask id="servicetask2" name="行政人事收件人查询" activiti:class="com.eorionsolution.riying.bpms.javaservice.http.RestAPIService"></serviceTask>
+    <sequenceFlow id="flow5" sourceRef="scripttask2" targetRef="servicetask2"></sequenceFlow>
+    <scriptTask id="scripttask3" name="行政人事收件人结果保存" activiti:autoStoreVariables="false" scriptFormat="groovy">
+    	<script>
+    	<![CDATA[
+    	import groovy.json.JsonOutput
+		import groovy.json.JsonSlurper
+		
+		if (_http_response_status_code != 200) {
+   			throw new org.activiti.engine.ActivitiIllegalArgumentException('Drools查询行政人事邮件收件人失败')
+   		}
+   		
+   		def jsonSlurper = new JsonSlurper()
+		def returnList = jsonSlurper.parseText(_http_response_body)
+		//admins
+		def collectAdmins = returnList.collect{it.buyer}
+		if (collectAdmins.contains(null)){
+			throw new org.activiti.engine.ActivitiIllegalArgumentException('Drools行政邮箱没有维护buyer')
+		}
+    	def adminSet = new HashSet(collectAdmins.join(",").split(",").toList())
+    	execution.setVariable('adminSns', adminSet)
+    	
+    	//hrs
+    	def collectHrs = returnList.collect{it.arrive}
+		if (collectHrs.contains(null)) {
+		    throw new org.activiti.engine.ActivitiIllegalArgumentException('Drools HR抄送邮箱没有维护arrive')
+		}
+		def hrSet = new HashSet(collectHrs.join(",").split(",").toList())
+		execution.setVariable('hrSns', hrSet)
+    	
+    	//call eim api
+		def bodyObj = new HashMap()
+		bodyObj.put('sn', sn)
+		bodyObj.put('dimissionTime',leaveDate)
+		
+		def body = JsonOutput.toJson(bodyObj)
+		//send request
+		execution.setVariable("_http_method", "PUT")
+		def headerMap = new HashMap()
+		headerMap.put("Content-Type","application/json")
+		execution.setVariable("_http_headers", headerMap)
+		execution.setVariable("_http_body", body)
+		execution.setVariable("_http_url", 'https://bpm.dipont.com/hr-dp-api/v2/employee/withoutauth/leave')
+		execution.setVariable("_http_response_body", '')
+		execution.setVariable("_http_response_status_code", '')
+    	]]>
+    	</script>
+    </scriptTask>
+    <sequenceFlow id="flow6" sourceRef="servicetask2" targetRef="scripttask3"></sequenceFlow>
+    <sequenceFlow id="flow7" sourceRef="scripttask3" targetRef="EIMCHANGE"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_DPPE002">
+    <bpmndi:BPMNPlane bpmnElement="DPPE002" id="BPMNPlane_DPPE002">
+      <bpmndi:BPMNShape bpmnElement="STEVENT" id="BPMNShape_STEVENT">
+        <omgdc:Bounds height="35.0" width="35.0" x="30.0" y="50.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="DEPARTMAIL" id="BPMNShape_DEPARTMAIL">
+        <omgdc:Bounds height="55.0" width="121.0" x="26.0" y="301.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="DEPARTMAILSEND" id="BPMNShape_DEPARTMAILSEND">
+        <omgdc:Bounds height="61.0" width="121.0" x="227.0" y="298.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="EIMCHANGE" id="BPMNShape_EIMCHANGE">
+        <omgdc:Bounds height="61.0" width="112.0" x="232.0" y="147.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scripttask1" id="BPMNShape_scripttask1">
+        <omgdc:Bounds height="61.0" width="114.0" x="30.0" y="147.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="COMPELETEVAR" id="BPMNShape_COMPELETEVAR">
+        <omgdc:Bounds height="55.0" width="105.0" x="260.0" y="40.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="METABASEST" id="BPMNShape_METABASEST">
+        <omgdc:Bounds height="55.0" width="105.0" x="110.0" y="40.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="420.0" y="311.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="servicetask1" id="BPMNShape_servicetask1">
+        <omgdc:Bounds height="55.0" width="105.0" x="410.0" y="40.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scripttask2" id="BPMNShape_scripttask2">
+        <omgdc:Bounds height="55.0" width="105.0" x="570.0" y="40.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="servicetask2" id="BPMNShape_servicetask2">
+        <omgdc:Bounds height="55.0" width="105.0" x="570.0" y="150.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scripttask3" id="BPMNShape_scripttask3">
+        <omgdc:Bounds height="55.0" width="105.0" x="410.0" y="150.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow10" id="BPMNEdge_flow10">
+        <omgdi:waypoint x="147.0" y="328.0"></omgdi:waypoint>
+        <omgdi:waypoint x="227.0" y="328.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow8" id="BPMNEdge_flow8">
+        <omgdi:waypoint x="232.0" y="177.0"></omgdi:waypoint>
+        <omgdi:waypoint x="144.0" y="177.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="65.0" y="67.0"></omgdi:waypoint>
+        <omgdi:waypoint x="110.0" y="67.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="215.0" y="67.0"></omgdi:waypoint>
+        <omgdi:waypoint x="260.0" y="67.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3">
+        <omgdi:waypoint x="365.0" y="67.0"></omgdi:waypoint>
+        <omgdi:waypoint x="410.0" y="67.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow9" id="BPMNEdge_flow9">
+        <omgdi:waypoint x="87.0" y="208.0"></omgdi:waypoint>
+        <omgdi:waypoint x="86.0" y="301.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow11" id="BPMNEdge_flow11">
+        <omgdi:waypoint x="348.0" y="328.0"></omgdi:waypoint>
+        <omgdi:waypoint x="420.0" y="328.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow4" id="BPMNEdge_flow4">
+        <omgdi:waypoint x="515.0" y="67.0"></omgdi:waypoint>
+        <omgdi:waypoint x="570.0" y="67.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow5" id="BPMNEdge_flow5">
+        <omgdi:waypoint x="622.0" y="95.0"></omgdi:waypoint>
+        <omgdi:waypoint x="622.0" y="150.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow6" id="BPMNEdge_flow6">
+        <omgdi:waypoint x="570.0" y="177.0"></omgdi:waypoint>
+        <omgdi:waypoint x="515.0" y="177.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow7" id="BPMNEdge_flow7">
+        <omgdi:waypoint x="410.0" y="177.0"></omgdi:waypoint>
+        <omgdi:waypoint x="344.0" y="177.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>
