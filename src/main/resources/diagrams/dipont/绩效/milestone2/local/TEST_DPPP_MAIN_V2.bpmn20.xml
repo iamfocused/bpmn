@@ -1,0 +1,189 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/pur">
+  <process id="DPPP_MAIN_V2" name="绩效考核主流程 Performance appraisal main process" isExecutable="true" activiti:candidateStarterGroups="admin">
+    <startEvent id="startevent1" name="Start" activiti:initiator="initiator">
+      <extensionElements>
+        <activiti:formProperty id="tbhdaddemployees_item" name="指定员工列表 Designated employee list" type="string" variable="tbhdaddemployees_item"></activiti:formProperty>
+        <activiti:formProperty id="tbhdaddemployees_员工 Employee_employeesn_1_string_psbi_$$A" name="员工 Employee" type="string" variable="tbhdaddemployees_employeesn_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdaddemployees_汇报对象 Manager_managersn_2_string_psbi_$$A" name="汇报对象 Manager" type="string" variable="tbhdaddemployees_managersn_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdaddemployees_成本中心 Costcenter_costcenter_3_string_tree_$$A" name="成本中心 Costcenter" type="string" variable="tbhdaddemployees_costcenter_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdaddemployees_职能 Function_function_4_enum_sbs_$$A" name="职能 Function" type="enum" variable="function" required="true">
+          <activiti:value id="双语教师/中教" name="双语教师/中教 Bilingual/Chinese teacher"></activiti:value>
+          <activiti:value id="外教" name="外教 Foreign teacher"></activiti:value>
+          <activiti:value id="管理层/校长" name="管理层、校长 Management, principal"></activiti:value>
+          <activiti:value id="咨询顾问/升学指导" name="咨询顾问/升学指导 Consultant/professional guidance"></activiti:value>
+          <activiti:value id="服务人员" name="服务人员 Service staff"></activiti:value>
+          <activiti:value id="市场人员" name="市场人员 Market staff"></activiti:value>
+          <activiti:value id="研发人员" name="研发人员 R &amp; D staff"></activiti:value>
+          <activiti:value id="后勤运营人员" name="后勤运营人员 Logistics operator"></activiti:value>
+          <activiti:value id="销售人员" name="销售人员 Sales staff"></activiti:value>
+          <activiti:value id="保育员" name="保育员 Nurse"></activiti:value>
+          <activiti:value id="助教/教辅" name="助教/教辅 Teaching assistant"></activiti:value>
+          <activiti:value id="教务" name="教务 Academic affairs"></activiti:value>
+        </activiti:formProperty>
+        <activiti:executionListener event="end" class="org.activiti.engine.impl.bpmn.listener.ScriptExecutionListener">
+          <activiti:field name="language">
+            <activiti:string><![CDATA[groovy]]></activiti:string>
+          </activiti:field>
+          <activiti:field name="script">
+            <activiti:string><![CDATA[import groovy.json.JsonSlurper
+        			import groovy.json.JsonOutput
+        			
+        			def jsonSlurper = new JsonSlurper()
+    				def std = jsonSlurper.parseText(execution.getVariable('tbhdaddemployees_item_std'))
+    				if(std && std.size() > 0) {
+    					execution.setVariable('callmetabase', 'N')
+    					
+    					def subflows = []//List[Map]
+    					std.each{
+		    				subflows<< ['employeesn':it.employeesn, 'managersn': it.managersn, 'costcenter': JsonOutput.toJson(it.costcenter), 'function': it.function]
+		    			}
+		    			execution.setVariable('subflows', subflows)
+		    			execution.setVariable('businessKey', execution.getBusinessKey())
+    				} else {
+    					execution.setVariable('callmetabase', 'Y')
+    					
+    					execution.setVariable("_http_method", "GET")
+						def headerMap = new java.util.HashMap<String,String>()	
+						execution.setVariable("_http_headers", headerMap)
+						execution.setVariable("_http_body", '')
+						execution.setVariable("_http_url", 'https://metabase.eorionsolution.com/public/question/ab9d592d-0e01-4e02-9a56-eb80b7123a41.json')
+						execution.setVariable("_http_response_body", '')
+						execution.setVariable("_http_response_status_code", '')
+    				}]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </startEvent>
+    <scriptTask id="scripttask1" name="metabase result" scriptFormat="groovy" activiti:autoStoreVariables="false">
+      <script>
+    	<![CDATA[
+    		import groovy.json.JsonSlurper
+    		import groovy.json.JsonOutput
+    		
+    		def jsonSlurper = new JsonSlurper()
+    		
+    		def responseCode = execution.getVariable("_http_response_status_code")
+   			if (responseCode != 200) {
+				throw new org.activiti.engine.ActivitiIllegalArgumentException('METABASE调用失败 Call metabase fail.')
+			}
+			def empListFromDb = jsonSlurper.parseText(execution.getVariable('_http_response_body'))
+			if(empListFromDb.size() == 0){
+				throw new org.activiti.engine.ActivitiIllegalArgumentException('empty data error.')
+			}
+    		
+    		def empListFromLdap = []
+    		def subflows = []//List[Map]
+    		
+    		//com.eorionsolution.bpms.extension.ldap.LdapService.getUsersByGroupName('_dpcglc').each{
+    		//	empListFromLdap<<it
+    		//}
+    		
+    		empListFromLdap<<'dptest1'//TODO delete
+    		empListFromLdap<<'dptest2'//TODO delete
+    		
+    		if(empListFromLdap.size() == 0){
+    			throw new org.activiti.engine.ActivitiIllegalArgumentException('LDAP search result is empty, please contact Administrator')
+    		}
+    		
+			def snsFromDb = empListFromDb.collect {it.sn}
+			def notExists = empListFromLdap.findAll{!snsFromDb.contains(it)}
+			if(notExists.size() > 0) {
+				throw new org.activiti.engine.ActivitiIllegalArgumentException('Please supplement following accounts\'s info to EIM : ' + JsonOutput.toJson(notExists))
+			}
+			
+			empListFromLdap.each{ sn_l ->
+				def search_result = empListFromDb.find{it.sn==sn_l}
+				subflows << [
+				'employeesn': sn_l,
+				'managersn': search_result.managerSn,
+				'costcenter': JsonOutput.toJson(['code':search_result.costCenterCode,'name':search_result.costCenterName]),
+				'function': search_result.function 
+				]
+			}
+			    		
+    		execution.setVariable('subflows', subflows)
+    		execution.setVariable('businessKey', execution.getBusinessKey())
+    		
+    		]]>
+    	</script>
+    </scriptTask>
+    <callActivity id="callactivity1" name="分配绩效考核子流程 Allocation subprocess" calledElement="DPPP_SUB_V2">
+      <extensionElements>
+        <activiti:in sourceExpression="${subflows[loopCounter].get('employeesn')}" target="employee"></activiti:in>
+        <activiti:in sourceExpression="${subflows[loopCounter].get('managersn')}" target="managerSn"></activiti:in>
+        <activiti:in sourceExpression="${subflows[loopCounter].get('costcenter')}" target="costcenter"></activiti:in>
+        <activiti:in sourceExpression="${subflows[loopCounter].get('function')}" target="function"></activiti:in>
+        <activiti:in sourceExpression="${callmetabase}" target="callmetabase"></activiti:in>
+        <activiti:in sourceExpression="${businessKey}" target="businessKey"></activiti:in>
+      </extensionElements>
+      <multiInstanceLoopCharacteristics isSequential="false">
+        <loopCardinality>${subflows.size()}</loopCardinality>
+        <completionCondition>nrOfCompletedInstances/nrOfInstances == 1</completionCondition>
+      </multiInstanceLoopCharacteristics>
+    </callActivity>
+    <endEvent id="endevent1" name="End"></endEvent>
+    <sequenceFlow id="flow3" sourceRef="callactivity1" targetRef="endevent1"></sequenceFlow>
+    <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="exclusivegateway1"></sequenceFlow>
+    <exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway"></exclusiveGateway>
+    <serviceTask id="servicetask1" name="call metabase" activiti:class="com.eorionsolution.riying.bpms.javaservice.http.RestAPIService"></serviceTask>
+    <sequenceFlow id="flow4" name="need call metabase" sourceRef="exclusivegateway1" targetRef="servicetask1"></sequenceFlow>
+    <sequenceFlow id="flow5" sourceRef="servicetask1" targetRef="scripttask1"></sequenceFlow>
+    <sequenceFlow id="flow6" name="need not call metabase" sourceRef="exclusivegateway1" targetRef="callactivity1"></sequenceFlow>
+    <sequenceFlow id="flow7" sourceRef="scripttask1" targetRef="callactivity1"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_DPPP_MAIN_V2">
+    <bpmndi:BPMNPlane bpmnElement="DPPP_MAIN_V2" id="BPMNPlane_DPPP_MAIN_V2">
+      <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="20.0" y="180.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scripttask1" id="BPMNShape_scripttask1">
+        <omgdc:Bounds height="61.0" width="105.0" x="340.0" y="105.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="callactivity1" id="BPMNShape_callactivity1">
+        <omgdc:Bounds height="65.0" width="105.0" x="590.0" y="165.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="740.0" y="180.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway1" id="BPMNShape_exclusivegateway1">
+        <omgdc:Bounds height="40.0" width="40.0" x="100.0" y="177.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="servicetask1" id="BPMNShape_servicetask1">
+        <omgdc:Bounds height="60.0" width="105.0" x="180.0" y="106.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3">
+        <omgdi:waypoint x="695.0" y="197.0"></omgdi:waypoint>
+        <omgdi:waypoint x="740.0" y="197.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="55.0" y="197.0"></omgdi:waypoint>
+        <omgdi:waypoint x="100.0" y="197.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow4" id="BPMNEdge_flow4">
+        <omgdi:waypoint x="120.0" y="177.0"></omgdi:waypoint>
+        <omgdi:waypoint x="120.0" y="136.0"></omgdi:waypoint>
+        <omgdi:waypoint x="180.0" y="136.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="39.0" width="100.0" x="71.0" y="106.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow5" id="BPMNEdge_flow5">
+        <omgdi:waypoint x="285.0" y="136.0"></omgdi:waypoint>
+        <omgdi:waypoint x="340.0" y="135.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow6" id="BPMNEdge_flow6">
+        <omgdi:waypoint x="140.0" y="197.0"></omgdi:waypoint>
+        <omgdi:waypoint x="590.0" y="197.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="39.0" width="100.0" x="283.0" y="200.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow7" id="BPMNEdge_flow7">
+        <omgdi:waypoint x="445.0" y="135.0"></omgdi:waypoint>
+        <omgdi:waypoint x="643.0" y="135.0"></omgdi:waypoint>
+        <omgdi:waypoint x="642.0" y="165.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>
