@@ -41,7 +41,10 @@
         <activiti:formProperty id="changeReason_变更原因_4_string_t2_$$C" name="变更原因" type="string" variable="changeReason" required="true"></activiti:formProperty>        
         <activiti:formProperty id="changeBefore_变更前_1_string_t2_$$D" name="变更前" type="string" variable="changeBefore" required="true"></activiti:formProperty>
         <activiti:formProperty id="changeAfter_变更后_2_string_t2_$$D" name="变更后" type="string" variable="changeAfter" required="true"></activiti:formProperty>
-
+        
+        <activiti:formProperty id="projectNumber_项目编号_1_string_t1_$$E" name="项目编号" type="string" variable="projectNumber" required="true"/>
+        <activiti:formProperty id="projectStage_项目阶段_2_string_t1_$$E" name="项目阶段" type="string" variable="projectStage" required="true"/>
+        
 		<activiti:formProperty id="attachmentback1_附件_1_string_t9_$$A" name="上传附件" type="string" variable="attachmentback1"></activiti:formProperty>
 		
         <activiti:executionListener event="end" class="org.activiti.engine.impl.bpmn.listener.ScriptExecutionListener">
@@ -99,7 +102,7 @@
     	
     	</script>
     </scriptTask>
-    <userTask id="usertask1" name="变更可行性评审" activiti:assignee="${manager}" activiti:dueDate="P1D">
+    <userTask id="usertask1" name="部门领导确认" activiti:assignee="${manager}" activiti:dueDate="P1D">
       <extensionElements>
         <activiti:formProperty id="sourceOfChange_变更来源_1_enum_rbv_$$VA" name="变更来源" type="enum" variable="sourceOfChange" required="true">
           <activiti:value id="客户变更" name="客户变更"></activiti:value>
@@ -141,119 +144,15 @@
         <activiti:formProperty id="changeReason_变更原因_4_string_t2_$$VC" name="变更原因" type="string" variable="changeReason" required="true"></activiti:formProperty>        
         <activiti:formProperty id="changeBefore_变更前_1_string_t2_$$VD" name="变更前" type="string" variable="changeBefore" required="true"></activiti:formProperty>
         <activiti:formProperty id="changeAfter_变更后_2_string_t2_$$VD" name="变更后" type="string" variable="changeAfter" required="true"></activiti:formProperty>
+        
+        <activiti:formProperty id="projectNumber_项目编号_1_string_t1_$$VE" name="项目编号" type="string" variable="projectNumber" required="true"/>
+        <activiti:formProperty id="projectStage_项目阶段_2_string_t1_$$VE" name="项目阶段" type="string" variable="projectStage" required="true"/>
                 
-        <activiti:formProperty id="coreaction_可行性评审_1_enum_rbv_$$A" name="可行性评审结论" type="enum" variable="coreaction_result" required="true">
+        <activiti:formProperty id="coreaction_评审_1_enum_rbv_$$A" name="审评" type="enum" variable="coreaction_result" required="true">
           <activiti:value id="同意变更" name="同意变更"></activiti:value>
           <activiti:value id="拒绝变更" name="拒绝变更"></activiti:value>
         </activiti:formProperty>
         <activiti:formProperty id="corecomments_评审意见_2_string_t2_$$A" name="评审意见" type="string" variable="corecomments_result"></activiti:formProperty>
-        
-        <activiti:formProperty id="changeVerificationSchema_变更验证方案_1_string_t2_$$B" name="变更验证方案" type="string" variable="changeVerificationSchema"/>
-        
-        <activiti:formProperty id="riskApprovalDue_风险评审计划完成日期_1_string_t3_$$C" name="风险评审计划完成日期" type="string" variable="riskApprovalDue"/>
-        <activiti:formProperty id="preliminaryApprovalDue_初步批准计划完成日期_2_string_t3_$$C" name="初步批准计划完成日期" type="string" variable="preliminaryApprovalDue"/>
-        <activiti:formProperty id="testAndVerifyDue_试制和验证计划完成日期_3_string_t3_$$C" name="试制和验证计划完成日期" type="string" variable="testAndVerifyDue"/>
-        <activiti:formProperty id="customerAcceptanceDue_客户认可计划完成日期_4_string_t3_$$C" name="客户认可计划完成日期" type="string" variable="customerAcceptanceDue"/>
-        <activiti:formProperty id="formalApprovalDue_正式批准计划完成日期_5_string_t3_$$C" name="正式批准计划完成日期" type="string" variable="formalApprovalDue"/>
-        <activiti:formProperty id="fileUpdateDue_技术文件更新计划完成日期_6_string_t3_$$C" name="技术文件更新计划完成日期" type="string" variable="fileUpdateDue"/>
-        <activiti:formProperty id="productBreakpointDue_产品断点计划完成日期_7_string_t3_$$C" name="产品断点计划完成日期" type="string" variable="productBreakpointDue"/>
-        <activiti:formProperty id="summaryOfChangeDue_变更总结计划完成日期_8_string_t3_$$C" name="变更总结计划完成日期" type="string" variable="summaryOfChangeDue"/>
-        
-        <activiti:formProperty id="riskOf1_风险结果：技术上可行（含重量）_1_enum_rbv_$$D" name="风险结果：技术上可行（含重量）" type="enum" variable="riskOf1">
-        	<activiti:value id="有" name="有"></activiti:value>
-        	<activiti:value id="无" name="无"></activiti:value>
-        </activiti:formProperty>
-        <activiti:formProperty id="riskDesc1_风险描述及消除方案_2_string_t2_$$D" name="风险描述及消除方案" type="string" variable="riskDesc1"/>
-        <activiti:formProperty id="costcenter_成本中心_3_string_tree_$$D" name="评审部门" type="string" variable="approvalDept1"/>
-        <activiti:formProperty id="approvalPerson1_评审人_4_string_psbn_$$D" name="评审人" type="string" variable="approvalPerson1"/>
-        
-        <activiti:formProperty id="riskOf2_风险结果：工艺、模具、工装夹具、包装方案等产生变更_1_enum_rbv_$$E" name="风险结果：工艺、模具、工装夹具、包装方案等产生变更" type="enum" variable="riskOf2">
-        	<activiti:value id="有" name="有"></activiti:value>
-        	<activiti:value id="无" name="无"></activiti:value>
-        </activiti:formProperty>
-        <activiti:formProperty id="riskDesc2_风险描述及消除方案_2_string_t2_$$E" name="风险描述及消除方案" type="string" variable="riskDesc2"/>
-        <activiti:formProperty id="costcenter_成本中心_3_string_tree_$$E" name="评审部门" type="string" variable="approvalDept2"/>
-        <activiti:formProperty id="approvalPerson2_评审人_4_string_psbn_$$E" name="评审人" type="string" variable="approvalPerson2"/>
-        
-        <activiti:formProperty id="riskOf3_风险结果：变更成本影响_1_enum_rbv_$$F" name="风险结果：变更成本影响" type="enum" variable="riskOf3">
-        	<activiti:value id="有" name="有"></activiti:value>
-        	<activiti:value id="无" name="无"></activiti:value>
-        </activiti:formProperty>
-        <activiti:formProperty id="riskDesc3_风险描述及消除方案_2_string_t2_$$F" name="风险描述及消除方案" type="string" variable="riskDesc3"/>
-        <activiti:formProperty id="costcenter_成本中心_3_string_tree_$$F" name="评审部门" type="string" variable="approvalDept3"/>
-        <activiti:formProperty id="approvalPerson3_评审人_4_string_psbn_$$F" name="评审人" type="string" variable="approvalPerson3"/>
-        
-        <activiti:formProperty id="riskOf4_风险结果：设备产生变更_1_enum_rbv_$$G" name="风险结果：设备产生变更" type="enum" variable="riskOf4">
-        	<activiti:value id="有" name="有"></activiti:value>
-        	<activiti:value id="无" name="无"></activiti:value>
-        </activiti:formProperty>
-        <activiti:formProperty id="riskDesc4_风险描述及消除方案_2_string_t2_$$G" name="风险描述及消除方案" type="string" variable="riskDesc4"/>
-        <activiti:formProperty id="costcenter_成本中心_3_string_tree_$$G" name="评审部门" type="string" variable="approvalDept4"/>
-        <activiti:formProperty id="approvalPerson4_评审人_4_string_psbn_$$G" name="评审人" type="string" variable="approvalPerson4"/>
-
-        <activiti:formProperty id="riskOf5_风险结果：供应商、原材料、零部件、周期等产生变更_1_enum_rbv_$$H" name="风险结果：供应商、原材料、零部件、周期等产生变更" type="enum" variable="riskOf5">
-        	<activiti:value id="有" name="有"></activiti:value>
-        	<activiti:value id="无" name="无"></activiti:value>
-        </activiti:formProperty>
-        <activiti:formProperty id="riskDesc5_风险描述及消除方案_2_string_t2_$$H" name="风险描述及消除方案" type="string" variable="riskDesc5"/>
-        <activiti:formProperty id="costcenter_成本中心_3_string_tree_$$H" name="评审部门" type="string" variable="approvalDept5"/>
-        <activiti:formProperty id="approvalPerson5_评审人_4_string_psbn_$$H" name="评审人" type="string" variable="approvalPerson5"/>
-        
-        <activiti:formProperty id="riskOf6_风险结果：产能、周期等产生变更_1_enum_rbv_$$I" name="风险结果：产能、周期等产生变更" type="enum" variable="riskOf6">
-        	<activiti:value id="有" name="有"></activiti:value>
-        	<activiti:value id="无" name="无"></activiti:value>
-        </activiti:formProperty>
-        <activiti:formProperty id="riskDesc6_风险描述及消除方案_2_string_t2_$$I" name="风险描述及消除方案" type="string" variable="riskDesc6"/>
-        <activiti:formProperty id="costcenter_成本中心_3_string_tree_$$I" name="评审部门" type="string" variable="approvalDept6"/>
-        <activiti:formProperty id="approvalPerson6_评审人_4_string_psbn_$$I" name="评审人" type="string" variable="approvalPerson6"/>
-        
-        <activiti:formProperty id="riskOf7_风险结果：物流运输、安全库存、周期等产生变更_1_enum_rbv_$$J" name="风险结果：物流运输、安全库存、周期等产生变更" type="enum" variable="riskOf7">
-        	<activiti:value id="有" name="有"></activiti:value>
-        	<activiti:value id="无" name="无"></activiti:value>
-        </activiti:formProperty>
-        <activiti:formProperty id="riskDesc7_风险描述及消除方案_2_string_t2_$$J" name="风险描述及消除方案" type="string" variable="riskDesc7"/>
-        <activiti:formProperty id="costcenter_成本中心_3_string_tree_$$J" name="评审部门" type="string" variable="approvalDept7"/>
-        <activiti:formProperty id="approvalPerson7_评审人_4_string_psbn_$$J" name="评审人" type="string" variable="approvalPerson7"/>
-        
-        <activiti:formProperty id="riskOf8_风险结果：质量保证方案、风险评估_1_enum_rbv_$$K" name="风险结果：质量保证方案、风险评估" type="enum" variable="riskOf8">
-        	<activiti:value id="有" name="有"></activiti:value>
-        	<activiti:value id="无" name="无"></activiti:value>
-        </activiti:formProperty>
-        <activiti:formProperty id="riskDesc8_风险描述及消除方案_2_string_t2_$$K" name="风险描述及消除方案" type="string" variable="riskDesc8"/>
-        <activiti:formProperty id="costcenter_成本中心_3_string_tree_$$K" name="评审部门" type="string" variable="approvalDept8"/>
-        <activiti:formProperty id="approvalPerson8_评审人_4_string_psbn_$$K" name="评审人" type="string" variable="approvalPerson8"/>
-        
-        <activiti:formProperty id="riskOf9_风险结果：客户端影响_1_enum_rbv_$$L" name="风险结果：客户端影响" type="enum" variable="riskOf9">
-        	<activiti:value id="有" name="有"></activiti:value>
-        	<activiti:value id="无" name="无"></activiti:value>
-        </activiti:formProperty>
-        <activiti:formProperty id="riskDesc9_风险描述及消除方案_2_string_t2_$$L" name="风险描述及消除方案" type="string" variable="riskDesc9"/>
-        <activiti:formProperty id="costcenter_成本中心_3_string_tree_$$L" name="评审部门" type="string" variable="approvalDept9"/>
-        <activiti:formProperty id="approvalPerson9_评审人_4_string_psbn_$$L" name="评审人" type="string" variable="approvalPerson9"/>
-        
-        <activiti:formProperty id="riskOf10_风险结果：环境安全影响_1_enum_rbv_$$M" name="风险结果：环境安全影响" type="enum" variable="riskOf10">
-        	<activiti:value id="有" name="有"></activiti:value>
-        	<activiti:value id="无" name="无"></activiti:value>
-        </activiti:formProperty>
-        <activiti:formProperty id="riskDesc10_风险描述及消除方案_2_string_t2_$$M" name="风险描述及消除方案" type="string" variable="riskDesc10"/>
-        <activiti:formProperty id="costcenter_成本中心_3_string_tree_$$M" name="评审部门" type="string" variable="approvalDept10"/>
-        <activiti:formProperty id="approvalPerson10_评审人_4_string_psbn_$$M" name="评审人" type="string" variable="approvalPerson10"/>
-        
-        <activiti:formProperty id="riskOf11_风险结果：其他_1_enum_rbv_$$N" name="风险结果：其他" type="enum" variable="riskOf11">
-        	<activiti:value id="有" name="有"></activiti:value>
-        	<activiti:value id="无" name="无"></activiti:value>
-        </activiti:formProperty>
-        <activiti:formProperty id="riskDesc11_风险描述及消除方案_2_string_t2_$$N" name="风险描述及消除方案" type="string" variable="riskDesc11"/>
-        <activiti:formProperty id="costcenter_成本中心_3_string_tree_$$N" name="评审部门" type="string" variable="approvalDept11"/>
-        <activiti:formProperty id="approvalPerson11_评审人_4_string_psbn_$$N" name="评审人" type="string" variable="approvalPerson11"/>
-        
-        <activiti:formProperty id="riskOf12_风险结果：其他_1_enum_rbv_$$O" name="风险结果：其他" type="enum" variable="riskOf12">
-        	<activiti:value id="有" name="有"></activiti:value>
-        	<activiti:value id="无" name="无"></activiti:value>
-        </activiti:formProperty>
-        <activiti:formProperty id="riskDesc12_风险描述及消除方案_2_string_t2_$$O" name="风险描述及消除方案" type="string" variable="riskDesc12"/>
-        <activiti:formProperty id="costcenter_成本中心_3_string_tree_$$O" name="评审部门" type="string" variable="approvalDept12"/>
-        <activiti:formProperty id="approvalPerson12_评审人_4_string_psbn_$$O" name="评审人" type="string" variable="approvalPerson12"/>                                                                                        
         
        	<activiti:formProperty id="attachmentback1_附件_1_string_t9_$$VA" name="上传附件" type="string" variable="attachmentback1"></activiti:formProperty>
         
@@ -326,112 +225,8 @@
         </activiti:formProperty>
         <activiti:formProperty id="corecomments_评审意见_2_string_t2_$$VD" name="评审意见" type="string" variable="corecomments_result"></activiti:formProperty>
         
-        <activiti:formProperty id="changeVerificationSchema_变更验证方案_1_string_t2_$$VE" name="变更验证方案" type="string" variable="changeVerificationSchema"/>
-        
-        <activiti:formProperty id="riskApprovalDue_风险评审计划完成日期_1_string_t3_$$VF" name="风险评审计划完成日期" type="string" variable="riskApprovalDue"/>
-        <activiti:formProperty id="preliminaryApprovalDue_初步批准计划完成日期_2_string_t3_$$VF" name="初步批准计划完成日期" type="string" variable="preliminaryApprovalDue"/>
-        <activiti:formProperty id="testAndVerifyDue_试制和验证计划完成日期_3_string_t3_$$VF" name="试制和验证计划完成日期" type="string" variable="testAndVerifyDue"/>
-        <activiti:formProperty id="customerAcceptanceDue_客户认可计划完成日期_4_string_t3_$$VF" name="客户认可计划完成日期" type="string" variable="customerAcceptanceDue"/>
-        <activiti:formProperty id="formalApprovalDue_正式批准计划完成日期_5_string_t3_$$VF" name="正式批准计划完成日期" type="string" variable="formalApprovalDue"/>
-        <activiti:formProperty id="fileUpdateDue_技术文件更新计划完成日期_6_string_t3_$$VF" name="技术文件更新计划完成日期" type="string" variable="fileUpdateDue"/>
-        <activiti:formProperty id="productBreakpointDue_产品断点计划完成日期_7_string_t3_$$VF" name="产品断点计划完成日期" type="string" variable="productBreakpointDue"/>
-        <activiti:formProperty id="summaryOfChangeDue_变更总结计划完成日期_8_string_t3_$$VF" name="变更总结计划完成日期" type="string" variable="summaryOfChangeDue"/>
-        
-        <activiti:formProperty id="riskOf1_风险结果：技术上可行（含重量）_1_enum_rbv_$$VG" name="风险结果：技术上可行（含重量）" type="enum" variable="riskOf1">
-        	<activiti:value id="有" name="有"></activiti:value>
-        	<activiti:value id="无" name="无"></activiti:value>
-        </activiti:formProperty>
-        <activiti:formProperty id="riskDesc1_风险描述及消除方案_2_string_t2_$$VG" name="风险描述及消除方案" type="string" variable="riskDesc1"/>
-        <activiti:formProperty id="costcenter_成本中心_3_string_tree_$$VG" name="评审部门" type="string" variable="approvalDept1"/>
-        <activiti:formProperty id="approvalPerson1_评审人_4_string_psbn_$$VG" name="评审人" type="string" variable="approvalPerson1"/>
-        
-        <activiti:formProperty id="riskOf2_风险结果：工艺、模具、工装夹具、包装方案等产生变更_1_enum_rbv_$$VH" name="风险结果：工艺、模具、工装夹具、包装方案等产生变更" type="enum" variable="riskOf2">
-        	<activiti:value id="有" name="有"></activiti:value>
-        	<activiti:value id="无" name="无"></activiti:value>
-        </activiti:formProperty>
-        <activiti:formProperty id="riskDesc2_风险描述及消除方案_2_string_t2_$$VH" name="风险描述及消除方案" type="string" variable="riskDesc2"/>
-        <activiti:formProperty id="costcenter_成本中心_3_string_tree_$$VH" name="评审部门" type="string" variable="approvalDept2"/>
-        <activiti:formProperty id="approvalPerson2_评审人_4_string_psbn_$$VH" name="评审人" type="string" variable="approvalPerson2"/>
-        
-        <activiti:formProperty id="riskOf3_风险结果：变更成本影响_1_enum_rbv_$$VI" name="风险结果：变更成本影响" type="enum" variable="riskOf3">
-        	<activiti:value id="有" name="有"></activiti:value>
-        	<activiti:value id="无" name="无"></activiti:value>
-        </activiti:formProperty>
-        <activiti:formProperty id="riskDesc3_风险描述及消除方案_2_string_t2_$$VI" name="风险描述及消除方案" type="string" variable="riskDesc3"/>
-        <activiti:formProperty id="costcenter_成本中心_3_string_tree_$$VI" name="评审部门" type="string" variable="approvalDept3"/>
-        <activiti:formProperty id="approvalPerson3_评审人_4_string_psbn_$$VI" name="评审人" type="string" variable="approvalPerson3"/>
-        
-        <activiti:formProperty id="riskOf4_风险结果：设备产生变更_1_enum_rbv_$$VJ" name="风险结果：设备产生变更" type="enum" variable="riskOf4">
-        	<activiti:value id="有" name="有"></activiti:value>
-        	<activiti:value id="无" name="无"></activiti:value>
-        </activiti:formProperty>
-        <activiti:formProperty id="riskDesc4_风险描述及消除方案_2_string_t2_$$VJ" name="风险描述及消除方案" type="string" variable="riskDesc4"/>
-        <activiti:formProperty id="costcenter_成本中心_3_string_tree_$$VJ" name="评审部门" type="string" variable="approvalDept4"/>
-        <activiti:formProperty id="approvalPerson4_评审人_4_string_psbn_$$VJ" name="评审人" type="string" variable="approvalPerson4"/>
-
-        <activiti:formProperty id="riskOf5_风险结果：供应商、原材料、零部件、周期等产生变更_1_enum_rbv_$$VK" name="风险结果：供应商、原材料、零部件、周期等产生变更" type="enum" variable="riskOf5">
-        	<activiti:value id="有" name="有"></activiti:value>
-        	<activiti:value id="无" name="无"></activiti:value>
-        </activiti:formProperty>
-        <activiti:formProperty id="riskDesc5_风险描述及消除方案_2_string_t2_$$VK" name="风险描述及消除方案" type="string" variable="riskDesc5"/>
-        <activiti:formProperty id="costcenter_成本中心_3_string_tree_$$VK" name="评审部门" type="string" variable="approvalDept5"/>
-        <activiti:formProperty id="approvalPerson5_评审人_4_string_psbn_$$VK" name="评审人" type="string" variable="approvalPerson5"/>
-        
-        <activiti:formProperty id="riskOf6_风险结果：产能、周期等产生变更_1_enum_rbv_$$VL" name="风险结果：产能、周期等产生变更" type="enum" variable="riskOf6">
-        	<activiti:value id="有" name="有"></activiti:value>
-        	<activiti:value id="无" name="无"></activiti:value>
-        </activiti:formProperty>
-        <activiti:formProperty id="riskDesc6_风险描述及消除方案_2_string_t2_$$VL" name="风险描述及消除方案" type="string" variable="riskDesc6"/>
-        <activiti:formProperty id="costcenter_成本中心_3_string_tree_$$VL" name="评审部门" type="string" variable="approvalDept6"/>
-        <activiti:formProperty id="approvalPerson6_评审人_4_string_psbn_$$VL" name="评审人" type="string" variable="approvalPerson6"/>
-        
-        <activiti:formProperty id="riskOf7_风险结果：物流运输、安全库存、周期等产生变更_1_enum_rbv_$$VM" name="风险结果：物流运输、安全库存、周期等产生变更" type="enum" variable="riskOf7">
-        	<activiti:value id="有" name="有"></activiti:value>
-        	<activiti:value id="无" name="无"></activiti:value>
-        </activiti:formProperty>
-        <activiti:formProperty id="riskDesc7_风险描述及消除方案_2_string_t2_$$VM" name="风险描述及消除方案" type="string" variable="riskDesc7"/>
-        <activiti:formProperty id="costcenter_成本中心_3_string_tree_$$VM" name="评审部门" type="string" variable="approvalDept7"/>
-        <activiti:formProperty id="approvalPerson7_评审人_4_string_psbn_$$VM" name="评审人" type="string" variable="approvalPerson7"/>
-        
-        <activiti:formProperty id="riskOf8_风险结果：质量保证方案、风险评估_1_enum_rbv_$$VN" name="风险结果：质量保证方案、风险评估" type="enum" variable="riskOf8">
-        	<activiti:value id="有" name="有"></activiti:value>
-        	<activiti:value id="无" name="无"></activiti:value>
-        </activiti:formProperty>
-        <activiti:formProperty id="riskDesc8_风险描述及消除方案_2_string_t2_$$VN" name="风险描述及消除方案" type="string" variable="riskDesc8"/>
-        <activiti:formProperty id="costcenter_成本中心_3_string_tree_$$VN" name="评审部门" type="string" variable="approvalDept8"/>
-        <activiti:formProperty id="approvalPerson8_评审人_4_string_psbn_$$VN" name="评审人" type="string" variable="approvalPerson8"/>
-        
-        <activiti:formProperty id="riskOf9_风险结果：客户端影响_1_enum_rbv_$$VO" name="风险结果：客户端影响" type="enum" variable="riskOf9">
-        	<activiti:value id="有" name="有"></activiti:value>
-        	<activiti:value id="无" name="无"></activiti:value>
-        </activiti:formProperty>
-        <activiti:formProperty id="riskDesc9_风险描述及消除方案_2_string_t2_$$VO" name="风险描述及消除方案" type="string" variable="riskDesc9"/>
-        <activiti:formProperty id="costcenter_成本中心_3_string_tree_$$VO" name="评审部门" type="string" variable="approvalDept9"/>
-        <activiti:formProperty id="approvalPerson9_评审人_4_string_psbn_$$VO" name="评审人" type="string" variable="approvalPerson9"/>
-        
-        <activiti:formProperty id="riskOf10_风险结果：环境安全影响_1_enum_rbv_$$VP" name="风险结果：环境安全影响" type="enum" variable="riskOf10">
-        	<activiti:value id="有" name="有"></activiti:value>
-        	<activiti:value id="无" name="无"></activiti:value>
-        </activiti:formProperty>
-        <activiti:formProperty id="riskDesc10_风险描述及消除方案_2_string_t2_$$VP" name="风险描述及消除方案" type="string" variable="riskDesc10"/>
-        <activiti:formProperty id="costcenter_成本中心_3_string_tree_$$VP" name="评审部门" type="string" variable="approvalDept10"/>
-        <activiti:formProperty id="approvalPerson10_评审人_4_string_psbn_$$VP" name="评审人" type="string" variable="approvalPerson10"/>
-        
-        <activiti:formProperty id="riskOf11_风险结果：其他_1_enum_rbv_$$VQ" name="风险结果：其他" type="enum" variable="riskOf11">
-        	<activiti:value id="有" name="有"></activiti:value>
-        	<activiti:value id="无" name="无"></activiti:value>
-        </activiti:formProperty>
-        <activiti:formProperty id="riskDesc11_风险描述及消除方案_2_string_t2_$$VQ" name="风险描述及消除方案" type="string" variable="riskDesc11"/>
-        <activiti:formProperty id="costcenter_成本中心_3_string_tree_$$VQ" name="评审部门" type="string" variable="approvalDept11"/>
-        <activiti:formProperty id="approvalPerson11_评审人_4_string_psbn_$$VQ" name="评审人" type="string" variable="approvalPerson11"/>
-        
-        <activiti:formProperty id="riskOf12_风险结果：其他_1_enum_rbv_$$VR" name="风险结果：其他" type="enum" variable="riskOf12">
-        	<activiti:value id="有" name="有"></activiti:value>
-        	<activiti:value id="无" name="无"></activiti:value>
-        </activiti:formProperty>
-        <activiti:formProperty id="riskDesc12_风险描述及消除方案_2_string_t2_$$VR" name="风险描述及消除方案" type="string" variable="riskDesc12"/>
-        <activiti:formProperty id="costcenter_成本中心_3_string_tree_$$VR" name="评审部门" type="string" variable="approvalDept12"/>
-        <activiti:formProperty id="approvalPerson12_评审人_4_string_psbn_$$VR" name="评审人" type="string" variable="approvalPerson12"/>                                                                                        
+        <activiti:formProperty id="projectNumber_项目编号_1_string_t1_$$VE" name="项目编号" type="string" variable="projectNumber" required="true"/>
+        <activiti:formProperty id="projectStage_项目阶段_2_string_t1_$$VE" name="项目阶段" type="string" variable="projectStage" required="true"/>
         
         <activiti:formProperty id="attachment_附件_1_string_t9i_$$A" name="上传附件" type="string" variable="attachment" required="true"></activiti:formProperty>
       

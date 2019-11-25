@@ -127,9 +127,13 @@
     <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="exclusivegateway1"></sequenceFlow>
     <exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway"></exclusiveGateway>
     <serviceTask id="servicetask1" name="call metabase" activiti:class="com.eorionsolution.riying.bpms.javaservice.http.RestAPIService"></serviceTask>
-    <sequenceFlow id="flow4" name="need call metabase" sourceRef="exclusivegateway1" targetRef="servicetask1"></sequenceFlow>
+    <sequenceFlow id="flow4" name="need call metabase" sourceRef="exclusivegateway1" targetRef="servicetask1">
+    	<conditionExpression xsi:type="tFormalExpression"><![CDATA[${callmetabase=='Y'}]]></conditionExpression>
+    </sequenceFlow>
     <sequenceFlow id="flow5" sourceRef="servicetask1" targetRef="scripttask1"></sequenceFlow>
-    <sequenceFlow id="flow6" name="need not call metabase" sourceRef="exclusivegateway1" targetRef="callactivity1"></sequenceFlow>
+    <sequenceFlow id="flow6" name="need not call metabase" sourceRef="exclusivegateway1" targetRef="callactivity1">
+    	<conditionExpression xsi:type="tFormalExpression"><![CDATA[${callmetabase=='N'}]]></conditionExpression>
+    </sequenceFlow>
     <sequenceFlow id="flow7" sourceRef="scripttask1" targetRef="callactivity1"></sequenceFlow>
   </process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_DPPP_MAIN_V2">

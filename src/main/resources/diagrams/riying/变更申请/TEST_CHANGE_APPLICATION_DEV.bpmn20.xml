@@ -42,6 +42,9 @@
         <activiti:formProperty id="changeBefore_变更前_1_string_t2_$$D" name="变更前" type="string" variable="changeBefore" required="true"></activiti:formProperty>
         <activiti:formProperty id="changeAfter_变更后_2_string_t2_$$D" name="变更后" type="string" variable="changeAfter" required="true"></activiti:formProperty>
         
+        <activiti:formProperty id="projectNumber_项目编号_1_string_t1_$$E" name="项目编号" type="string" variable="projectNumber" required="true"/>
+        <activiti:formProperty id="projectStage_项目阶段_2_string_t1_$$E" name="项目阶段" type="string" variable="projectStage" required="true"/>
+        
 		<activiti:formProperty id="attachmentback1_附件_1_string_t9_$$A" name="上传附件" type="string" variable="attachmentback1"></activiti:formProperty>
         
         <activiti:executionListener event="end" class="org.activiti.engine.impl.bpmn.listener.ScriptExecutionListener">
@@ -99,7 +102,7 @@
     	
     	</script>
     </scriptTask>
-    <userTask id="usertask1" name="变更可行性评审" activiti:assignee="${manager}" activiti:dueDate="P1D">
+    <userTask id="usertask1" name="部门领导确认" activiti:assignee="${manager}" activiti:dueDate="P1D">
       <extensionElements>
         <activiti:formProperty id="sourceOfChange_变更来源_1_enum_rbv_$$VA" name="变更来源" type="enum" variable="sourceOfChange" required="true">
           <activiti:value id="客户变更" name="客户变更"></activiti:value>
@@ -141,24 +144,15 @@
         <activiti:formProperty id="changeReason_变更原因_4_string_t2_$$VC" name="变更原因" type="string" variable="changeReason" required="true"></activiti:formProperty>        
         <activiti:formProperty id="changeBefore_变更前_1_string_t2_$$VD" name="变更前" type="string" variable="changeBefore" required="true"></activiti:formProperty>
         <activiti:formProperty id="changeAfter_变更后_2_string_t2_$$VD" name="变更后" type="string" variable="changeAfter" required="true"></activiti:formProperty>
+        
+        <activiti:formProperty id="projectNumber_项目编号_1_string_t1_$$VE" name="项目编号" type="string" variable="projectNumber" required="true"/>
+        <activiti:formProperty id="projectStage_项目阶段_2_string_t1_$$VE" name="项目阶段" type="string" variable="projectStage" required="true"/>        
 
-        <activiti:formProperty id="coreaction_可行性评审_1_enum_rbv_$$A" name="可行性评审结论" type="enum" variable="coreaction_result" required="true">
+        <activiti:formProperty id="coreaction_评审_1_enum_rbv_$$A" name="评审" type="enum" variable="coreaction_result" required="true">
           <activiti:value id="同意变更" name="同意变更"></activiti:value>
           <activiti:value id="拒绝变更" name="拒绝变更"></activiti:value>
         </activiti:formProperty>
         <activiti:formProperty id="corecomments_评审意见_2_string_t2_$$A" name="评审意见" type="string" variable="corecomments_result"></activiti:formProperty>
-        <activiti:formProperty id="verification_追加验证_3_enum_rbv_$$A" name="追加验证" type="enum" variable="verification">
-          <activiti:value id="需要追加验证" name="需要追加验证"></activiti:value>
-          <activiti:value id="不需要追加验证" name="不需要追加验证"></activiti:value>
-        </activiti:formProperty>
-        <activiti:formProperty id="verificationContent_验证内容_4_string_t2_$$A" name="验证内容" type="string" variable="verificationContent"></activiti:formProperty>
-        <activiti:formProperty id="performanceImpact_对产品性能的影响_1_string_t2_$$B" name="对产品性能的影响" type="string" variable="performanceImpact"></activiti:formProperty>
-        <activiti:formProperty id="costImpact_对成本的影响_1_string_t2_$$C" name="对成本的影响" type="string" variable="costImpact"></activiti:formProperty>
-        <activiti:formProperty id="cycleImpact_对周期的影响_1_string_t2_$$D" name="对周期的影响" type="string" variable="cycleImpact"></activiti:formProperty>
-        <activiti:formProperty id="environmentalImpact_对环境安全对影响_1_string_t2_$$E" name="对环境安全的影响" type="string" variable="environmentalImpact"></activiti:formProperty>
-        <activiti:formProperty id="otherImpact1_其他影响_1_string_t2_$$F" name="其他影响" type="string" variable="otherImpact1"></activiti:formProperty>
-        <activiti:formProperty id="otherImpact2_其他影响_1_string_t2_$$G" name="其他影响" type="string" variable="otherImpact2"></activiti:formProperty>
-        <activiti:formProperty id="otherImpact3_其他影响_1_string_t2_$$H" name="其他影响" type="string" variable="otherImpact3"></activiti:formProperty>
       	
 		<activiti:formProperty id="attachmentback1_附件_1_string_t9_$$VA" name="上传附件" type="string" variable="attachmentback1"></activiti:formProperty>
 		<activiti:formProperty id="attachmentback2_附件_1_string_t9_$$A" name="上传附件" type="string" variable="attachmentback2"></activiti:formProperty>      	
@@ -224,25 +218,16 @@
         <activiti:formProperty id="changeBefore_变更前_5_string_t2_$$VC" name="变更前" type="string" variable="changeBefore" required="true"></activiti:formProperty>
         <activiti:formProperty id="changeAfter_变更后_6_string_t2_$$VC" name="变更后" type="string" variable="changeAfter" required="true"></activiti:formProperty>
         <activiti:formProperty id="changeReason_变更原因_4_string_t2_$$VC" name="变更原因" type="string" variable="changeReason" required="true"></activiti:formProperty>
-
-
-        <activiti:formProperty id="coreaction_可行性评审_1_enum_rbv_$$VD" name="可行性评审结论" type="enum" variable="coreaction_result" required="true">
+        
+        <activiti:formProperty id="coreaction_评审_1_enum_rbv_$$VD" name="评审" type="enum" variable="coreaction_result" required="true">
           <activiti:value id="同意变更" name="同意变更"></activiti:value>
           <activiti:value id="拒绝变更" name="拒绝变更"></activiti:value>
         </activiti:formProperty>
-        <activiti:formProperty id="corecomments_评审意见_2_string_t2_$$VD" name="评审意见" type="string" variable="corecomments_result"></activiti:formProperty>
-        <activiti:formProperty id="verification_追加验证_3_enum_rbv_$$VD" name="追加验证" type="enum" variable="verification">
-          <activiti:value id="需要追加验证" name="需要追加验证"></activiti:value>
-          <activiti:value id="不需要追加验证" name="不需要追加验证"></activiti:value>
-        </activiti:formProperty>
-        <activiti:formProperty id="verificationContent_验证内容_4_string_t2_$$VD" name="验证内容" type="string" variable="verificationContent"></activiti:formProperty>
-        <activiti:formProperty id="performanceImpact_对产品性能的影响_1_string_t2_$$VE" name="对产品性能的影响" type="string" variable="performanceImpact"></activiti:formProperty>
-        <activiti:formProperty id="costImpact_对成本的影响_1_string_t2_$$VF" name="对成本的影响" type="string" variable="costImpact"></activiti:formProperty>
-        <activiti:formProperty id="cycleImpact_对周期的影响_1_string_t2_$$VG" name="对周期的影响" type="string" variable="cycleImpact"></activiti:formProperty>
-        <activiti:formProperty id="environmentalImpact_对环境安全对影响_1_string_t2_$$VH" name="对环境安全的影响" type="string" variable="environmentalImpact"></activiti:formProperty>
-        <activiti:formProperty id="otherImpact1_其他影响_1_string_t2_$$VI" name="其他影响" type="string" variable="otherImpact1"></activiti:formProperty>
-        <activiti:formProperty id="otherImpact2_其他影响_1_string_t2_$$VJ" name="其他影响" type="string" variable="otherImpact2"></activiti:formProperty>
-        <activiti:formProperty id="otherImpact3_其他影响_1_string_t2_$$VK" name="其他影响" type="string" variable="otherImpact3"></activiti:formProperty>
+        <activiti:formProperty id="corecomments_评审意见_2_string_t2_$$VD" name="评审意见" type="string" variable="corecomments_result"></activiti:formProperty>        
+        
+        <activiti:formProperty id="projectNumber_项目编号_1_string_t1_$$VE" name="项目编号" type="string" variable="projectNumber" required="true"/>
+        <activiti:formProperty id="projectStage_项目阶段_2_string_t1_$$VE" name="项目阶段" type="string" variable="projectStage" required="true"/>        
+
         <activiti:formProperty id="attachment_附件_1_string_t9i_$$A" name="上传附件" type="string" variable="attachment" required="true"></activiti:formProperty>
       
 		<activiti:formProperty id="attachmentback1_附件_1_string_t9_$$VA" name="上传附件" type="string" variable="attachmentback1"></activiti:formProperty>
