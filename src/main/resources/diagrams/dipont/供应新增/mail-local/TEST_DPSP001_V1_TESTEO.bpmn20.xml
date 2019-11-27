@@ -112,8 +112,8 @@ exit
             <activiti:string><![CDATA[groovy]]></activiti:string>
           </activiti:field>
           <activiti:field name="script">
-            <activiti:string><![CDATA[//if(task.getExecution().getVariable('camelBody').contains('exec failed') || task.getExecution().getVariable('camelBody').contains('Error'))
-					//throw new org.activiti.engine.ActivitiIllegalArgumentException(task.getExecution().getVariable('camelBody'));]]></activiti:string>
+            <activiti:string><![CDATA[if(task.getExecution().getVariable('camelBody').contains('exec failed') || task.getExecution().getVariable('camelBody').contains('Error'))
+					throw new org.activiti.engine.ActivitiIllegalArgumentException(task.getExecution().getVariable('camelBody'));]]></activiti:string>
           </activiti:field>
         </activiti:taskListener>
         <activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
@@ -173,9 +173,9 @@ exit
 		def jsonSlurper = new JsonSlurper()
 		def sptype = jsonSlurper.parseText(sptype?:"""{"name":""}""")
 		def comments = comments?:''
-		def mailBodyStr = """
 		def employeeOpt = Optional.ofNullable(identityService.createUserQuery().userId(initiator).singleResult())
 		def employeename = employeeOpt.map({u ->  u.getLastName() + u.getFirstName()}).orElse('')
+		def mailBodyStr = """
 		{
 		    "mail":{
 		        "templateName":"add_supplier",
@@ -186,9 +186,9 @@ exit
 		            "comments":"$comments",
 		            "initiator":"$employeename"
 		        },
-		        "from":"develop@eorionsolution.com",
+		        "from":"notice@dipont.com",
 		        "to":[
-		            "baocaixue@eorionsolution.com"
+		            "$initiator"
 		        ]
 		    }
 		}

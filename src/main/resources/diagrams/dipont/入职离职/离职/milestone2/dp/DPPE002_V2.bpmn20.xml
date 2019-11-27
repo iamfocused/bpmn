@@ -53,9 +53,12 @@
 			
 			def toList = new HashSet()
 			toList.add(initiator)//启动者
+			toList.add('it@dipont-edu.com')//IT
 			toList.addAll(hrSns)//hr抄送
 			toList.addAll(adminSns)//行政
-			toList.addAll(finSns)//财务
+			if(finSns.size() > 0){
+				toList.addAll(finSns)//财务
+			}
 			if(managersn){
 				toList.add(managersn)
 			}
@@ -178,9 +181,9 @@
     		
     		def jsonSlurper = new JsonSlurper()
 			def finList = jsonSlurper.parseText(_http_response_body)
-			if (finList.size() == 0) {
-				throw new org.activiti.engine.ActivitiIllegalArgumentException(corp + '实体下未找到财务收件人')
-			}
+			//if (finList.size() == 0) {
+			//	throw new org.activiti.engine.ActivitiIllegalArgumentException(legalCorp + '实体下未找到财务收件人')
+			//}
 			
 			execution.setVariable('finSns', new HashSet(finList.collect {it.sn}))
 			

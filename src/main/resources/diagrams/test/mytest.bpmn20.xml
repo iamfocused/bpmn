@@ -3,29 +3,27 @@
   <process id="constructData" name="construct data" isExecutable="true" activiti:candidateStarterGroups="admin">
     <startEvent id="startevent1" name="Start">
       <extensionElements>
-        <activiti:formProperty id="tbhdperformance_item" name="绩效考核表 Performance appraisal table" type="string" variable="tbhdperformance_item" required="true"></activiti:formProperty>      
-        <activiti:formProperty id="tbhdperformance_构面 Perspective_perspective_1_enum_sbs_$$A" name="构面 Perspective" type="enum" variable="tbhdperformance_perspective_t00" required="true">
-          <activiti:value id="财务及预算 Finance &amp; Budget" name="财务及预算 Finance &amp; Budget"></activiti:value>
-          <activiti:value id="创新及专业 Innovation &amp; Profession" name="创新及专业 Innovation &amp; Profession"></activiti:value>
-          <activiti:value id="客户及服务 Customer &amp; Service" name="客户及服务 Customer &amp; Service"></activiti:value>
-          <activiti:value id="流程及改进 Procedure inprovement" name="流程及改进 Procedure inprovement"></activiti:value>
-          <activiti:value id="学习与成长 Learning &amp; Development" name="学习与成长 Learning &amp; Development"></activiti:value>
+        <activiti:formProperty id="tbhdclaim1_item" name="索赔明细" type="string" variable="tbhdclaim1_item" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim1_发邮件日期_mailSendDate_1_string_t3_$$A" name="发邮件日期" type="string" variable="tbhdclaim1_mailSendDate_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim1_上报日期_reportDate_2_string_t3_$$A" name="上报日期" type="string" variable="tbhdclaim1_reportDate_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim1_经销商代码_dealerCode_3_string_t1_$$A" name="经销商代码" type="string" variable="tbhdclaim1_dealerCode_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim1_零件号_partNumber_4_string_t1_$$A" name="零件号" type="string" variable="tbhdclaim1_partNumber_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim1_中文名称_chineseName_5_string_t1_$$A" name="中文名称" type="string" variable="tbhdclaim1_chineseName_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim1_索赔数量_claimNumber_6_string_t6_$$A" name="索赔数量" type="string" variable="tbhdclaim1_claimNumber_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim1_索赔金额_claimAmount_7_string_cny_$$A" name="索赔金额" type="string" variable="tbhdclaim1_claimAmount_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim1_工程回复日期_replyDate_8_string_t3_$$A" name="工程回复日期" type="string" variable="tbhdclaim1_replyDate_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim1_工程回复_reply_9_string_t1_$$A" name="工程回复" type="string" variable="tbhdclaim1_reply_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim1_情况描述（归口处理）_desc_10_string_t1_$$A" name="情况描述（归口处理）" type="string" variable="tbhdclaim1_desc_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim1_是否回运_isReturn_11_string_t1_$$A" name="是否回运" type="string" variable="tbhdclaim1_isReturn_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim1_订单号_orderNumber_12_string_t1_$$A" name="订单号" type="string" variable="tbhdclaim1_orderNumber_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim1_上报途径_reportWay_13_string_t1_$$A" name="上报途径" type="string" variable="tbhdclaim1_reportWay_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim1_货运单_freightOrder_14_string_t1_$$A" name="货运单" type="string" variable="tbhdclaim1_freightOrder_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim1_计划员_planner_15_string_t1_$$A" name="计划员" type="string" variable="tbhdclaim1_planner_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim1_责任判定_judge_16_enum_sbs_$$A" name="责任判定" type="enum" variable="tbhdclaim1_judge_t00">
+          <activiti:value id="供应商责任" name="供应商责任"></activiti:value>
+          <activiti:value id="安吉物流责任" name="安吉物流责任"></activiti:value>
         </activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_说明 Description_description_2_string_t2_$$A" name="说明 Description" type="string" variable="tbhdperformance_description_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_目标 Objective_objective_3_string_t2_$$A" name="目标 Objective" type="string" variable="tbhdperformance_objective_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_绩效指标 KPI_kpi_4_string_t1_$$A" name="绩效指标 KPI" type="string" variable="tbhdperformance_kpi_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_权重 Weighting(%)_weighting_5_string_t1_$$A" name="权重 Weighting(%)" type="string" variable="tbhdperformance_weighting_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_单位 Unit_unit_6_string_t1_$$A" name="单位 Unit" type="string" variable="tbhdperformance_unit_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_上年度实际 Actual last year_actual_7_string_t1_$$A" name="上年度实际 Actual last year" type="string" variable="tbhdperformance_actual_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_指标属性 KPI achievement measurement(Fill in ≥ or ≤)_kpiattribute_8_string_t1_$$A" name="指标属性 KPI achievement measurement(Fill in ≥ or ≤)" type="string" variable="tbhdperformance_kpiattribute_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_Plan Q1_planq1_9_string_t1_$$A" name="Plan Q1" type="string" variable="tbhdperformance_planq1_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_Plan Q2_planq2_10_string_t1_$$A" name="Plan Q2" type="string" variable="tbhdperformance_planq2_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_Plan Q3_planq3_11_string_t1_$$A" name="Plan Q3" type="string" variable="tbhdperformance_planq3_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_Plan Q4_planq4_12_string_t1_$$A" name="Plan Q4" type="string" variable="tbhdperformance_planq4_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_Actual Q1_actualq1_13_string_t1_$$HA" name="Actual Q1" type="string" variable="tbhdperformance_actualq1_t00"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_Actual Q2_actualq2_14_string_t1_$$HA" name="Actual Q2" type="string" variable="tbhdperformance_actualq2_t00"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_Actual Q3_actualq3_15_string_t1_$$HA" name="Actual Q3" type="string" variable="tbhdperformance_actualq3_t00"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_Actual Q4_actualq4_16_string_t1_$$HA" name="Actual Q4" type="string" variable="tbhdperformance_actualq4_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim1_已复判_doubleCheck_17_string_t1_$$HA" name="已复判" type="string" variable="tbhdclaim1_doubleCheck_t00"></activiti:formProperty>
       </extensionElements>
     </startEvent>
     <endEvent id="endevent1" name="End"></endEvent>
