@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/pur">
-  <process id="DPPP_MAIN_V2" name="绩效考核主流程 Performance appraisal main process" isExecutable="true" activiti:candidateStarterGroups="admin">
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/frm">
+  <process id="DPPP_MAIN_V2" name="绩效考核主流程 Performance appraisal main process" isExecutable="true" activiti:candidateStarterGroups="_dpmsadmin">
     <startEvent id="startevent1" name="Start" activiti:initiator="initiator">
       <extensionElements>
         <activiti:formProperty id="tbhdaddemployees_item" name="指定员工列表 Designated employee list" type="string" variable="tbhdaddemployees_item"></activiti:formProperty>
@@ -47,7 +47,7 @@
 						def headerMap = new java.util.HashMap<String,String>()	
 						execution.setVariable("_http_headers", headerMap)
 						execution.setVariable("_http_body", '')
-						execution.setVariable("_http_url", 'https://metabase.eorionsolution.com/public/question/ab9d592d-0e01-4e02-9a56-eb80b7123a41.json')
+						execution.setVariable("_http_url", 'https://bpmmb.dipont.com/public/question/35b047d6-57a3-4e3b-beb3-6956d6ca4159.json')
 						execution.setVariable("_http_response_body", '')
 						execution.setVariable("_http_response_status_code", '')
     				}]]></activiti:string>
@@ -60,6 +60,7 @@
     	<![CDATA[
     		import groovy.json.JsonSlurper
     		import groovy.json.JsonOutput
+    		import com.eorionsolution.bpms.extension.ldap.LdapService;
     		
     		def jsonSlurper = new JsonSlurper()
     		
@@ -75,12 +76,9 @@
     		def empListFromLdap = []
     		def subflows = []//List[Map]
     		
-    		//com.eorionsolution.bpms.extension.ldap.LdapService.getUsersByGroupName('_dpcglc').each{
-    		//	empListFromLdap<<it
-    		//}
-    		
-    		empListFromLdap<<'dptest1'//TODO delete
-    		empListFromLdap<<'dptest2'//TODO delete
+    		LdapService.getUsersByGroupName('_erpf').each{
+    			empListFromLdap<<it
+    		}
     		
     		if(empListFromLdap.size() == 0){
     			throw new org.activiti.engine.ActivitiIllegalArgumentException('LDAP search result is empty, please contact Administrator')
