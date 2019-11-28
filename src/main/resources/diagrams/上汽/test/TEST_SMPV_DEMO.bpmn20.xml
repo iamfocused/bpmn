@@ -4,26 +4,27 @@
     <startEvent id="startevent1" name="开始" activiti:initiator="initiator">
       <extensionElements>
         <activiti:formProperty id="tbhdclaim_item" name="索赔明细" type="string" variable="tbhdclaim_item" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim_发邮件日期_mailSendDate_1_string_t3_$$A" name="发邮件日期" type="string" variable="tbhdclaim_mailSendDate_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim_上报日期_reportDate_2_string_t3_$$A" name="上报日期" type="string" variable="tbhdclaim_reportDate_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim_经销商代码_dealerCode_3_string_t1_$$A" name="经销商代码" type="string" variable="tbhdclaim_dealerCode_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim_经销商名称_dealerName_4_string_t1_$$A" name="经销商名称" type="string" variable="tbhdclaim_dealerName_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim_零件号_partNumber_5_string_t1_$$A" name="零件号" type="string" variable="tbhdclaim_partNumber_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim_中文名称_chineseName_6_string_t1_$$A" name="中文名称" type="string" variable="tbhdclaim_chineseName_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim_索赔数量_claimNumber_7_string_t6_$$A" name="索赔数量" type="string" variable="tbhdclaim_claimNumber_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim_索赔金额_claimAmount_8_string_cny_$$A" name="索赔金额" type="string" variable="tbhdclaim_claimAmount_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim_工程回复日期_replyDate_9_string_t3_$$A" name="工程回复日期" type="string" variable="tbhdclaim_replyDate_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim_工程回复_reply_10_string_t1_$$A" name="工程回复" type="string" variable="tbhdclaim_reply_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim_情况描述（归口处理）_desc_11_string_t1_$$A" name="情况描述（归口处理）" type="string" variable="tbhdclaim_desc_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim_是否回运_isReturn_12_string_t1_$$A" name="是否回运" type="string" variable="tbhdclaim_isReturn_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim_订单号_orderNumber_13_string_t1_$$A" name="订单号" type="string" variable="tbhdclaim_orderNumber_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim_上报途径_reportWay_14_string_t1_$$A" name="上报途径" type="string" variable="tbhdclaim_reportWay_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim_货运单_freightOrder_15_string_t1_$$A" name="货运单" type="string" variable="tbhdclaim_freightOrder_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim_计划员_planner_16_string_t1_$$A" name="计划员" type="string" variable="tbhdclaim_planner_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim_责任判定_judge_17_enum_sbs_$$HA" name="责任判定" type="enum" variable="tbhdclaim_judge_t00">
+        <activiti:formProperty id="tbhdclaim_责任判定_judge_1_enum_sbs_$$HA" name="责任判定" type="enum" variable="tbhdclaim_judge_t00">
           <activiti:value id="供应商责任" name="供应商责任"></activiti:value>
           <activiti:value id="安吉物流责任" name="安吉物流责任"></activiti:value>
-        </activiti:formProperty>
+        </activiti:formProperty>        
+        <activiti:formProperty id="tbhdclaim_发邮件日期_mailSendDate_2_string_t3_$$A" name="发邮件日期" type="string" variable="tbhdclaim_mailSendDate_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_上报日期_reportDate_3_string_t3_$$A" name="上报日期" type="string" variable="tbhdclaim_reportDate_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_经销商代码_dealerCode_4_string_t1_$$A" name="经销商代码" type="string" variable="tbhdclaim_dealerCode_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_经销商名称_dealerName_5_string_t1_$$A" name="经销商名称" type="string" variable="tbhdclaim_dealerName_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_零件号_partNumber_6_string_t1_$$A" name="零件号" type="string" variable="tbhdclaim_partNumber_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_中文名称_chineseName_7_string_t1_$$A" name="中文名称" type="string" variable="tbhdclaim_chineseName_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_索赔数量_claimNumber_8_string_t6_$$A" name="索赔数量" type="string" variable="tbhdclaim_claimNumber_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_索赔金额_claimAmount_9_string_cny_$$A" name="索赔金额" type="string" variable="tbhdclaim_claimAmount_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_工程回复日期_replyDate_10_string_t3_$$A" name="工程回复日期" type="string" variable="tbhdclaim_replyDate_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_工程回复_reply_11_string_t1_$$A" name="工程回复" type="string" variable="tbhdclaim_reply_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_情况描述（归口处理）_desc_12_string_t1_$$A" name="情况描述（归口处理）" type="string" variable="tbhdclaim_desc_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_是否回运_isReturn_13_string_t1_$$A" name="是否回运" type="string" variable="tbhdclaim_isReturn_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_订单号_orderNumber_14_string_t1_$$A" name="订单号" type="string" variable="tbhdclaim_orderNumber_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_上报途径_reportWay_15_string_t1_$$A" name="上报途径" type="string" variable="tbhdclaim_reportWay_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_货运单_freightOrder_16_string_t1_$$A" name="货运单" type="string" variable="tbhdclaim_freightOrder_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_计划员_planner_17_string_t1_$$A" name="计划员" type="string" variable="tbhdclaim_planner_t00" required="true"></activiti:formProperty>
+
         <activiti:formProperty id="tbhdclaim_已复判_doubleCheck_18_string_t1_$$HA" name="已复判" type="string" variable="tbhdclaim_doubleCheck_t00"></activiti:formProperty>
         <activiti:executionListener event="end" class="org.activiti.engine.impl.bpmn.listener.ScriptExecutionListener">
           <activiti:field name="language">
@@ -38,28 +39,29 @@
     <userTask id="usertask1" name="初判" activiti:assignee="${initiator}" activiti:dueDate="P1D">
       <extensionElements>
         <activiti:formProperty id="tbhdclaim_item" name="索赔明细" type="string" variable="tbhdclaim_item" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim_发邮件日期_mailSendDate_1_string_t3_$$VA" name="发邮件日期" type="string" variable="tbhdclaim_mailSendDate_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim_上报日期_reportDate_2_string_t3_$$VA" name="上报日期" type="string" variable="tbhdclaim_reportDate_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim_经销商代码_dealerCode_3_string_t1_$$VA" name="经销商代码" type="string" variable="tbhdclaim_dealerCode_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim_经销商名称_dealerName_4_string_t1_$$VA" name="经销商名称" type="string" variable="tbhdclaim_dealerName_t00" required="true"></activiti:formProperty>
-        
-        <activiti:formProperty id="tbhdclaim_零件号_partNumber_5_string_t1_$$VA" name="零件号" type="string" variable="tbhdclaim_partNumber_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim_中文名称_chineseName_6_string_t1_$$VA" name="中文名称" type="string" variable="tbhdclaim_chineseName_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim_索赔数量_claimNumber_7_string_t6_$$VA" name="索赔数量" type="string" variable="tbhdclaim_claimNumber_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim_索赔金额_claimAmount_8_string_cny_$$VA" name="索赔金额" type="string" variable="tbhdclaim_claimAmount_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim_工程回复日期_replyDate_9_string_t3_$$VA" name="工程回复日期" type="string" variable="tbhdclaim_replyDate_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim_工程回复_reply_10_string_t1_$$VA" name="工程回复" type="string" variable="tbhdclaim_reply_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim_情况描述（归口处理）_desc_11_string_t1_$$VA" name="情况描述（归口处理）" type="string" variable="tbhdclaim_desc_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim_是否回运_isReturn_12_string_t1_$$VA" name="是否回运" type="string" variable="tbhdclaim_isReturn_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim_订单号_orderNumber_13_string_t1_$$VA" name="订单号" type="string" variable="tbhdclaim_orderNumber_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim_上报途径_reportWay_14_string_t1_$$VA" name="上报途径" type="string" variable="tbhdclaim_reportWay_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim_货运单_freightOrder_15_string_t1_$$VA" name="货运单" type="string" variable="tbhdclaim_freightOrder_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim_计划员_planner_16_string_t1_$$VA" name="计划员" type="string" variable="tbhdclaim_planner_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim_责任判定_judge_17_enum_sbs_$$A" name="责任判定" type="enum" variable="tbhdclaim_judge_t00" required="true">
+        <activiti:formProperty id="tbhdclaim_责任判定_judge_1_enum_sbs_$$A" name="责任判定" type="enum" variable="tbhdclaim_judge_t00" required="true">
           <activiti:value id=" " name=" "></activiti:value>
           <activiti:value id="供应商责任" name="供应商责任"></activiti:value>
           <activiti:value id="安吉物流责任" name="安吉物流责任"></activiti:value>
-        </activiti:formProperty>
+        </activiti:formProperty>        
+        <activiti:formProperty id="tbhdclaim_发邮件日期_mailSendDate_2_string_t3_$$VA" name="发邮件日期" type="string" variable="tbhdclaim_mailSendDate_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_上报日期_reportDate_3_string_t3_$$VA" name="上报日期" type="string" variable="tbhdclaim_reportDate_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_经销商代码_dealerCode_4_string_t1_$$VA" name="经销商代码" type="string" variable="tbhdclaim_dealerCode_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_经销商名称_dealerName_5_string_t1_$$VA" name="经销商名称" type="string" variable="tbhdclaim_dealerName_t00" required="true"></activiti:formProperty>
+        
+        <activiti:formProperty id="tbhdclaim_零件号_partNumber_6_string_t1_$$VA" name="零件号" type="string" variable="tbhdclaim_partNumber_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_中文名称_chineseName_7_string_t1_$$VA" name="中文名称" type="string" variable="tbhdclaim_chineseName_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_索赔数量_claimNumber_8_string_t6_$$VA" name="索赔数量" type="string" variable="tbhdclaim_claimNumber_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_索赔金额_claimAmount_9_string_cny_$$VA" name="索赔金额" type="string" variable="tbhdclaim_claimAmount_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_工程回复日期_replyDate_10_string_t3_$$VA" name="工程回复日期" type="string" variable="tbhdclaim_replyDate_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_工程回复_reply_11_string_t1_$$VA" name="工程回复" type="string" variable="tbhdclaim_reply_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_情况描述（归口处理）_desc_12_string_t1_$$VA" name="情况描述（归口处理）" type="string" variable="tbhdclaim_desc_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_是否回运_isReturn_13_string_t1_$$VA" name="是否回运" type="string" variable="tbhdclaim_isReturn_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_订单号_orderNumber_14_string_t1_$$VA" name="订单号" type="string" variable="tbhdclaim_orderNumber_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_上报途径_reportWay_15_string_t1_$$VA" name="上报途径" type="string" variable="tbhdclaim_reportWay_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_货运单_freightOrder_16_string_t1_$$VA" name="货运单" type="string" variable="tbhdclaim_freightOrder_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_计划员_planner_17_string_t1_$$VA" name="计划员" type="string" variable="tbhdclaim_planner_t00" required="true"></activiti:formProperty>
+
         <activiti:formProperty id="tbhdclaim_已复判_doubleCheck_18_string_t1_$$HA" name="已复判" type="string" variable="tbhdclaim_doubleCheck_t00"></activiti:formProperty>
         <activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
           <activiti:field name="language">
@@ -89,7 +91,7 @@
 						processedLi.addAll(item_std.findAll{it.judge == '供应商责任'})
 						execution.setVariable('tbhdclaim_item_std', JsonOutput.toJson(needHandleStd))
 						//item remove
-						item.put('rows',item.get('rows').findAll{it[16] == '安吉物流责任'})
+						item.put('rows',item.get('rows').findAll{it[0] == '安吉物流责任'})
 						execution.setVariable('tbhdclaim_item', JsonOutput.toJson(item))
 						
 					}
@@ -103,28 +105,29 @@
     <userTask id="usertask2" name="核定索赔并接受责任判定" activiti:assignee="${initiator}" activiti:dueDate="P1D">
       <extensionElements>
         <activiti:formProperty id="tbhdclaim_item_$$VA" name="索赔明细" type="string" variable="tbhdclaim_item" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim_发邮件日期_mailSendDate_1_string_t3_$$VA" name="发邮件日期" type="string" variable="tbhdclaim_mailSendDate_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim_上报日期_reportDate_2_string_t3_$$VA" name="上报日期" type="string" variable="tbhdclaim_reportDate_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim_经销商代码_dealerCode_3_string_t1_$$VA" name="经销商代码" type="string" variable="tbhdclaim_dealerCode_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim_经销商名称_dealerName_4_string_t1_$$VA" name="经销商名称" type="string" variable="tbhdclaim_dealerName_t00" required="true"></activiti:formProperty>
-        
-        <activiti:formProperty id="tbhdclaim_零件号_partNumber_5_string_t1_$$VA" name="零件号" type="string" variable="tbhdclaim_partNumber_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim_中文名称_chineseName_6_string_t1_$$VA" name="中文名称" type="string" variable="tbhdclaim_chineseName_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim_索赔数量_claimNumber_7_string_t6_$$VA" name="索赔数量" type="string" variable="tbhdclaim_claimNumber_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim_索赔金额_claimAmount_8_string_cny_$$VA" name="索赔金额" type="string" variable="tbhdclaim_claimAmount_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim_工程回复日期_replyDate_9_string_t3_$$VA" name="工程回复日期" type="string" variable="tbhdclaim_replyDate_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim_工程回复_reply_10_string_t1_$$VA" name="工程回复" type="string" variable="tbhdclaim_reply_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim_情况描述（归口处理）_desc_11_string_t1_$$VA" name="情况描述（归口处理）" type="string" variable="tbhdclaim_desc_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim_是否回运_isReturn_12_string_t1_$$VA" name="是否回运" type="string" variable="tbhdclaim_isReturn_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim_订单号_orderNumber_13_string_t1_$$VA" name="订单号" type="string" variable="tbhdclaim_orderNumber_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim_上报途径_reportWay_14_string_t1_$$VA" name="上报途径" type="string" variable="tbhdclaim_reportWay_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim_货运单_freightOrder_15_string_t1_$$VA" name="货运单" type="string" variable="tbhdclaim_freightOrder_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim_计划员_planner_16_string_t1_$$VA" name="计划员" type="string" variable="tbhdclaim_planner_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim_责任判定_judge_17_enum_sbs_$$VA" name="责任判定" type="enum" variable="tbhdclaim_judge_t00" required="true">
+        <activiti:formProperty id="tbhdclaim_责任判定_judge_1_enum_sbs_$$VA" name="责任判定" type="enum" variable="tbhdclaim_judge_t00" required="true">
           <activiti:value id=" " name=" "></activiti:value>
           <activiti:value id="供应商责任" name="供应商责任"></activiti:value>
           <activiti:value id="安吉物流责任" name="安吉物流责任"></activiti:value>
-        </activiti:formProperty>
+        </activiti:formProperty>        
+        <activiti:formProperty id="tbhdclaim_发邮件日期_mailSendDate_2_string_t3_$$VA" name="发邮件日期" type="string" variable="tbhdclaim_mailSendDate_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_上报日期_reportDate_3_string_t3_$$VA" name="上报日期" type="string" variable="tbhdclaim_reportDate_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_经销商代码_dealerCode_4_string_t1_$$VA" name="经销商代码" type="string" variable="tbhdclaim_dealerCode_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_经销商名称_dealerName_5_string_t1_$$VA" name="经销商名称" type="string" variable="tbhdclaim_dealerName_t00" required="true"></activiti:formProperty>
+        
+        <activiti:formProperty id="tbhdclaim_零件号_partNumber_6_string_t1_$$VA" name="零件号" type="string" variable="tbhdclaim_partNumber_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_中文名称_chineseName_7_string_t1_$$VA" name="中文名称" type="string" variable="tbhdclaim_chineseName_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_索赔数量_claimNumber_8_string_t6_$$VA" name="索赔数量" type="string" variable="tbhdclaim_claimNumber_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_索赔金额_claimAmount_9_string_cny_$$VA" name="索赔金额" type="string" variable="tbhdclaim_claimAmount_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_工程回复日期_replyDate_10_string_t3_$$VA" name="工程回复日期" type="string" variable="tbhdclaim_replyDate_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_工程回复_reply_11_string_t1_$$VA" name="工程回复" type="string" variable="tbhdclaim_reply_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_情况描述（归口处理）_desc_12_string_t1_$$VA" name="情况描述（归口处理）" type="string" variable="tbhdclaim_desc_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_是否回运_isReturn_13_string_t1_$$VA" name="是否回运" type="string" variable="tbhdclaim_isReturn_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_订单号_orderNumber_14_string_t1_$$VA" name="订单号" type="string" variable="tbhdclaim_orderNumber_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_上报途径_reportWay_15_string_t1_$$VA" name="上报途径" type="string" variable="tbhdclaim_reportWay_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_货运单_freightOrder_16_string_t1_$$VA" name="货运单" type="string" variable="tbhdclaim_freightOrder_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_计划员_planner_17_string_t1_$$VA" name="计划员" type="string" variable="tbhdclaim_planner_t00" required="true"></activiti:formProperty>
+
         <activiti:formProperty id="tbhdclaim_已复判_doubleCheck_18_string_t1_$$HA" name="已复判" type="string" variable="tbhdclaim_doubleCheck_t00"></activiti:formProperty>
       </extensionElements>
     </userTask>
@@ -132,29 +135,30 @@
     <userTask id="usertask3" name="责任划分" activiti:assignee="${initiator}" activiti:dueDate="P1D">
       <extensionElements>
         <activiti:formProperty id="tbhdclaim_item" name="索赔明细" type="string" variable="tbhdclaim_item" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim_发邮件日期_mailSendDate_1_string_t3_$$VA" name="发邮件日期" type="string" variable="tbhdclaim_mailSendDate_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim_上报日期_reportDate_2_string_t3_$$VA" name="上报日期" type="string" variable="tbhdclaim_reportDate_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim_经销商代码_dealerCode_3_string_t1_$$VA" name="经销商代码" type="string" variable="tbhdclaim_dealerCode_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim_经销商名称_dealerName_4_string_t1_$$VA" name="经销商名称" type="string" variable="tbhdclaim_dealerName_t00" required="true"></activiti:formProperty>
-        
-        <activiti:formProperty id="tbhdclaim_零件号_partNumber_5_string_t1_$$VA" name="零件号" type="string" variable="tbhdclaim_partNumber_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim_中文名称_chineseName_6_string_t1_$$VA" name="中文名称" type="string" variable="tbhdclaim_chineseName_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim_索赔数量_claimNumber_7_string_t6_$$VA" name="索赔数量" type="string" variable="tbhdclaim_claimNumber_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim_索赔金额_claimAmount_8_string_cny_$$VA" name="索赔金额" type="string" variable="tbhdclaim_claimAmount_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim_工程回复日期_replyDate_9_string_t3_$$VA" name="工程回复日期" type="string" variable="tbhdclaim_replyDate_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim_工程回复_reply_10_string_t1_$$VA" name="工程回复" type="string" variable="tbhdclaim_reply_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim_情况描述（归口处理）_desc_11_string_t1_$$VA" name="情况描述（归口处理）" type="string" variable="tbhdclaim_desc_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim_是否回运_isReturn_12_string_t1_$$VA" name="是否回运" type="string" variable="tbhdclaim_isReturn_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim_订单号_orderNumber_13_string_t1_$$VA" name="订单号" type="string" variable="tbhdclaim_orderNumber_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim_上报途径_reportWay_14_string_t1_$$VA" name="上报途径" type="string" variable="tbhdclaim_reportWay_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim_货运单_freightOrder_15_string_t1_$$VA" name="货运单" type="string" variable="tbhdclaim_freightOrder_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim_计划员_planner_16_string_t1_$$VA" name="计划员" type="string" variable="tbhdclaim_planner_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim_责任判定_judge_17_enum_sbs_$$A" name="责任判定" type="enum" variable="tbhdclaim_judge_t00" required="true">
+        <activiti:formProperty id="tbhdclaim_责任判定_judge_1_enum_sbs_$$A" name="责任判定" type="enum" variable="tbhdclaim_judge_t00" required="true">
           <activiti:value id=" " name=" "></activiti:value>
           <activiti:value id="仓库责任" name="仓库责任"></activiti:value>
           <activiti:value id="运输责任" name="运输责任"></activiti:value>
           <activiti:value id="包装责任" name="包装责任"></activiti:value>
-        </activiti:formProperty>
+        </activiti:formProperty>        
+        <activiti:formProperty id="tbhdclaim_发邮件日期_mailSendDate_2_string_t3_$$VA" name="发邮件日期" type="string" variable="tbhdclaim_mailSendDate_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_上报日期_reportDate_3_string_t3_$$VA" name="上报日期" type="string" variable="tbhdclaim_reportDate_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_经销商代码_dealerCode_4_string_t1_$$VA" name="经销商代码" type="string" variable="tbhdclaim_dealerCode_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_经销商名称_dealerName_5_string_t1_$$VA" name="经销商名称" type="string" variable="tbhdclaim_dealerName_t00" required="true"></activiti:formProperty>
+        
+        <activiti:formProperty id="tbhdclaim_零件号_partNumber_6_string_t1_$$VA" name="零件号" type="string" variable="tbhdclaim_partNumber_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_中文名称_chineseName_7_string_t1_$$VA" name="中文名称" type="string" variable="tbhdclaim_chineseName_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_索赔数量_claimNumber_8_string_t6_$$VA" name="索赔数量" type="string" variable="tbhdclaim_claimNumber_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_索赔金额_claimAmount_9_string_cny_$$VA" name="索赔金额" type="string" variable="tbhdclaim_claimAmount_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_工程回复日期_replyDate_10_string_t3_$$VA" name="工程回复日期" type="string" variable="tbhdclaim_replyDate_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_工程回复_reply_11_string_t1_$$VA" name="工程回复" type="string" variable="tbhdclaim_reply_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_情况描述（归口处理）_desc_12_string_t1_$$VA" name="情况描述（归口处理）" type="string" variable="tbhdclaim_desc_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_是否回运_isReturn_13_string_t1_$$VA" name="是否回运" type="string" variable="tbhdclaim_isReturn_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_订单号_orderNumber_14_string_t1_$$VA" name="订单号" type="string" variable="tbhdclaim_orderNumber_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_上报途径_reportWay_15_string_t1_$$VA" name="上报途径" type="string" variable="tbhdclaim_reportWay_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_货运单_freightOrder_16_string_t1_$$VA" name="货运单" type="string" variable="tbhdclaim_freightOrder_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_计划员_planner_17_string_t1_$$VA" name="计划员" type="string" variable="tbhdclaim_planner_t00" required="true"></activiti:formProperty>
+
         <activiti:formProperty id="tbhdclaim_已复判_doubleCheck_18_string_t1_$$HA" name="已复判" type="string" variable="tbhdclaim_doubleCheck_t00"></activiti:formProperty>
         <activiti:taskListener event="create" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
           <activiti:field name="language">
@@ -173,7 +177,7 @@
       				execution.setVariable('tbhdclaim_item_std', JsonOutput.toJson(std))
       				def item = jsonSlurper.parseText(tbhdclaim_item)
       				item.each {k,v ->
-						if (k == 'rows') {v.each{it[16]=' '}}      					
+						if (k == 'rows') {v.each{it[0]=' '}}      					
       				}
       				execution.setVariable('tbhdclaim_item', JsonOutput.toJson(item))]]></activiti:string>
           </activiti:field>
@@ -239,7 +243,7 @@
 					        }
 					    }
 					    item.put('tableName', duty)
-					    item.put('rows', item.get('rows').findAll{it[16]==types.get(duty)})
+					    item.put('rows', item.get('rows').findAll{it[0]==types.get(duty)})
 					    return item
 					}]]></activiti:string>
           </activiti:field>
@@ -254,35 +258,37 @@
     <userTask id="usertask4" name="仓库核对" activiti:assignee="${initiator}" activiti:dueDate="P1D">
       <extensionElements>
         <activiti:formProperty id="tbhdclaim1_item" name="索赔明细" type="string" variable="tbhdclaim1_item" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim1_发邮件日期_mailSendDate_1_string_t3_$$VA" name="发邮件日期" type="string" variable="tbhdclaim1_mailSendDate_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim1_上报日期_reportDate_2_string_t3_$$VA" name="上报日期" type="string" variable="tbhdclaim1_reportDate_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim1_经销商代码_dealerCode_3_string_t1_$$VA" name="经销商代码" type="string" variable="tbhdclaim1_dealerCode_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim1_经销商名称_dealerName_4_string_t1_$$VA" name="经销商名称" type="string" variable="tbhdclaim_dealerName_t00" required="true"></activiti:formProperty>
-        
-        <activiti:formProperty id="tbhdclaim1_零件号_partNumber_5_string_t1_$$VA" name="零件号" type="string" variable="tbhdclaim1_partNumber_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim1_中文名称_chineseName_6_string_t1_$$VA" name="中文名称" type="string" variable="tbhdclaim1_chineseName_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim1_索赔数量_claimNumber_7_string_t6_$$VA" name="索赔数量" type="string" variable="tbhdclaim1_claimNumber_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim1_索赔金额_claimAmount_8_string_cny_$$VA" name="索赔金额" type="string" variable="tbhdclaim1_claimAmount_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim1_工程回复日期_replyDate_9_string_t3_$$VA" name="工程回复日期" type="string" variable="tbhdclaim1_replyDate_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim1_工程回复_reply_10_string_t1_$$VA" name="工程回复" type="string" variable="tbhdclaim1_reply_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim1_情况描述（归口处理）_desc_11_string_t1_$$VA" name="情况描述（归口处理）" type="string" variable="tbhdclaim1_desc_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim1_是否回运_isReturn_12_string_t1_$$VA" name="是否回运" type="string" variable="tbhdclaim1_isReturn_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim1_订单号_orderNumber_13_string_t1_$$VA" name="订单号" type="string" variable="tbhdclaim1_orderNumber_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim1_上报途径_reportWay_14_string_t1_$$VA" name="上报途径" type="string" variable="tbhdclaim1_reportWay_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim1_货运单_freightOrder_15_string_t1_$$VA" name="货运单" type="string" variable="tbhdclaim1_freightOrder_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim1_计划员_planner_16_string_t1_$$VA" name="计划员" type="string" variable="tbhdclaim1_planner_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim1_责任判定_judge_17_enum_sbs_$$VA" name="责任判定" type="enum" variable="tbhdclaim1_judge_t00">
+        <activiti:formProperty id="tbhdclaim1_责任判定_judge_1_enum_sbs_$$VA" name="责任判定" type="enum" variable="tbhdclaim1_judge_t00">
           <activiti:value id=" " name=" "></activiti:value>
           <activiti:value id="仓库责任" name="仓库责任"></activiti:value>
           <activiti:value id="运输责任" name="运输责任"></activiti:value>
           <activiti:value id="包装责任" name="包装责任"></activiti:value>
-        </activiti:formProperty>
+        </activiti:formProperty>        
+        <activiti:formProperty id="tbhdclaim1_发邮件日期_mailSendDate_2_string_t3_$$VA" name="发邮件日期" type="string" variable="tbhdclaim1_mailSendDate_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim1_上报日期_reportDate_3_string_t3_$$VA" name="上报日期" type="string" variable="tbhdclaim1_reportDate_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim1_经销商代码_dealerCode_4_string_t1_$$VA" name="经销商代码" type="string" variable="tbhdclaim1_dealerCode_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim1_经销商名称_dealerName_5_string_t1_$$VA" name="经销商名称" type="string" variable="tbhdclaim_dealerName_t00" required="true"></activiti:formProperty>
+        
+        <activiti:formProperty id="tbhdclaim1_零件号_partNumber_6_string_t1_$$VA" name="零件号" type="string" variable="tbhdclaim1_partNumber_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim1_中文名称_chineseName_7_string_t1_$$VA" name="中文名称" type="string" variable="tbhdclaim1_chineseName_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim1_索赔数量_claimNumber_8_string_t6_$$VA" name="索赔数量" type="string" variable="tbhdclaim1_claimNumber_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim1_索赔金额_claimAmount_9_string_cny_$$VA" name="索赔金额" type="string" variable="tbhdclaim1_claimAmount_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim1_工程回复日期_replyDate_10_string_t3_$$VA" name="工程回复日期" type="string" variable="tbhdclaim1_replyDate_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim1_工程回复_reply_11_string_t1_$$VA" name="工程回复" type="string" variable="tbhdclaim1_reply_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim1_情况描述（归口处理）_desc_12_string_t1_$$VA" name="情况描述（归口处理）" type="string" variable="tbhdclaim1_desc_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim1_是否回运_isReturn_13_string_t1_$$VA" name="是否回运" type="string" variable="tbhdclaim1_isReturn_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim1_订单号_orderNumber_14_string_t1_$$VA" name="订单号" type="string" variable="tbhdclaim1_orderNumber_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim1_上报途径_reportWay_15_string_t1_$$VA" name="上报途径" type="string" variable="tbhdclaim1_reportWay_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim1_货运单_freightOrder_16_string_t1_$$VA" name="货运单" type="string" variable="tbhdclaim1_freightOrder_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim1_计划员_planner_17_string_t1_$$VA" name="计划员" type="string" variable="tbhdclaim1_planner_t00" required="true"></activiti:formProperty>
+
         <activiti:formProperty id="tbhdclaim1_已复判_doubleCheck_18_string_t1_$$HA" name="已复判" type="string" variable="tbhdclaim1_doubleCheck_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhdclaim1_是否有异议_existDissent_19_enum_rbv_$$A" name="是否有异议" type="enum" variable="tbhdclaim1_existDissent_t00" required="true">
           <activiti:value id="提出异议" name="提出异议"></activiti:value>
           <activiti:value id="没有异议" name="没有异议"></activiti:value>
         </activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim1_理由_reason_20_enum_rbv_$$A" name="理由" type="enum" variable="tbhdclaim1_reason_t00">
+        <activiti:formProperty id="tbhdclaim1_理由_reason_20_enum_sbs_$$A" name="理由" type="enum" variable="tbhdclaim1_reason_t00">
+          <activiti:value id=" " name=" "></activiti:value>
           <activiti:value id="供应商责任" name="供应商责任"></activiti:value>
           <activiti:value id="其他" name="其他"></activiti:value>
         </activiti:formProperty>
@@ -305,6 +311,9 @@
 						if (!it.existDissent) {
 							throw new org.activiti.engine.ActivitiIllegalArgumentException('请对每条索赔记录确定\"是否有异议\"')
 						}
+						if (it.existDissent == '提出异议' && it.reason == ' ') {
+							throw new org.activiti.engine.ActivitiIllegalArgumentException('请对\"提出异议\"的索赔记录选择理由')
+						}
 					}
 				
 				]]>
@@ -316,35 +325,37 @@
     <userTask id="usertask5" name="运输核对" activiti:assignee="${initiator}" activiti:dueDate="P1D">
       <extensionElements>
         <activiti:formProperty id="tbhdclaim2_item" name="索赔明细" type="string" variable="tbhdclaim2_item" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim2_发邮件日期_mailSendDate_1_string_t3_$$VA" name="发邮件日期" type="string" variable="tbhdclaim2_mailSendDate_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim2_上报日期_reportDate_2_string_t3_$$VA" name="上报日期" type="string" variable="tbhdclaim2_reportDate_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim2_经销商代码_dealerCode_3_string_t1_$$VA" name="经销商代码" type="string" variable="tbhdclaim2_dealerCode_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim2_经销商名称_dealerName_4_string_t1_$$VA" name="经销商名称" type="string" variable="tbhdclaim_dealerName_t00" required="true"></activiti:formProperty>
-        
-        <activiti:formProperty id="tbhdclaim2_零件号_partNumber_5_string_t1_$$VA" name="零件号" type="string" variable="tbhdclaim2_partNumber_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim2_中文名称_chineseName_6_string_t1_$$VA" name="中文名称" type="string" variable="tbhdclaim2_chineseName_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim2_索赔数量_claimNumber_7_string_t6_$$VA" name="索赔数量" type="string" variable="tbhdclaim2_claimNumber_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim2_索赔金额_claimAmount_8_string_cny_$$VA" name="索赔金额" type="string" variable="tbhdclaim2_claimAmount_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim2_工程回复日期_replyDate_9_string_t3_$$VA" name="工程回复日期" type="string" variable="tbhdclaim2_replyDate_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim2_工程回复_reply_10_string_t1_$$VA" name="工程回复" type="string" variable="tbhdclaim2_reply_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim2_情况描述（归口处理）_desc_11_string_t1_$$VA" name="情况描述（归口处理）" type="string" variable="tbhdclaim2_desc_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim2_是否回运_isReturn_12_string_t1_$$VA" name="是否回运" type="string" variable="tbhdclaim2_isReturn_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim2_订单号_orderNumber_13_string_t1_$$VA" name="订单号" type="string" variable="tbhdclaim2_orderNumber_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim2_上报途径_reportWay_14_string_t1_$$VA" name="上报途径" type="string" variable="tbhdclaim2_reportWay_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim2_货运单_freightOrder_15_string_t1_$$VA" name="货运单" type="string" variable="tbhdclaim2_freightOrder_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim2_计划员_planner_16_string_t1_$$VA" name="计划员" type="string" variable="tbhdclaim2_planner_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim2_责任判定_judge_17_enum_sbs_$$VA" name="责任判定" type="enum" variable="tbhdclaim2_judge_t00">
+        <activiti:formProperty id="tbhdclaim2_责任判定_judge_1_enum_sbs_$$VA" name="责任判定" type="enum" variable="tbhdclaim2_judge_t00">
           <activiti:value id=" " name=" "></activiti:value>
           <activiti:value id="仓库责任" name="仓库责任"></activiti:value>
           <activiti:value id="运输责任" name="运输责任"></activiti:value>
           <activiti:value id="包装责任" name="包装责任"></activiti:value>
-        </activiti:formProperty>
+        </activiti:formProperty>        
+        <activiti:formProperty id="tbhdclaim2_发邮件日期_mailSendDate_2_string_t3_$$VA" name="发邮件日期" type="string" variable="tbhdclaim2_mailSendDate_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim2_上报日期_reportDate_3_string_t3_$$VA" name="上报日期" type="string" variable="tbhdclaim2_reportDate_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim2_经销商代码_dealerCode_4_string_t1_$$VA" name="经销商代码" type="string" variable="tbhdclaim2_dealerCode_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim2_经销商名称_dealerName_5_string_t1_$$VA" name="经销商名称" type="string" variable="tbhdclaim_dealerName_t00" required="true"></activiti:formProperty>
+        
+        <activiti:formProperty id="tbhdclaim2_零件号_partNumber_6_string_t1_$$VA" name="零件号" type="string" variable="tbhdclaim2_partNumber_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim2_中文名称_chineseName_7_string_t1_$$VA" name="中文名称" type="string" variable="tbhdclaim2_chineseName_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim2_索赔数量_claimNumber_8_string_t6_$$VA" name="索赔数量" type="string" variable="tbhdclaim2_claimNumber_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim2_索赔金额_claimAmount_9_string_cny_$$VA" name="索赔金额" type="string" variable="tbhdclaim2_claimAmount_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim2_工程回复日期_replyDate_10_string_t3_$$VA" name="工程回复日期" type="string" variable="tbhdclaim2_replyDate_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim2_工程回复_reply_11_string_t1_$$VA" name="工程回复" type="string" variable="tbhdclaim2_reply_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim2_情况描述（归口处理）_desc_12_string_t1_$$VA" name="情况描述（归口处理）" type="string" variable="tbhdclaim2_desc_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim2_是否回运_isReturn_13_string_t1_$$VA" name="是否回运" type="string" variable="tbhdclaim2_isReturn_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim2_订单号_orderNumber_14_string_t1_$$VA" name="订单号" type="string" variable="tbhdclaim2_orderNumber_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim2_上报途径_reportWay_15_string_t1_$$VA" name="上报途径" type="string" variable="tbhdclaim2_reportWay_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim2_货运单_freightOrder_16_string_t1_$$VA" name="货运单" type="string" variable="tbhdclaim2_freightOrder_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim2_计划员_planner_17_string_t1_$$VA" name="计划员" type="string" variable="tbhdclaim2_planner_t00" required="true"></activiti:formProperty>
+
         <activiti:formProperty id="tbhdclaim2_已复判_doubleCheck_18_string_t1_$$HA" name="已复判" type="string" variable="tbhdclaim2_doubleCheck_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhdclaim2_是否有异议_existDissent_19_enum_rbv_$$A" name="是否有异议" type="enum" variable="tbhdclaim2_existDissent_t00" required="true">
           <activiti:value id="提出异议" name="提出异议"></activiti:value>
           <activiti:value id="没有异议" name="没有异议"></activiti:value>
         </activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim2_理由_reason_20_enum_rbv_$$A" name="理由" type="enum" variable="tbhdclaim2_reason_t00">
+        <activiti:formProperty id="tbhdclaim2_理由_reason_20_enum_sbs_$$A" name="理由" type="enum" variable="tbhdclaim2_reason_t00">
+          <activiti:value id=" " name=" "></activiti:value>
           <activiti:value id="供应商责任" name="供应商责任"></activiti:value>
           <activiti:value id="其他" name="其他"></activiti:value>
         </activiti:formProperty>
@@ -367,6 +378,9 @@
 						if (!it.existDissent) {
 							throw new org.activiti.engine.ActivitiIllegalArgumentException('请对每条索赔记录确定\"是否有异议\"')
 						}
+						if (it.existDissent == '提出异议' && it.reason == ' ') {
+							throw new org.activiti.engine.ActivitiIllegalArgumentException('请对\"提出异议\"的索赔记录选择理由')
+						}
 					}
 				
 				]]>
@@ -378,35 +392,37 @@
     <userTask id="usertask6" name="包装核对" activiti:assignee="${initiator}" activiti:dueDate="P1D">
       <extensionElements>
         <activiti:formProperty id="tbhdclaim3_item" name="索赔明细" type="string" variable="tbhdclaim3_item" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim3_发邮件日期_mailSendDate_1_string_t3_$$VA" name="发邮件日期" type="string" variable="tbhdclaim3_mailSendDate_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim3_上报日期_reportDate_2_string_t3_$$VA" name="上报日期" type="string" variable="tbhdclaim3_reportDate_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim3_经销商代码_dealerCode_3_string_t1_$$VA" name="经销商代码" type="string" variable="tbhdclaim3_dealerCode_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim3_经销商名称_dealerName_4_string_t1_$$VA" name="经销商名称" type="string" variable="tbhdclaim_dealerName_t00" required="true"></activiti:formProperty>
-        
-        <activiti:formProperty id="tbhdclaim3_零件号_partNumber_5_string_t1_$$VA" name="零件号" type="string" variable="tbhdclaim3_partNumber_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim3_中文名称_chineseName_6_string_t1_$$VA" name="中文名称" type="string" variable="tbhdclaim3_chineseName_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim3_索赔数量_claimNumber_7_string_t6_$$VA" name="索赔数量" type="string" variable="tbhdclaim3_claimNumber_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim3_索赔金额_claimAmount_8_string_cny_$$VA" name="索赔金额" type="string" variable="tbhdclaim3_claimAmount_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim3_工程回复日期_replyDate_9_string_t3_$$VA" name="工程回复日期" type="string" variable="tbhdclaim3_replyDate_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim3_工程回复_reply_10_string_t1_$$VA" name="工程回复" type="string" variable="tbhdclaim3_reply_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim3_情况描述（归口处理）_desc_11_string_t1_$$VA" name="情况描述（归口处理）" type="string" variable="tbhdclaim3_desc_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim3_是否回运_isReturn_12_string_t1_$$VA" name="是否回运" type="string" variable="tbhdclaim3_isReturn_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim3_订单号_orderNumber_13_string_t1_$$VA" name="订单号" type="string" variable="tbhdclaim3_orderNumber_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim3_上报途径_reportWay_14_string_t1_$$VA" name="上报途径" type="string" variable="tbhdclaim3_reportWay_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim3_货运单_freightOrder_15_string_t1_$$VA" name="货运单" type="string" variable="tbhdclaim3_freightOrder_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim3_计划员_planner_16_string_t1_$$VA" name="计划员" type="string" variable="tbhdclaim3_planner_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim3_责任判定_judge_17_enum_sbs_$$VA" name="责任判定" type="enum" variable="tbhdclaim3_judge_t00">
+        <activiti:formProperty id="tbhdclaim3_责任判定_judge_1_enum_sbs_$$VA" name="责任判定" type="enum" variable="tbhdclaim3_judge_t00">
           <activiti:value id=" " name=" "></activiti:value>
           <activiti:value id="仓库责任" name="仓库责任"></activiti:value>
           <activiti:value id="运输责任" name="运输责任"></activiti:value>
           <activiti:value id="包装责任" name="包装责任"></activiti:value>
-        </activiti:formProperty>
+        </activiti:formProperty>        
+        <activiti:formProperty id="tbhdclaim3_发邮件日期_mailSendDate_2_string_t3_$$VA" name="发邮件日期" type="string" variable="tbhdclaim3_mailSendDate_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim3_上报日期_reportDate_3_string_t3_$$VA" name="上报日期" type="string" variable="tbhdclaim3_reportDate_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim3_经销商代码_dealerCode_4_string_t1_$$VA" name="经销商代码" type="string" variable="tbhdclaim3_dealerCode_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim3_经销商名称_dealerName_5_string_t1_$$VA" name="经销商名称" type="string" variable="tbhdclaim_dealerName_t00" required="true"></activiti:formProperty>
+        
+        <activiti:formProperty id="tbhdclaim3_零件号_partNumber_6_string_t1_$$VA" name="零件号" type="string" variable="tbhdclaim3_partNumber_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim3_中文名称_chineseName_7_string_t1_$$VA" name="中文名称" type="string" variable="tbhdclaim3_chineseName_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim3_索赔数量_claimNumber_8_string_t6_$$VA" name="索赔数量" type="string" variable="tbhdclaim3_claimNumber_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim3_索赔金额_claimAmount_9_string_cny_$$VA" name="索赔金额" type="string" variable="tbhdclaim3_claimAmount_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim3_工程回复日期_replyDate_10_string_t3_$$VA" name="工程回复日期" type="string" variable="tbhdclaim3_replyDate_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim3_工程回复_reply_11_string_t1_$$VA" name="工程回复" type="string" variable="tbhdclaim3_reply_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim3_情况描述（归口处理）_desc_12_string_t1_$$VA" name="情况描述（归口处理）" type="string" variable="tbhdclaim3_desc_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim3_是否回运_isReturn_13_string_t1_$$VA" name="是否回运" type="string" variable="tbhdclaim3_isReturn_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim3_订单号_orderNumber_14_string_t1_$$VA" name="订单号" type="string" variable="tbhdclaim3_orderNumber_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim3_上报途径_reportWay_15_string_t1_$$VA" name="上报途径" type="string" variable="tbhdclaim3_reportWay_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim3_货运单_freightOrder_16_string_t1_$$VA" name="货运单" type="string" variable="tbhdclaim3_freightOrder_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim3_计划员_planner_17_string_t1_$$VA" name="计划员" type="string" variable="tbhdclaim3_planner_t00" required="true"></activiti:formProperty>
+
         <activiti:formProperty id="tbhdclaim3_已复判_doubleCheck_18_string_t1_$$HA" name="已复判" type="string" variable="tbhdclaim3_doubleCheck_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhdclaim3_是否有异议_existDissent_19_enum_rbv_$$A" name="是否有异议" type="enum" variable="tbhdclaim3_existDissent_t00" required="true">
           <activiti:value id="提出异议" name="提出异议"></activiti:value>
           <activiti:value id="没有异议" name="没有异议"></activiti:value>
         </activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim3_理由_reason_20_enum_rbv_$$A" name="理由" type="enum" variable="tbhdclaim3_reason_t00">
+        <activiti:formProperty id="tbhdclaim3_理由_reason_20_enum_sbs_$$A" name="理由" type="enum" variable="tbhdclaim3_reason_t00">
+          <activiti:value id=" " name=" "></activiti:value>
           <activiti:value id="供应商责任" name="供应商责任"></activiti:value>
           <activiti:value id="其他" name="其他"></activiti:value>
         </activiti:formProperty>
@@ -428,6 +444,9 @@
 					std.each {
 						if (!it.existDissent) {
 							throw new org.activiti.engine.ActivitiIllegalArgumentException('请对每条索赔记录确定\"是否有异议\"')
+						}
+						if (it.existDissent == '提出异议' && it.reason == ' ') {
+							throw new org.activiti.engine.ActivitiIllegalArgumentException('请对\"提出异议\"的索赔记录选择理由')
 						}
 					}
 				
@@ -457,9 +476,13 @@
 	      def processedLi = jsonSlurper.parseText(processedLi)
 	      def arr = new HashSet()//判断是否全部接受责任
 	      
+	      def tbhdclaim_item_temp = null
+	      def idName = 'tbhdclaim1'
+	      
 	      
 	      //仓库
 	      if(existWarehourse == 'Y') {
+	      	tbhdclaim_item_temp = tbhdclaim1_item
 	      	def a_rows_1 = filterDissentRows1(jsonSlurper.parseText(tbhdclaim1_item))
 	      	if (a_rows_1.size() &gt; 0) {
 	      		a_rows.addAll(a_rows_1)
@@ -475,6 +498,8 @@
 	      }
 	      //运输
 	      if(existTransport == 'Y') {
+	      	tbhdclaim_item_temp = tbhdclaim2_item
+	      	idName = 'tbhdclaim2'
 	      	def a_rows_2 = filterDissentRows1(jsonSlurper.parseText(tbhdclaim2_item))
 	      	if (a_rows_2.size() &gt; 0) {
 	      		a_rows.addAll(a_rows_2)
@@ -490,6 +515,8 @@
 	      
 	      //包装
 	      if(existPackage == 'Y') {
+	      	tbhdclaim_item_temp = tbhdclaim3_item
+	      	idName = 'tbhdclaim3'
 	      	def a_rows_3 = filterDissentRows1(jsonSlurper.parseText(tbhdclaim3_item))
 	      	if (a_rows_3.size() &gt; 0) {
 	      		a_rows.addAll(a_rows_3)
@@ -504,17 +531,16 @@
 	      
 	      //复判
 	      if (a_rows.size() &gt; 0) {
-	      	def tbhdclaim_item = jsonSlurper.parseText(tbhdclaim_item)
+	      	def tbhdclaim_item = arbitration(jsonSlurper.parseText(tbhdclaim_item_temp),a_rows,'tbhdclaim',idName)
 	      	a_rows.each{
 	      		//reset
-	      		it[16] = ' '
+	      		it[0] = ' '
 	      	}
-	      	tbhdclaim_item.put('rows',a_rows)
 	      	execution.setVariable('tbhdclaim_item', JsonOutput.toJson(tbhdclaim_item))
 	      }
 	      //进入仲裁区的
 	      if(b_rows.size() &gt; 0) {
-	      	def tbhdclaim4_item = arbitration(jsonSlurper.parseText(tbhdclaim1_item),b_rows)
+	      	def tbhdclaim4_item = arbitration(jsonSlurper.parseText(tbhdclaim_item_temp),b_rows,'tbhdclaim4',idName)
 	      	execution.setVariable('tbhdclaim4_item',JsonOutput.toJson(tbhdclaim4_item))
 	      }
 	      
@@ -540,13 +566,13 @@
 	      	return item.get('rows').findAll{(it[18]=='提出异议'&amp;&amp;it[19]!='供应商责任') || (it[18]=='提出异议'&amp;&amp;it[17]=='Y')}
 	      }
 	      
-	      static def arbitration(def item, def rows){
+	      static def arbitration(def item, def rows, def targetName, def sourceName){
 		    item.each {k,v -&gt;
 		        if (k == 'headers') {
-		            v.each { it.id = it.id.replace('tbhdclaim1', 'tbhdclaim4')}
+		            v.each { it.id = it.id.replace(sourceName, targetName)}
 		        }
 		    }
-		    item.put('tableName', 'tbhdclaim4')
+		    item.put('tableName', targetName)
 		    item.put('rows', rows)
 		    return item
 		}
@@ -558,35 +584,37 @@
     <userTask id="usertask7" name="仲裁区讨论确定责任方" activiti:assignee="${initiator}" activiti:dueDate="P1D">
       <extensionElements>
         <activiti:formProperty id="tbhdclaim4_item" name="索赔明细" type="string" variable="tbhdclaim4_item" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim4_发邮件日期_mailSendDate_1_string_t3_$$VA" name="发邮件日期" type="string" variable="tbhdclaim4_mailSendDate_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim4_上报日期_reportDate_2_string_t3_$$VA" name="上报日期" type="string" variable="tbhdclaim4_reportDate_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim4_经销商代码_dealerCode_3_string_t1_$$VA" name="经销商代码" type="string" variable="tbhdclaim4_dealerCode_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim4_经销商名称_dealerName_4_string_t1_$$VA" name="经销商名称" type="string" variable="tbhdclaim_dealerName_t00" required="true"></activiti:formProperty>
-        
-        <activiti:formProperty id="tbhdclaim4_零件号_partNumber_5_string_t1_$$VA" name="零件号" type="string" variable="tbhdclaim4_partNumber_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim4_中文名称_chineseName_6_string_t1_$$VA" name="中文名称" type="string" variable="tbhdclaim4_chineseName_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim4_索赔数量_claimNumber_7_string_t6_$$VA" name="索赔数量" type="string" variable="tbhdclaim4_claimNumber_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim4_索赔金额_claimAmount_8_string_cny_$$VA" name="索赔金额" type="string" variable="tbhdclaim4_claimAmount_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim4_工程回复日期_replyDate_9_string_t3_$$VA" name="工程回复日期" type="string" variable="tbhdclaim4_replyDate_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim4_工程回复_reply_10_string_t1_$$VA" name="工程回复" type="string" variable="tbhdclaim4_reply_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim4_情况描述（归口处理）_desc_11_string_t1_$$VA" name="情况描述（归口处理）" type="string" variable="tbhdclaim4_desc_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim4_是否回运_isReturn_12_string_t1_$$VA" name="是否回运" type="string" variable="tbhdclaim4_isReturn_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim4_订单号_orderNumber_13_string_t1_$$VA" name="订单号" type="string" variable="tbhdclaim4_orderNumber_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim4_上报途径_reportWay_14_string_t1_$$VA" name="上报途径" type="string" variable="tbhdclaim4_reportWay_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim4_货运单_freightOrder_15_string_t1_$$VA" name="货运单" type="string" variable="tbhdclaim4_freightOrder_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim4_计划员_planner_16_string_t1_$$VA" name="计划员" type="string" variable="tbhdclaim4_planner_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim4_责任判定_judge_17_enum_sbs_$$A" name="责任判定" type="enum" variable="tbhdclaim4_judge_t00">
+        <activiti:formProperty id="tbhdclaim4_责任判定_judge_1_enum_sbs_$$A" name="责任判定" type="enum" variable="tbhdclaim4_judge_t00">
           <activiti:value id="供应商责任" name="供应商责任"></activiti:value>
           <activiti:value id="仓库责任" name="仓库责任"></activiti:value>
           <activiti:value id="运输责任" name="运输责任"></activiti:value>
           <activiti:value id="包装责任" name="包装责任"></activiti:value>
-        </activiti:formProperty>
+        </activiti:formProperty>        
+        <activiti:formProperty id="tbhdclaim4_发邮件日期_mailSendDate_2_string_t3_$$VA" name="发邮件日期" type="string" variable="tbhdclaim4_mailSendDate_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim4_上报日期_reportDate_3_string_t3_$$VA" name="上报日期" type="string" variable="tbhdclaim4_reportDate_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim4_经销商代码_dealerCode_4_string_t1_$$VA" name="经销商代码" type="string" variable="tbhdclaim4_dealerCode_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim4_经销商名称_dealerName_5_string_t1_$$VA" name="经销商名称" type="string" variable="tbhdclaim_dealerName_t00" required="true"></activiti:formProperty>
+        
+        <activiti:formProperty id="tbhdclaim4_零件号_partNumber_6_string_t1_$$VA" name="零件号" type="string" variable="tbhdclaim4_partNumber_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim4_中文名称_chineseName_7_string_t1_$$VA" name="中文名称" type="string" variable="tbhdclaim4_chineseName_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim4_索赔数量_claimNumber_8_string_t6_$$VA" name="索赔数量" type="string" variable="tbhdclaim4_claimNumber_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim4_索赔金额_claimAmount_9_string_cny_$$VA" name="索赔金额" type="string" variable="tbhdclaim4_claimAmount_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim4_工程回复日期_replyDate_10_string_t3_$$VA" name="工程回复日期" type="string" variable="tbhdclaim4_replyDate_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim4_工程回复_reply_11_string_t1_$$VA" name="工程回复" type="string" variable="tbhdclaim4_reply_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim4_情况描述（归口处理）_desc_12_string_t1_$$VA" name="情况描述（归口处理）" type="string" variable="tbhdclaim4_desc_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim4_是否回运_isReturn_13_string_t1_$$VA" name="是否回运" type="string" variable="tbhdclaim4_isReturn_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim4_订单号_orderNumber_14_string_t1_$$VA" name="订单号" type="string" variable="tbhdclaim4_orderNumber_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim4_上报途径_reportWay_15_string_t1_$$VA" name="上报途径" type="string" variable="tbhdclaim4_reportWay_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim4_货运单_freightOrder_16_string_t1_$$VA" name="货运单" type="string" variable="tbhdclaim4_freightOrder_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim4_计划员_planner_17_string_t1_$$VA" name="计划员" type="string" variable="tbhdclaim4_planner_t00" required="true"></activiti:formProperty>
+
         <activiti:formProperty id="tbhdclaim4_已复判_doubleCheck_18_string_t1_$$VA" name="已复判" type="string" variable="tbhdclaim4_doubleCheck_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhdclaim4_是否有异议_existDissent_19_enum_rbv_$$VA" name="是否有异议" type="enum" variable="tbhdclaim4_existDissent_t00" required="true">
           <activiti:value id="提出异议" name="提出异议"></activiti:value>
           <activiti:value id="没有异议" name="没有异议"></activiti:value>
         </activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim4_理由_reason_20_enum_rbv_$$VA" name="理由" type="enum" variable="tbhdclaim4_reason_t00">
+        <activiti:formProperty id="tbhdclaim4_理由_reason_20_enum_sbs_$$VA" name="理由" type="enum" variable="tbhdclaim4_reason_t00">
+          <activiti:value id=" " name=" "></activiti:value>
           <activiti:value id="供应商责任" name="供应商责任"></activiti:value>
           <activiti:value id="其他" name="其他"></activiti:value>
         </activiti:formProperty>
@@ -671,29 +699,40 @@
     <userTask id="usertask8" name="复判" activiti:assignee="${initiator}" activiti:dueDate="P1D">
       <extensionElements>
         <activiti:formProperty id="tbhdclaim_item" name="索赔明细" type="string" variable="tbhdclaim_item" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim_发邮件日期_mailSendDate_1_string_t3_$$VA" name="发邮件日期" type="string" variable="tbhdclaim_mailSendDate_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim_上报日期_reportDate_2_string_t3_$$VA" name="上报日期" type="string" variable="tbhdclaim_reportDate_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim_经销商代码_dealerCode_3_string_t1_$$VA" name="经销商代码" type="string" variable="tbhdclaim_dealerCode_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim_经销商名称_dealerName_4_string_t1_$$VA" name="经销商名称" type="string" variable="tbhdclaim_dealerName_t00" required="true"></activiti:formProperty>
-        
-        <activiti:formProperty id="tbhdclaim_零件号_partNumber_5_string_t1_$$VA" name="零件号" type="string" variable="tbhdclaim_partNumber_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim_中文名称_chineseName_6_string_t1_$$VA" name="中文名称" type="string" variable="tbhdclaim_chineseName_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim_索赔数量_claimNumber_7_string_t6_$$VA" name="索赔数量" type="string" variable="tbhdclaim_claimNumber_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim_索赔金额_claimAmount_8_string_cny_$$VA" name="索赔金额" type="string" variable="tbhdclaim_claimAmount_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim_工程回复日期_replyDate_9_string_t3_$$VA" name="工程回复日期" type="string" variable="tbhdclaim_replyDate_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim_工程回复_reply_10_string_t1_$$VA" name="工程回复" type="string" variable="tbhdclaim_reply_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim_情况描述（归口处理）_desc_11_string_t1_$$VA" name="情况描述（归口处理）" type="string" variable="tbhdclaim_desc_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim_是否回运_isReturn_12_string_t1_$$VA" name="是否回运" type="string" variable="tbhdclaim_isReturn_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim_订单号_orderNumber_13_string_t1_$$VA" name="订单号" type="string" variable="tbhdclaim_orderNumber_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim_上报途径_reportWay_14_string_t1_$$VA" name="上报途径" type="string" variable="tbhdclaim_reportWay_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim_货运单_freightOrder_15_string_t1_$$VA" name="货运单" type="string" variable="tbhdclaim_freightOrder_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim_计划员_planner_16_string_t1_$$VA" name="计划员" type="string" variable="tbhdclaim_planner_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim_责任判定_judge_17_enum_sbs_$$A" name="责任判定" type="enum" variable="tbhdclaim_judge_t00" required="true">
+        <activiti:formProperty id="tbhdclaim_责任判定_judge_1_enum_sbs_$$A" name="责任判定" type="enum" variable="tbhdclaim_judge_t00" required="true">
           <activiti:value id=" " name=" "></activiti:value>
           <activiti:value id="供应商责任" name="供应商责任"></activiti:value>
           <activiti:value id="安吉物流责任" name="安吉物流责任"></activiti:value>
-        </activiti:formProperty>
+        </activiti:formProperty>        
+        <activiti:formProperty id="tbhdclaim_发邮件日期_mailSendDate_2_string_t3_$$VA" name="发邮件日期" type="string" variable="tbhdclaim_mailSendDate_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_上报日期_reportDate_3_string_t3_$$VA" name="上报日期" type="string" variable="tbhdclaim_reportDate_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_经销商代码_dealerCode_4_string_t1_$$VA" name="经销商代码" type="string" variable="tbhdclaim_dealerCode_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_经销商名称_dealerName_5_string_t1_$$VA" name="经销商名称" type="string" variable="tbhdclaim_dealerName_t00" required="true"></activiti:formProperty>
+        
+        <activiti:formProperty id="tbhdclaim_零件号_partNumber_6_string_t1_$$VA" name="零件号" type="string" variable="tbhdclaim_partNumber_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_中文名称_chineseName_7_string_t1_$$VA" name="中文名称" type="string" variable="tbhdclaim_chineseName_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_索赔数量_claimNumber_8_string_t6_$$VA" name="索赔数量" type="string" variable="tbhdclaim_claimNumber_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_索赔金额_claimAmount_9_string_cny_$$VA" name="索赔金额" type="string" variable="tbhdclaim_claimAmount_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_工程回复日期_replyDate_10_string_t3_$$VA" name="工程回复日期" type="string" variable="tbhdclaim_replyDate_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_工程回复_reply_11_string_t1_$$VA" name="工程回复" type="string" variable="tbhdclaim_reply_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_情况描述（归口处理）_desc_12_string_t1_$$VA" name="情况描述（归口处理）" type="string" variable="tbhdclaim_desc_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_是否回运_isReturn_13_string_t1_$$VA" name="是否回运" type="string" variable="tbhdclaim_isReturn_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_订单号_orderNumber_14_string_t1_$$VA" name="订单号" type="string" variable="tbhdclaim_orderNumber_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_上报途径_reportWay_15_string_t1_$$VA" name="上报途径" type="string" variable="tbhdclaim_reportWay_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_货运单_freightOrder_16_string_t1_$$VA" name="货运单" type="string" variable="tbhdclaim_freightOrder_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_计划员_planner_17_string_t1_$$VA" name="计划员" type="string" variable="tbhdclaim_planner_t00" required="true"></activiti:formProperty>
+
         <activiti:formProperty id="tbhdclaim_已复判_doubleCheck_18_string_t1_$$HA" name="已复判" type="string" variable="tbhdclaim_doubleCheck_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_是否有异议_existDissent_19_enum_rbv_$$VA" name="是否有异议" type="enum" variable="tbhdclaim_existDissent_t00" required="true">
+          <activiti:value id="提出异议" name="提出异议"></activiti:value>
+          <activiti:value id="没有异议" name="没有异议"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_理由_reason_20_enum_sbs_$$VA" name="理由" type="enum" variable="tbhdclaim4_reason_t00">
+          <activiti:value id=" " name=" "></activiti:value>
+          <activiti:value id="供应商责任" name="供应商责任"></activiti:value>
+          <activiti:value id="其他" name="其他"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_备注_note_21_string_t2_$$VA" name="备注" type="string" variable="tbhdclaim_note_t00"></activiti:formProperty>        
         <activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
           <activiti:field name="language">
             <activiti:string><![CDATA[groovy]]></activiti:string>
@@ -728,7 +767,7 @@
 						processedLi.addAll(item_std.findAll{it.judge == '供应商责任'})
 						execution.setVariable('tbhdclaim_item_std', JsonOutput.toJson(needHandleStd))
 						//item remove
-						def rows = item.get('rows').findAll{it[16] == '安吉物流责任'}
+						def rows = item.get('rows').findAll{it[0] == '安吉物流责任'}
 						rows.each {
 							it[17]='Y'
 						}
