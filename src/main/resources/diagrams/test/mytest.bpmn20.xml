@@ -3,9 +3,11 @@
   <process id="constructData" name="construct data" isExecutable="true" activiti:candidateStarterGroups="admin">
     <startEvent id="startevent1" name="Start">
       <extensionElements>
-      <activiti:formProperty id="employeename_员工姓名 Employee Name_1_string_t1_$$A" name="员工姓名 Employee Name" type="string" variable="employeename" required="true"></activiti:formProperty>
-        <activiti:formProperty id="costcenter_成本中心 Costcenter_2_string_tree_$$A" name="成本中心 Costcenter" type="string" variable="costcenter" required="true"></activiti:formProperty>
-        <activiti:formProperty id="function_职能 Function_3_enum_sbs_$$A" name="职能 Function" type="enum" variable="function" required="true">
+      <activiti:formProperty id="tbhdaddemployees_item" name="指定员工列表 Designated employee list" type="string" variable="tbhdaddemployees_item" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdaddemployees_员工 Employee_employeesn_1_string_psbi_$$A" name="员工 Employee" type="string" variable="tbhdaddemployees_employeesn_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdaddemployees_汇报对象 Manager_managersn_2_string_psbi_$$A" name="汇报对象 Manager" type="string" variable="tbhdaddemployees_managersn_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdaddemployees_成本中心 Costcenter_costcenter_3_string_tree_$$A" name="成本中心 Costcenter" type="string" variable="tbhdaddemployees_costcenter_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdaddemployees_职能 Function_function_4_enum_sbs_$$A" name="职能 Function" type="enum" variable="function" required="true">
           <activiti:value id="双语教师/中教" name="双语教师/中教 Bilingual/Chinese teacher"></activiti:value>
           <activiti:value id="外教" name="外教 Foreign teacher"></activiti:value>
           <activiti:value id="管理层/校长" name="管理层、校长 Management, principal"></activiti:value>
@@ -19,73 +21,9 @@
           <activiti:value id="助教/教辅" name="助教/教辅 Teaching assistant"></activiti:value>
           <activiti:value id="教务" name="教务 Academic affairs"></activiti:value>
         </activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_item" name="绩效考核表 Performance appraisal table" type="string" variable="tbhdperformance_item" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_构面 Perspective_perspective_1_enum_sbs_$$A" name="构面 Perspective" type="enum" variable="tbhdperformance_perspective_t00" required="true">
-          <activiti:value id="财务及预算 Finance &amp; Budget" name="财务及预算 Finance &amp; Budget"></activiti:value>
-          <activiti:value id="创新及专业 Innovation &amp; Profession" name="创新及专业 Innovation &amp; Profession"></activiti:value>
-          <activiti:value id="客户及服务 Customer &amp; Service" name="客户及服务 Customer &amp; Service"></activiti:value>
-          <activiti:value id="流程及改进 Procedure inprovement" name="流程及改进 Procedure inprovement"></activiti:value>
-          <activiti:value id="学习与成长 Learning &amp; Development" name="学习与成长 Learning &amp; Development"></activiti:value>
-        </activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_说明 Description_description_2_string_t2_$$A" name="说明 Description" type="string" variable="tbhdperformance_description_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_目标 Objective_objective_3_string_t2_$$A" name="目标 Objective" type="string" variable="tbhdperformance_objective_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_绩效指标 KPI_kpi_4_string_t1_$$A" name="绩效指标 KPI" type="string" variable="tbhdperformance_kpi_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_权重 Weighting(%)_weighting_5_string_t1_$$A" name="权重 Weighting(%)" type="string" variable="tbhdperformance_weighting_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_单位 Unit_unit_6_string_t1_$$A" name="单位 Unit" type="string" variable="tbhdperformance_unit_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_上年度实际 Actual last year_actual_7_string_t1_$$A" name="上年度实际 Actual last year" type="string" variable="tbhdperformance_actual_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_指标属性 KPI achievement measurement(Fill in ≥ or ≤)_kpiattribute_8_string_t1_$$A" name="指标属性 KPI achievement measurement(Fill in ≥ or ≤)" type="string" variable="tbhdperformance_kpiattribute_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_Plan Q1_planq1_9_string_t1_$$A" name="Plan Q1" type="string" variable="tbhdperformance_planq1_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_Plan Q2_planq2_10_string_t1_$$A" name="Plan Q2" type="string" variable="tbhdperformance_planq2_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_Plan Q3_planq3_11_string_t1_$$A" name="Plan Q3" type="string" variable="tbhdperformance_planq3_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_Plan Q4_planq4_12_string_t1_$$A" name="Plan Q4" type="string" variable="tbhdperformance_planq4_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_Actual Q1_actualq1_13_string_t1_$$HA" name="Actual Q1" type="string" variable="tbhdperformance_actualq1_t00"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_Actual Q2_actualq2_14_string_t1_$$HA" name="Actual Q2" type="string" variable="tbhdperformance_actualq2_t00"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_Actual Q3_actualq3_15_string_t1_$$HA" name="Actual Q3" type="string" variable="tbhdperformance_actualq3_t00"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_Actual Q4_actualq4_16_string_t1_$$HA" name="Actual Q4" type="string" variable="tbhdperformance_actualq4_t00"></activiti:formProperty>
       </extensionElements>
     </startEvent>
     <userTask id="usertask1" name="User Task" activiti:assignee="100011">
-    <extensionElements>
-    <activiti:formProperty id="employeename_员工姓名 Employee Name_1_string_t1_$$A" name="员工姓名 Employee Name" type="string" variable="employeename" required="true"></activiti:formProperty>
-        <activiti:formProperty id="costcenter_成本中心 Costcenter_2_string_tree_$$A" name="成本中心 Costcenter" type="string" variable="costcenter" required="true"></activiti:formProperty>
-        <activiti:formProperty id="function_职能 Function_3_enum_sbs_$$A" name="职能 Function" type="enum" variable="function" required="true">
-          <activiti:value id="双语教师/中教" name="双语教师/中教 Bilingual/Chinese teacher"></activiti:value>
-          <activiti:value id="外教" name="外教 Foreign teacher"></activiti:value>
-          <activiti:value id="管理层/校长" name="管理层、校长 Management, principal"></activiti:value>
-          <activiti:value id="咨询顾问/升学指导" name="咨询顾问/升学指导 Consultant/professional guidance"></activiti:value>
-          <activiti:value id="服务人员" name="服务人员 Service staff"></activiti:value>
-          <activiti:value id="市场人员" name="市场人员 Market staff"></activiti:value>
-          <activiti:value id="研发人员" name="研发人员 R &amp; D staff"></activiti:value>
-          <activiti:value id="后勤运营人员" name="后勤运营人员 Logistics operator"></activiti:value>
-          <activiti:value id="销售人员" name="销售人员 Sales staff"></activiti:value>
-          <activiti:value id="保育员" name="保育员 Nurse"></activiti:value>
-          <activiti:value id="助教/教辅" name="助教/教辅 Teaching assistant"></activiti:value>
-          <activiti:value id="教务" name="教务 Academic affairs"></activiti:value>
-        </activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_item" name="绩效考核表 Performance appraisal table" type="string" variable="tbhdperformance_item" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_构面 Perspective_perspective_1_enum_sbs_$$A" name="构面 Perspective" type="enum" variable="tbhdperformance_perspective_t00" required="true">
-          <activiti:value id="财务及预算 Finance &amp; Budget" name="财务及预算 Finance &amp; Budget"></activiti:value>
-          <activiti:value id="创新及专业 Innovation &amp; Profession" name="创新及专业 Innovation &amp; Profession"></activiti:value>
-          <activiti:value id="客户及服务 Customer &amp; Service" name="客户及服务 Customer &amp; Service"></activiti:value>
-          <activiti:value id="流程及改进 Procedure inprovement" name="流程及改进 Procedure inprovement"></activiti:value>
-          <activiti:value id="学习与成长 Learning &amp; Development" name="学习与成长 Learning &amp; Development"></activiti:value>
-        </activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_说明 Description_description_2_string_t2_$$A" name="说明 Description" type="string" variable="tbhdperformance_description_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_目标 Objective_objective_3_string_t2_$$A" name="目标 Objective" type="string" variable="tbhdperformance_objective_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_绩效指标 KPI_kpi_4_string_t1_$$A" name="绩效指标 KPI" type="string" variable="tbhdperformance_kpi_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_权重 Weighting(%)_weighting_5_string_t1_$$A" name="权重 Weighting(%)" type="string" variable="tbhdperformance_weighting_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_单位 Unit_unit_6_string_t1_$$A" name="单位 Unit" type="string" variable="tbhdperformance_unit_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_上年度实际 Actual last year_actual_7_string_t1_$$A" name="上年度实际 Actual last year" type="string" variable="tbhdperformance_actual_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_指标属性 KPI achievement measurement(Fill in ≥ or ≤)_kpiattribute_8_string_t1_$$A" name="指标属性 KPI achievement measurement(Fill in ≥ or ≤)" type="string" variable="tbhdperformance_kpiattribute_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_Plan Q1_planq1_9_string_t1_$$A" name="Plan Q1" type="string" variable="tbhdperformance_planq1_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_Plan Q2_planq2_10_string_t1_$$A" name="Plan Q2" type="string" variable="tbhdperformance_planq2_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_Plan Q3_planq3_11_string_t1_$$A" name="Plan Q3" type="string" variable="tbhdperformance_planq3_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_Plan Q4_planq4_12_string_t1_$$A" name="Plan Q4" type="string" variable="tbhdperformance_planq4_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_Actual Q1_actualq1_13_string_t1_$$HA" name="Actual Q1" type="string" variable="tbhdperformance_actualq1_t00"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_Actual Q2_actualq2_14_string_t1_$$HA" name="Actual Q2" type="string" variable="tbhdperformance_actualq2_t00"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_Actual Q3_actualq3_15_string_t1_$$HA" name="Actual Q3" type="string" variable="tbhdperformance_actualq3_t00"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_Actual Q4_actualq4_16_string_t1_$$HA" name="Actual Q4" type="string" variable="tbhdperformance_actualq4_t00"></activiti:formProperty>
-      </extensionElements>
     </userTask>
     <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="usertask1"></sequenceFlow>
     <endEvent id="endevent1" name="End"></endEvent>

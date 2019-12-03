@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/frm">
+  <process id="DPPP_MAIN_V3" name="绩效考核主流程 Performance appraisal main process" isExecutable="true" activiti:candidateStarterGroups="_dpmsadmin,admin">
+    <startEvent id="startevent1" name="Start" activiti:initiator="initiator">
+      <extensionElements>
+      	<activiti:formProperty id="fiscalYear_财年 Fiscal Year_1_string_t6_$$A" name="财年 Fiscal Year" type="string" variable="fiscalYear" required="true"/>
+      	<activiti:formProperty id="quarter_季度 Quarter_1_enum_sbs_$$B" name="季度 Quarter" type="enum" variable="quarter" required="true">
+      		<activiti:value id="Q1" name="Q1"></activiti:value>
+      		<activiti:value id="Q2" name="Q2"></activiti:value>
+      		<activiti:value id="Q3" name="Q3"></activiti:value>
+      		<activiti:value id="Q4" name="Q4"></activiti:value>
+      	</activiti:formProperty>
+      	<activiti:formProperty id="checkTime_考核时间 Check Time_2_string_t5_$$B" name="考核时间 Check Time" type="string" variable="checkTime" required="true"/>
+        <activiti:formProperty id="tbhdaddemployees_item" name="指定员工列表 Designated employee list" type="string" variable="tbhdaddemployees_item" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdaddemployees_员工 Employee_employeesn_1_string_psbi_$$A" name="员工 Employee" type="string" variable="tbhdaddemployees_employeesn_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdaddemployees_汇报对象 Manager_managersn_2_string_psbi_$$A" name="汇报对象 Manager" type="string" variable="tbhdaddemployees_managersn_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdaddemployees_成本中心 Costcenter_costcenter_3_string_tree_$$A" name="成本中心 Costcenter" type="string" variable="tbhdaddemployees_costcenter_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdaddemployees_职能 Function_function_4_enum_sbs_$$A" name="职能 Function" type="enum" variable="function" required="true">
+          <activiti:value id="双语教师/中教" name="双语教师/中教 Bilingual/Chinese teacher"></activiti:value>
+          <activiti:value id="外教" name="外教 Foreign teacher"></activiti:value>
+          <activiti:value id="管理层/校长" name="管理层、校长 Management, principal"></activiti:value>
+          <activiti:value id="咨询顾问/升学指导" name="咨询顾问/升学指导 Consultant/professional guidance"></activiti:value>
+          <activiti:value id="服务人员" name="服务人员 Service staff"></activiti:value>
+          <activiti:value id="市场人员" name="市场人员 Market staff"></activiti:value>
+          <activiti:value id="研发人员" name="研发人员 R &amp; D staff"></activiti:value>
+          <activiti:value id="后勤运营人员" name="后勤运营人员 Logistics operator"></activiti:value>
+          <activiti:value id="销售人员" name="销售人员 Sales staff"></activiti:value>
+          <activiti:value id="保育员" name="保育员 Nurse"></activiti:value>
+          <activiti:value id="助教/教辅" name="助教/教辅 Teaching assistant"></activiti:value>
+          <activiti:value id="教务" name="教务 Academic affairs"></activiti:value>
+        </activiti:formProperty>
+        <activiti:executionListener event="end" class="org.activiti.engine.impl.bpmn.listener.ScriptExecutionListener">
+          <activiti:field name="language">
+            <activiti:string><![CDATA[groovy]]></activiti:string>
+          </activiti:field>
+          <activiti:field name="script">
+            <activiti:string><![CDATA[import groovy.json.JsonSlurper
+        			import groovy.json.JsonOutput
+        			import java.text.DateFormat
+					import java.text.SimpleDateFormat
+        			
+        			def jsonSlurper = new JsonSlurper()
+    				def std = jsonSlurper.parseText(execution.getVariable('tbhdaddemployees_item_std'))
+    					
+   					def subflows = []//List[Map]
+   					std.each{
+	    				subflows<< ['employeeSn':it.employeesn, 'managerSn': it.managersn, 'costcenter': JsonOutput.toJson(it.costcenter), 'function': it.function]
+	    			}
+	    			execution.setVariable('subflows', subflows)
+	    			//execution.setVariable('businessKey', execution.getBusinessKey())
+	    			
+	    			def checkTime = new Date(checkTime.toLong())
+	    			DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")
+					df.setTimeZone(TimeZone.getTimeZone("GMT+8"))
+					execution.setVariable('checkTime', df.format(checkTime))
+    				]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </startEvent>
+    <callActivity id="callactivity1" name="分配绩效考核子流程 Allocation subprocess" calledElement="DPPP_SUB_V3">
+      <extensionElements>
+        <activiti:in sourceExpression="${subflows[loopCounter].get('employeeSn')}" target="employeeSn"></activiti:in>
+        <activiti:in sourceExpression="${subflows[loopCounter].get('managerSn')}" target="managerSn"></activiti:in>
+        <activiti:in sourceExpression="${subflows[loopCounter].get('costcenter')}" target="costcenter"></activiti:in>
+        <activiti:in sourceExpression="${subflows[loopCounter].get('function')}" target="function"></activiti:in>
+        <activiti:in sourceExpression="${fiscalYear}" target="fiscalYear"></activiti:in>
+        <activiti:in sourceExpression="${quarter}" target="quarter"></activiti:in>
+        <activiti:in sourceExpression="${checkTime}" target="checkTime"></activiti:in>
+      </extensionElements>
+      <multiInstanceLoopCharacteristics isSequential="false">
+        <loopCardinality>${subflows.size()}</loopCardinality>
+        <completionCondition>${nrOfCompletedInstances/nrOfInstances == 1}</completionCondition>
+      </multiInstanceLoopCharacteristics>
+    </callActivity>
+    <endEvent id="endevent1" name="End"></endEvent>
+    <sequenceFlow id="flow3" sourceRef="callactivity1" targetRef="endevent1"></sequenceFlow>
+    <sequenceFlow id="flow4" sourceRef="startevent1" targetRef="callactivity1"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_DPPP_MAIN_V3">
+    <bpmndi:BPMNPlane bpmnElement="DPPP_MAIN_V3" id="BPMNPlane_DPPP_MAIN_V3">
+      <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="90.0" y="185.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="callactivity1" id="BPMNShape_callactivity1">
+        <omgdc:Bounds height="65.0" width="105.0" x="220.0" y="170.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="410.0" y="185.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3">
+        <omgdi:waypoint x="325.0" y="202.0"></omgdi:waypoint>
+        <omgdi:waypoint x="410.0" y="202.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow4" id="BPMNEdge_flow4">
+        <omgdi:waypoint x="125.0" y="202.0"></omgdi:waypoint>
+        <omgdi:waypoint x="220.0" y="202.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>
