@@ -1,0 +1,1009 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/pur">
+  <process id="smpvProcess" name="2019临港SMPV索赔流程Demo" isExecutable="true" activiti:candidateStarterGroups="admin">
+    <startEvent id="startevent1" name="开始" activiti:initiator="initiator">
+      <extensionElements>
+        <activiti:formProperty id="tbhdclaim_item" name="索赔明细" type="string" variable="tbhdclaim_item" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_责任判定_judge_1_enum_sbs_$$HA" name="责任判定" type="enum" variable="tbhdclaim_judge_t00">
+          <activiti:value id="供应商责任" name="供应商责任"></activiti:value>
+          <activiti:value id="安吉物流责任" name="安吉物流责任"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_发邮件日期_mailSendDate_2_string_t3_$$A" name="发邮件日期" type="string" variable="tbhdclaim_mailSendDate_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_上报日期_reportDate_3_string_t3_$$A" name="上报日期" type="string" variable="tbhdclaim_reportDate_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_经销商代码_dealerCode_4_string_t1_$$A" name="经销商代码" type="string" variable="tbhdclaim_dealerCode_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_经销商名称_dealerName_5_string_t1_$$A" name="经销商名称" type="string" variable="tbhdclaim_dealerName_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_零件号_partNumber_6_string_t1_$$A" name="零件号" type="string" variable="tbhdclaim_partNumber_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_中文名称_chineseName_7_string_t1_$$A" name="中文名称" type="string" variable="tbhdclaim_chineseName_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_索赔数量_claimNumber_8_string_t6_$$A" name="索赔数量" type="string" variable="tbhdclaim_claimNumber_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_索赔金额_claimAmount_9_string_cny_$$A" name="索赔金额" type="string" variable="tbhdclaim_claimAmount_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_工程回复日期_replyDate_10_string_t3_$$A" name="工程回复日期" type="string" variable="tbhdclaim_replyDate_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_工程回复_reply_11_string_t1_$$A" name="工程回复" type="string" variable="tbhdclaim_reply_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_情况描述（归口处理）_desc_12_string_t1_$$A" name="情况描述（归口处理）" type="string" variable="tbhdclaim_desc_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_是否回运_isReturn_13_string_t1_$$A" name="是否回运" type="string" variable="tbhdclaim_isReturn_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_订单号_orderNumber_14_string_t1_$$A" name="订单号" type="string" variable="tbhdclaim_orderNumber_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_上报途径_reportWay_15_string_t1_$$A" name="上报途径" type="string" variable="tbhdclaim_reportWay_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_货运单_freightOrder_16_string_t1_$$A" name="货运单" type="string" variable="tbhdclaim_freightOrder_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_计划员_planner_17_string_t1_$$A" name="计划员" type="string" variable="tbhdclaim_planner_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_已复判_doubleCheck_18_string_t1_$$HA" name="已复判" type="string" variable="tbhdclaim_doubleCheck_t00"></activiti:formProperty>
+        <activiti:executionListener event="end" class="org.activiti.engine.impl.bpmn.listener.ScriptExecutionListener">
+          <activiti:field name="language">
+            <activiti:string><![CDATA[groovy]]></activiti:string>
+          </activiti:field>
+          <activiti:field name="script">
+            <activiti:string><![CDATA[import groovy.json.JsonOutput
+            	import groovy.json.JsonSlurper
+            	
+            	execution.setVariable('b_rows',new ArrayList())
+            	
+            	def jsonSlurper = new JsonSlurper()
+            	def item_std = jsonSlurper.parseText(tbhdclaim_item_std)
+            	item_std.each{
+            		if (it.reply?.contains('供应商')) {
+            			it.judge = '供应商责任'
+            		} else {
+            			it.judge = '安吉物流责任'
+            		}
+            	}
+            	def item = jsonSlurper.parseText(tbhdclaim_item)
+            	item.each {k,v ->
+            		if(k == 'rows') {
+            			v.each{
+            				if (it[10].contains('供应商')){it[0]='供应商责任'} else {it[0]='安吉物流责任'}
+            			}
+            		}
+            	}
+            	def judges = new HashSet(item_std.collect{it.judge})
+            	
+            	if(judges.contains(null) || judges.contains(' ')) {
+					throw new org.activiti.engine.ActivitiIllegalArgumentException('unknown error')
+				}
+				def processedLi = []
+				//所有明细都是 供应商责任
+				if (judges.size() == 1 && judges[0] == '供应商责任') {
+					execution.setVariable('allSupDuty', 'Y')
+					processedLi.addAll(item_std)
+				} else {
+					execution.setVariable('allSupDuty', 'N')
+					//std remove
+					def needHandleStd = item_std.findAll{it.judge == '安吉物流责任'}
+					processedLi.addAll(item_std.findAll{it.judge == '供应商责任'})
+					execution.setVariable('tbhdclaim_item_std', JsonOutput.toJson(needHandleStd))
+					//item remove
+					item.put('rows',item.get('rows').findAll{it[0] == '安吉物流责任'})
+					execution.setVariable('tbhdclaim_item', JsonOutput.toJson(item))
+					
+				}
+				//save to collection
+				execution.setVariable('processedLi',JsonOutput.toJson(processedLi))
+            	]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </startEvent>
+    <exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway"></exclusiveGateway>
+    <userTask id="usertask2" name="核定索赔并接受责任判定" activiti:assignee="${initiator}" activiti:dueDate="P1D">
+      <extensionElements>
+        <activiti:formProperty id="tbhdclaim_item_$$VA" name="索赔明细" type="string" variable="tbhdclaim_item" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_责任判定_judge_1_enum_sbs_$$VA" name="责任判定" type="enum" variable="tbhdclaim_judge_t00" required="true">
+          <activiti:value id=" " name=" "></activiti:value>
+          <activiti:value id="供应商责任" name="供应商责任"></activiti:value>
+          <activiti:value id="安吉物流责任" name="安吉物流责任"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_发邮件日期_mailSendDate_2_string_t3_$$VA" name="发邮件日期" type="string" variable="tbhdclaim_mailSendDate_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_上报日期_reportDate_3_string_t3_$$VA" name="上报日期" type="string" variable="tbhdclaim_reportDate_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_经销商代码_dealerCode_4_string_t1_$$VA" name="经销商代码" type="string" variable="tbhdclaim_dealerCode_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_经销商名称_dealerName_5_string_t1_$$VA" name="经销商名称" type="string" variable="tbhdclaim_dealerName_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_零件号_partNumber_6_string_t1_$$VA" name="零件号" type="string" variable="tbhdclaim_partNumber_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_中文名称_chineseName_7_string_t1_$$VA" name="中文名称" type="string" variable="tbhdclaim_chineseName_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_索赔数量_claimNumber_8_string_t6_$$VA" name="索赔数量" type="string" variable="tbhdclaim_claimNumber_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_索赔金额_claimAmount_9_string_cny_$$VA" name="索赔金额" type="string" variable="tbhdclaim_claimAmount_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_工程回复日期_replyDate_10_string_t3_$$VA" name="工程回复日期" type="string" variable="tbhdclaim_replyDate_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_工程回复_reply_11_string_t1_$$VA" name="工程回复" type="string" variable="tbhdclaim_reply_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_情况描述（归口处理）_desc_12_string_t1_$$VA" name="情况描述（归口处理）" type="string" variable="tbhdclaim_desc_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_是否回运_isReturn_13_string_t1_$$VA" name="是否回运" type="string" variable="tbhdclaim_isReturn_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_订单号_orderNumber_14_string_t1_$$VA" name="订单号" type="string" variable="tbhdclaim_orderNumber_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_上报途径_reportWay_15_string_t1_$$VA" name="上报途径" type="string" variable="tbhdclaim_reportWay_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_货运单_freightOrder_16_string_t1_$$VA" name="货运单" type="string" variable="tbhdclaim_freightOrder_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_计划员_planner_17_string_t1_$$VA" name="计划员" type="string" variable="tbhdclaim_planner_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_已复判_doubleCheck_18_string_t1_$$HA" name="已复判" type="string" variable="tbhdclaim_doubleCheck_t00"></activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <endEvent id="endevent1" name="End"></endEvent>
+    <userTask id="usertask3" name="责任划分" activiti:assignee="${initiator}" activiti:dueDate="P1D">
+      <extensionElements>
+        <activiti:formProperty id="tbhdclaim_item" name="索赔明细" type="string" variable="tbhdclaim_item" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_责任判定_judge_1_enum_sbs_$$A" name="责任判定" type="enum" variable="tbhdclaim_judge_t00" required="true">
+          <activiti:value id=" " name=" "></activiti:value>
+          <activiti:value id="仓库责任" name="仓库责任"></activiti:value>
+          <activiti:value id="运输责任" name="运输责任"></activiti:value>
+          <activiti:value id="包装责任" name="包装责任"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_发邮件日期_mailSendDate_2_string_t3_$$VA" name="发邮件日期" type="string" variable="tbhdclaim_mailSendDate_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_上报日期_reportDate_3_string_t3_$$VA" name="上报日期" type="string" variable="tbhdclaim_reportDate_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_经销商代码_dealerCode_4_string_t1_$$VA" name="经销商代码" type="string" variable="tbhdclaim_dealerCode_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_经销商名称_dealerName_5_string_t1_$$VA" name="经销商名称" type="string" variable="tbhdclaim_dealerName_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_零件号_partNumber_6_string_t1_$$VA" name="零件号" type="string" variable="tbhdclaim_partNumber_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_中文名称_chineseName_7_string_t1_$$VA" name="中文名称" type="string" variable="tbhdclaim_chineseName_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_索赔数量_claimNumber_8_string_t6_$$VA" name="索赔数量" type="string" variable="tbhdclaim_claimNumber_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_索赔金额_claimAmount_9_string_cny_$$VA" name="索赔金额" type="string" variable="tbhdclaim_claimAmount_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_工程回复日期_replyDate_10_string_t3_$$VA" name="工程回复日期" type="string" variable="tbhdclaim_replyDate_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_工程回复_reply_11_string_t1_$$VA" name="工程回复" type="string" variable="tbhdclaim_reply_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_情况描述（归口处理）_desc_12_string_t1_$$VA" name="情况描述（归口处理）" type="string" variable="tbhdclaim_desc_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_是否回运_isReturn_13_string_t1_$$VA" name="是否回运" type="string" variable="tbhdclaim_isReturn_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_订单号_orderNumber_14_string_t1_$$VA" name="订单号" type="string" variable="tbhdclaim_orderNumber_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_上报途径_reportWay_15_string_t1_$$VA" name="上报途径" type="string" variable="tbhdclaim_reportWay_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_货运单_freightOrder_16_string_t1_$$VA" name="货运单" type="string" variable="tbhdclaim_freightOrder_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_计划员_planner_17_string_t1_$$VA" name="计划员" type="string" variable="tbhdclaim_planner_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_已复判_doubleCheck_18_string_t1_$$HA" name="已复判" type="string" variable="tbhdclaim_doubleCheck_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_备注_note1_19_string_t2_$$A" name="备注" type="string" variable="tbhdclaim_note1_t00"/>
+        <activiti:taskListener event="create" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+          <activiti:field name="language">
+            <activiti:string><![CDATA[groovy]]></activiti:string>
+          </activiti:field>
+          <activiti:field name="script">
+            <activiti:string><![CDATA[import groovy.json.JsonOutput
+					import groovy.json.JsonSlurper
+					
+      				def execution = task.getExecution()
+					def jsonSlurper = new JsonSlurper()
+      				def std = jsonSlurper.parseText(tbhdclaim_item_std)
+      				std.each{
+      					it.judge = ' '
+      				}
+      				execution.setVariable('tbhdclaim_item_std', JsonOutput.toJson(std))
+      				def item = jsonSlurper.parseText(tbhdclaim_item)
+      				item.each {k,v ->
+						if (k == 'rows') {v.each{it[0]=' '}}      					
+      				}
+      				execution.setVariable('tbhdclaim_item', JsonOutput.toJson(item))]]></activiti:string>
+          </activiti:field>
+        </activiti:taskListener>
+        <activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+          <activiti:field name="language">
+            <activiti:string><![CDATA[groovy]]></activiti:string>
+          </activiti:field>
+          <activiti:field name="script">
+            <activiti:string><![CDATA[import groovy.json.JsonOutput
+					import groovy.json.JsonSlurper
+					
+      				def execution = task.getExecution()
+					def jsonSlurper = new JsonSlurper()
+					
+					def item = jsonSlurper.parseText(tbhdclaim_item)
+					def std = jsonSlurper.parseText(tbhdclaim_item_std)
+					
+					std.each {
+						if (!it.judge || it.judge.trim() == '') {
+							throw new org.activiti.engine.ActivitiIllegalArgumentException('请对每条记录进行责任划分')
+						}
+					}
+					
+					//划分数据到每个责任人（组）
+					def existWarehourse = 'N'//存在仓库责任
+					def existTransport = 'N'//存在运输责任
+					def existPackage = 'N'//存在包装责任
+					//仓库责任
+					def item1 = analysisDuty(jsonSlurper.parseText(tbhdclaim_item), 'tbhdclaim1')
+					if (item1.get('rows').size() > 0) {
+						existWarehourse = 'Y'
+						execution.setVariable('tbhdclaim1_item', JsonOutput.toJson(item1))
+					}
+					
+					//运输责任
+					def item2 = analysisDuty(jsonSlurper.parseText(tbhdclaim_item), 'tbhdclaim2')
+					if (item2.get('rows').size() > 0) {
+						existTransport = 'Y'
+						execution.setVariable('tbhdclaim2_item', JsonOutput.toJson(item2))
+					}
+					
+					//包装责任
+					def item3 = analysisDuty(jsonSlurper.parseText(tbhdclaim_item), 'tbhdclaim3')
+					if (item3.get('rows').size() > 0) {
+						existPackage = 'Y'
+						execution.setVariable('tbhdclaim3_item', JsonOutput.toJson(item3))
+					}
+					
+					//gateway
+					execution.setVariable('existWarehourse', existWarehourse)
+					execution.setVariable('existTransport', existTransport)
+					execution.setVariable('existPackage', existPackage)
+      			
+      				static def analysisDuty(def item, def duty){
+					    def types = ['tbhdclaim1':'仓库责任','tbhdclaim2':'运输责任','tbhdclaim3':'包装责任']
+					    if (!types.keySet().contains(duty)) {
+					        throw new Exception("责任划分超出范围")
+					    }
+					    item.each {k,v ->
+					        if (k == 'headers') {
+					            v.each { it.id = it.id.replace('tbhdclaim', duty)}
+					        }
+					    }
+					    item.put('tableName', duty)
+					    item.put('rows', item.get('rows').findAll{it[0]==types.get(duty)})
+					    return item
+					}]]></activiti:string>
+          </activiti:field>
+        </activiti:taskListener>
+      </extensionElements>
+    </userTask>
+    <parallelGateway id="parallelgateway1" name="Parallel Gateway"></parallelGateway>
+    <parallelGateway id="parallelgateway2" name="Parallel Gateway"></parallelGateway>
+    <exclusiveGateway id="exclusivegateway2" name="Exclusive Gateway"></exclusiveGateway>
+    <exclusiveGateway id="exclusivegateway3" name="Exclusive Gateway"></exclusiveGateway>
+    <exclusiveGateway id="exclusivegateway4" name="Exclusive Gateway"></exclusiveGateway>
+    <userTask id="usertask4" name="仓库核对" activiti:assignee="${initiator}" activiti:dueDate="P1D">
+      <extensionElements>
+        <activiti:formProperty id="tbhdclaim1_item" name="索赔明细" type="string" variable="tbhdclaim1_item" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim1_责任判定_judge_1_enum_sbs_$$VA" name="责任判定" type="enum" variable="tbhdclaim1_judge_t00">
+          <activiti:value id=" " name=" "></activiti:value>
+          <activiti:value id="仓库责任" name="仓库责任"></activiti:value>
+          <activiti:value id="运输责任" name="运输责任"></activiti:value>
+          <activiti:value id="包装责任" name="包装责任"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim1_发邮件日期_mailSendDate_2_string_t3_$$VA" name="发邮件日期" type="string" variable="tbhdclaim1_mailSendDate_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim1_上报日期_reportDate_3_string_t3_$$VA" name="上报日期" type="string" variable="tbhdclaim1_reportDate_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim1_经销商代码_dealerCode_4_string_t1_$$VA" name="经销商代码" type="string" variable="tbhdclaim1_dealerCode_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim1_经销商名称_dealerName_5_string_t1_$$VA" name="经销商名称" type="string" variable="tbhdclaim_dealerName_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim1_零件号_partNumber_6_string_t1_$$VA" name="零件号" type="string" variable="tbhdclaim1_partNumber_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim1_中文名称_chineseName_7_string_t1_$$VA" name="中文名称" type="string" variable="tbhdclaim1_chineseName_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim1_索赔数量_claimNumber_8_string_t6_$$VA" name="索赔数量" type="string" variable="tbhdclaim1_claimNumber_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim1_索赔金额_claimAmount_9_string_cny_$$VA" name="索赔金额" type="string" variable="tbhdclaim1_claimAmount_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim1_工程回复日期_replyDate_10_string_t3_$$VA" name="工程回复日期" type="string" variable="tbhdclaim1_replyDate_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim1_工程回复_reply_11_string_t1_$$VA" name="工程回复" type="string" variable="tbhdclaim1_reply_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim1_情况描述（归口处理）_desc_12_string_t1_$$VA" name="情况描述（归口处理）" type="string" variable="tbhdclaim1_desc_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim1_是否回运_isReturn_13_string_t1_$$VA" name="是否回运" type="string" variable="tbhdclaim1_isReturn_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim1_订单号_orderNumber_14_string_t1_$$VA" name="订单号" type="string" variable="tbhdclaim1_orderNumber_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim1_上报途径_reportWay_15_string_t1_$$VA" name="上报途径" type="string" variable="tbhdclaim1_reportWay_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim1_货运单_freightOrder_16_string_t1_$$VA" name="货运单" type="string" variable="tbhdclaim1_freightOrder_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim1_计划员_planner_17_string_t1_$$VA" name="计划员" type="string" variable="tbhdclaim1_planner_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim1_已复判_doubleCheck_18_string_t1_$$HA" name="已复判" type="string" variable="tbhdclaim1_doubleCheck_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim1_备注_note1_19_string_t2_$$VA" name="责任划分备注" type="string" variable="tbhdclaim1_note1_t00"/>
+        <activiti:formProperty id="tbhdclaim1_是否有异议_existDissent_20_enum_rbv_$$A" name="是否有异议" type="enum" variable="tbhdclaim1_existDissent_t00" required="true">
+          <activiti:value id="提出异议" name="提出异议"></activiti:value>
+          <activiti:value id="没有异议" name="没有异议"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim1_理由_reason_21_enum_sbs_$$A" name="理由" type="enum" variable="tbhdclaim1_reason_t00">
+          <activiti:value id=" " name=" "></activiti:value>
+          <activiti:value id="供应商责任" name="供应商责任"></activiti:value>
+          <activiti:value id="其他" name="其他"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim1_备注_note_22_string_t2_$$A" name="备注" type="string" variable="tbhdclaim1_note_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim1_图片_images_23_string_t9i_$$A" name="图片" type="string" variable="tbhdclaim1_images_t00"/>
+        <activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+          <activiti:field name="language">
+            <activiti:string><![CDATA[groovy]]></activiti:string>
+          </activiti:field>
+          <activiti:field name="script">
+            <activiti:string><![CDATA[import groovy.json.JsonOutput
+					import groovy.json.JsonSlurper
+	
+					def execution = task.getExecution()
+					def jsonSlurper = new JsonSlurper()
+					
+					def std = jsonSlurper.parseText(tbhdclaim1_item_std)
+					std.each {
+						if (!it.existDissent) {
+							throw new org.activiti.engine.ActivitiIllegalArgumentException('请对每条索赔记录确定\"是否有异议\"')
+						}
+						if (it.existDissent == '提出异议' && it.reason == ' ') {
+							throw new org.activiti.engine.ActivitiIllegalArgumentException('请对\"提出异议\"的索赔记录选择理由')
+						}
+					}]]></activiti:string>
+          </activiti:field>
+        </activiti:taskListener>
+      </extensionElements>
+    </userTask>
+    <userTask id="usertask5" name="运输核对" activiti:assignee="${initiator}" activiti:dueDate="P1D">
+      <extensionElements>
+        <activiti:formProperty id="tbhdclaim2_item" name="索赔明细" type="string" variable="tbhdclaim2_item" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim2_责任判定_judge_1_enum_sbs_$$VA" name="责任判定" type="enum" variable="tbhdclaim2_judge_t00">
+          <activiti:value id=" " name=" "></activiti:value>
+          <activiti:value id="仓库责任" name="仓库责任"></activiti:value>
+          <activiti:value id="运输责任" name="运输责任"></activiti:value>
+          <activiti:value id="包装责任" name="包装责任"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim2_发邮件日期_mailSendDate_2_string_t3_$$VA" name="发邮件日期" type="string" variable="tbhdclaim2_mailSendDate_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim2_上报日期_reportDate_3_string_t3_$$VA" name="上报日期" type="string" variable="tbhdclaim2_reportDate_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim2_经销商代码_dealerCode_4_string_t1_$$VA" name="经销商代码" type="string" variable="tbhdclaim2_dealerCode_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim2_经销商名称_dealerName_5_string_t1_$$VA" name="经销商名称" type="string" variable="tbhdclaim_dealerName_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim2_零件号_partNumber_6_string_t1_$$VA" name="零件号" type="string" variable="tbhdclaim2_partNumber_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim2_中文名称_chineseName_7_string_t1_$$VA" name="中文名称" type="string" variable="tbhdclaim2_chineseName_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim2_索赔数量_claimNumber_8_string_t6_$$VA" name="索赔数量" type="string" variable="tbhdclaim2_claimNumber_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim2_索赔金额_claimAmount_9_string_cny_$$VA" name="索赔金额" type="string" variable="tbhdclaim2_claimAmount_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim2_工程回复日期_replyDate_10_string_t3_$$VA" name="工程回复日期" type="string" variable="tbhdclaim2_replyDate_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim2_工程回复_reply_11_string_t1_$$VA" name="工程回复" type="string" variable="tbhdclaim2_reply_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim2_情况描述（归口处理）_desc_12_string_t1_$$VA" name="情况描述（归口处理）" type="string" variable="tbhdclaim2_desc_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim2_是否回运_isReturn_13_string_t1_$$VA" name="是否回运" type="string" variable="tbhdclaim2_isReturn_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim2_订单号_orderNumber_14_string_t1_$$VA" name="订单号" type="string" variable="tbhdclaim2_orderNumber_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim2_上报途径_reportWay_15_string_t1_$$VA" name="上报途径" type="string" variable="tbhdclaim2_reportWay_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim2_货运单_freightOrder_16_string_t1_$$VA" name="货运单" type="string" variable="tbhdclaim2_freightOrder_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim2_计划员_planner_17_string_t1_$$VA" name="计划员" type="string" variable="tbhdclaim2_planner_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim2_已复判_doubleCheck_18_string_t1_$$HA" name="已复判" type="string" variable="tbhdclaim2_doubleCheck_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim2_备注_note1_19_string_t2_$$VA" name="责任划分备注" type="string" variable="tbhdclaim2_note1_t00"/>
+        <activiti:formProperty id="tbhdclaim2_是否有异议_existDissent_20_enum_rbv_$$A" name="是否有异议" type="enum" variable="tbhdclaim2_existDissent_t00" required="true">
+          <activiti:value id="提出异议" name="提出异议"></activiti:value>
+          <activiti:value id="没有异议" name="没有异议"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim2_理由_reason_21_enum_sbs_$$A" name="理由" type="enum" variable="tbhdclaim2_reason_t00">
+          <activiti:value id=" " name=" "></activiti:value>
+          <activiti:value id="供应商责任" name="供应商责任"></activiti:value>
+          <activiti:value id="其他" name="其他"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim2_备注_note_22_string_t2_$$A" name="备注" type="string" variable="tbhdclaim2_note_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim2_图片_images_23_string_t9i_$$A" name="图片" type="string" variable="tbhdclaim2_images_t00"/>
+        
+        <activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+          <activiti:field name="language">
+            <activiti:string><![CDATA[groovy]]></activiti:string>
+          </activiti:field>
+          <activiti:field name="script">
+            <activiti:string><![CDATA[import groovy.json.JsonOutput
+					import groovy.json.JsonSlurper
+	
+					def execution = task.getExecution()
+					def jsonSlurper = new JsonSlurper()
+					
+					def std = jsonSlurper.parseText(tbhdclaim2_item_std)
+					std.each {
+						if (!it.existDissent) {
+							throw new org.activiti.engine.ActivitiIllegalArgumentException('请对每条索赔记录确定\"是否有异议\"')
+						}
+						if (it.existDissent == '提出异议' && it.reason == ' ') {
+							throw new org.activiti.engine.ActivitiIllegalArgumentException('请对\"提出异议\"的索赔记录选择理由')
+						}
+					}]]></activiti:string>
+          </activiti:field>
+        </activiti:taskListener>
+      </extensionElements>
+    </userTask>
+    <userTask id="usertask6" name="包装核对" activiti:assignee="${initiator}" activiti:dueDate="P1D">
+      <extensionElements>
+        <activiti:formProperty id="tbhdclaim3_item" name="索赔明细" type="string" variable="tbhdclaim3_item" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim3_责任判定_judge_1_enum_sbs_$$VA" name="责任判定" type="enum" variable="tbhdclaim3_judge_t00">
+          <activiti:value id=" " name=" "></activiti:value>
+          <activiti:value id="仓库责任" name="仓库责任"></activiti:value>
+          <activiti:value id="运输责任" name="运输责任"></activiti:value>
+          <activiti:value id="包装责任" name="包装责任"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim3_发邮件日期_mailSendDate_2_string_t3_$$VA" name="发邮件日期" type="string" variable="tbhdclaim3_mailSendDate_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim3_上报日期_reportDate_3_string_t3_$$VA" name="上报日期" type="string" variable="tbhdclaim3_reportDate_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim3_经销商代码_dealerCode_4_string_t1_$$VA" name="经销商代码" type="string" variable="tbhdclaim3_dealerCode_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim3_经销商名称_dealerName_5_string_t1_$$VA" name="经销商名称" type="string" variable="tbhdclaim_dealerName_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim3_零件号_partNumber_6_string_t1_$$VA" name="零件号" type="string" variable="tbhdclaim3_partNumber_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim3_中文名称_chineseName_7_string_t1_$$VA" name="中文名称" type="string" variable="tbhdclaim3_chineseName_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim3_索赔数量_claimNumber_8_string_t6_$$VA" name="索赔数量" type="string" variable="tbhdclaim3_claimNumber_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim3_索赔金额_claimAmount_9_string_cny_$$VA" name="索赔金额" type="string" variable="tbhdclaim3_claimAmount_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim3_工程回复日期_replyDate_10_string_t3_$$VA" name="工程回复日期" type="string" variable="tbhdclaim3_replyDate_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim3_工程回复_reply_11_string_t1_$$VA" name="工程回复" type="string" variable="tbhdclaim3_reply_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim3_情况描述（归口处理）_desc_12_string_t1_$$VA" name="情况描述（归口处理）" type="string" variable="tbhdclaim3_desc_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim3_是否回运_isReturn_13_string_t1_$$VA" name="是否回运" type="string" variable="tbhdclaim3_isReturn_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim3_订单号_orderNumber_14_string_t1_$$VA" name="订单号" type="string" variable="tbhdclaim3_orderNumber_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim3_上报途径_reportWay_15_string_t1_$$VA" name="上报途径" type="string" variable="tbhdclaim3_reportWay_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim3_货运单_freightOrder_16_string_t1_$$VA" name="货运单" type="string" variable="tbhdclaim3_freightOrder_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim3_计划员_planner_17_string_t1_$$VA" name="计划员" type="string" variable="tbhdclaim3_planner_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim3_已复判_doubleCheck_18_string_t1_$$HA" name="已复判" type="string" variable="tbhdclaim3_doubleCheck_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim3_备注_note1_19_string_t2_$$VA" name="责任划分备注" type="string" variable="tbhdclaim3_note1_t00"/>
+        <activiti:formProperty id="tbhdclaim3_是否有异议_existDissent_20_enum_rbv_$$A" name="是否有异议" type="enum" variable="tbhdclaim3_existDissent_t00" required="true">
+          <activiti:value id="提出异议" name="提出异议"></activiti:value>
+          <activiti:value id="没有异议" name="没有异议"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim3_理由_reason_21_enum_sbs_$$A" name="理由" type="enum" variable="tbhdclaim3_reason_t00">
+          <activiti:value id=" " name=" "></activiti:value>
+          <activiti:value id="供应商责任" name="供应商责任"></activiti:value>
+          <activiti:value id="其他" name="其他"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim3_备注_note_22_string_t2_$$A" name="备注" type="string" variable="tbhdclaim3_note_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim3_图片_images_23_string_t9i_$$A" name="图片" type="string" variable="tbhdclaim3_images_t00"/>
+        
+        <activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+          <activiti:field name="language">
+            <activiti:string><![CDATA[groovy]]></activiti:string>
+          </activiti:field>
+          <activiti:field name="script">
+            <activiti:string><![CDATA[import groovy.json.JsonOutput
+					import groovy.json.JsonSlurper
+	
+					def execution = task.getExecution()
+					def jsonSlurper = new JsonSlurper()
+					
+					def std = jsonSlurper.parseText(tbhdclaim3_item_std)
+					std.each {
+						if (!it.existDissent) {
+							throw new org.activiti.engine.ActivitiIllegalArgumentException('请对每条索赔记录确定\"是否有异议\"')
+						}
+						if (it.existDissent == '提出异议' && it.reason == ' ') {
+							throw new org.activiti.engine.ActivitiIllegalArgumentException('请对\"提出异议\"的索赔记录选择理由')
+						}
+					}]]></activiti:string>
+          </activiti:field>
+        </activiti:taskListener>
+      </extensionElements>
+    </userTask>
+    <exclusiveGateway id="exclusivegateway5" name="Exclusive Gateway"></exclusiveGateway>
+    <exclusiveGateway id="exclusivegateway6" name="Exclusive Gateway"></exclusiveGateway>
+    <exclusiveGateway id="exclusivegateway7" name="Exclusive Gateway"></exclusiveGateway>
+    <scriptTask id="scripttask1" name="整理明细" scriptFormat="groovy" activiti:autoStoreVariables="false">
+      <script>
+      
+	      import groovy.json.JsonOutput
+	      import groovy.json.JsonSlurper
+	      
+	      def allAccept = 'N'
+	      def toArbitration = 'Y'
+	      //将所有有异议的明细重新放入item中
+	      //有异议且是供应商责任且没有复判过的--复判
+	      //有异议不是供应商责任或者有异议是供应商责任但是复判过--仲裁区域
+	      //所有的都没有异议--保存结束
+	      def jsonSlurper = new JsonSlurper()
+	      def a_rows = []//需要复判
+	      def processedLi = jsonSlurper.parseText(processedLi)
+	      def arr = new HashSet()//判断是否全部接受责任
+	      
+	      def tbhdclaim_item_temp = null
+	      def idName = 'tbhdclaim1'
+	      
+	      
+	      //仓库
+	      if(existWarehourse == 'Y') {
+	      	tbhdclaim_item_temp = tbhdclaim1_item
+	      	def a_rows_1 = filterDissentRows1(jsonSlurper.parseText(tbhdclaim1_item))
+	      	if (a_rows_1.size() &gt; 0) {
+	      		a_rows.addAll(a_rows_1)
+	      	}
+	      	def b_rows_1 = filterDissentRows2(jsonSlurper.parseText(tbhdclaim1_item))
+	      	if (b_rows_1.size() &gt; 0) {
+	      		b_rows.addAll(b_rows_1)
+	      	}
+	      	//将已接受的存入collection
+	      	processedLi.addAll(jsonSlurper.parseText(tbhdclaim1_item_std).findAll{it.existDissent=='没有异议'})
+	      	
+	      	arr.addAll(jsonSlurper.parseText(tbhdclaim1_item_std).collect{it.existDissent})
+	      }
+	      //运输
+	      if(existTransport == 'Y') {
+	      	tbhdclaim_item_temp = tbhdclaim2_item
+	      	idName = 'tbhdclaim2'
+	      	def a_rows_2 = filterDissentRows1(jsonSlurper.parseText(tbhdclaim2_item))
+	      	if (a_rows_2.size() &gt; 0) {
+	      		a_rows.addAll(a_rows_2)
+	      	}
+	      	def b_rows_2 = filterDissentRows2(jsonSlurper.parseText(tbhdclaim2_item))
+	      	if (b_rows_2.size() &gt; 0) {
+	      		b_rows.addAll(b_rows_2)
+	      	}
+	      	processedLi.addAll(jsonSlurper.parseText(tbhdclaim2_item_std).findAll{it.existDissent=='没有异议'})
+	      	
+	      	arr.addAll(jsonSlurper.parseText(tbhdclaim2_item_std).collect{it.existDissent})
+	      }
+	      
+	      //包装
+	      if(existPackage == 'Y') {
+	      	tbhdclaim_item_temp = tbhdclaim3_item
+	      	idName = 'tbhdclaim3'
+	      	def a_rows_3 = filterDissentRows1(jsonSlurper.parseText(tbhdclaim3_item))
+	      	if (a_rows_3.size() &gt; 0) {
+	      		a_rows.addAll(a_rows_3)
+	      	}
+	      	def b_rows_3 = filterDissentRows2(jsonSlurper.parseText(tbhdclaim3_item))
+	      	if (b_rows_3.size() &gt; 0) {
+	      		b_rows.addAll(b_rows_3)
+	      	}
+	      	processedLi.addAll(jsonSlurper.parseText(tbhdclaim3_item_std).findAll{it.existDissent=='没有异议'})
+	      	arr.addAll(jsonSlurper.parseText(tbhdclaim3_item_std).collect{it.existDissent})
+	      }
+	      
+	      //复判
+	      if (a_rows.size() &gt; 0) {
+	      	def tbhdclaim_item = arbitration(jsonSlurper.parseText(tbhdclaim_item_temp),a_rows,'tbhdclaim',idName)
+	      	a_rows.each{
+	      		//reset
+	      		it[0] = ' '
+	      	}
+	      	execution.setVariable('tbhdclaim_item', JsonOutput.toJson(tbhdclaim_item))
+	      }
+	      //进入仲裁区的
+	      if(b_rows.size() &gt; 0) {
+	      	def tbhdclaim4_item = arbitration(jsonSlurper.parseText(tbhdclaim_item_temp),b_rows,'tbhdclaim4',idName)
+	      	execution.setVariable('tbhdclaim4_item',JsonOutput.toJson(tbhdclaim4_item))
+	      }
+	      
+	      //save confirm to collection
+	      execution.setVariable('processedLi', JsonOutput.toJson(processedLi))
+	      
+	      //gateway
+	      if (b_rows.size() == 0 &amp;&amp; arr.size() == 1 &amp;&amp; arr[0] =='没有异议') {
+	      	allAccept = 'Y'
+	      }
+	      if (a_rows.size() &gt; 0) {
+	      	toArbitration = 'N'
+	      }
+	      execution.setVariable('allAccept', allAccept)
+	      execution.setVariable('toArbitration',toArbitration)
+	      
+	      //需要复判
+	      static def filterDissentRows1(def item) {
+	      	return item.get('rows').findAll{it[19]=='提出异议'&amp;&amp;it[20]=='供应商责任'&amp;&amp;it[17]!='Y'}
+	      }
+	      //需要进入仲裁区的
+	      static def filterDissentRows2(def item) {
+	      	return item.get('rows').findAll{(it[19]=='提出异议'&amp;&amp;it[20]!='供应商责任') || (it[18]=='提出异议'&amp;&amp;it[17]=='Y')}
+	      }
+	      
+	      static def arbitration(def item, def rows, def targetName, def sourceName){
+		    item.each {k,v -&gt;
+		        if (k == 'headers') {
+		            v.each { it.id = it.id.replace(sourceName, targetName)}
+		        }
+		    }
+		    item.put('tableName', targetName)
+		    item.put('rows', rows)
+		    return item
+		}
+      
+      </script>
+    </scriptTask>
+    <exclusiveGateway id="exclusivegateway8" name="Exclusive Gateway"></exclusiveGateway>
+    <exclusiveGateway id="exclusivegateway9" name="Exclusive Gateway"></exclusiveGateway>
+    <userTask id="usertask7" name="仲裁区讨论确定责任方" activiti:assignee="${initiator}" activiti:dueDate="P1D">
+      <extensionElements>
+        <activiti:formProperty id="tbhdclaim4_item" name="索赔明细" type="string" variable="tbhdclaim4_item" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim4_责任判定_judge_1_enum_sbs_$$A" name="责任判定" type="enum" variable="tbhdclaim4_judge_t00">
+          <activiti:value id="供应商责任" name="供应商责任"></activiti:value>
+          <activiti:value id="仓库责任" name="仓库责任"></activiti:value>
+          <activiti:value id="运输责任" name="运输责任"></activiti:value>
+          <activiti:value id="包装责任" name="包装责任"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim4_发邮件日期_mailSendDate_2_string_t3_$$VA" name="发邮件日期" type="string" variable="tbhdclaim4_mailSendDate_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim4_上报日期_reportDate_3_string_t3_$$VA" name="上报日期" type="string" variable="tbhdclaim4_reportDate_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim4_经销商代码_dealerCode_4_string_t1_$$VA" name="经销商代码" type="string" variable="tbhdclaim4_dealerCode_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim4_经销商名称_dealerName_5_string_t1_$$VA" name="经销商名称" type="string" variable="tbhdclaim_dealerName_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim4_零件号_partNumber_6_string_t1_$$VA" name="零件号" type="string" variable="tbhdclaim4_partNumber_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim4_中文名称_chineseName_7_string_t1_$$VA" name="中文名称" type="string" variable="tbhdclaim4_chineseName_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim4_索赔数量_claimNumber_8_string_t6_$$VA" name="索赔数量" type="string" variable="tbhdclaim4_claimNumber_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim4_索赔金额_claimAmount_9_string_cny_$$VA" name="索赔金额" type="string" variable="tbhdclaim4_claimAmount_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim4_工程回复日期_replyDate_10_string_t3_$$VA" name="工程回复日期" type="string" variable="tbhdclaim4_replyDate_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim4_工程回复_reply_11_string_t1_$$VA" name="工程回复" type="string" variable="tbhdclaim4_reply_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim4_情况描述（归口处理）_desc_12_string_t1_$$VA" name="情况描述（归口处理）" type="string" variable="tbhdclaim4_desc_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim4_是否回运_isReturn_13_string_t1_$$VA" name="是否回运" type="string" variable="tbhdclaim4_isReturn_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim4_订单号_orderNumber_14_string_t1_$$VA" name="订单号" type="string" variable="tbhdclaim4_orderNumber_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim4_上报途径_reportWay_15_string_t1_$$VA" name="上报途径" type="string" variable="tbhdclaim4_reportWay_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim4_货运单_freightOrder_16_string_t1_$$VA" name="货运单" type="string" variable="tbhdclaim4_freightOrder_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim4_计划员_planner_17_string_t1_$$VA" name="计划员" type="string" variable="tbhdclaim4_planner_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim4_已复判_doubleCheck_18_string_t1_$$VA" name="已复判" type="string" variable="tbhdclaim4_doubleCheck_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim4_备注_note1_19_string_t2_$$VA" name="责任划分备注" type="string" variable="tbhdclaim_note1_t00"/>
+        <activiti:formProperty id="tbhdclaim4_是否有异议_existDissent_20_enum_rbv_$$VA" name="是否有异议" type="enum" variable="tbhdclaim4_existDissent_t00" required="true">
+          <activiti:value id="提出异议" name="提出异议"></activiti:value>
+          <activiti:value id="没有异议" name="没有异议"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim4_理由_reason_21_enum_sbs_$$VA" name="理由" type="enum" variable="tbhdclaim4_reason_t00">
+          <activiti:value id=" " name=" "></activiti:value>
+          <activiti:value id="供应商责任" name="供应商责任"></activiti:value>
+          <activiti:value id="其他" name="其他"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim4_备注_note_22_string_t2_$$VA" name="异议备注" type="string" variable="tbhdclaim4_note_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim4_图片_images_23_string_t9i_$$VA" name="图片" type="string" variable="tbhdclaim1_images_t00"/>
+        
+        <activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+          <activiti:field name="language">
+            <activiti:string><![CDATA[groovy]]></activiti:string>
+          </activiti:field>
+          <activiti:field name="script">
+            <activiti:string><![CDATA[import groovy.json.JsonOutput
+					import groovy.json.JsonSlurper
+
+					def execution = task.getExecution()
+					def jsonSlurper = new JsonSlurper()
+					
+					def processedLi = jsonSlurper.parseText(processedLi)
+					def std = jsonSlurper.parseText(tbhdclaim4_item_std)
+					processedLi.addAll(std)
+					
+					execution.setVariable('processedLi', JsonOutput.toJson(processedLi))]]></activiti:string>
+          </activiti:field>
+        </activiti:taskListener>
+      </extensionElements>
+    </userTask>
+    <sequenceFlow id="flow3" name="所有索赔明细都是供应商责任" sourceRef="exclusivegateway1" targetRef="usertask2">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${allSupDuty=='Y'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow4" sourceRef="usertask2" targetRef="scripttask2"></sequenceFlow>
+    <sequenceFlow id="flow5" name="存在安吉物流责任" sourceRef="exclusivegateway1" targetRef="usertask3">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${allSupDuty=='N'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow6" sourceRef="usertask3" targetRef="parallelgateway1"></sequenceFlow>
+    <sequenceFlow id="flow7" sourceRef="parallelgateway1" targetRef="exclusivegateway2"></sequenceFlow>
+    <sequenceFlow id="flow8" sourceRef="parallelgateway1" targetRef="exclusivegateway3"></sequenceFlow>
+    <sequenceFlow id="flow9" sourceRef="parallelgateway1" targetRef="exclusivegateway4"></sequenceFlow>
+    <sequenceFlow id="flow10" name="存在仓库核对数据" sourceRef="exclusivegateway2" targetRef="usertask4">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${existWarehourse=='Y'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow11" sourceRef="usertask4" targetRef="exclusivegateway5"></sequenceFlow>
+    <sequenceFlow id="flow12" name="存在运输核对数据" sourceRef="exclusivegateway3" targetRef="usertask5">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${existTransport=='Y'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow13" sourceRef="usertask5" targetRef="exclusivegateway6"></sequenceFlow>
+    <sequenceFlow id="flow14" name="存在包装核对数据" sourceRef="exclusivegateway4" targetRef="usertask6">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${existPackage=='Y'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow15" sourceRef="usertask6" targetRef="exclusivegateway7"></sequenceFlow>
+    <sequenceFlow id="flow16" sourceRef="exclusivegateway5" targetRef="parallelgateway2"></sequenceFlow>
+    <sequenceFlow id="flow17" sourceRef="exclusivegateway6" targetRef="parallelgateway2"></sequenceFlow>
+    <sequenceFlow id="flow18" sourceRef="exclusivegateway7" targetRef="parallelgateway2"></sequenceFlow>
+    <sequenceFlow id="flow19" name="没有仓库核对数据" sourceRef="exclusivegateway2" targetRef="exclusivegateway5">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${existWarehourse=='N'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow20" name="没有运输核对数据" sourceRef="exclusivegateway3" targetRef="exclusivegateway6">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${existTransport=='N'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow21" name="没有包装核对数据" sourceRef="exclusivegateway4" targetRef="exclusivegateway7">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${existPackage=='N'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow22" sourceRef="parallelgateway2" targetRef="scripttask1"></sequenceFlow>
+    <sequenceFlow id="flow23" sourceRef="scripttask1" targetRef="exclusivegateway8"></sequenceFlow>
+    <sequenceFlow id="flow24" name="所有明细责任划分已被接受" sourceRef="exclusivegateway8" targetRef="scripttask2">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${allAccept=='Y'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow25" name="存在异议明细" sourceRef="exclusivegateway8" targetRef="exclusivegateway9">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${allAccept == 'N'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow26" name="不是供应商责任" sourceRef="exclusivegateway9" targetRef="usertask7">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${toArbitration == 'Y'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow27" sourceRef="usertask7" targetRef="scripttask2"></sequenceFlow>
+    <sequenceFlow id="flow28" name="没有申诉过且是供应商责任" sourceRef="exclusivegateway9" targetRef="usertask8">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${toArbitration == 'N'}]]></conditionExpression>
+    </sequenceFlow>
+    <userTask id="usertask8" name="复判" activiti:assignee="${initiator}" activiti:dueDate="P1D">
+      <extensionElements>
+        <activiti:formProperty id="tbhdclaim_item" name="索赔明细" type="string" variable="tbhdclaim_item" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_责任判定_judge_1_enum_sbs_$$A" name="责任判定" type="enum" variable="tbhdclaim_judge_t00" required="true">
+          <activiti:value id=" " name=" "></activiti:value>
+          <activiti:value id="供应商责任" name="供应商责任"></activiti:value>
+          <activiti:value id="安吉物流责任" name="安吉物流责任"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_发邮件日期_mailSendDate_2_string_t3_$$VA" name="发邮件日期" type="string" variable="tbhdclaim_mailSendDate_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_上报日期_reportDate_3_string_t3_$$VA" name="上报日期" type="string" variable="tbhdclaim_reportDate_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_经销商代码_dealerCode_4_string_t1_$$VA" name="经销商代码" type="string" variable="tbhdclaim_dealerCode_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_经销商名称_dealerName_5_string_t1_$$VA" name="经销商名称" type="string" variable="tbhdclaim_dealerName_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_零件号_partNumber_6_string_t1_$$VA" name="零件号" type="string" variable="tbhdclaim_partNumber_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_中文名称_chineseName_7_string_t1_$$VA" name="中文名称" type="string" variable="tbhdclaim_chineseName_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_索赔数量_claimNumber_8_string_t6_$$VA" name="索赔数量" type="string" variable="tbhdclaim_claimNumber_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_索赔金额_claimAmount_9_string_cny_$$VA" name="索赔金额" type="string" variable="tbhdclaim_claimAmount_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_工程回复日期_replyDate_10_string_t3_$$VA" name="工程回复日期" type="string" variable="tbhdclaim_replyDate_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_工程回复_reply_11_string_t1_$$VA" name="工程回复" type="string" variable="tbhdclaim_reply_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_情况描述（归口处理）_desc_12_string_t1_$$VA" name="情况描述（归口处理）" type="string" variable="tbhdclaim_desc_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_是否回运_isReturn_13_string_t1_$$VA" name="是否回运" type="string" variable="tbhdclaim_isReturn_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_订单号_orderNumber_14_string_t1_$$VA" name="订单号" type="string" variable="tbhdclaim_orderNumber_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_上报途径_reportWay_15_string_t1_$$VA" name="上报途径" type="string" variable="tbhdclaim_reportWay_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_货运单_freightOrder_16_string_t1_$$VA" name="货运单" type="string" variable="tbhdclaim_freightOrder_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_计划员_planner_17_string_t1_$$VA" name="计划员" type="string" variable="tbhdclaim_planner_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_已复判_doubleCheck_18_string_t1_$$HA" name="已复判" type="string" variable="tbhdclaim_doubleCheck_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_备注_note1_19_string_t2_$$VA" name="责任划分备注" type="string" variable="tbhdclaim_note1_t00"/>
+        <activiti:formProperty id="tbhdclaim_是否有异议_existDissent_20_enum_rbv_$$VA" name="是否有异议" type="enum" variable="tbhdclaim_existDissent_t00" required="true">
+          <activiti:value id="提出异议" name="提出异议"></activiti:value>
+          <activiti:value id="没有异议" name="没有异议"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_理由_reason_21_enum_sbs_$$VA" name="异议理由" type="enum" variable="tbhdclaim4_reason_t00">
+          <activiti:value id=" " name=" "></activiti:value>
+          <activiti:value id="供应商责任" name="供应商责任"></activiti:value>
+          <activiti:value id="其他" name="其他"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_备注_note_22_string_t2_$$VA" name="异议备注" type="string" variable="tbhdclaim_note_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_图片_images_23_string_t9i_$$A" name="图片" type="string" variable="tbhdclaim1_images_t00"/>
+        
+        <activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+          <activiti:field name="language">
+            <activiti:string><![CDATA[groovy]]></activiti:string>
+          </activiti:field>
+          <activiti:field name="script">
+            <activiti:string><![CDATA[import groovy.json.JsonOutput
+					import groovy.json.JsonSlurper
+
+					def execution = task.getExecution()
+					def jsonSlurper = new JsonSlurper()
+					def item_std = jsonSlurper.parseText(tbhdclaim_item_std)
+					def item = jsonSlurper.parseText(tbhdclaim_item)
+					def judges = new HashSet(item_std.collect{it.judge})
+					if(judges.contains(null) || judges.contains(' ')) {
+						throw new org.activiti.engine.ActivitiIllegalArgumentException('复判阶段需要重新判定每条明细的责任归属')
+					}
+					def processedLi = jsonSlurper.parseText(processedLi)
+					//所有明细都是 供应商责任
+					if (judges.size() == 1 && judges[0] == '供应商责任' && b_rows.size() == 0) {
+						execution.setVariable('allSupDuty', 'Y')
+						processedLi.addAll(item_std)
+					} else if(judges.size() == 1 && judges[0] == '供应商责任' && b_rows.size() > 0) {
+						execution.setVariable('allSupDuty', 'O')
+						processedLi.addAll(item_std.findAll{it.judge == '供应商责任'})
+					}else {
+						execution.setVariable('allSupDuty', 'N')
+						//std remove
+						def needHandleStd = item_std.findAll{it.judge == '安吉物流责任'}
+						needHandleStd.each{
+							it.doubleCheck = 'Y'
+						}
+						processedLi.addAll(item_std.findAll{it.judge == '供应商责任'})
+						execution.setVariable('tbhdclaim_item_std', JsonOutput.toJson(needHandleStd))
+						//item remove
+						def rows = item.get('rows').findAll{it[0] == '安吉物流责任'}
+						rows.each {
+							it[17]='Y'
+						}
+						item.put('rows', rows)
+						execution.setVariable('tbhdclaim_item', JsonOutput.toJson(item))
+						
+					}
+					//save to collection
+					execution.setVariable('processedLi',JsonOutput.toJson(processedLi))]]></activiti:string>
+          </activiti:field>
+        </activiti:taskListener>
+      </extensionElements>
+    </userTask>
+    <sequenceFlow id="flow29" sourceRef="usertask8" targetRef="exclusivegateway1"></sequenceFlow>
+    <scriptTask id="scripttask2" name="数据保存" scriptFormat="groovy" activiti:autoStoreVariables="false">
+      <script>
+    	</script>
+    </scriptTask>
+    <sequenceFlow id="flow30" sourceRef="scripttask2" targetRef="endevent1"></sequenceFlow>
+    <sequenceFlow id="flow31" name="复判所有明细为供应商责任，但任然存在需要进入仲裁区的" sourceRef="exclusivegateway1" targetRef="usertask7">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${allSupDuty=='O'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow32" sourceRef="startevent1" targetRef="exclusivegateway1"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_smpvProcess">
+    <bpmndi:BPMNPlane bpmnElement="smpvProcess" id="BPMNPlane_smpvProcess">
+      <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="180.0" y="125.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway1" id="BPMNShape_exclusivegateway1">
+        <omgdc:Bounds height="40.0" width="40.0" x="441.0" y="122.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask2" id="BPMNShape_usertask2">
+        <omgdc:Bounds height="65.0" width="105.0" x="591.0" y="110.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="1136.0" y="1370.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask3" id="BPMNShape_usertask3">
+        <omgdc:Bounds height="65.0" width="105.0" x="591.0" y="300.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="parallelgateway1" id="BPMNShape_parallelgateway1">
+        <omgdc:Bounds height="40.0" width="40.0" x="623.0" y="420.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="parallelgateway2" id="BPMNShape_parallelgateway2">
+        <omgdc:Bounds height="40.0" width="40.0" x="623.0" y="890.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway2" id="BPMNShape_exclusivegateway2">
+        <omgdc:Bounds height="40.0" width="40.0" x="341.0" y="510.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway3" id="BPMNShape_exclusivegateway3">
+        <omgdc:Bounds height="40.0" width="40.0" x="623.0" y="500.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway4" id="BPMNShape_exclusivegateway4">
+        <omgdc:Bounds height="40.0" width="40.0" x="871.0" y="500.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask4" id="BPMNShape_usertask4">
+        <omgdc:Bounds height="65.0" width="105.0" x="309.0" y="640.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask5" id="BPMNShape_usertask5">
+        <omgdc:Bounds height="65.0" width="105.0" x="591.0" y="640.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask6" id="BPMNShape_usertask6">
+        <omgdc:Bounds height="65.0" width="105.0" x="839.0" y="640.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway5" id="BPMNShape_exclusivegateway5">
+        <omgdc:Bounds height="40.0" width="40.0" x="341.0" y="810.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway6" id="BPMNShape_exclusivegateway6">
+        <omgdc:Bounds height="40.0" width="40.0" x="623.0" y="810.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway7" id="BPMNShape_exclusivegateway7">
+        <omgdc:Bounds height="40.0" width="40.0" x="871.0" y="810.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scripttask1" id="BPMNShape_scripttask1">
+        <omgdc:Bounds height="65.0" width="105.0" x="591.0" y="990.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway8" id="BPMNShape_exclusivegateway8">
+        <omgdc:Bounds height="40.0" width="40.0" x="623.0" y="1160.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway9" id="BPMNShape_exclusivegateway9">
+        <omgdc:Bounds height="40.0" width="40.0" x="331.0" y="1160.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask7" id="BPMNShape_usertask7">
+        <omgdc:Bounds height="65.0" width="105.0" x="299.0" y="1255.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask8" id="BPMNShape_usertask8">
+        <omgdc:Bounds height="65.0" width="105.0" x="1.0" y="1148.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scripttask2" id="BPMNShape_scripttask2">
+        <omgdc:Bounds height="66.0" width="105.0" x="1101.0" y="1253.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3">
+        <omgdi:waypoint x="481.0" y="142.0"></omgdi:waypoint>
+        <omgdi:waypoint x="591.0" y="142.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="48.0" width="100.0" x="481.0" y="142.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow4" id="BPMNEdge_flow4">
+        <omgdi:waypoint x="696.0" y="142.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1148.0" y="142.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1153.0" y="1253.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow5" id="BPMNEdge_flow5">
+        <omgdi:waypoint x="461.0" y="162.0"></omgdi:waypoint>
+        <omgdi:waypoint x="461.0" y="332.0"></omgdi:waypoint>
+        <omgdi:waypoint x="591.0" y="332.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="88.0" x="471.0" y="299.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow6" id="BPMNEdge_flow6">
+        <omgdi:waypoint x="643.0" y="365.0"></omgdi:waypoint>
+        <omgdi:waypoint x="643.0" y="420.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow7" id="BPMNEdge_flow7">
+        <omgdi:waypoint x="623.0" y="440.0"></omgdi:waypoint>
+        <omgdi:waypoint x="360.0" y="440.0"></omgdi:waypoint>
+        <omgdi:waypoint x="361.0" y="510.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow8" id="BPMNEdge_flow8">
+        <omgdi:waypoint x="643.0" y="460.0"></omgdi:waypoint>
+        <omgdi:waypoint x="643.0" y="500.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow9" id="BPMNEdge_flow9">
+        <omgdi:waypoint x="663.0" y="440.0"></omgdi:waypoint>
+        <omgdi:waypoint x="891.0" y="440.0"></omgdi:waypoint>
+        <omgdi:waypoint x="891.0" y="500.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow10" id="BPMNEdge_flow10">
+        <omgdi:waypoint x="361.0" y="550.0"></omgdi:waypoint>
+        <omgdi:waypoint x="361.0" y="640.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="88.0" x="361.0" y="579.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow11" id="BPMNEdge_flow11">
+        <omgdi:waypoint x="361.0" y="705.0"></omgdi:waypoint>
+        <omgdi:waypoint x="361.0" y="810.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow12" id="BPMNEdge_flow12">
+        <omgdi:waypoint x="643.0" y="540.0"></omgdi:waypoint>
+        <omgdi:waypoint x="643.0" y="640.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="88.0" x="648.0" y="569.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow13" id="BPMNEdge_flow13">
+        <omgdi:waypoint x="643.0" y="705.0"></omgdi:waypoint>
+        <omgdi:waypoint x="643.0" y="810.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow14" id="BPMNEdge_flow14">
+        <omgdi:waypoint x="891.0" y="540.0"></omgdi:waypoint>
+        <omgdi:waypoint x="891.0" y="640.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="88.0" x="891.0" y="569.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow15" id="BPMNEdge_flow15">
+        <omgdi:waypoint x="891.0" y="705.0"></omgdi:waypoint>
+        <omgdi:waypoint x="891.0" y="810.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow16" id="BPMNEdge_flow16">
+        <omgdi:waypoint x="361.0" y="850.0"></omgdi:waypoint>
+        <omgdi:waypoint x="361.0" y="909.0"></omgdi:waypoint>
+        <omgdi:waypoint x="623.0" y="910.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow17" id="BPMNEdge_flow17">
+        <omgdi:waypoint x="643.0" y="850.0"></omgdi:waypoint>
+        <omgdi:waypoint x="643.0" y="890.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow18" id="BPMNEdge_flow18">
+        <omgdi:waypoint x="891.0" y="850.0"></omgdi:waypoint>
+        <omgdi:waypoint x="891.0" y="909.0"></omgdi:waypoint>
+        <omgdi:waypoint x="663.0" y="910.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow19" id="BPMNEdge_flow19">
+        <omgdi:waypoint x="341.0" y="530.0"></omgdi:waypoint>
+        <omgdi:waypoint x="281.0" y="530.0"></omgdi:waypoint>
+        <omgdi:waypoint x="281.0" y="679.0"></omgdi:waypoint>
+        <omgdi:waypoint x="281.0" y="830.0"></omgdi:waypoint>
+        <omgdi:waypoint x="341.0" y="830.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="88.0" x="201.0" y="625.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow20" id="BPMNEdge_flow20">
+        <omgdi:waypoint x="623.0" y="520.0"></omgdi:waypoint>
+        <omgdi:waypoint x="553.0" y="520.0"></omgdi:waypoint>
+        <omgdi:waypoint x="553.0" y="676.0"></omgdi:waypoint>
+        <omgdi:waypoint x="553.0" y="830.0"></omgdi:waypoint>
+        <omgdi:waypoint x="623.0" y="830.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="88.0" x="493.0" y="620.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow21" id="BPMNEdge_flow21">
+        <omgdi:waypoint x="871.0" y="520.0"></omgdi:waypoint>
+        <omgdi:waypoint x="801.0" y="520.0"></omgdi:waypoint>
+        <omgdi:waypoint x="801.0" y="675.0"></omgdi:waypoint>
+        <omgdi:waypoint x="801.0" y="829.0"></omgdi:waypoint>
+        <omgdi:waypoint x="871.0" y="830.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="88.0" x="732.0" y="620.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow22" id="BPMNEdge_flow22">
+        <omgdi:waypoint x="643.0" y="930.0"></omgdi:waypoint>
+        <omgdi:waypoint x="643.0" y="990.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow23" id="BPMNEdge_flow23">
+        <omgdi:waypoint x="643.0" y="1055.0"></omgdi:waypoint>
+        <omgdi:waypoint x="643.0" y="1160.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow24" id="BPMNEdge_flow24">
+        <omgdi:waypoint x="643.0" y="1200.0"></omgdi:waypoint>
+        <omgdi:waypoint x="643.0" y="1287.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1101.0" y="1286.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="48.0" width="100.0" x="648.0" y="1211.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow25" id="BPMNEdge_flow25">
+        <omgdi:waypoint x="623.0" y="1180.0"></omgdi:waypoint>
+        <omgdi:waypoint x="371.0" y="1180.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="66.0" x="483.0" y="1160.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow26" id="BPMNEdge_flow26">
+        <omgdi:waypoint x="351.0" y="1200.0"></omgdi:waypoint>
+        <omgdi:waypoint x="351.0" y="1255.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="77.0" x="351.0" y="1211.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow27" id="BPMNEdge_flow27">
+        <omgdi:waypoint x="404.0" y="1287.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1101.0" y="1286.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow28" id="BPMNEdge_flow28">
+        <omgdi:waypoint x="331.0" y="1180.0"></omgdi:waypoint>
+        <omgdi:waypoint x="106.0" y="1180.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="48.0" width="100.0" x="243.0" y="1160.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow29" id="BPMNEdge_flow29">
+        <omgdi:waypoint x="53.0" y="1148.0"></omgdi:waypoint>
+        <omgdi:waypoint x="56.0" y="590.0"></omgdi:waypoint>
+        <omgdi:waypoint x="56.0" y="223.0"></omgdi:waypoint>
+        <omgdi:waypoint x="56.0" y="35.0"></omgdi:waypoint>
+        <omgdi:waypoint x="461.0" y="35.0"></omgdi:waypoint>
+        <omgdi:waypoint x="461.0" y="122.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow30" id="BPMNEdge_flow30">
+        <omgdi:waypoint x="1153.0" y="1319.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1153.0" y="1370.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow31" id="BPMNEdge_flow31">
+        <omgdi:waypoint x="461.0" y="122.0"></omgdi:waypoint>
+        <omgdi:waypoint x="461.0" y="25.0"></omgdi:waypoint>
+        <omgdi:waypoint x="770.0" y="25.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1215.0" y="25.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1215.0" y="700.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1215.0" y="903.0"></omgdi:waypoint>
+        <omgdi:waypoint x="1215.0" y="1408.0"></omgdi:waypoint>
+        <omgdi:waypoint x="351.0" y="1408.0"></omgdi:waypoint>
+        <omgdi:waypoint x="351.0" y="1320.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="64.0" width="100.0" x="842.0" y="32.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow32" id="BPMNEdge_flow32">
+        <omgdi:waypoint x="215.0" y="142.0"></omgdi:waypoint>
+        <omgdi:waypoint x="441.0" y="142.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

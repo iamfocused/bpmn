@@ -3,27 +3,28 @@
   <process id="constructData" name="construct data" isExecutable="true" activiti:candidateStarterGroups="admin">
     <startEvent id="startevent1" name="Start">
       <extensionElements>
-      <activiti:formProperty id="tbhdaddemployees_item" name="指定员工列表 Designated employee list" type="string" variable="tbhdaddemployees_item" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdaddemployees_员工 Employee_employeesn_1_string_psbi_$$A" name="员工 Employee" type="string" variable="tbhdaddemployees_employeesn_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdaddemployees_汇报对象 Manager_managersn_2_string_psbi_$$A" name="汇报对象 Manager" type="string" variable="tbhdaddemployees_managersn_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdaddemployees_成本中心 Costcenter_costcenter_3_string_tree_$$A" name="成本中心 Costcenter" type="string" variable="tbhdaddemployees_costcenter_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdaddemployees_职能 Function_function_4_enum_sbs_$$A" name="职能 Function" type="enum" variable="function" required="true">
-          <activiti:value id="双语教师/中教" name="双语教师/中教 Bilingual/Chinese teacher"></activiti:value>
-          <activiti:value id="外教" name="外教 Foreign teacher"></activiti:value>
-          <activiti:value id="管理层/校长" name="管理层、校长 Management, principal"></activiti:value>
-          <activiti:value id="咨询顾问/升学指导" name="咨询顾问/升学指导 Consultant/professional guidance"></activiti:value>
-          <activiti:value id="服务人员" name="服务人员 Service staff"></activiti:value>
-          <activiti:value id="市场人员" name="市场人员 Market staff"></activiti:value>
-          <activiti:value id="研发人员" name="研发人员 R &amp; D staff"></activiti:value>
-          <activiti:value id="后勤运营人员" name="后勤运营人员 Logistics operator"></activiti:value>
-          <activiti:value id="销售人员" name="销售人员 Sales staff"></activiti:value>
-          <activiti:value id="保育员" name="保育员 Nurse"></activiti:value>
-          <activiti:value id="助教/教辅" name="助教/教辅 Teaching assistant"></activiti:value>
-          <activiti:value id="教务" name="教务 Academic affairs"></activiti:value>
-        </activiti:formProperty>
+     <activiti:formProperty id="tbhdclaim_item" name="索赔明细" type="string" variable="tbhdclaim_item"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_图片_images_1_string_t9i_$$A" name="图片" type="string" variable="tbhdclaim1_images_t00"/>
+      	<activiti:executionListener event="start" class="org.activiti.engine.impl.bpmn.listener.ScriptExecutionListener">
+      		<activiti:field name="language">
+      			<activiti:string><![CDATA[groovy]]></activiti:string>
+      		</activiti:field>
+      		<activiti:field name="script">
+      			<activiti:string>
+      			<![CDATA[
+      				execution.setVariableLocal('name','isaac')
+      			]]>
+      			</activiti:string>
+      		</activiti:field>
+      	</activiti:executionListener>
       </extensionElements>
     </startEvent>
     <userTask id="usertask1" name="User Task" activiti:assignee="100011">
+    <extensionElements>
+    	<activiti:formProperty id="name_名字_string_t1_$$A" name="名字" type="string" variable="name"/>
+     <activiti:formProperty id="tbhdclaim_item" name="索赔明细" type="string" variable="tbhdclaim_item"></activiti:formProperty>
+        <activiti:formProperty id="tbhdclaim_图片_images_1_string_t9i_$$A" name="图片" type="string" variable="tbhdclaim1_images_t00"/>
+      </extensionElements>
     </userTask>
     <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="usertask1"></sequenceFlow>
     <endEvent id="endevent1" name="End"></endEvent>

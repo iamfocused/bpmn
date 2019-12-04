@@ -67,6 +67,7 @@
         <activiti:in sourceExpression="${fiscalYear}" target="fiscalYear"></activiti:in>
         <activiti:in sourceExpression="${quarter}" target="quarter"></activiti:in>
         <activiti:in sourceExpression="${checkTime}" target="checkTime"></activiti:in>
+        <activiti:in sourceExpression="${initiator}" target="initiator"/>
       </extensionElements>
       <multiInstanceLoopCharacteristics isSequential="false">
         <loopCardinality>${subflows.size()}</loopCardinality>
