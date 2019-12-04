@@ -95,14 +95,14 @@
 								
 
 				//test
-				localVerifiers.clear();
-				localVerifiers << execution.getVariable("claimsn");
-				execution.setVariable("level",localVerifiers.size());
-				execution.setVariable("verifiers",localVerifiers);
-				execution.setVariable('special','Y');
+				//localVerifiers.clear();
+				//localVerifiers << execution.getVariable("claimsn");
+				//execution.setVariable("level",localVerifiers.size());
+				//execution.setVariable("verifiers",localVerifiers);
+				//execution.setVariable('special','Y');
 				
 				//GATEWAY JUDGE
-				//execution.setVariable('special',localcostCenterDrools.special)
+				execution.setVariable('special',localcostCenterDrools.special)
 				
 				
 				//SET BUSINESSKEY
@@ -762,7 +762,7 @@
       		</activiti:executionListener>
       	</extensionElements>      
       </startEvent>
-      <userTask id="usertask2" name="成本中心审批 Cost center approval" activiti:assignee="bpm@dipont.com" activiti:dueDate="P1D" activiti:priority="8080">
+      <userTask id="usertask2" name="成本中心审批 Cost center approval" activiti:assignee="${approver}" activiti:dueDate="P1D" activiti:priority="8080">
 	      <extensionElements>
 	        <activiti:formProperty id="coreaction_审批结果 Approval_1_enum_rbv_$$A" name="审批结果 Approval" type="enum" variable="coreaction_result" required="true">
 	          <activiti:value id="同意 Agree" name="同意 Agree"></activiti:value>
@@ -825,7 +825,7 @@
 	      	<completionCondition>${CurApprovalResults=='驳回修改 Refuse' || CurApprovalResults=='彻底拒绝 Total rejection'}</completionCondition>
 	      </multiInstanceLoopCharacteristics>
       </userTask>
-      <userTask id="usertask1" name="并发审批" activiti:candidateUsers="bpm@dipont.com" activiti:dueDate="P1D" activiti:priority="8080">
+      <userTask id="usertask1" name="并发审批" activiti:candidateUsers="${approvers[0]}" activiti:dueDate="P1D" activiti:priority="8080">
 	      <extensionElements>
 	        <activiti:formProperty id="coreaction_审批结果 Approval_1_enum_rbv_$$A" name="审批结果 Approval" type="enum" variable="coreaction_level4" required="true">
 	          <activiti:value id="同意 Agree" name="同意 Agree"></activiti:value>

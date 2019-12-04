@@ -95,14 +95,14 @@
 				}
 				
 				//test
-				localVerifiers.clear();
-				localVerifiers << execution.getVariable("claimsn");
-				execution.setVariable("level",localVerifiers.size());
-				execution.setVariable("verifiers",localVerifiers);
-				execution.setVariable('special','Y');				
+				//localVerifiers.clear();
+				//localVerifiers << execution.getVariable("claimsn");
+				//execution.setVariable("level",localVerifiers.size());
+				//execution.setVariable("verifiers",localVerifiers);
+				//execution.setVariable('special','Y');				
 				
 				//GATEWAY JUDGE
-				//execution.setVariable('special',localcostCenterDrools.special)
+				execution.setVariable('special',localcostCenterDrools.special)
 				
 				
 				//SET BUSINESSKEY
