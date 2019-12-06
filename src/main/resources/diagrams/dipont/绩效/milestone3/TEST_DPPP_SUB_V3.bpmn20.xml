@@ -11,8 +11,11 @@
             <activiti:string><![CDATA[def upBusinessKey = fiscalYear + quarter + 'goal setting - ' + employeeSn
     					runtimeService.updateBusinessKey(execution.getProcessInstanceId(), upBusinessKey)
     					
-    					execution.setVariable('mailUrl', 'https://commonservices.eorionsolution.com/mailsender/mail/v2/mail')
-    					execution.setVariable('mailFrom', 'develop@eorionsolution.com')]]></activiti:string>
+    					execution.setVariable('employeeNameEn', employeeSn.substring(0,employeeSn.indexOf("@")))
+    					execution.setVariable('managerNameEn', managerSn.substring(0,managerSn.indexOf("@")))
+    					
+    					execution.setVariable('mailUrl', 'https://bpmcs.dipont.com/mail/v2/mail')
+    					execution.setVariable('mailFrom', 'notice@dipont.com')]]></activiti:string>
           </activiti:field>
         </activiti:executionListener>
       </extensionElements>
@@ -86,10 +89,15 @@
     					def jsonSlurper = new JsonSlurper()
     					def execution = task.getExecution()
     					
-    					jsonSlurper.parseText(tbhdperformance_item_std).each{
+    					def item_std = jsonSlurper.parseText(tbhdperformance_item_std)
+    					item_std.each{
             			if(it.actualLastYear == null || it.actualLastYear.trim() == ''){
 	            				throw new org.activiti.engine.ActivitiIllegalArgumentException('请完善您的考核计划表 Please complete your performance appraisal plan')
 	            			}
+	            		}
+	            		def perspectives = item_std.collect{it.perspective}
+	            		if (!perspectives.contains('学习与成长 Learning & Development')) {
+	            			throw new org.activiti.engine.ActivitiIllegalArgumentException('学习与成长构面是必要的 Learning and Development perspective is necessary')
 	            		}
     					
     					//mail send
@@ -100,12 +108,13 @@
     "subject": "$employeeName 绩效考核计划Review",
     "templateData":{
       "employeeName": "$employeeName",
+      "employeeNameEn": "$employeeNameEn",
       "type1":"1",
       "performanceList": $tbhdperformance_item_std
     },
     "from":"$mailFrom",
     "to":[
-      "baocaixue@eorionsolution.com"
+      "$managerSn"
     ]
   }
 }
@@ -127,7 +136,7 @@
       </extensionElements>
     </userTask>
     <serviceTask id="servicetask1" name="发送邮件给manager Send Mail To Manager" activiti:class="com.eorionsolution.riying.bpms.javaservice.http.RestAPIService"></serviceTask>
-    <userTask id="usertask2" name="领导审阅 Manager Review" activiti:assignee="${employeeSn}" activiti:dueDate="P1D">
+    <userTask id="usertask2" name="领导审阅 Manager Review" activiti:assignee="${managerSn}" activiti:dueDate="P1D">
       <extensionElements>
         <activiti:formProperty id="employeeName_员工姓名 Employee Name_1_string_t1_$$VA" name="员工姓名 Employee Name" type="string" variable="employeeName" required="true"></activiti:formProperty>
         <activiti:formProperty id="costcenter_成本中心 Costcenter_2_string_tree_$$VA" name="成本中心 Costcenter" type="string" variable="costcenter" required="true"></activiti:formProperty>
@@ -181,12 +190,13 @@
     "subject":"$employeeName 绩效考核计划已Review",
     "templateData":{
       "managerName":"$managerName",
+      "managerNameEn":"$managerNameEn",
       "type2":"1",
       "performanceList": $tbhdperformance_item_std
     },
     "from":"$mailFrom",
     "to":[
-      "baocaixue@eorionsolution.com"
+      "$employeeSn"
     ]
   }
 }    					
@@ -301,11 +311,11 @@
         <activiti:formProperty id="tbhdperformance_Plan_plan_9_string_t1_$$A" name="当前季度计划 Quarter Plan" type="string" variable="tbhdperformance_plan_t00" required="true"></activiti:formProperty>
         <activiti:formProperty id="tbhdperformance_Actual_actual_10_string_t1_$$A" name="当前季度实际 Quarter Actual" type="string" variable="tbhdperformance_actual_t00"></activiti:formProperty>
         <activiti:formProperty id="performanceresult_绩效结果 Performance Result_1_enum_sbs_$$A" name="绩效结果 Performance Result" type="enum" variable="performanceresult" required="true">
-          <activiti:value id="5" name="杰出 Outstanding"></activiti:value>
-          <activiti:value id="4" name="超过目标 Exceeds expectations"></activiti:value>
-          <activiti:value id="3" name="达到目标 Meets expectations"></activiti:value>
-          <activiti:value id="2" name="需要改善 Improvement needed"></activiti:value>
-          <activiti:value id="1" name="远低于要求 Far Below expectation"></activiti:value>
+          <activiti:value id="5" name="杰出 Outstanding[5]"></activiti:value>
+          <activiti:value id="4" name="超过目标 Exceeds expectations[4]"></activiti:value>
+          <activiti:value id="3" name="达到目标 Meets expectations[3]"></activiti:value>
+          <activiti:value id="2" name="需要改善 Improvement needed[2]"></activiti:value>
+          <activiti:value id="1" name="远低于要求 Far Below expectation[1]"></activiti:value>
         </activiti:formProperty>
         <activiti:formProperty id="competencies1_选择做的好的胜任力 Choose competency_1_enum_sbs_$$B" name="选择做的好的胜任力 Choose competency as employee's advantage" type="enum" variable="competencies1" required="true">
           <activiti:value id="追求品质&amp;目标导向Quality Driven &amp; result go-getter" name="追求品质&amp;目标导向Quality Driven &amp; result go-getter"></activiti:value>
@@ -401,6 +411,20 @@
         </activiti:formProperty>
         <activiti:formProperty id="memo_备注 Memo_1_string_t2_$$D" name="备注 Memo" type="string" variable="memo"></activiti:formProperty>
         <activiti:formProperty id="adder_加签人 add Judger_1_string_psbi_$$E" name="加签人 add Judger" type="string" variable="adder"></activiti:formProperty>
+      	<activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+      		<activiti:field name="language">
+      			<activiti:string>
+      				<![CDATA[groovy]]>
+      			</activiti:string>
+      		</activiti:field>
+      		<activiti:field name="script">
+      			<activiti:string>
+      				<![CDATA[
+      					task.getExecution().setVariable('performanceresult1', performanceresult)
+      				]]>
+      			</activiti:string>
+      		</activiti:field>
+      	</activiti:taskListener>
       </extensionElements>
     </userTask>
     <userTask id="usertask5" name="领导评分 Manager Assess" activiti:assignee="${managerSn}" activiti:dueDate="P1D">
@@ -439,11 +463,11 @@
         <activiti:formProperty id="tbhdperformance_Plan_plan_9_string_t1_$$A" name="当前季度计划 Quarter Plan" type="string" variable="tbhdperformance_plan_t00" required="true"></activiti:formProperty>
         <activiti:formProperty id="tbhdperformance_Actual_actual_10_string_t1_$$A" name="当前季度实际 Quarter Actual" type="string" variable="tbhdperformance_actual_t00"></activiti:formProperty>
         <activiti:formProperty id="performanceresult_绩效结果 Performance Result_1_enum_sbs_$$A" name="绩效结果 Performance Result" type="enum" variable="performanceresult" required="true">
-          <activiti:value id="5" name="杰出 Outstanding"></activiti:value>
-          <activiti:value id="4" name="超过目标 Exceeds expectations"></activiti:value>
-          <activiti:value id="3" name="达到目标 Meets expectations"></activiti:value>
-          <activiti:value id="2" name="需要改善 Improvement needed"></activiti:value>
-          <activiti:value id="1" name="远低于要求 Far Below expectation"></activiti:value>
+          <activiti:value id="5" name="杰出 Outstanding[5]"></activiti:value>
+          <activiti:value id="4" name="超过目标 Exceeds expectations[4]"></activiti:value>
+          <activiti:value id="3" name="达到目标 Meets expectations[3]"></activiti:value>
+          <activiti:value id="2" name="需要改善 Improvement needed[2]"></activiti:value>
+          <activiti:value id="1" name="远低于要求 Far Below expectation[1]"></activiti:value>
         </activiti:formProperty>
         <activiti:formProperty id="competencies1_选择做的好的胜任力 Choose competency_1_enum_sbs_$$B" name="选择做的好的胜任力 Choose competency as employee's advantage" type="enum" variable="competencies1" required="true">
           <activiti:value id="追求品质&amp;目标导向Quality Driven &amp; result go-getter" name="追求品质&amp;目标导向Quality Driven &amp; result go-getter"></activiti:value>
@@ -554,6 +578,20 @@
           <activiti:value id="Wait and see" name="⭕"></activiti:value>
         </activiti:formProperty>
         <activiti:formProperty id="adder_加签人 add Judger_1_string_psbi_$$H" name="加签人 add Judger" type="string" variable="adder"></activiti:formProperty>
+      	<activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+      		<activiti:field name="language">
+      			<activiti:string>
+      				<![CDATA[groovy]]>
+      			</activiti:string>
+      		</activiti:field>
+      		<activiti:field name="script">
+      			<activiti:string>
+      				<![CDATA[
+      					task.getExecution().setVariable('performanceresult1', performanceresult)
+      				]]>
+      			</activiti:string>
+      		</activiti:field>
+      	</activiti:taskListener>
       </extensionElements>
     </userTask>
     <exclusiveGateway id="exclusivegateway2" name="Exclusive Gateway"></exclusiveGateway>
@@ -576,7 +614,7 @@
           <activiti:value id="助教/教辅" name="助教/教辅 Teaching assistant"></activiti:value>
           <activiti:value id="教务" name="教务 Academic affairs"></activiti:value>
         </activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_item_$$VA" name="绩效考核表 Performance appraisal table" type="string" variable="tbhdperformance_item" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdperformance_item" name="绩效考核表 Performance appraisal table" type="string" variable="tbhdperformance_item" required="true"></activiti:formProperty>
         <activiti:formProperty id="tbhdperformance_构面 Perspective_perspective_1_enum_sbs_$$VA" name="构面 Perspective" type="enum" variable="tbhdperformance_perspective_t00" required="true">
           <activiti:value id="财务及预算 Finance &amp; Budget" name="财务及预算 Finance &amp; Budget"></activiti:value>
           <activiti:value id="创新及专业 Innovation &amp; Profession" name="创新及专业 Innovation &amp; Profession"></activiti:value>
@@ -594,11 +632,11 @@
         <activiti:formProperty id="tbhdperformance_Plan_plan_9_string_t1_$$A" name="当前季度计划 Quarter Plan" type="string" variable="tbhdperformance_plan_t00" required="true"></activiti:formProperty>
         <activiti:formProperty id="tbhdperformance_Actual_actual_10_string_t1_$$A" name="当前季度实际 Quarter Actual" type="string" variable="tbhdperformance_actual_t00"></activiti:formProperty>
         <activiti:formProperty id="performanceresult_绩效结果 Performance Result_1_enum_sbs_$$VB" name="绩效结果 Performance Result" type="enum" variable="performanceresult" required="true">
-          <activiti:value id="5" name="杰出 Outstanding"></activiti:value>
-          <activiti:value id="4" name="超过目标 Exceeds expectations"></activiti:value>
-          <activiti:value id="3" name="达到目标 Meets expectations"></activiti:value>
-          <activiti:value id="2" name="需要改善 Improvement needed"></activiti:value>
-          <activiti:value id="1" name="远低于要求 Far Below expectation"></activiti:value>
+          <activiti:value id="5" name="杰出 Outstanding[5]"></activiti:value>
+          <activiti:value id="4" name="超过目标 Exceeds expectations[4]"></activiti:value>
+          <activiti:value id="3" name="达到目标 Meets expectations[3]"></activiti:value>
+          <activiti:value id="2" name="需要改善 Improvement needed[2]"></activiti:value>
+          <activiti:value id="1" name="远低于要求 Far Below expectation[1]"></activiti:value>
         </activiti:formProperty>
         <activiti:formProperty id="competencies1_选择做的好的胜任力 Choose competency_1_enum_sbs_$$VC" name="选择做的好的胜任力 Choose competency as employee's advantage" type="enum" variable="competencies1" required="true">
           <activiti:value id="追求品质&amp;目标导向Quality Driven &amp; result go-getter" name="追求品质&amp;目标导向Quality Driven &amp; result go-getter"></activiti:value>
@@ -694,11 +732,11 @@
         </activiti:formProperty>
         <activiti:formProperty id="memo_备注 Memo_1_string_t2_$$VE" name="备注 Memo" type="string" variable="memo"></activiti:formProperty>
         <activiti:formProperty id="adderperformanceresult_绩效结果 Performance Result_1_enum_sbs_$$A" name="绩效结果 Performance Result" type="enum" variable="adderperformanceresult" required="true">
-          <activiti:value id="5" name="杰出 Outstanding"></activiti:value>
-          <activiti:value id="4" name="超过目标 Exceeds expectations"></activiti:value>
-          <activiti:value id="3" name="达到目标 Meets expectations"></activiti:value>
-          <activiti:value id="2" name="需要改善 Improvement needed"></activiti:value>
-          <activiti:value id="1" name="远低于要求 Far Below expectation"></activiti:value>
+          <activiti:value id="5" name="杰出 Outstanding[5]"></activiti:value>
+          <activiti:value id="4" name="超过目标 Exceeds expectations[4]"></activiti:value>
+          <activiti:value id="3" name="达到目标 Meets expectations[3]"></activiti:value>
+          <activiti:value id="2" name="需要改善 Improvement needed[2]"></activiti:value>
+          <activiti:value id="1" name="远低于要求 Far Below expectation[1]"></activiti:value>
         </activiti:formProperty>
         <activiti:formProperty id="addercompetencies1_选择做的好的胜任力 Choose competency_1_enum_sbs_$$B" name="选择做的好的胜任力 Choose competency as employee's advantage" type="enum" variable="addercompetencies1" required="true">
           <activiti:value id="追求品质&amp;目标导向Quality Driven &amp; result go-getter" name="追求品质&amp;目标导向Quality Driven &amp; result go-getter"></activiti:value>
@@ -813,7 +851,7 @@
           <activiti:value id="助教/教辅" name="助教/教辅 Teaching assistant"></activiti:value>
           <activiti:value id="教务" name="教务 Academic affairs"></activiti:value>
         </activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_item_$$VA" name="绩效考核表 Performance appraisal table" type="string" variable="tbhdperformance_item" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdperformance_item" name="绩效考核表 Performance appraisal table" type="string" variable="tbhdperformance_item" required="true"></activiti:formProperty>
         <activiti:formProperty id="tbhdperformance_构面 Perspective_perspective_1_enum_sbs_$$VA" name="构面 Perspective" type="enum" variable="tbhdperformance_perspective_t00" required="true">
           <activiti:value id="财务及预算 Finance &amp; Budget" name="财务及预算 Finance &amp; Budget"></activiti:value>
           <activiti:value id="创新及专业 Innovation &amp; Profession" name="创新及专业 Innovation &amp; Profession"></activiti:value>
@@ -831,11 +869,11 @@
         <activiti:formProperty id="tbhdperformance_Plan_plan_9_string_t1_$$A" name="当前季度计划 Quarter Plan" type="string" variable="tbhdperformance_plan_t00" required="true"></activiti:formProperty>
         <activiti:formProperty id="tbhdperformance_Actual_actual_10_string_t1_$$A" name="当前季度实际 Quarter Actual" type="string" variable="tbhdperformance_actual_t00"></activiti:formProperty>
         <activiti:formProperty id="performanceresult_绩效结果 Performance Result_1_enum_sbs_$$VB" name="绩效结果 Performance Result" type="enum" variable="performanceresult" required="true">
-          <activiti:value id="5" name="杰出 Outstanding"></activiti:value>
-          <activiti:value id="4" name="超过目标 Exceeds expectations"></activiti:value>
-          <activiti:value id="3" name="达到目标 Meets expectations"></activiti:value>
-          <activiti:value id="2" name="需要改善 Improvement needed"></activiti:value>
-          <activiti:value id="1" name="远低于要求 Far Below expectation"></activiti:value>
+          <activiti:value id="5" name="杰出 Outstanding[5]"></activiti:value>
+          <activiti:value id="4" name="超过目标 Exceeds expectations[4]"></activiti:value>
+          <activiti:value id="3" name="达到目标 Meets expectations[3]"></activiti:value>
+          <activiti:value id="2" name="需要改善 Improvement needed[2]"></activiti:value>
+          <activiti:value id="1" name="远低于要求 Far Below expectation[1]"></activiti:value>
         </activiti:formProperty>
         <activiti:formProperty id="competencies1_选择做的好的胜任力 Choose competency_1_enum_sbs_$$VC" name="选择做的好的胜任力 Choose competency as employee's advantage" type="enum" variable="competencies1" required="true">
           <activiti:value id="追求品质&amp;目标导向Quality Driven &amp; result go-getter" name="追求品质&amp;目标导向Quality Driven &amp; result go-getter"></activiti:value>
@@ -946,11 +984,11 @@
           <activiti:value id="Wait and see" name="⭕"></activiti:value>
         </activiti:formProperty>
         <activiti:formProperty id="adderperformanceresult_绩效结果 Performance Result_1_enum_sbs_$$A" name="绩效结果 Performance Result" type="enum" variable="adderperformanceresult" required="true">
-          <activiti:value id="5" name="杰出 Outstanding"></activiti:value>
-          <activiti:value id="4" name="超过目标 Exceeds expectations"></activiti:value>
-          <activiti:value id="3" name="达到目标 Meets expectations"></activiti:value>
-          <activiti:value id="2" name="需要改善 Improvement needed"></activiti:value>
-          <activiti:value id="1" name="远低于要求 Far Below expectation"></activiti:value>
+          <activiti:value id="5" name="杰出 Outstanding[5]"></activiti:value>
+          <activiti:value id="4" name="超过目标 Exceeds expectations[4]"></activiti:value>
+          <activiti:value id="3" name="达到目标 Meets expectations[3]"></activiti:value>
+          <activiti:value id="2" name="需要改善 Improvement needed[2]"></activiti:value>
+          <activiti:value id="1" name="远低于要求 Far Below expectation[1]"></activiti:value>
         </activiti:formProperty>
         <activiti:formProperty id="addercompetencies1_选择做的好的胜任力 Choose competency_1_enum_sbs_$$B" name="选择做的好的胜任力 Choose competency as employee's advantage" type="enum" variable="addercompetencies1" required="true">
           <activiti:value id="追求品质&amp;目标导向Quality Driven &amp; result go-getter" name="追求品质&amp;目标导向Quality Driven &amp; result go-getter"></activiti:value>
@@ -1081,7 +1119,7 @@
           <activiti:value id="助教/教辅" name="助教/教辅 Teaching assistant"></activiti:value>
           <activiti:value id="教务" name="教务 Academic affairs"></activiti:value>
         </activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_item_$$VA" name="绩效考核表 Performance appraisal table" type="string" variable="tbhdperformance_item" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdperformance_item" name="绩效考核表 Performance appraisal table" type="string" variable="tbhdperformance_item" required="true"></activiti:formProperty>
         <activiti:formProperty id="tbhdperformance_构面 Perspective_perspective_1_enum_sbs_$$VA" name="构面 Perspective" type="enum" variable="tbhdperformance_perspective_t00" required="true">
           <activiti:value id="财务及预算 Finance &amp; Budget" name="财务及预算 Finance &amp; Budget"></activiti:value>
           <activiti:value id="创新及专业 Innovation &amp; Profession" name="创新及专业 Innovation &amp; Profession"></activiti:value>
@@ -1100,11 +1138,11 @@
         <activiti:formProperty id="tbhdperformance_Actual_actual_10_string_t1_$$A" name="当前季度实际 Quarter Actual" type="string" variable="tbhdperformance_actual_t00"></activiti:formProperty>
         <activiti:formProperty id="adder_加签人 add Judger_1_string_psbi_$$VB" name="加签人 add Judger" type="string" variable="adder"></activiti:formProperty>
         <activiti:formProperty id="adderperformanceresult_绩效结果 Performance Result_1_enum_sbs_$$VC" name="绩效结果 Performance Result" type="enum" variable="adderperformanceresult" required="true">
-          <activiti:value id="5" name="杰出 Outstanding"></activiti:value>
-          <activiti:value id="4" name="超过目标 Exceeds expectations"></activiti:value>
-          <activiti:value id="3" name="达到目标 Meets expectations"></activiti:value>
-          <activiti:value id="2" name="需要改善 Improvement needed"></activiti:value>
-          <activiti:value id="1" name="远低于要求 Far Below expectation"></activiti:value>
+          <activiti:value id="5" name="杰出 Outstanding[5]"></activiti:value>
+          <activiti:value id="4" name="超过目标 Exceeds expectations[4]"></activiti:value>
+          <activiti:value id="3" name="达到目标 Meets expectations[3]"></activiti:value>
+          <activiti:value id="2" name="需要改善 Improvement needed[2]"></activiti:value>
+          <activiti:value id="1" name="远低于要求 Far Below expectation[1]"></activiti:value>
         </activiti:formProperty>
         <activiti:formProperty id="addercompetencies1_选择做的好的胜任力 Choose competency_1_enum_sbs_$$VD" name="选择做的好的胜任力 Choose competency as employee's advantage" type="enum" variable="addercompetencies1" required="true">
           <activiti:value id="追求品质&amp;目标导向Quality Driven &amp; result go-getter" name="追求品质&amp;目标导向Quality Driven &amp; result go-getter"></activiti:value>
@@ -1215,11 +1253,11 @@
           <activiti:value id="Wait and see" name="⭕"></activiti:value>
         </activiti:formProperty>
         <activiti:formProperty id="performanceresult_绩效结果 Performance Result_1_enum_sbs_$$A" name="绩效结果 Performance Result" type="enum" variable="performanceresult" required="true">
-          <activiti:value id="5" name="杰出 Outstanding"></activiti:value>
-          <activiti:value id="4" name="超过目标 Exceeds expectations"></activiti:value>
-          <activiti:value id="3" name="达到目标 Meets expectations"></activiti:value>
-          <activiti:value id="2" name="需要改善 Improvement needed"></activiti:value>
-          <activiti:value id="1" name="远低于要求 Far Below expectation"></activiti:value>
+          <activiti:value id="5" name="杰出 Outstanding[5]"></activiti:value>
+          <activiti:value id="4" name="超过目标 Exceeds expectations[4]"></activiti:value>
+          <activiti:value id="3" name="达到目标 Meets expectations[3]"></activiti:value>
+          <activiti:value id="2" name="需要改善 Improvement needed[2]"></activiti:value>
+          <activiti:value id="1" name="远低于要求 Far Below expectation[1]"></activiti:value>
         </activiti:formProperty>
         <activiti:formProperty id="competencies1_选择做的好的胜任力 Choose competency_1_enum_sbs_$$B" name="选择做的好的胜任力 Choose competency as employee's advantage" type="enum" variable="competencies1" required="true">
           <activiti:value id="追求品质&amp;目标导向Quality Driven &amp; result go-getter" name="追求品质&amp;目标导向Quality Driven &amp; result go-getter"></activiti:value>
@@ -1350,7 +1388,7 @@
           <activiti:value id="助教/教辅" name="助教/教辅 Teaching assistant"></activiti:value>
           <activiti:value id="教务" name="教务 Academic affairs"></activiti:value>
         </activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_item_$$VA" name="绩效考核表 Performance appraisal table" type="string" variable="tbhdperformance_item" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdperformance_item" name="绩效考核表 Performance appraisal table" type="string" variable="tbhdperformance_item" required="true"></activiti:formProperty>
         <activiti:formProperty id="tbhdperformance_构面 Perspective_perspective_1_enum_sbs_$$VA" name="构面 Perspective" type="enum" variable="tbhdperformance_perspective_t00" required="true">
           <activiti:value id="财务及预算 Finance &amp; Budget" name="财务及预算 Finance &amp; Budget"></activiti:value>
           <activiti:value id="创新及专业 Innovation &amp; Profession" name="创新及专业 Innovation &amp; Profession"></activiti:value>
@@ -1369,11 +1407,11 @@
         <activiti:formProperty id="tbhdperformance_Actual_actual_10_string_t1_$$A" name="当前季度实际 Quarter Actual" type="string" variable="tbhdperformance_actual_t00"></activiti:formProperty>
         <activiti:formProperty id="adder_加签人 add Judger_1_string_psbi_$$VB" name="加签人 add Judger" type="string" variable="adder"></activiti:formProperty>
         <activiti:formProperty id="adderperformanceresult_绩效结果 Performance Result_1_enum_sbs_$$VC" name="绩效结果 Performance Result" type="enum" variable="adderperformanceresult" required="true">
-          <activiti:value id="5" name="杰出 Outstanding"></activiti:value>
-          <activiti:value id="4" name="超过目标 Exceeds expectations"></activiti:value>
-          <activiti:value id="3" name="达到目标 Meets expectations"></activiti:value>
-          <activiti:value id="2" name="需要改善 Improvement needed"></activiti:value>
-          <activiti:value id="1" name="远低于要求 Far Below expectation"></activiti:value>
+          <activiti:value id="5" name="杰出 Outstanding[5]"></activiti:value>
+          <activiti:value id="4" name="超过目标 Exceeds expectations[4]"></activiti:value>
+          <activiti:value id="3" name="达到目标 Meets expectations[3]"></activiti:value>
+          <activiti:value id="2" name="需要改善 Improvement needed[2]"></activiti:value>
+          <activiti:value id="1" name="远低于要求 Far Below expectation[1]"></activiti:value>
         </activiti:formProperty>
         <activiti:formProperty id="addercompetencies1_选择做的好的胜任力 Choose competency_1_enum_sbs_$$VD" name="选择做的好的胜任力 Choose competency as employee's advantage" type="enum" variable="addercompetencies1" required="true">
           <activiti:value id="追求品质&amp;目标导向Quality Driven &amp; result go-getter" name="追求品质&amp;目标导向Quality Driven &amp; result go-getter"></activiti:value>
@@ -1469,11 +1507,11 @@
         </activiti:formProperty>
         <activiti:formProperty id="addermemo_加签人备注 Adder Memo_1_string_t2_$$VF" name="加签人备注 Adder Memo" type="string" variable="addermemo"></activiti:formProperty>
         <activiti:formProperty id="performanceresult_绩效结果 Performance Result_1_enum_sbs_$$A" name="绩效结果 Performance Result" type="enum" variable="performanceresult" required="true">
-          <activiti:value id="5" name="杰出 Outstanding"></activiti:value>
-          <activiti:value id="4" name="超过目标 Exceeds expectations"></activiti:value>
-          <activiti:value id="3" name="达到目标 Meets expectations"></activiti:value>
-          <activiti:value id="2" name="需要改善 Improvement needed"></activiti:value>
-          <activiti:value id="1" name="远低于要求 Far Below expectation"></activiti:value>
+          <activiti:value id="5" name="杰出 Outstanding[5]"></activiti:value>
+          <activiti:value id="4" name="超过目标 Exceeds expectations[4]"></activiti:value>
+          <activiti:value id="3" name="达到目标 Meets expectations[3]"></activiti:value>
+          <activiti:value id="2" name="需要改善 Improvement needed[2]"></activiti:value>
+          <activiti:value id="1" name="远低于要求 Far Below expectation[1]"></activiti:value>
         </activiti:formProperty>
         <activiti:formProperty id="competencies1_选择做的好的胜任力 Choose competency_1_enum_sbs_$$B" name="选择做的好的胜任力 Choose competency as employee's advantage" type="enum" variable="competencies1" required="true">
           <activiti:value id="追求品质&amp;目标导向Quality Driven &amp; result go-getter" name="追求品质&amp;目标导向Quality Driven &amp; result go-getter"></activiti:value>
@@ -1594,6 +1632,7 @@
       "cycle": "$fiscalYear fiscal year",
       "function": "$function",
       "managerName": "$managerName",
+      "managerNameEn":"$managerNameEn",
       "performanceresult": "$performanceresult",
       "competencies1": "$competencies1",
       "competencies2": "$competencies2",
@@ -1604,7 +1643,7 @@
     },
     "from":"$mailFrom",
     "to":[
-      "baocaixue@eorionsolution.com"
+      "$employeeSn"
     ]
   }
 }
@@ -1631,6 +1670,17 @@
       		import groovy.json.JsonOutput
       		def jsonSlurper = new JsonSlurper()
       		
+      		//评分历史-供PDF
+      		def history = new StringBuffer(managerSn + ":" + performanceresult1)
+      		def adderResult = execution.getVariable('adderperformanceresult')
+      		if (adderResult) {
+      			history.append('\n' + adder + ":" + adderResult)
+      			if (adderResult != performanceresult1) {
+      				history.append('\n' + managerSn + ":" + performanceresult)
+      			}
+      		}
+      		execution.setVariable('assessHistory', history.toString())
+      		
       		//mail send
       		def costCenter = jsonSlurper.parseText(costcenter).name
       		def competencies2 = competencies2?:''
@@ -1647,6 +1697,7 @@
     "templateData":{
       "type4":"$quarter",
       "employeeName": "$employeeName",
+      "employeeNameEn":"$employeeNameEn",
       "costCenter":"$costCenter",
       "cycle": "$fiscalYear fiscal year",
       "function": "$function",
@@ -1664,7 +1715,7 @@
     },
     "from":"$mailFrom",
     "to":[
-      "baocaixue@eorionsolution.com"
+      "$managerSn"
     ]
   }
 }
@@ -1724,7 +1775,7 @@
     </sequenceFlow>
     <sequenceFlow id="flow28" sourceRef="usertask9" targetRef="scripttask1"></sequenceFlow>
     <sequenceFlow id="flow29" name="加签评分与领导评分一致" sourceRef="exclusivegateway5" targetRef="scripttask1">
-      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${performanceresult == adderperformanceresult}]}]]></conditionExpression>
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${performanceresult == adderperformanceresult}]]></conditionExpression>
     </sequenceFlow>
     <sequenceFlow id="flow34" name="q2q4" sourceRef="exclusivegateway1" targetRef="usertask5">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${quarter=='Q2'||quarter=='Q4'}]]></conditionExpression>

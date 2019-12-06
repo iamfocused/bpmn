@@ -44,6 +44,9 @@
     					
    					def subflows = []//List[Map]
    					std.each{
+   						if(!it.managersn || it.managersn.trim() == '') {
+   							throw new org.activiti.engine.ActivitiIllegalArgumentException('当前账号的Manager没有指定, The manager of the current account is not specified. userID[' + it.employeesn + ']')
+   						}
 	    				subflows<< ['employeeSn':it.employeesn, 'managerSn': it.managersn, 'costcenter': JsonOutput.toJson(it.costcenter), 'function': it.function]
 	    			}
 	    			execution.setVariable('subflows', subflows)
