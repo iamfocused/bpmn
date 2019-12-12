@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/pur">
+  <message id="produceComplete" name="produceComplete"></message>
+  <process id="produceProcess" name="生产流程" isExecutable="true">
+    <startEvent id="timerstartevent" name="定时启动事件">
+      <extensionElements>
+        <activiti:executionListener event="start" class="org.activiti.engine.impl.bpmn.listener.ScriptExecutionListener">
+          <activiti:field name="language">
+            <activiti:string><![CDATA[groovy]]></activiti:string>
+          </activiti:field>
+          <activiti:field name="script">
+            <activiti:string><![CDATA[import java.time.LocalDateTime
+      					runtimeService.updateBusinessKey(execution.getProcessInstanceId(), LocalDateTime.now().toString() + '(定时生产流程)')
+      					
+      					def sn = '100011'
+		            	execution.setVariable("_http_method", "GET")
+						def headerMap = new java.util.HashMap<String,String>()			
+						execution.setVariable("_http_headers", headerMap)
+						execution.setVariable("_http_body", '')
+						def param=java.net.URLEncoder.encode('[{"type":"category","target":["variable",["template-tag","param"]],"value":\"'+ sn+ '\"}]', "UTF-8")
+						execution.setVariable("_http_url", 'https://metabase.eorionsolution.com/public/question/2c5a9a8b-9bf4-4260-8060-0ee2cafb8b28.json?parameters='+param)
+						execution.setVariable("_http_response_body", '')
+						execution.setVariable("_http_response_status_code", '')]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+      <timerEventDefinition>
+        <timeCycle>0 0/5 * * * ?</timeCycle>
+      </timerEventDefinition>
+    </startEvent>
+    <userTask id="usertask1" name="包装/入库" activiti:assignee="100011"></userTask>
+    <sequenceFlow id="flow1" sourceRef="timerstartevent" targetRef="servicetask1"></sequenceFlow>
+    <serviceTask id="servicetask1" name="调用接口获取数据" activiti:class="com.eorionsolution.riying.bpms.javaservice.http.RestAPIService"></serviceTask>
+    <intermediateCatchEvent id="messageintermediatecatchevent1" name="messageIntermediateCatchEvent">
+      <messageEventDefinition messageRef="produceComplete"></messageEventDefinition>
+    </intermediateCatchEvent>
+    <scriptTask id="scripttask1" name="数据保存" scriptFormat="groovy" activiti:autoStoreVariables="false">
+    	<script><![CDATA[def a = '']]></script>
+    </scriptTask>
+    <sequenceFlow id="flow2" sourceRef="servicetask1" targetRef="scripttask1"></sequenceFlow>
+    <sequenceFlow id="flow3" sourceRef="scripttask1" targetRef="messageintermediatecatchevent1"></sequenceFlow>
+    <sequenceFlow id="flow4" sourceRef="messageintermediatecatchevent1" targetRef="usertask1"></sequenceFlow>
+    <endEvent id="endevent1" name="End"></endEvent>
+    <sequenceFlow id="flow5" sourceRef="usertask1" targetRef="endevent1"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_produceProcess">
+    <bpmndi:BPMNPlane bpmnElement="produceProcess" id="BPMNPlane_produceProcess">
+      <bpmndi:BPMNShape bpmnElement="timerstartevent" id="BPMNShape_timerstartevent">
+        <omgdc:Bounds height="35.0" width="35.0" x="70.0" y="210.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask1" id="BPMNShape_usertask1">
+        <omgdc:Bounds height="71.0" width="105.0" x="640.0" y="192.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="servicetask1" id="BPMNShape_servicetask1">
+        <omgdc:Bounds height="71.0" width="105.0" x="170.0" y="192.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="messageintermediatecatchevent1" id="BPMNShape_messageintermediatecatchevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="530.0" y="210.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scripttask1" id="BPMNShape_scripttask1">
+        <omgdc:Bounds height="71.0" width="105.0" x="360.0" y="192.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="790.0" y="210.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="105.0" y="227.0"></omgdi:waypoint>
+        <omgdi:waypoint x="170.0" y="227.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="275.0" y="227.0"></omgdi:waypoint>
+        <omgdi:waypoint x="360.0" y="227.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3">
+        <omgdi:waypoint x="465.0" y="227.0"></omgdi:waypoint>
+        <omgdi:waypoint x="530.0" y="227.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow4" id="BPMNEdge_flow4">
+        <omgdi:waypoint x="565.0" y="227.0"></omgdi:waypoint>
+        <omgdi:waypoint x="640.0" y="227.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow5" id="BPMNEdge_flow5">
+        <omgdi:waypoint x="745.0" y="227.0"></omgdi:waypoint>
+        <omgdi:waypoint x="790.0" y="227.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

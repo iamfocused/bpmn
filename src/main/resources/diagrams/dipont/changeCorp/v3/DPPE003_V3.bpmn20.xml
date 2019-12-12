@@ -1,0 +1,494 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/frm">
+  <process id="DPPE003" name="实体变更流程" isExecutable="true" activiti:candidateStarterGroups="_dpbgst,admin">
+    <documentation>{ "description": "员工实体变更流程", 
+	"documents": [
+	{ "name": "BPMFLOWCHART", "path": "https://bpm.dipont.com/images/docs/DPPE003.pdf", "size": "pdf" }
+
+	] }</documentation>
+    <startEvent id="S1" name="启动流程" activiti:initiator="initiator">
+      <extensionElements>
+        <activiti:formProperty id="employeeSn_域账号_1_string_psbi_$$A" name="员工账号（企业邮箱）" type="string" variable="employeeSn" required="true"></activiti:formProperty>
+        <activiti:formProperty id="corp_实体_1_string_tree_$$B" name="变更实体" type="string" variable="corp" required="true"></activiti:formProperty>
+        <activiti:formProperty id="effectiveTime_生效时间_2_string_t3_$$B" name="变更生效时间" type="string" variable="effectiveTime" required="true"></activiti:formProperty>
+        <activiti:formProperty id="adminSn_人事对接人_1_string_psbi_$$C" name="人事对接人（企业邮箱）" type="string" variable="adminSn" required="true"></activiti:formProperty>
+        <activiti:executionListener event="end" class="org.activiti.engine.impl.bpmn.listener.ScriptExecutionListener">
+          <activiti:field name="language">
+            <activiti:string><![CDATA[groovy]]></activiti:string>
+          </activiti:field>
+          <activiti:field name="script">
+            <activiti:string><![CDATA[import groovy.json.JsonSlurper
+            			def jsonSlurper = new JsonSlurper()
+            			execution.setVariable('newCorpCode',jsonSlurper.parseText(corp).code)
+            			execution.setVariable('newCorpName',jsonSlurper.parseText(corp).name)
+            			
+            			def metabaseUrl = "https://metabase.eorionsolution.com/public/question/2c5a9a8b-9bf4-4260-8060-0ee2cafb8b28.json?parameters="
+      					execution.setVariable('metabaseUrl', metabaseUrl)
+      					def droolsUrl = "https://commonservices.eorionsolution.com/decisiontables/v1/fire/entityfn01a.xls"
+      					execution.setVariable('droolsUrl', droolsUrl)
+      					def postUrl = "https://bpms.eorionsolution.com/neo-hr-api/v2/employee/withoutauth/changeEntity"
+      					execution.setVariable('postUrl',postUrl)
+      					def mailUrl = "https://commonservices.eorionsolution.com/mailsender/mail/v2/mail"
+      					execution.setVariable('mailUrl',mailUrl)
+      					execution.setVariable('mailFrom','develop@eorionsolution.com')
+      					def checkMetabaseUrl = "https://metabase.eorionsolution.com/public/question/561d0aa4-614d-4efd-9e22-a84148b38707.json?parameters="
+      					
+      					//call metabase
+				  		execution.setVariable("_http_method", "GET")
+						def headerMap = new java.util.HashMap()		
+						execution.setVariable("_http_headers", headerMap)
+						execution.setVariable("_http_body", '')
+						def param=java.net.URLEncoder.encode('[{"type":"category","target":["variable",["template-tag","sn"]],"value":\"'+ employeeSn + '\"}]', "UTF-8")
+						execution.setVariable("_http_url", checkMetabaseUrl + param)
+						execution.setVariable("_http_response_body", '');
+						execution.setVariable("_http_response_status_code", '')]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </startEvent>
+    <serviceTask id="servicetask1" name="call metabase" activiti:class="com.eorionsolution.riying.bpms.javaservice.http.RestAPIService"></serviceTask>
+    <scriptTask id="scripttask1" name="analyze data and construct drools body" scriptFormat="groovy" activiti:autoStoreVariables="false">
+      <script>
+    	import groovy.json.JsonSlurper
+    		import groovy.json.JsonOutput
+    		
+    		if (_http_response_status_code != 200) {
+    			throw new org.activiti.engine.ActivitiIllegalArgumentException("metabase call exception")
+    		}
+    		def jsonSlurper = new JsonSlurper()
+    		def employeeList = jsonSlurper.parseText(_http_response_body)
+    		if (employeeList.size() != 1) {
+    			throw new org.activiti.engine.ActivitiIllegalArgumentException('当前员工数据库数据异常')
+    		}
+    		def employee = employeeList[0]
+    		execution.setVariable('employeeName', employee.NAME_?:'')
+			execution.setVariable('ncCode', employee.NC_CODE_?:'')
+			execution.setVariable('mobilePhone', employee.MOBILE_PHONE_?:'')
+			execution.setVariable('oldCorpName', employee.CORP_NAME_?:'')
+			def oldCorpCode = employee.CORP_SN_?:''
+			execution.setVariable('oldCorpCode', oldCorpCode)
+			if (oldCorpCode == newCorpCode) {
+				throw new org.activiti.engine.ActivitiIllegalArgumentException('员工已在' + oldCorpName + '实体,无需更改')
+			}
+			
+			//drools
+			def newCorpCode = jsonSlurper.parseText(corp).code
+			def jsonBody = """ 
+[
+    {
+        "entity": "$oldCorpCode"
+    },
+    {
+        "entity": "$newCorpCode"
+    }
+]			
+"""
+			execution.setVariable("_http_method", "POST")
+			def headerMap = new HashMap()
+			headerMap.put("Content-Type","application/json")				
+			execution.setVariable("_http_headers", headerMap)
+
+			execution.setVariable("_http_body", JsonOutput.toJson(jsonSlurper.parseText(jsonBody)))
+			execution.setVariable("_http_url", droolsUrl)
+			execution.setVariable("_http_response_body", '')
+		    execution.setVariable("_http_response_status_code", '')
+    	
+    	</script>
+    </scriptTask>
+    <serviceTask id="servicetask2" name="call drools" activiti:class="com.eorionsolution.riying.bpms.javaservice.http.RestAPIService"></serviceTask>
+    <scriptTask id="scripttask2" name="analyze data and save and send mail" scriptFormat="groovy" activiti:autoStoreVariables="false">
+      <script>
+    	import groovy.json.JsonSlurper
+    		import groovy.json.JsonOutput
+    		
+    		if (_http_response_status_code != 200) {
+    			throw new org.activiti.engine.ActivitiIllegalArgumentException("drools call exception")
+    		}
+    		def jsonSlurper = new JsonSlurper()
+    		def droolsResults = jsonSlurper.parseText(_http_response_body)
+    		
+    		def oldInfo = droolsResults.find{it.entity==oldCorpCode}
+    		if (!oldInfo || (!oldInfo.accountant &amp;&amp; !oldInfo.cashier)) {
+    			throw new org.activiti.engine.ActivitiIllegalArgumentException("unexpect exception of drools result")
+    		}
+    		def newInfo = droolsResults.find{it.entity==newCorpCode}
+    		if (!newInfo || (!newInfo.accountant &amp;&amp; !newInfo.cashier)) {
+    			throw new org.activiti.engine.ActivitiIllegalArgumentException("unexpect exception of drools result")
+    		}
+    		def oldFinas = []
+    		oldFinas &lt;&lt; oldInfo.accountant//会计
+    		oldFinas &lt;&lt; oldInfo.cashier//出纳
+    		def newFinas = []
+    		newFinas &lt;&lt; newInfo.accountant
+    		newFinas &lt;&lt; newInfo.cashier
+    		def oldFinasMail = JsonOutput.toJson(oldFinas)
+    		
+    		def oldFinasStr = oldFinas.join(',')
+    		execution.setVariable('oldFinasStr',oldFinasStr)
+    		execution.setVariable('newFinas', newFinas)
+    		
+    		def mailString = """
+{
+  "mail":{
+    "templateName":"changeEntity",
+    "subject":"$employeeName 转实体财务审核",
+    "templateData":{
+      "type1":"1",
+      "employeeName": "$employeeName",
+      "oldCorpName": "$oldCorpName",
+      "newCorpName": "$newCorpName"
+    },
+    "from":"$mailFrom",
+    "to":[
+      "baocaixue@eorionsolution.com"
+    ]
+  }
+}    		
+"""
+			def mailBody = jsonSlurper.parseText(mailString)
+			def mailBodyJson = JsonOutput.toJson(mailBody)
+			execution.setVariable('mail1', mailBodyJson)
+			
+    		execution.setVariable("_http_method", "POST")
+			def headerMap = new HashMap()
+			headerMap.put("Content-Type","application/json")
+			execution.setVariable("_http_headers", headerMap)
+			execution.setVariable("_http_body", mailBodyJson)
+			execution.setVariable("_http_url", mailUrl)
+			execution.setVariable("_http_response_body", '')
+			execution.setVariable("_http_response_status_code", '')
+    	
+    	</script>
+    </scriptTask>
+    <userTask id="usertask1" name="借款信息核对" activiti:candidateUsers="${oldFinasStr}" activiti:dueDate="P1D">
+      <extensionElements>
+        <activiti:formProperty id="employeeSn_域账号_1_string_psbi_$$VA" name="员工账号（企业邮箱）" type="string" variable="employeeSn" required="true"></activiti:formProperty>
+        <activiti:formProperty id="corp_实体_1_string_tree_$$VB" name="变更实体" type="string" variable="corp" required="true"></activiti:formProperty>
+        <activiti:formProperty id="effectiveTime_生效时间_2_string_t3_$$B" name="变更生效时间" type="string" variable="effectiveTime" required="true"></activiti:formProperty>
+        <activiti:formProperty id="adminSn_人事对接人_1_string_psbi_$$VC" name="人事对接人（企业邮箱）" type="string" variable="adminSn" required="true"></activiti:formProperty>
+        <activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+          <activiti:field name="language">
+            <activiti:string><![CDATA[groovy]]></activiti:string>
+          </activiti:field>
+          <activiti:field name="script">
+            <activiti:string><![CDATA[import groovy.json.JsonOutput
+        				def execution = task.getExecution()
+        			
+        				def bodyMap = new HashMap()
+						bodyMap.put('sn', employeeSn)
+						bodyMap.put('to', effectiveTime.toLong())
+						bodyMap.put('proInstId', execution.getProcessInstanceId())
+						bodyMap.put('newEntityCode', newCorpCode)
+						bodyMap.put('newEntityName', newCorpName)
+						def body = JsonOutput.toJson(bodyMap)
+						
+						execution.setVariable("_http_method", "PUT")
+						def headerMap = new HashMap()
+						headerMap.put("Content-Type","application/json")
+						execution.setVariable("_http_headers", headerMap)
+						execution.setVariable("_http_body", body)
+						execution.setVariable("_http_url", postUrl)
+						execution.setVariable("_http_response_body", '')
+						execution.setVariable("_http_response_status_code", '')]]></activiti:string>
+          </activiti:field>
+        </activiti:taskListener>
+      </extensionElements>
+    </userTask>
+    <serviceTask id="servicetask3" name="send mail1" activiti:class="com.eorionsolution.riying.bpms.javaservice.http.RestAPIService"></serviceTask>
+    <serviceTask id="servicetask4" name="post request" activiti:class="com.eorionsolution.riying.bpms.javaservice.http.RestAPIService"></serviceTask>
+    <scriptTask id="scripttask3" name="judge result and send mail" scriptFormat="groovy" activiti:autoStoreVariables="false">
+      <script>
+    	import groovy.json.JsonSlurper
+    		import groovy.json.JsonOutput
+    		
+    		if (_http_response_status_code != 200) {
+    			def responseBody = new groovy.json.JsonSlurper().parseText(_http_response_body)
+				//throw new org.activiti.engine.ActivitiIllegalArgumentException(responseBody.description)
+				execution.setVariable('errorDesc', responseBody?.description)
+				execution.setVariable('error', 'Y')
+    		} else {
+    			execution.setVariable('error', 'N')
+    		}
+    		
+    	</script>
+    </scriptTask>
+    <serviceTask id="servicetask5" name="send mail3" activiti:class="com.eorionsolution.riying.bpms.javaservice.http.RestAPIService"></serviceTask>
+    <sequenceFlow id="flow1" sourceRef="S1" targetRef="servicetask6"></sequenceFlow>
+    <sequenceFlow id="flow2" sourceRef="servicetask1" targetRef="scripttask1"></sequenceFlow>
+    <sequenceFlow id="flow3" sourceRef="scripttask1" targetRef="servicetask2"></sequenceFlow>
+    <sequenceFlow id="flow4" sourceRef="servicetask2" targetRef="scripttask2"></sequenceFlow>
+    <sequenceFlow id="flow5" sourceRef="scripttask2" targetRef="servicetask3"></sequenceFlow>
+    <sequenceFlow id="flow6" sourceRef="servicetask3" targetRef="usertask1"></sequenceFlow>
+    <sequenceFlow id="flow7" sourceRef="usertask1" targetRef="servicetask4"></sequenceFlow>
+    <sequenceFlow id="flow8" sourceRef="servicetask4" targetRef="scripttask3"></sequenceFlow>
+    <sequenceFlow id="flow9" sourceRef="scripttask3" targetRef="exclusivegateway1"></sequenceFlow>
+    <endEvent id="endevent1" name="End"></endEvent>
+    <sequenceFlow id="flow10" sourceRef="servicetask5" targetRef="endevent1"></sequenceFlow>
+    <serviceTask id="servicetask6" name="metabase data check" activiti:class="com.eorionsolution.riying.bpms.javaservice.http.RestAPIService"></serviceTask>
+    <scriptTask id="scripttask4" name="analyze input date" scriptFormat="groovy" activiti:autoStoreVariables="false">
+      <script>
+      import groovy.json.JsonSlurper
+    	import groovy.json.JsonOutput
+    		
+   		if (_http_response_status_code != 200) {
+   			throw new org.activiti.engine.ActivitiIllegalArgumentException("metabase call exception of check")
+   		}
+   		def jsonSlurper = new JsonSlurper()
+   		def checkResult = jsonSlurper.parseText(_http_response_body)
+   		if (checkResult &amp;&amp; checkResult.size() &gt; 0 &amp;&amp; checkResult[0].tomax) {
+   			def max = checkResult[0].tomax.toLong()
+   			def t = effectiveTime.toLong()
+   			if (t &lt;= max) {
+   				throw new org.activiti.engine.ActivitiIllegalArgumentException("当前员工在该生效日期内不能更改实体")
+   			}
+   			
+   		}
+      	//call metabase
+  		execution.setVariable("_http_method", "GET")
+		def headerMap = new java.util.HashMap()		
+		execution.setVariable("_http_headers", headerMap)
+		execution.setVariable("_http_body", '')
+		def param=java.net.URLEncoder.encode('[{"type":"category","target":["variable",["template-tag","param"]],"value":\"'+ employeeSn + '\"}]', "UTF-8")
+		execution.setVariable("_http_url", metabaseUrl + param)
+		execution.setVariable("_http_response_body", '');
+		execution.setVariable("_http_response_status_code", '')
+      
+      </script>
+    </scriptTask>
+    <sequenceFlow id="flow11" sourceRef="servicetask6" targetRef="scripttask4"></sequenceFlow>
+    <sequenceFlow id="flow12" sourceRef="scripttask4" targetRef="servicetask1"></sequenceFlow>
+    <exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway"></exclusiveGateway>
+    <sequenceFlow id="flow13" name="success" sourceRef="exclusivegateway1" targetRef="scripttask5">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${error=='N'}]]></conditionExpression>
+    </sequenceFlow>
+    <scriptTask id="scripttask5" name="send mail to success" scriptFormat="groovy" activiti:autoStoreVariables="false">
+      <script>
+    	import groovy.json.JsonSlurper
+    		import groovy.json.JsonOutput
+    		
+    		def jsonSlurper = new JsonSlurper()
+    		def to = []
+    		to &lt;&lt; adminSn
+    		to.addAll(newFinas)
+    		def tos = JsonOutput.toJson(to)
+    		def mailString = """
+{
+  "mail":{
+    "templateName":"changeEntity",
+    "subject":"$employeeName 转实体通知",
+    "templateData":{
+      "type2":"1",
+      "employeeName": "$employeeName",
+      "oldCorpName": "$oldCorpName",
+      "newCorpName": "$newCorpName",
+      "ncCode": "$ncCode",
+      "sn": "$employeeSn",
+      "mobilePhone": "$mobilePhone"
+    },
+    "from":"$mailFrom",
+    "to":[
+      "baocaixue@eorionsolution.com"
+    ]
+  }
+}    		
+"""
+			def mailBody = jsonSlurper.parseText(mailString)
+			def mailBodyJson = JsonOutput.toJson(mailBody)
+			execution.setVariable('mail2', mailBodyJson)
+			
+    		execution.setVariable("_http_method", "POST")
+			def headerMap = new HashMap()
+			headerMap.put("Content-Type","application/json")
+			execution.setVariable("_http_headers", headerMap)
+			execution.setVariable("_http_body", mailBodyJson)
+			execution.setVariable("_http_url", mailUrl)
+			execution.setVariable("_http_response_body", '')
+			execution.setVariable("_http_response_status_code", '')
+    		
+    	
+    	</script>
+    </scriptTask>
+    <scriptTask id="scripttask6" name="send mail to it for failed" scriptFormat="groovy" activiti:autoStoreVariables="false">
+      <script>
+    	import groovy.json.JsonSlurper
+    		import groovy.json.JsonOutput
+    		
+    		def processInstId = execution.getProcessInstanceId()
+    		def jsonSlurper = new JsonSlurper()
+    		
+    		def mailString = """
+{
+  "mail":{
+    "templateName":"changeEntity",
+    "subject":"$employeeName 转实体接口调用失败通知",
+    "templateData":{
+      "type3":"1",
+      "employeeName": "$employeeName",
+      "oldCorpName": "$oldCorpName",
+      "newCorpName": "$newCorpName",
+      "ncCode": "$ncCode",
+      "sn": "$employeeSn",
+      "proInstId": "$processInstId"
+    },
+    "from":"$mailFrom",
+    "to":[
+      "baocaixue@eorionsolution.com"
+    ]
+  }
+}    		
+"""
+			def mailBody = jsonSlurper.parseText(mailString)
+			def mailBodyJson = JsonOutput.toJson(mailBody)
+			execution.setVariable('mail3', mailBodyJson)
+			
+    		execution.setVariable("_http_method", "POST")
+			def headerMap = new HashMap()
+			headerMap.put("Content-Type","application/json")
+			execution.setVariable("_http_headers", headerMap)
+			execution.setVariable("_http_body", mailBodyJson)
+			execution.setVariable("_http_url", mailUrl)
+			execution.setVariable("_http_response_body", '')
+			execution.setVariable("_http_response_status_code", '')
+    		
+    	
+    	</script>
+    </scriptTask>
+    <sequenceFlow id="flow14" name="failed" sourceRef="exclusivegateway1" targetRef="scripttask6">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${error=='Y'}]]></conditionExpression>
+    </sequenceFlow>
+    <serviceTask id="servicetask7" name="send mail2"  activiti:class="com.eorionsolution.riying.bpms.javaservice.http.RestAPIService"></serviceTask>
+    <sequenceFlow id="flow15" sourceRef="scripttask6" targetRef="servicetask7"></sequenceFlow>
+    <sequenceFlow id="flow16" sourceRef="scripttask5" targetRef="servicetask5"></sequenceFlow>
+    <sequenceFlow id="flow17" sourceRef="servicetask7" targetRef="scripttask5"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_DPPE003">
+    <bpmndi:BPMNPlane bpmnElement="DPPE003" id="BPMNPlane_DPPE003">
+      <bpmndi:BPMNShape bpmnElement="S1" id="BPMNShape_S1">
+        <omgdc:Bounds height="35.0" width="35.0" x="390.0" y="1.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="servicetask1" id="BPMNShape_servicetask1">
+        <omgdc:Bounds height="65.0" width="105.0" x="355.0" y="291.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scripttask1" id="BPMNShape_scripttask1">
+        <omgdc:Bounds height="65.0" width="105.0" x="355.0" y="421.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="servicetask2" id="BPMNShape_servicetask2">
+        <omgdc:Bounds height="65.0" width="105.0" x="355.0" y="541.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scripttask2" id="BPMNShape_scripttask2">
+        <omgdc:Bounds height="65.0" width="105.0" x="355.0" y="651.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask1" id="BPMNShape_usertask1">
+        <omgdc:Bounds height="65.0" width="105.0" x="355.0" y="881.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="servicetask3" id="BPMNShape_servicetask3">
+        <omgdc:Bounds height="65.0" width="105.0" x="355.0" y="761.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="servicetask4" id="BPMNShape_servicetask4">
+        <omgdc:Bounds height="65.0" width="105.0" x="355.0" y="1001.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scripttask3" id="BPMNShape_scripttask3">
+        <omgdc:Bounds height="65.0" width="105.0" x="355.0" y="1121.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="servicetask5" id="BPMNShape_servicetask5">
+        <omgdc:Bounds height="65.0" width="105.0" x="355.0" y="1400.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="390.0" y="1490.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="servicetask6" id="BPMNShape_servicetask6">
+        <omgdc:Bounds height="65.0" width="105.0" x="355.0" y="81.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scripttask4" id="BPMNShape_scripttask4">
+        <omgdc:Bounds height="65.0" width="105.0" x="355.0" y="181.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway1" id="BPMNShape_exclusivegateway1">
+        <omgdc:Bounds height="40.0" width="40.0" x="387.0" y="1220.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scripttask5" id="BPMNShape_scripttask5">
+        <omgdc:Bounds height="65.0" width="105.0" x="355.0" y="1290.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scripttask6" id="BPMNShape_scripttask6">
+        <omgdc:Bounds height="65.0" width="105.0" x="530.0" y="1208.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="servicetask7" id="BPMNShape_servicetask7">
+        <omgdc:Bounds height="65.0" width="105.0" x="670.0" y="1208.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="407.0" y="36.0"></omgdi:waypoint>
+        <omgdi:waypoint x="407.0" y="81.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="407.0" y="356.0"></omgdi:waypoint>
+        <omgdi:waypoint x="407.0" y="421.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3">
+        <omgdi:waypoint x="407.0" y="486.0"></omgdi:waypoint>
+        <omgdi:waypoint x="407.0" y="541.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow4" id="BPMNEdge_flow4">
+        <omgdi:waypoint x="407.0" y="606.0"></omgdi:waypoint>
+        <omgdi:waypoint x="407.0" y="651.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow5" id="BPMNEdge_flow5">
+        <omgdi:waypoint x="407.0" y="716.0"></omgdi:waypoint>
+        <omgdi:waypoint x="407.0" y="761.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow6" id="BPMNEdge_flow6">
+        <omgdi:waypoint x="407.0" y="826.0"></omgdi:waypoint>
+        <omgdi:waypoint x="407.0" y="881.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow7" id="BPMNEdge_flow7">
+        <omgdi:waypoint x="407.0" y="946.0"></omgdi:waypoint>
+        <omgdi:waypoint x="407.0" y="1001.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow8" id="BPMNEdge_flow8">
+        <omgdi:waypoint x="407.0" y="1066.0"></omgdi:waypoint>
+        <omgdi:waypoint x="407.0" y="1121.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow9" id="BPMNEdge_flow9">
+        <omgdi:waypoint x="407.0" y="1186.0"></omgdi:waypoint>
+        <omgdi:waypoint x="407.0" y="1220.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow10" id="BPMNEdge_flow10">
+        <omgdi:waypoint x="407.0" y="1465.0"></omgdi:waypoint>
+        <omgdi:waypoint x="407.0" y="1490.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow11" id="BPMNEdge_flow11">
+        <omgdi:waypoint x="407.0" y="146.0"></omgdi:waypoint>
+        <omgdi:waypoint x="407.0" y="181.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow12" id="BPMNEdge_flow12">
+        <omgdi:waypoint x="407.0" y="246.0"></omgdi:waypoint>
+        <omgdi:waypoint x="407.0" y="291.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow13" id="BPMNEdge_flow13">
+        <omgdi:waypoint x="407.0" y="1260.0"></omgdi:waypoint>
+        <omgdi:waypoint x="407.0" y="1290.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="13.0" width="100.0" x="407.0" y="1260.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow14" id="BPMNEdge_flow14">
+        <omgdi:waypoint x="427.0" y="1240.0"></omgdi:waypoint>
+        <omgdi:waypoint x="530.0" y="1240.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="13.0" width="100.0" x="427.0" y="1240.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow15" id="BPMNEdge_flow15">
+        <omgdi:waypoint x="635.0" y="1240.0"></omgdi:waypoint>
+        <omgdi:waypoint x="670.0" y="1240.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow16" id="BPMNEdge_flow16">
+        <omgdi:waypoint x="407.0" y="1355.0"></omgdi:waypoint>
+        <omgdi:waypoint x="407.0" y="1400.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow17" id="BPMNEdge_flow17">
+        <omgdi:waypoint x="722.0" y="1273.0"></omgdi:waypoint>
+        <omgdi:waypoint x="722.0" y="1322.0"></omgdi:waypoint>
+        <omgdi:waypoint x="460.0" y="1322.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

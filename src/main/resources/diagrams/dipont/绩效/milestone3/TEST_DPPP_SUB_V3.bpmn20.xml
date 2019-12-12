@@ -105,7 +105,7 @@
 {
   "mail":{
     "templateName":"performance-appraisal-all-template",
-    "subject": "$employeeName 绩效考核计划Review",
+    "subject": "$employeeName 目标设定计划待审核Review",
     "templateData":{
       "employeeName": "$employeeName",
       "employeeNameEn": "$employeeNameEn",
@@ -187,7 +187,7 @@
 {
   "mail":{
     "templateName":"performance-appraisal-all-template",
-    "subject":"$employeeName 绩效考核计划已Review",
+    "subject":"$employeeName 目标设定计划审核已Review",
     "templateData":{
       "managerName":"$managerName",
       "managerNameEn":"$managerNameEn",
@@ -258,19 +258,55 @@
         <activiti:formProperty id="tbhdperformance_上年度实际 Actual last year_actualLastYear_7_string_t1_$$VA" name="上年度实际 Actual last year" type="string" variable="tbhdperformance_actualLastYear_t00" required="true"></activiti:formProperty>
         <activiti:formProperty id="tbhdperformance_指标属性 KPI achievement measurement(Fill in ≥ or ≤)_kpiAttribute_8_string_t1_$$VA" name="指标属性 KPI achievement measurement(Fill in ≥ or ≤)" type="string" variable="tbhdperformance_kpiAttribute_t00" required="true"></activiti:formProperty>
         <activiti:formProperty id="tbhdperformance_Plan_plan_9_string_t1_$$VA" name="当前季度计划 Quarter Plan" type="string" variable="tbhdperformance_plan_t00" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdperformance_Actual_actual_10_string_t1_$$A" name="当前季度实际 Quarter Actual" type="string" variable="tbhdperformance_actual_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdperformance_Actual_actual_10_string_t1_$$A" name="当前季度实际 Quarter Actual" type="string" variable="tbhdperformance_actual_t00" required="true"></activiti:formProperty>
         <activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
           <activiti:field name="language">
             <activiti:string><![CDATA[groovy]]></activiti:string>
           </activiti:field>
           <activiti:field name="script">
             <activiti:string><![CDATA[import groovy.json.JsonSlurper
+            			import groovy.json.JsonOutput
 	        			def jsonSlurper = new JsonSlurper()
 						jsonSlurper.parseText(tbhdperformance_item_std).each{
 							if(!it.actual) {
 								throw new org.activiti.engine.ActivitiIllegalArgumentException('请填写当前季度实际完成情况 Please fill in the actual completion of the current quarter.')
 							}
-						}]]></activiti:string>
+						}
+						
+						def execution = task.getExecution()
+						//mail send
+			    		def mailStr = """
+{
+  "mail":{
+    "templateName":"performance-appraisal-all-template",
+    "subject": "$employeeName $fiscalYear $quarter 评分提醒",
+    "templateData":{
+      "type5":"$quarter",
+      "employeeName": "$employeeName",
+      "employeeNameEn":"$employeeNameEn",
+      "cycle": "$fiscalYear fiscal year",
+      "performanceList": $tbhdperformance_item_std
+    },
+    "from":"$mailFrom",
+    "to":[
+      "$managerSn"
+    ]
+  }
+}
+"""
+						def mailBodyObj = jsonSlurper.parseText(mailStr)
+						def mailBody = JsonOutput.toJson(mailBodyObj)
+						execution.setVariable('mailBody4',mailBody)
+						
+						execution.setVariable("_http_method", "POST")
+						def headerMap = new HashMap()
+						headerMap.put("Content-Type","application/json")
+						execution.setVariable("_http_headers", headerMap)
+						execution.setVariable("_http_body", mailBody)
+						execution.setVariable("_http_url", mailUrl)
+						execution.setVariable("_http_response_body", '')
+						execution.setVariable("_http_response_status_code", '')
+						]]></activiti:string>
           </activiti:field>
         </activiti:taskListener>
       </extensionElements>
@@ -411,20 +447,14 @@
         </activiti:formProperty>
         <activiti:formProperty id="memo_备注 Memo_1_string_t2_$$D" name="备注 Memo" type="string" variable="memo"></activiti:formProperty>
         <activiti:formProperty id="adder_加签人 add Judger_1_string_psbi_$$E" name="加签人 add Judger" type="string" variable="adder"></activiti:formProperty>
-      	<activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
-      		<activiti:field name="language">
-      			<activiti:string>
-      				<![CDATA[groovy]]>
-      			</activiti:string>
-      		</activiti:field>
-      		<activiti:field name="script">
-      			<activiti:string>
-      				<![CDATA[
-      					task.getExecution().setVariable('performanceresult1', performanceresult)
-      				]]>
-      			</activiti:string>
-      		</activiti:field>
-      	</activiti:taskListener>
+        <activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+          <activiti:field name="language">
+            <activiti:string><![CDATA[groovy]]></activiti:string>
+          </activiti:field>
+          <activiti:field name="script">
+            <activiti:string><![CDATA[task.getExecution().setVariable('performanceresult1', performanceresult)]]></activiti:string>
+          </activiti:field>
+        </activiti:taskListener>
       </extensionElements>
     </userTask>
     <userTask id="usertask5" name="领导评分 Manager Assess" activiti:assignee="${managerSn}" activiti:dueDate="P1D">
@@ -578,20 +608,14 @@
           <activiti:value id="Wait and see" name="⭕"></activiti:value>
         </activiti:formProperty>
         <activiti:formProperty id="adder_加签人 add Judger_1_string_psbi_$$H" name="加签人 add Judger" type="string" variable="adder"></activiti:formProperty>
-      	<activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
-      		<activiti:field name="language">
-      			<activiti:string>
-      				<![CDATA[groovy]]>
-      			</activiti:string>
-      		</activiti:field>
-      		<activiti:field name="script">
-      			<activiti:string>
-      				<![CDATA[
-      					task.getExecution().setVariable('performanceresult1', performanceresult)
-      				]]>
-      			</activiti:string>
-      		</activiti:field>
-      	</activiti:taskListener>
+        <activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+          <activiti:field name="language">
+            <activiti:string><![CDATA[groovy]]></activiti:string>
+          </activiti:field>
+          <activiti:field name="script">
+            <activiti:string><![CDATA[task.getExecution().setVariable('performanceresult1', performanceresult)]]></activiti:string>
+          </activiti:field>
+        </activiti:taskListener>
       </extensionElements>
     </userTask>
     <exclusiveGateway id="exclusivegateway2" name="Exclusive Gateway"></exclusiveGateway>
@@ -1610,7 +1634,7 @@
     </userTask>
     <scriptTask id="scripttask1" name="Send Mail To Employee" scriptFormat="groovy" activiti:autoStoreVariables="false">
       <script>
-      <![CDATA[import groovy.json.JsonSlurper
+      import groovy.json.JsonSlurper
       		import groovy.json.JsonOutput
       		def jsonSlurper = new JsonSlurper()
       		
@@ -1660,13 +1684,13 @@
 			execution.setVariable("_http_url", mailUrl)
 			execution.setVariable("_http_response_body", '')
 			execution.setVariable("_http_response_status_code", '')
-      ]]>
+      
       </script>
     </scriptTask>
     <serviceTask id="servicetask3" name="Send Mail To Employee" activiti:class="com.eorionsolution.riying.bpms.javaservice.http.RestAPIService"></serviceTask>
     <scriptTask id="scripttask2" name="Send Mail To Manager" scriptFormat="groovy" activiti:autoStoreVariables="false">
       <script>
-      <![CDATA[import groovy.json.JsonSlurper
+      import groovy.json.JsonSlurper
       		import groovy.json.JsonOutput
       		def jsonSlurper = new JsonSlurper()
       		
@@ -1732,7 +1756,7 @@
 			execution.setVariable("_http_url", mailUrl)
 			execution.setVariable("_http_response_body", '')
 			execution.setVariable("_http_response_status_code", '')
-      ]]>
+      
       </script>
     </scriptTask>
     <serviceTask id="servicetask5" name="Send Mail To Manager" activiti:class="com.eorionsolution.riying.bpms.javaservice.http.RestAPIService"></serviceTask>
@@ -1745,7 +1769,7 @@
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${quarter=='Q1'||quarter=='Q3'}]]></conditionExpression>
     </sequenceFlow>
     <sequenceFlow id="flow7" sourceRef="timerintermediatecatchevent1" targetRef="usertask3"></sequenceFlow>
-    <sequenceFlow id="flow8" sourceRef="usertask3" targetRef="exclusivegateway1"></sequenceFlow>
+    <sequenceFlow id="flow8" sourceRef="usertask3" targetRef="servicetask6"></sequenceFlow>
     <sequenceFlow id="flow9" sourceRef="usertask4" targetRef="exclusivegateway2"></sequenceFlow>
     <sequenceFlow id="flow10" name="有加签" sourceRef="exclusivegateway2" targetRef="usertask6">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${adder != null && adder != ''}]]></conditionExpression>
@@ -1767,8 +1791,12 @@
     <endEvent id="endevent1" name="End"></endEvent>
     <sequenceFlow id="flow19" sourceRef="servicetask5" targetRef="endevent1"></sequenceFlow>
     <sequenceFlow id="flow23" sourceRef="usertask5" targetRef="exclusivegateway3"></sequenceFlow>
-    <sequenceFlow id="flow24" name="有加签" sourceRef="exclusivegateway3" targetRef="usertask7"></sequenceFlow>
-    <sequenceFlow id="flow25" name="没有加签" sourceRef="exclusivegateway3" targetRef="scripttask1"></sequenceFlow>
+    <sequenceFlow id="flow24" name="有加签" sourceRef="exclusivegateway3" targetRef="usertask7">
+    	<conditionExpression xsi:type="tFormalExpression"><![CDATA[${adder != null && adder != ''}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow25" name="没有加签" sourceRef="exclusivegateway3" targetRef="scripttask1">
+    	<conditionExpression xsi:type="tFormalExpression"><![CDATA[${adder == null || adder == ''}]]></conditionExpression>
+    </sequenceFlow>
     <sequenceFlow id="flow26" sourceRef="usertask7" targetRef="exclusivegateway5"></sequenceFlow>
     <sequenceFlow id="flow27" name="加签评分与领导评分不一致" sourceRef="exclusivegateway5" targetRef="usertask9">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${performanceresult != adderperformanceresult}]]></conditionExpression>
@@ -1780,6 +1808,8 @@
     <sequenceFlow id="flow34" name="q2q4" sourceRef="exclusivegateway1" targetRef="usertask5">
       <conditionExpression xsi:type="tFormalExpression"><![CDATA[${quarter=='Q2'||quarter=='Q4'}]]></conditionExpression>
     </sequenceFlow>
+    <serviceTask id="servicetask6" name="通知领导实际值已填写" activiti:class="com.eorionsolution.riying.bpms.javaservice.http.RestAPIService"></serviceTask>
+    <sequenceFlow id="flow35" sourceRef="servicetask6" targetRef="exclusivegateway1"></sequenceFlow>
   </process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_DPPP_SUB_V3">
     <bpmndi:BPMNPlane bpmnElement="DPPP_SUB_V3" id="BPMNPlane_DPPP_SUB_V3">
@@ -1802,10 +1832,10 @@
         <omgdc:Bounds height="40.0" width="40.0" x="438.0" y="853.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="timerintermediatecatchevent1" id="BPMNShape_timerintermediatecatchevent1">
-        <omgdc:Bounds height="35.0" width="35.0" x="441.0" y="612.0"></omgdc:Bounds>
+        <omgdc:Bounds height="35.0" width="35.0" x="441.0" y="570.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="usertask3" id="BPMNShape_usertask3">
-        <omgdc:Bounds height="65.0" width="115.0" x="401.0" y="711.0"></omgdc:Bounds>
+        <omgdc:Bounds height="65.0" width="115.0" x="401.0" y="630.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="usertask4" id="BPMNShape_usertask4">
         <omgdc:Bounds height="65.0" width="115.0" x="181.0" y="840.0"></omgdc:Bounds>
@@ -1852,6 +1882,9 @@
       <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
         <omgdc:Bounds height="35.0" width="35.0" x="410.0" y="1880.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="servicetask6" id="BPMNShape_servicetask6">
+        <omgdc:Bounds height="65.0" width="105.0" x="406.0" y="740.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
         <omgdi:waypoint x="458.0" y="55.0"></omgdi:waypoint>
         <omgdi:waypoint x="458.0" y="100.0"></omgdi:waypoint>
@@ -1870,7 +1903,7 @@
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow5" id="BPMNEdge_flow5">
         <omgdi:waypoint x="458.0" y="525.0"></omgdi:waypoint>
-        <omgdi:waypoint x="458.0" y="612.0"></omgdi:waypoint>
+        <omgdi:waypoint x="458.0" y="570.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow6" id="BPMNEdge_flow6">
         <omgdi:waypoint x="438.0" y="873.0"></omgdi:waypoint>
@@ -1880,12 +1913,12 @@
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow7" id="BPMNEdge_flow7">
-        <omgdi:waypoint x="458.0" y="647.0"></omgdi:waypoint>
-        <omgdi:waypoint x="458.0" y="711.0"></omgdi:waypoint>
+        <omgdi:waypoint x="458.0" y="605.0"></omgdi:waypoint>
+        <omgdi:waypoint x="458.0" y="630.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow8" id="BPMNEdge_flow8">
-        <omgdi:waypoint x="458.0" y="776.0"></omgdi:waypoint>
-        <omgdi:waypoint x="458.0" y="853.0"></omgdi:waypoint>
+        <omgdi:waypoint x="458.0" y="695.0"></omgdi:waypoint>
+        <omgdi:waypoint x="458.0" y="740.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow9" id="BPMNEdge_flow9">
         <omgdi:waypoint x="238.0" y="905.0"></omgdi:waypoint>
@@ -1995,6 +2028,10 @@
         <bpmndi:BPMNLabel>
           <omgdc:Bounds height="13.0" width="25.0" x="509.0" y="879.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow35" id="BPMNEdge_flow35">
+        <omgdi:waypoint x="458.0" y="805.0"></omgdi:waypoint>
+        <omgdi:waypoint x="458.0" y="853.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>

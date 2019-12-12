@@ -3,14 +3,14 @@
   <process id="DPPP_MAIN_V3" name="绩效考核主流程 Performance appraisal main process" isExecutable="true" activiti:candidateStarterGroups="_dpmsadmin,admin">
     <startEvent id="startevent1" name="Start" activiti:initiator="initiator">
       <extensionElements>
-      	<activiti:formProperty id="fiscalYear_财年 Fiscal Year_1_string_t6_$$A" name="财年 Fiscal Year" type="string" variable="fiscalYear" required="true"/>
-      	<activiti:formProperty id="quarter_季度 Quarter_1_enum_sbs_$$B" name="季度 Quarter" type="enum" variable="quarter" required="true">
-      		<activiti:value id="Q1" name="Q1"></activiti:value>
-      		<activiti:value id="Q2" name="Q2"></activiti:value>
-      		<activiti:value id="Q3" name="Q3"></activiti:value>
-      		<activiti:value id="Q4" name="Q4"></activiti:value>
-      	</activiti:formProperty>
-      	<activiti:formProperty id="checkTime_考核时间 Check Time_2_string_t5_$$B" name="考核时间 Check Time" type="string" variable="checkTime" required="true"/>
+        <activiti:formProperty id="fiscalYear_财年 Fiscal Year_1_string_t6_$$A" name="财年 Fiscal Year" type="string" variable="fiscalYear" required="true"></activiti:formProperty>
+        <activiti:formProperty id="quarter_季度 Quarter_1_enum_sbs_$$B" name="季度 Quarter" type="enum" variable="quarter" required="true">
+          <activiti:value id="Q1" name="Q1"></activiti:value>
+          <activiti:value id="Q2" name="Q2"></activiti:value>
+          <activiti:value id="Q3" name="Q3"></activiti:value>
+          <activiti:value id="Q4" name="Q4"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="checkTime_考核时间 Check Time_2_string_t5_$$B" name="考核时间 Check Time" type="string" variable="checkTime" required="true"></activiti:formProperty>
         <activiti:formProperty id="tbhdaddemployees_item" name="指定员工列表 Designated employee list" type="string" variable="tbhdaddemployees_item" required="true"></activiti:formProperty>
         <activiti:formProperty id="tbhdaddemployees_员工 Employee_employeesn_1_string_psbi_$$A" name="员工 Employee" type="string" variable="tbhdaddemployees_employeesn_t00" required="true"></activiti:formProperty>
         <activiti:formProperty id="tbhdaddemployees_汇报对象 Manager_managersn_2_string_psbi_$$A" name="汇报对象 Manager" type="string" variable="tbhdaddemployees_managersn_t00" required="true"></activiti:formProperty>
@@ -43,12 +43,16 @@
     				def std = jsonSlurper.parseText(execution.getVariable('tbhdaddemployees_item_std'))
     					
    					def subflows = []//List[Map]
+   					def allEmployeeArr = new HashSet()
    					std.each{
-   						if(!it.managersn || it.managersn.trim() == '') {
+   						if(!it.managersn || it.managersn.trim() == '' || !it.employeesn || it.employeesn.trim() == '') {
    							throw new org.activiti.engine.ActivitiIllegalArgumentException('当前账号的Manager没有指定, The manager of the current account is not specified. userID[' + it.employeesn + ']')
    						}
 	    				subflows<< ['employeeSn':it.employeesn, 'managerSn': it.managersn, 'costcenter': JsonOutput.toJson(it.costcenter), 'function': it.function]
+	    				allEmployeeArr << it.employeesn
 	    			}
+	    			def allEmployee = JsonOutput.toJson(allEmployeeArr)
+	    			execution.setVariable('allEmployee', allEmployee)
 	    			execution.setVariable('subflows', subflows)
 	    			//execution.setVariable('businessKey', execution.getBusinessKey())
 	    			
@@ -56,7 +60,40 @@
 	    			DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")
 					df.setTimeZone(TimeZone.getTimeZone("GMT+8"))
 					execution.setVariable('checkTime', df.format(checkTime))
-    				]]></activiti:string>
+					
+					def mailUrl = 'https://bpmcs.dipont.com/mail/v2/mail'
+					execution.setVariable('mailUrl', mailUrl)
+					def mailFrom = 'notice@dipont.com'
+   					execution.setVariable('mailFrom', mailFrom)
+					
+					//send mail
+					def mailStr = """
+					
+{
+  "mail":{
+    "templateName":"performance-appraisal-all-template",
+    "subject": "$fiscalYear $quarter 目标设定提醒",
+    "templateData":{
+      "main1":"1",
+      "quarter":"${quarter}",
+      "fiscalYear": "$fiscalYear"
+    },
+    "from":"$mailFrom",
+    "to": $allEmployee
+  }
+}
+"""
+					def mailBodyObj = jsonSlurper.parseText(mailStr)
+					def mailBody = JsonOutput.toJson(mailBodyObj)
+					execution.setVariable('mailBody1',mailBody)
+					execution.setVariable("_http_method", "POST")
+					def headerMap = new HashMap()
+					headerMap.put("Content-Type","application/json")
+					execution.setVariable("_http_headers", headerMap)
+					execution.setVariable("_http_body", mailBody)
+					execution.setVariable("_http_url", mailUrl)
+					execution.setVariable("_http_response_body", '')
+					execution.setVariable("_http_response_status_code", '')]]></activiti:string>
           </activiti:field>
         </activiti:executionListener>
       </extensionElements>
@@ -70,7 +107,7 @@
         <activiti:in sourceExpression="${fiscalYear}" target="fiscalYear"></activiti:in>
         <activiti:in sourceExpression="${quarter}" target="quarter"></activiti:in>
         <activiti:in sourceExpression="${checkTime}" target="checkTime"></activiti:in>
-        <activiti:in sourceExpression="${initiator}" target="initiator"/>
+        <activiti:in sourceExpression="${initiator}" target="initiator"></activiti:in>
       </extensionElements>
       <multiInstanceLoopCharacteristics isSequential="false">
         <loopCardinality>${subflows.size()}</loopCardinality>
@@ -78,27 +115,131 @@
       </multiInstanceLoopCharacteristics>
     </callActivity>
     <endEvent id="endevent1" name="End"></endEvent>
-    <sequenceFlow id="flow3" sourceRef="callactivity1" targetRef="endevent1"></sequenceFlow>
-    <sequenceFlow id="flow4" sourceRef="startevent1" targetRef="callactivity1"></sequenceFlow>
+    <sequenceFlow id="flow3" sourceRef="parallelgateway2" targetRef="endevent1"></sequenceFlow>
+    <sequenceFlow id="flow4" sourceRef="startevent1" targetRef="servicetask1"></sequenceFlow>
+    <serviceTask id="servicetask1" name="goal setting notice" activiti:class="com.eorionsolution.riying.bpms.javaservice.http.RestAPIService"></serviceTask>
+    <sequenceFlow id="flow5" sourceRef="servicetask1" targetRef="parallelgateway1"></sequenceFlow>
+    <parallelGateway id="parallelgateway1" name="Parallel Gateway"></parallelGateway>
+    <parallelGateway id="parallelgateway2" name="Parallel Gateway"></parallelGateway>
+    <intermediateCatchEvent id="timerintermediatecatchevent1" name="TimerCatchEvent">
+      <timerEventDefinition>
+    	<timeDate>${checkTime}</timeDate>
+      </timerEventDefinition>
+    </intermediateCatchEvent>
+    <sequenceFlow id="flow6" sourceRef="parallelgateway1" targetRef="timerintermediatecatchevent1"></sequenceFlow>
+    <sequenceFlow id="flow7" sourceRef="parallelgateway1" targetRef="callactivity1"></sequenceFlow>
+    <scriptTask id="scripttask1" name="mail body of fill actual notice" activiti:autoStoreVariables="false" scriptFormat="groovy">
+    	<script>
+    	<![CDATA[import groovy.json.JsonSlurper
+        	import groovy.json.JsonOutput
+    		
+    		def jsonSlurper = new JsonSlurper()
+    		
+    		//send mail
+			def mailStr = """
+					
+{
+  "mail":{
+    "templateName":"performance-appraisal-all-template",
+    "subject": "$fiscalYear $quarter 实际达成提醒",
+    "templateData":{
+      "main2":"1",
+      "quarter":"${quarter}",
+      "fiscalYear": "$fiscalYear"
+    },
+    "from":"$mailFrom",
+    "to": $allEmployee
+  }
+}
+"""
+			def mailBodyObj = jsonSlurper.parseText(mailStr)
+			def mailBody = JsonOutput.toJson(mailBodyObj)
+			execution.setVariable('mailBody2',mailBody)
+			execution.setVariable("_http_method", "POST")
+			def headerMap = new HashMap()
+			headerMap.put("Content-Type","application/json")
+			execution.setVariable("_http_headers", headerMap)
+			execution.setVariable("_http_body", mailBody)
+			execution.setVariable("_http_url", mailUrl)
+			execution.setVariable("_http_response_body", '')
+			execution.setVariable("_http_response_status_code", '')
+    	]]>
+    	</script>
+    </scriptTask>
+    <serviceTask id="servicetask2" name="fill actual notice" activiti:class="com.eorionsolution.riying.bpms.javaservice.http.RestAPIService"></serviceTask>
+    <sequenceFlow id="flow8" sourceRef="timerintermediatecatchevent1" targetRef="scripttask1"></sequenceFlow>
+    <sequenceFlow id="flow9" sourceRef="scripttask1" targetRef="servicetask2"></sequenceFlow>
+    <sequenceFlow id="flow10" sourceRef="servicetask2" targetRef="parallelgateway2"></sequenceFlow>
+    <sequenceFlow id="flow11" sourceRef="callactivity1" targetRef="parallelgateway2"></sequenceFlow>
   </process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_DPPP_MAIN_V3">
     <bpmndi:BPMNPlane bpmnElement="DPPP_MAIN_V3" id="BPMNPlane_DPPP_MAIN_V3">
       <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
-        <omgdc:Bounds height="35.0" width="35.0" x="90.0" y="185.0"></omgdc:Bounds>
+        <omgdc:Bounds height="35.0" width="35.0" x="30.0" y="185.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="callactivity1" id="BPMNShape_callactivity1">
-        <omgdc:Bounds height="65.0" width="105.0" x="220.0" y="170.0"></omgdc:Bounds>
+        <omgdc:Bounds height="65.0" width="105.0" x="490.0" y="80.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
-        <omgdc:Bounds height="35.0" width="35.0" x="410.0" y="185.0"></omgdc:Bounds>
+        <omgdc:Bounds height="35.0" width="35.0" x="810.0" y="185.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="servicetask1" id="BPMNShape_servicetask1">
+        <omgdc:Bounds height="65.0" width="105.0" x="130.0" y="170.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="parallelgateway1" id="BPMNShape_parallelgateway1">
+        <omgdc:Bounds height="40.0" width="40.0" x="280.0" y="182.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="parallelgateway2" id="BPMNShape_parallelgateway2">
+        <omgdc:Bounds height="40.0" width="40.0" x="725.0" y="182.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="timerintermediatecatchevent1" id="BPMNShape_timerintermediatecatchevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="350.0" y="290.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scripttask1" id="BPMNShape_scripttask1">
+        <omgdc:Bounds height="65.0" width="105.0" x="420.0" y="275.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="servicetask2" id="BPMNShape_servicetask2">
+        <omgdc:Bounds height="65.0" width="105.0" x="594.0" y="275.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3">
-        <omgdi:waypoint x="325.0" y="202.0"></omgdi:waypoint>
-        <omgdi:waypoint x="410.0" y="202.0"></omgdi:waypoint>
+        <omgdi:waypoint x="765.0" y="202.0"></omgdi:waypoint>
+        <omgdi:waypoint x="810.0" y="202.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow4" id="BPMNEdge_flow4">
-        <omgdi:waypoint x="125.0" y="202.0"></omgdi:waypoint>
-        <omgdi:waypoint x="220.0" y="202.0"></omgdi:waypoint>
+        <omgdi:waypoint x="65.0" y="202.0"></omgdi:waypoint>
+        <omgdi:waypoint x="130.0" y="202.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow5" id="BPMNEdge_flow5">
+        <omgdi:waypoint x="235.0" y="202.0"></omgdi:waypoint>
+        <omgdi:waypoint x="280.0" y="202.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow6" id="BPMNEdge_flow6">
+        <omgdi:waypoint x="300.0" y="222.0"></omgdi:waypoint>
+        <omgdi:waypoint x="300.0" y="307.0"></omgdi:waypoint>
+        <omgdi:waypoint x="350.0" y="307.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow7" id="BPMNEdge_flow7">
+        <omgdi:waypoint x="300.0" y="182.0"></omgdi:waypoint>
+        <omgdi:waypoint x="300.0" y="112.0"></omgdi:waypoint>
+        <omgdi:waypoint x="490.0" y="112.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow8" id="BPMNEdge_flow8">
+        <omgdi:waypoint x="385.0" y="307.0"></omgdi:waypoint>
+        <omgdi:waypoint x="420.0" y="307.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow9" id="BPMNEdge_flow9">
+        <omgdi:waypoint x="525.0" y="307.0"></omgdi:waypoint>
+        <omgdi:waypoint x="594.0" y="307.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow10" id="BPMNEdge_flow10">
+        <omgdi:waypoint x="699.0" y="307.0"></omgdi:waypoint>
+        <omgdi:waypoint x="745.0" y="307.0"></omgdi:waypoint>
+        <omgdi:waypoint x="745.0" y="222.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow11" id="BPMNEdge_flow11">
+        <omgdi:waypoint x="595.0" y="112.0"></omgdi:waypoint>
+        <omgdi:waypoint x="745.0" y="112.0"></omgdi:waypoint>
+        <omgdi:waypoint x="745.0" y="182.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>
