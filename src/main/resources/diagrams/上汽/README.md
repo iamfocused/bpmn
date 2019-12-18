@@ -6,4 +6,14 @@
 	
 # 修改
 - 问题一开始就要判定，excel中，根据（安吉物流/供应商 ）自动区分
-- 选责任的时候搞一个备注字段，明细要搞多张图片
+- 选责任的时候搞一个备注字段，明细要搞多张图片  
+      
+      
+        
+- 尽量每个节点都可以上传图片    
+- 仲裁区都所有数据报表    
+
+所有责任划分：    
+https://metabase.eorionsolution.com/embed/question/eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyZXNvdXJjZSI6eyJxdWVzdGlvbiI6OTN9LCJwYXJhbXMiOnt9fQ==.jmAskdNQAWXkC4TgHTaG-v6483UzGS41DzGTuVgxxvU=#bordered=true&titled=true  
+仲裁区：    
+https://metabase.eorionsolution.com/embed/question/eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJyZXNvdXJjZSI6eyJxdWVzdGlvbiI6OTd9LCJwYXJhbXMiOnt9fQ==.Azz8w4AjbbZBMSDBMrCYL1Fpt7KYz396xAJB4KtikBk=#bordered=true&titled=true

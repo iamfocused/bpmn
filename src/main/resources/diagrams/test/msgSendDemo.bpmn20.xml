@@ -11,7 +11,9 @@
           </activiti:field>
           <activiti:field name="script">
             <activiti:string><![CDATA[def execId = runtimeService.createExecutionQuery().processInstanceId(processInstId).messageEventSubscriptionName(msgName).singleResult()
-    						runtimeService.messageEventReceived(msgName, execId.getId())]]></activiti:string>
+    						Map<String, Object> map = new HashMap()
+    						map.put("name","isaac")
+    						runtimeService.messageEventReceived(msgName, execId.getId(), map)]]></activiti:string>
           </activiti:field>
         </activiti:executionListener>
       </extensionElements>

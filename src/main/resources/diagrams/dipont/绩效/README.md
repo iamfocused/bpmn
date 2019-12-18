@@ -19,3 +19,12 @@
 5.报表加分数    
 6.mail userID英文名    
 7.PDF评分历史
+
+# 4    
+ 候艳 1920 fiscal year Q3  阶段绩效考核加签完成 endorser finished
+Dear,
+候艳 1920 fiscal year Q3 阶段绩效考核实际完成情况已填写完成，作为加签人，现在您可以在BPMS中对该员工进行打分。下面是实际完成情况： 
+yan.hou the actual completion of the 1920 fiscal year stage Q3 performance appraisal has been completed.Now you can rate this employee in BPMS as an endorser. Here is the actual completion:
+
+
+加签人已完成对侯艳2019 Q3 的绩效评分 The endorser has completed the grade of 候艳 2019 Q3 performance

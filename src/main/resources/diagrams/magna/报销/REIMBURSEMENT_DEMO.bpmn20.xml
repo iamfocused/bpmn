@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/fin">
+  <process id="magna_reimbursement_demo" name="报销流程Demo" isExecutable="true" activiti:candidateStarterGroups="admin">
+    <startEvent id="startevent1" name="报销申请" activiti:initiator="initiator">
+    	<extensionElements>
+    		<activiti:formProperty id="type_报销类型_1_enum_sbs_$$A" name="报销类型" type="enum" variable="type" required="true">
+    			<activiti:value id="个人报销" name="个人报销"/>
+    			<activiti:value id="出差报销" name="出差报销"/>
+    			<activiti:value id="物资采购报销" name="物资采购报销"/>
+    		</activiti:formProperty>
+    		<activiti:formProperty id="amount_报销金额_2_string_cny_$$A" name="报销金额" type="string" variable="amount" required="true"/>
+    		<activiti:formProperty id="memo_备注_3_string_t2_$$A" name="备注" type="string" variable="memo"/>
+    		
+    		<activiti:formProperty id="files_材料_4_string_t9_$$A" name="上传材料" type="string" variable="files"/>
+    		
+    		<activiti:executionListener event="end" class="org.activiti.engine.impl.bpmn.listener.ScriptExecutionListener">
+    			<activiti:field name="language">
+    				<activiti:string>
+    					<![CDATA[groovy]]>
+    				</activiti:string>
+    			</activiti:field>
+    			<activiti:field name="script">
+    				<activiti:string>
+    					<![CDATA[
+    						def body = "[{\"type\":\"$type\"}]"
+    						def droolsUrl = "https://commonservices.eorionsolution.com/decisiontables/v1/fire/magna_approval.xls"
+    						
+							def headerMap = new java.util.HashMap()
+							headerMap.put("Content-Type","application/json")
+							
+							execution.setVariable("_http_method", "POST")				
+							execution.setVariable("_http_headers", headerMap)
+							execution.setVariable("_http_body", body)
+							execution.setVariable("_http_url", droolsUrl);
+							execution.setVariable("_http_response_body", '')
+						    execution.setVariable("_http_response_status_code", '')
+    					]]>
+    				</activiti:string>
+    			</activiti:field>
+    		</activiti:executionListener>
+    	</extensionElements>
+    </startEvent>
+    <serviceTask id="servicetask1" name="call drools" activiti:class="com.eorionsolution.riying.bpms.javaservice.http.RestAPIService"></serviceTask>
+    <scriptTask id="scripttask1" name="根据drools结果获取审批流" activiti:autoStoreVariables="false" scriptFormat="groovy">
+    	<script>
+    	<![CDATA[import groovy.json.JsonOutput
+			import groovy.json.JsonSlurper
+    		
+    		if (_http_response_status_code != 200) {
+    			throw new org.activiti.engine.ActivitiIllegalArgumentException("drools call failed!")
+    		}
+    		def jsonSlurper = new JsonSlurper()
+    		def result = jsonSlurper.parseText(_http_response_body)[0]
+    		
+    		def approvalList = []
+    		if (result.manager) approvalList<<result.manager
+    		if (result.admin1) approvalList<<result.admin1
+    		if (result.admin2) approvalList<<result.admin2
+    		if (result.generalManager) approvalList<<result.generalManager
+    		if (result.finance) approvalList<<result.finance
+    		if (result.financeManager) approvalList<<result.financeManager
+    		
+    		if (approvalList.size() == 0) {
+    			throw new org.activiti.engine.ActivitiIllegalArgumentException("should add drools rule")
+    		}
+    		
+    		execution.setVariable('approvalList', approvalList)
+    	]]>
+    	</script>
+    </scriptTask>
+    <userTask id="usertask1" name="审批任务" activiti:assignee="${approver}"  activiti:dueDate="P1D">
+    	<extensionElements>
+    		<activiti:formProperty id="coreaction_审批结果 Approval_1_enum_rbv_$$A" name="审批结果 Approval" type="enum" variable="approvalResult" required="true">
+    			<activiti:value id="同意" name="同意"></activiti:value>
+          		<activiti:value id="拒绝" name="拒绝"></activiti:value>
+    		</activiti:formProperty>
+    		<activiti:formProperty id="corecomments_审批意见 Comments_1_string_t2_$$B" name="审批意见 Comments" type="string" variable="approvalComment"/>
+    		
+    		<activiti:formProperty id="type_报销类型_1_enum_sbs_$$VA" name="报销类型" type="enum" variable="type" required="true">
+    			<activiti:value id="个人报销" name="个人报销"/>
+    			<activiti:value id="出差报销" name="出差报销"/>
+    			<activiti:value id="物资采购报销" name="物资采购报销"/>
+    		</activiti:formProperty>
+    		<activiti:formProperty id="amount_报销金额_2_string_cny_$$VA" name="报销金额" type="string" variable="amount" required="true"/>
+    		<activiti:formProperty id="memo_备注_3_string_t2_$$VA" name="备注" type="string" variable="memo"/>
+    		
+    		<activiti:formProperty id="files_材料_4_string_t9_$$A" name="上传材料" type="string" variable="files"/>
+    		<activiti:taskListener event="create" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+    			<activiti:field name="language">
+    				<activiti:string>
+    					<![CDATA[groovy]]>
+    				</activiti:string>
+    			</activiti:field>
+    			<activiti:field name="script">
+    				<activiti:string>
+    					<![CDATA[
+    						def execution = task.getExecution()
+    						execution.setVariableLocal('approvalResult', '')
+    						execution.setVariableLocal('approvalComment', '')
+    					]]>
+    				</activiti:string>
+    			</activiti:field>
+    		</activiti:taskListener>
+    	</extensionElements>
+    	<multiInstanceLoopCharacteristics isSequential="true" activiti:collection="approvalList" activiti:elementVariable="approver">
+    		<completionCondition>${approvalResult=='拒绝'}</completionCondition>
+    	</multiInstanceLoopCharacteristics>
+    </userTask>
+    <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="servicetask1"></sequenceFlow>
+    <sequenceFlow id="flow2" sourceRef="servicetask1" targetRef="scripttask1"></sequenceFlow>
+    <sequenceFlow id="flow3" sourceRef="scripttask1" targetRef="usertask1"></sequenceFlow>
+    <endEvent id="endevent1" name="End"></endEvent>
+    <sequenceFlow id="flow4" sourceRef="usertask1" targetRef="endevent1"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_magna_reimbursement_demo">
+    <bpmndi:BPMNPlane bpmnElement="magna_reimbursement_demo" id="BPMNPlane_magna_reimbursement_demo">
+      <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="60.0" y="223.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="servicetask1" id="BPMNShape_servicetask1">
+        <omgdc:Bounds height="61.0" width="111.0" x="180.0" y="210.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scripttask1" id="BPMNShape_scripttask1">
+        <omgdc:Bounds height="60.0" width="111.0" x="340.0" y="210.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask1" id="BPMNShape_usertask1">
+        <omgdc:Bounds height="61.0" width="111.0" x="520.0" y="210.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="676.0" y="223.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="95.0" y="240.0"></omgdi:waypoint>
+        <omgdi:waypoint x="180.0" y="240.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="291.0" y="240.0"></omgdi:waypoint>
+        <omgdi:waypoint x="340.0" y="240.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3">
+        <omgdi:waypoint x="451.0" y="240.0"></omgdi:waypoint>
+        <omgdi:waypoint x="520.0" y="240.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow4" id="BPMNEdge_flow4">
+        <omgdi:waypoint x="631.0" y="240.0"></omgdi:waypoint>
+        <omgdi:waypoint x="676.0" y="240.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

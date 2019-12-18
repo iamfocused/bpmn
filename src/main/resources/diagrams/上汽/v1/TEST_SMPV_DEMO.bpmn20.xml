@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/pur">
-  <process id="smpvProcess" name="2019临港SMPV索赔流程Demo" isExecutable="true" activiti:candidateStarterGroups="admin">
+  <process id="smpvProcess" name="2019临港SMPV索赔流程Demo" isExecutable="true" activiti:candidateStarterGroups="admin,shangqi">
     <startEvent id="startevent1" name="开始" activiti:initiator="initiator">
       <extensionElements>
         <activiti:formProperty id="tbhdclaim_item" name="索赔明细" type="string" variable="tbhdclaim_item" required="true"></activiti:formProperty>
@@ -25,6 +25,8 @@
         <activiti:formProperty id="tbhdclaim_货运单_freightOrder_16_string_t1_$$A" name="货运单" type="string" variable="tbhdclaim_freightOrder_t00" required="true"></activiti:formProperty>
         <activiti:formProperty id="tbhdclaim_计划员_planner_17_string_t1_$$A" name="计划员" type="string" variable="tbhdclaim_planner_t00" required="true"></activiti:formProperty>
         <activiti:formProperty id="tbhdclaim_已复判_doubleCheck_18_string_t1_$$HA" name="已复判" type="string" variable="tbhdclaim_doubleCheck_t00"></activiti:formProperty>
+        
+        <activiti:formProperty id="tbhdclaim_图片_images_23_string_t9i_$$A" name="图片" type="string" variable="tbhdclaim_images_t00"/>
         <activiti:executionListener event="end" class="org.activiti.engine.impl.bpmn.listener.ScriptExecutionListener">
           <activiti:field name="language">
             <activiti:string><![CDATA[groovy]]></activiti:string>
@@ -106,6 +108,8 @@
         <activiti:formProperty id="tbhdclaim_货运单_freightOrder_16_string_t1_$$VA" name="货运单" type="string" variable="tbhdclaim_freightOrder_t00" required="true"></activiti:formProperty>
         <activiti:formProperty id="tbhdclaim_计划员_planner_17_string_t1_$$VA" name="计划员" type="string" variable="tbhdclaim_planner_t00" required="true"></activiti:formProperty>
         <activiti:formProperty id="tbhdclaim_已复判_doubleCheck_18_string_t1_$$HA" name="已复判" type="string" variable="tbhdclaim_doubleCheck_t00"></activiti:formProperty>
+        
+        <activiti:formProperty id="tbhdclaim_图片_images_23_string_t9i_$$A" name="图片" type="string" variable="tbhdclaim_images_t00"/>
       </extensionElements>
     </userTask>
     <endEvent id="endevent1" name="End"></endEvent>
@@ -136,6 +140,7 @@
         <activiti:formProperty id="tbhdclaim_计划员_planner_17_string_t1_$$VA" name="计划员" type="string" variable="tbhdclaim_planner_t00" required="true"></activiti:formProperty>
         <activiti:formProperty id="tbhdclaim_已复判_doubleCheck_18_string_t1_$$HA" name="已复判" type="string" variable="tbhdclaim_doubleCheck_t00"></activiti:formProperty>
         <activiti:formProperty id="tbhdclaim_备注_note1_19_string_t2_$$A" name="备注" type="string" variable="tbhdclaim_note1_t00"/>
+        <activiti:formProperty id="tbhdclaim_图片_images_23_string_t9i_$$A" name="图片" type="string" variable="tbhdclaim_images_t00"/>
         <activiti:taskListener event="create" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
           <activiti:field name="language">
             <activiti:string><![CDATA[groovy]]></activiti:string>
@@ -288,7 +293,20 @@
 						if (it.existDissent == '提出异议' && it.reason == ' ') {
 							throw new org.activiti.engine.ActivitiIllegalArgumentException('请对\"提出异议\"的索赔记录选择理由')
 						}
-					}]]></activiti:string>
+					}
+					
+					def b_rows_1 = filterDissentRows2(jsonSlurper.parseText(tbhdclaim1_item))
+					if (b_rows_1.size()>0) {
+						b_rows.addAll(b_rows_1)
+						execution.setVariable('b_rows_std', JsonOutput.toJson(b_rows))
+						execution.setVariable('b_rows', b_rows)
+					}
+					
+					//需要进入仲裁区的
+				    static def filterDissentRows2(def item) {
+				    	return item.get('rows').findAll{(it[19]=='提出异议'&&it[20]!='供应商责任') || (it[19]=='提出异议'&&it[17]=='Y')}
+				    }
+					]]></activiti:string>
           </activiti:field>
         </activiti:taskListener>
       </extensionElements>
@@ -351,7 +369,20 @@
 						if (it.existDissent == '提出异议' && it.reason == ' ') {
 							throw new org.activiti.engine.ActivitiIllegalArgumentException('请对\"提出异议\"的索赔记录选择理由')
 						}
-					}]]></activiti:string>
+					}
+					
+					def b_rows_2 = filterDissentRows2(jsonSlurper.parseText(tbhdclaim2_item))
+					if (b_rows_2.size()>0) {
+						b_rows.addAll(b_rows_2)
+						execution.setVariable('b_rows_std', JsonOutput.toJson(b_rows))
+						execution.setVariable('b_rows', b_rows)
+					}
+					
+					//需要进入仲裁区的
+				    static def filterDissentRows2(def item) {
+				    	return item.get('rows').findAll{(it[19]=='提出异议'&&it[20]!='供应商责任') || (it[19]=='提出异议'&&it[17]=='Y')}
+				    }
+					]]></activiti:string>
           </activiti:field>
         </activiti:taskListener>
       </extensionElements>
@@ -414,7 +445,20 @@
 						if (it.existDissent == '提出异议' && it.reason == ' ') {
 							throw new org.activiti.engine.ActivitiIllegalArgumentException('请对\"提出异议\"的索赔记录选择理由')
 						}
-					}]]></activiti:string>
+					}
+					
+					def b_rows_3 = filterDissentRows2(jsonSlurper.parseText(tbhdclaim3_item))
+					if (b_rows_3.size()>0) {
+						b_rows.addAll(b_rows_3)
+						execution.setVariable('b_rows_std', JsonOutput.toJson(b_rows))
+						execution.setVariable('b_rows', b_rows)
+					}
+					
+					//需要进入仲裁区的
+				    static def filterDissentRows2(def item) {
+				    	return item.get('rows').findAll{(it[19]=='提出异议'&&it[20]!='供应商责任') || (it[19]=='提出异议'&&it[17]=='Y')}
+				    }
+					]]></activiti:string>
           </activiti:field>
         </activiti:taskListener>
       </extensionElements>
@@ -450,10 +494,10 @@
 	      	if (a_rows_1.size() &gt; 0) {
 	      		a_rows.addAll(a_rows_1)
 	      	}
-	      	def b_rows_1 = filterDissentRows2(jsonSlurper.parseText(tbhdclaim1_item))
-	      	if (b_rows_1.size() &gt; 0) {
-	      		b_rows.addAll(b_rows_1)
-	      	}
+	      	//def b_rows_1 = filterDissentRows2(jsonSlurper.parseText(tbhdclaim1_item))
+	      	//if (b_rows_1.size() &gt; 0) {
+	      	//	b_rows.addAll(b_rows_1)
+	      	//}
 	      	//将已接受的存入collection
 	      	processedLi.addAll(jsonSlurper.parseText(tbhdclaim1_item_std).findAll{it.existDissent=='没有异议'})
 	      	
@@ -467,10 +511,10 @@
 	      	if (a_rows_2.size() &gt; 0) {
 	      		a_rows.addAll(a_rows_2)
 	      	}
-	      	def b_rows_2 = filterDissentRows2(jsonSlurper.parseText(tbhdclaim2_item))
-	      	if (b_rows_2.size() &gt; 0) {
-	      		b_rows.addAll(b_rows_2)
-	      	}
+	      	//def b_rows_2 = filterDissentRows2(jsonSlurper.parseText(tbhdclaim2_item))
+	      	//if (b_rows_2.size() &gt; 0) {
+	      	//	b_rows.addAll(b_rows_2)
+	      	//}
 	      	processedLi.addAll(jsonSlurper.parseText(tbhdclaim2_item_std).findAll{it.existDissent=='没有异议'})
 	      	
 	      	arr.addAll(jsonSlurper.parseText(tbhdclaim2_item_std).collect{it.existDissent})
@@ -484,10 +528,10 @@
 	      	if (a_rows_3.size() &gt; 0) {
 	      		a_rows.addAll(a_rows_3)
 	      	}
-	      	def b_rows_3 = filterDissentRows2(jsonSlurper.parseText(tbhdclaim3_item))
-	      	if (b_rows_3.size() &gt; 0) {
-	      		b_rows.addAll(b_rows_3)
-	      	}
+	      	//def b_rows_3 = filterDissentRows2(jsonSlurper.parseText(tbhdclaim3_item))
+	      	//if (b_rows_3.size() &gt; 0) {
+	      	//	b_rows.addAll(b_rows_3)
+	      	//}
 	      	processedLi.addAll(jsonSlurper.parseText(tbhdclaim3_item_std).findAll{it.existDissent=='没有异议'})
 	      	arr.addAll(jsonSlurper.parseText(tbhdclaim3_item_std).collect{it.existDissent})
 	      }
@@ -505,6 +549,7 @@
 	      if(b_rows.size() &gt; 0) {
 	      	def tbhdclaim4_item = arbitration(jsonSlurper.parseText(tbhdclaim_item_temp),b_rows,'tbhdclaim4',idName)
 	      	execution.setVariable('tbhdclaim4_item',JsonOutput.toJson(tbhdclaim4_item))
+	      	//execution.setVariable('b_rows_std', JsonOutput.toJson(b_rows))
 	      }
 	      
 	      //save confirm to collection
@@ -526,7 +571,7 @@
 	      }
 	      //需要进入仲裁区的
 	      static def filterDissentRows2(def item) {
-	      	return item.get('rows').findAll{(it[19]=='提出异议'&amp;&amp;it[20]!='供应商责任') || (it[18]=='提出异议'&amp;&amp;it[17]=='Y')}
+	      	return item.get('rows').findAll{(it[19]=='提出异议'&amp;&amp;it[20]!='供应商责任') || (it[19]=='提出异议'&amp;&amp;it[17]=='Y')}
 	      }
 	      
 	      static def arbitration(def item, def rows, def targetName, def sourceName){
@@ -581,7 +626,7 @@
           <activiti:value id="其他" name="其他"></activiti:value>
         </activiti:formProperty>
         <activiti:formProperty id="tbhdclaim4_备注_note_22_string_t2_$$VA" name="异议备注" type="string" variable="tbhdclaim4_note_t00"></activiti:formProperty>
-        <activiti:formProperty id="tbhdclaim4_图片_images_23_string_t9i_$$VA" name="图片" type="string" variable="tbhdclaim1_images_t00"/>
+        <activiti:formProperty id="tbhdclaim4_图片_images_23_string_t9i_$$A" name="图片" type="string" variable="tbhdclaim1_images_t00"/>
         
         <activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
           <activiti:field name="language">
