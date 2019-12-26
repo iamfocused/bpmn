@@ -18,19 +18,16 @@
 							def jsonSlurper = new JsonSlurper()
     						def jsonString = """
 {
-  "tableName":"PRODUCTION_PROCESS",
+  "tableName":"DP_HOLIDAY_BALANCE_",
   "type":0,
   "details":
   [
     {
-      "insert":{"SUP_PROC_INST_":"99999","CODE_":"TT1"}
-    },
-    {
-      "insert": {"SUP_PROC_INST_":"99999","CODE_":"TT2"}
+      "insert":{"SN_":"100010","LEAVE_TYPE_":"年假","REMAINING_DAYS_":20,"ENABLE_":true,"CREATE_TIME_":"2019-12-25T08:54:18.028"}
     }
   ]
 
-} 						
+}						
 """    					
 							def json = JsonOutput.toJson(jsonSlurper.parseText(jsonString))
 							def handleResult = JdbcUtils.batchInsert(json)

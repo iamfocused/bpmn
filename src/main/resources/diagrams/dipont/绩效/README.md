@@ -27,4 +27,7 @@ Dear,
 yan.hou the actual completion of the 1920 fiscal year stage Q3 performance appraisal has been completed.Now you can rate this employee in BPMS as an endorser. Here is the actual completion:
 
 
-加签人已完成对侯艳2019 Q3 的绩效评分 The endorser has completed the grade of 候艳 2019 Q3 performance
+加签人已完成对侯艳2019 Q3 的绩效评分 The endorser has completed the grade of 候艳 2019 Q3 performance    
+
+# 5    
+“上年度实际”  -->  这里改为上年度同期实际    

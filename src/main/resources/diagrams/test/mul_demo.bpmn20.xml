@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/pur">
+  <process id="multiProcess" name="多实例变量测试" isExecutable="true" activiti:candidateStarterGroups="admin">
+    <startEvent id="startevent1" name="Start">
+    	<extensionElements>
+    		<activiti:formProperty id="leaveType_请假类型 Leave Type_1_string_tree_$$A" name="请假类型 Leave Type" type="string" variable="leaveType"/>
+    		<activiti:executionListener event="end" class="org.activiti.engine.impl.bpmn.listener.ScriptExecutionListener">
+    			<activiti:field name="language">
+    				<activiti:string>
+    					<![CDATA[groovy]]>
+    				</activiti:string>
+    			</activiti:field>
+    			<activiti:field name="script">
+    				<activiti:string>
+    					<![CDATA[
+    						def list = ['111','222','333']
+    						execution.setVariable('list', list)
+    					]]>
+    				</activiti:string>
+    			</activiti:field>
+    		</activiti:executionListener>
+    	</extensionElements>
+    </startEvent>
+    <userTask id="usertask1" name="User Task" activiti:assignee="100011">
+    	<extensionElements>
+    		<activiti:formProperty id="uname_名字_1_string_t1_$$A" name="名字" type="string" variable="uname"/>
+    		<activiti:formProperty id="coreaction_审批结果 Approval_2_enum_rbv_$$A" name="审批结果 Approval" type="enum" variable="coreaction" required="true">
+          <activiti:value id="同意 Agree" name="同意 Agree"></activiti:value>
+          <activiti:value id="拒绝 Refuse" name="拒绝 Refuse"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="corecomments_审批意见 Comments_1_string_t2_$$B" name="审批意见 Comments" type="string" variable="corecomments"></activiti:formProperty>
+    	
+    		<activiti:taskListener event="create" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+    			<activiti:field name="language"><activiti:string><![CDATA[groovy]]></activiti:string></activiti:field>
+    			<activiti:field name="script">
+    				<activiti:string>
+    					<![CDATA[
+    						execution.setVariableLocal('corecomments','')
+    					]]>
+    				</activiti:string>
+    			</activiti:field>
+    		</activiti:taskListener>
+    	</extensionElements>
+    	<multiInstanceLoopCharacteristics isSequential="false" activiti:collection="list" activiti:elementVariable="uname">
+    		<completionCondition><![CDATA[${coreaction == '拒绝 Refuse'}]]></completionCondition>
+    	</multiInstanceLoopCharacteristics>
+    </userTask>
+    <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="usertask1"></sequenceFlow>
+    <endEvent id="endevent1" name="End"></endEvent>
+    <sequenceFlow id="flow2" sourceRef="usertask1" targetRef="endevent1"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_multiProcess">
+    <bpmndi:BPMNPlane bpmnElement="multiProcess" id="BPMNPlane_multiProcess">
+      <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="170.0" y="190.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask1" id="BPMNShape_usertask1">
+        <omgdc:Bounds height="55.0" width="105.0" x="250.0" y="180.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="400.0" y="190.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="205.0" y="207.0"></omgdi:waypoint>
+        <omgdi:waypoint x="250.0" y="207.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="355.0" y="207.0"></omgdi:waypoint>
+        <omgdi:waypoint x="400.0" y="207.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>
