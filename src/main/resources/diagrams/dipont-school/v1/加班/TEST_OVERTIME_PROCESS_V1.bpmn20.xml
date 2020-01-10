@@ -1,0 +1,297 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/frm">
+  <process id="overtime_process" name="加班流程 Overtime Process" isExecutable="true" activiti:candidateStarterGroups="dpschool">
+    <startEvent id="startevent1" name="Start" activiti:initiator="initiator">
+      <extensionElements>
+        <activiti:formProperty id="startDate_开始时间 Start_1_string_t5_$$A" name="开始时间 Start" type="string" variable="startDate" required="true"></activiti:formProperty>
+        <activiti:formProperty id="endDate_结束时间 End_2_string_t5_$$A" name="结束时间 End" type="string" variable="endDate" required="true"></activiti:formProperty>
+        <activiti:formProperty id="overtimeDays_加班天数 Overtime Days_3_string_t11_$$A" name="加班天数 Overtime Days" type="string" variable="overtimeDays" required="true">
+        </activiti:formProperty>
+        <activiti:formProperty id="reason_加班理由 Reason For Overtime_1_string_t2_$$B" name="加班理由 Reason For Overtime" type="string" variable="reason" required="true"/>
+        <activiti:executionListener event="end" class="org.activiti.engine.impl.bpmn.listener.ScriptExecutionListener">
+          <activiti:field name="language">
+            <activiti:string><![CDATA[groovy]]></activiti:string>
+          </activiti:field>
+          <activiti:field name="script">
+            <activiti:string><![CDATA[
+            				def days = overtimeDays.toBigDecimal().divide(BigDecimal.valueOf(0.5))
+    						def correctDays = days.remainder(BigDecimal.ONE).setScale(2) == BigDecimal.valueOf(0.00)
+			            	if (!correctDays) {
+			 					throw new org.activiti.engine.ActivitiIllegalArgumentException('加班的最小单位为0.5天 The minimum unit for overtime is 0.5 days.')
+			 				}
+			 				
+			 				//common init
+			 				def metabaseUrl = 'https://metabase.eorionsolution.com/public/question/f9e46380-b463-483a-8938-553c0e776f85.json?parameters='
+			 				execution.setVariable('mailUrl', 'https://commonservices.eorionsolution.com/mailsender/mail/v2/mail')
+ 							execution.setVariable('mailFrom', 'develop@eorionsolution.com')
+			 				
+			 				//get staff info by metabase
+			 				def headerMap = new HashMap()
+			 				def param=java.net.URLEncoder.encode('[{"type":"category","target":["variable",["template-tag","sn"]],"value":\"'+ initiator+ '\"}]', "UTF-8")
+			 				execution.setVariable("_http_method", "GET")
+			 				execution.setVariable("_http_headers", headerMap)
+			 				execution.setVariable("_http_body", '')
+			 				execution.setVariable("_http_url", metabaseUrl + param)
+			 				execution.setVariable("_http_response_body", '')
+			 				execution.setVariable("_http_response_status_code", '')
+			 				
+    						execution.setVariable('procInstId', execution.getProcessInstanceId())]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </startEvent>
+    <serviceTask id="eimService" name="EIM Service" activiti:class="com.eorionsolution.riying.bpms.javaservice.http.RestAPIService"></serviceTask>
+    <scriptTask id="scripttask1" name="resolve EIM data " scriptFormat="groovy" activiti:autoStoreVariables="false">
+      <script>
+      import groovy.json.JsonSlurper
+    		if (_http_response_status_code!=200) {
+    			throw new org.activiti.engine.ActivitiIllegalArgumentException('call metabase failed!')
+    		}
+    		def jsonSlurper = new JsonSlurper()
+    		def employeeLi = jsonSlurper.parseText(_http_response_body)
+    		if (employeeLi.size() != 1) {
+    			throw new org.activiti.engine.ActivitiIllegalArgumentException('当前您的数据不存在EIM中 Your information does not exist in the EIM.')
+    		}
+    		def employee = employeeLi[0]
+    		if (!employee.MANAGER_SN_ || employee.MANAGER_SN_.trim()=='') {
+    			throw new org.activiti.engine.ActivitiIllegalArgumentException('请在EIM中维护您的"直线领导"信息 Please maintain your "Manager" information in EIM. ')
+    		}
+    		execution.setVariable('managerSn', employee.MANAGER_SN_)
+    		
+      </script>
+    </scriptTask>
+    <userTask id="usertask1" name="加班申请审批 Overtime Application Approval" activiti:assignee="${managerSn}" activiti:dueDate="P1D" activiti:priority="8080">
+      <extensionElements>
+        <activiti:formProperty id="coreaction_审批结果 Approval_1_enum_rbv_$$A" name="审批结果 Approval" type="enum" variable="coreaction" required="true">
+          <activiti:value id="同意 Agree" name="同意 Agree"></activiti:value>
+          <activiti:value id="拒绝 Refuse" name="拒绝 Refuse"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="corecomments_审批意见 Comments_1_string_t2_$$B" name="审批意见 Comments" type="string" variable="corecomments"></activiti:formProperty>
+        <activiti:formProperty id="startDate_开始时间 Start_1_string_t5_$$VA" name="开始时间 Start" type="string" variable="startDate" required="true"></activiti:formProperty>
+        <activiti:formProperty id="endDate_结束时间 End_2_string_t5_$$VA" name="结束时间 End" type="string" variable="endDate" required="true"></activiti:formProperty>
+        <activiti:formProperty id="overtimeDays_加班天数 Overtime Days_3_string_t11_$$VA" name="加班天数 Overtime Days" type="string" variable="overtimeDays"/>
+        <activiti:formProperty id="reason_加班理由 Reason For Overtime_1_string_t2_$$VB" name="加班理由 Reason For Overtime" type="string" variable="reason" required="true"/>
+        <activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+          <activiti:field name="language">
+            <activiti:string><![CDATA[groovy]]></activiti:string>
+          </activiti:field>
+          <activiti:field name="script">
+            <activiti:string><![CDATA[def execution = task.getExecution()
+    						def managerOpt = Optional.ofNullable(identityService.createUserQuery().userId(task.getAssignee()).singleResult())
+    						def managerName = managerOpt.map({u ->  u.getLastName() + u.getFirstName()}).orElse('')
+    						execution.setVariable('managerName', managerName)]]></activiti:string>
+          </activiti:field>
+        </activiti:taskListener>
+      </extensionElements>
+    </userTask>
+    <endEvent id="endevent1" name="End"></endEvent>
+    <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="eimService"></sequenceFlow>
+    <sequenceFlow id="flow2" sourceRef="eimService" targetRef="scripttask1"></sequenceFlow>
+    <sequenceFlow id="flow3" sourceRef="scripttask1" targetRef="usertask1"></sequenceFlow>
+    <sequenceFlow id="flow4" sourceRef="usertask1" targetRef="exclusivegateway1"></sequenceFlow>
+    <exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway"></exclusiveGateway>
+    <scriptTask id="scripttask2" name="failure notification" scriptFormat="groovy" activiti:autoStoreVariables="false">
+      <script>
+      import groovy.json.JsonSlurper
+    		import groovy.json.JsonOutput
+    		
+    		def jsonSlurper = new JsonSlurper()
+    		def corecomments = corecomments?:''
+    		def mailStr = """
+{
+  "mail":{
+    "templateName":"school_oa",
+    "subject": "加班申请未通过-$reason",
+    "templateData":{
+      "fail":"1",
+      "managerName": "$managerName",
+      "corecomments": "$corecomments"
+    },
+    "from":"$mailFrom",
+    "to":[
+      "baocaixue@eorionsolution.com"
+    ]
+  }
+}	
+"""
+			def mailBodyObj = jsonSlurper.parseText(mailStr)
+			def mailBody = JsonOutput.toJson(mailBodyObj)
+			execution.setVariable('failMailBody', mailBody)
+			
+			execution.setVariable("_http_method", "POST")
+			def headerMap = new HashMap()
+			headerMap.put("Content-Type","application/json")
+			execution.setVariable("_http_headers", headerMap)
+			execution.setVariable("_http_body", mailBody)
+			execution.setVariable("_http_url", mailUrl)
+			execution.setVariable("_http_response_body", '')
+			execution.setVariable("_http_response_status_code", '')
+    	
+    	</script>
+    </scriptTask>
+    <scriptTask id="scripttask3" name="success notification" scriptFormat="groovy" activiti:autoStoreVariables="false">
+      <script>
+      
+    	import groovy.json.JsonSlurper
+    		import groovy.json.JsonOutput
+    		import com.eorionsolution.bpms.extension.jdbc.JdbcUtils
+    		import java.time.LocalDateTime
+    		
+    		def jsonSlurper = new JsonSlurper()
+    		def corecomments = corecomments?:''
+    		def mailStr = """
+{
+  "mail":{
+    "templateName":"school_oa",
+    "subject": "加班申请成功-$reason",
+    "templateData":{
+      "success":"1",
+      "managerName": "$managerName",
+      "corecomments": "$corecomments"
+    },
+    "from":"$mailFrom",
+    "to":[
+      "baocaixue@eorionsolution.com"
+    ]
+  }
+}	
+"""
+			def mailBodyObj = jsonSlurper.parseText(mailStr)
+			def mailBody = JsonOutput.toJson(mailBodyObj)
+			execution.setVariable('successMailBody', mailBody)
+			
+			execution.setVariable("_http_method", "POST")
+			def headerMap = new HashMap()
+			headerMap.put("Content-Type","application/json")
+			execution.setVariable("_http_headers", headerMap)
+			execution.setVariable("_http_body", mailBody)
+			execution.setVariable("_http_url", mailUrl)
+			execution.setVariable("_http_response_body", '')
+			execution.setVariable("_http_response_status_code", '')
+			
+			//insert overtime record
+			def overtimeDays = overtimeDays.toDouble()
+			def now = LocalDateTime.now().toString()
+			def insertJson = """
+{
+    "tableName":"DP_HOLIDAY_BALANCE_",
+    "type":0,
+    "details":[
+        {
+            "insert":{
+                "SN_":"$initiator",
+                "LEAVE_TYPE_":"调休假Leave In Lieu",
+                "REMAINING_DAYS_": $overtimeDays,
+                "PROC_INST_ID_":"$procInstId",
+                "ENABLE_":true,
+                "CREATE_TIME_":"$now"
+            }
+        }
+    ]
+}			
+"""
+			def result = JdbcUtils.batchInsert(JsonOutput.toJson(jsonSlurper.parseText(insertJson)));
+			if (result != 200) {
+				throw new org.activiti.engine.ActivitiIllegalArgumentException('加班记录异常 Insert Record Exception. ')
+			}
+    	
+    	</script>
+    </scriptTask>
+    <serviceTask id="mailService1" name="Mail Service" activiti:class="com.eorionsolution.riying.bpms.javaservice.http.RestAPIService"></serviceTask>
+    <serviceTask id="mailService2" name="Mail Service" activiti:class="com.eorionsolution.riying.bpms.javaservice.http.RestAPIService"></serviceTask>
+    <sequenceFlow id="flow5" name="agree" sourceRef="exclusivegateway1" targetRef="scripttask3">
+    	<conditionExpression xsi:type="tFormalExpression"><![CDATA[${coreaction == '同意 Agree'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow6" sourceRef="scripttask3" targetRef="mailService1"></sequenceFlow>
+    <sequenceFlow id="flow8" name="refuse" sourceRef="exclusivegateway1" targetRef="scripttask2">
+    	<conditionExpression xsi:type="tFormalExpression"><![CDATA[${coreaction == '拒绝 Refuse'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow9" sourceRef="scripttask2" targetRef="mailService2"></sequenceFlow>
+    <sequenceFlow id="flow10" sourceRef="mailService2" targetRef="endevent1"></sequenceFlow>
+    <endEvent id="endevent2" name="End"></endEvent>
+    <sequenceFlow id="flow11" sourceRef="mailService1" targetRef="endevent2"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_overtime_process">
+    <bpmndi:BPMNPlane bpmnElement="overtime_process" id="BPMNPlane_overtime_process">
+      <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="50.0" y="200.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="eimService" id="BPMNShape_eimService">
+        <omgdc:Bounds height="61.0" width="111.0" x="140.0" y="187.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scripttask1" id="BPMNShape_scripttask1">
+        <omgdc:Bounds height="61.0" width="111.0" x="290.0" y="187.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask1" id="BPMNShape_usertask1">
+        <omgdc:Bounds height="61.0" width="111.0" x="450.0" y="187.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="648.0" y="510.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway1" id="BPMNShape_exclusivegateway1">
+        <omgdc:Bounds height="40.0" width="40.0" x="485.0" y="300.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scripttask2" id="BPMNShape_scripttask2">
+        <omgdc:Bounds height="61.0" width="111.0" x="610.0" y="290.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scripttask3" id="BPMNShape_scripttask3">
+        <omgdc:Bounds height="61.0" width="111.0" x="280.0" y="290.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="mailService1" id="BPMNShape_mailService1">
+        <omgdc:Bounds height="61.0" width="111.0" x="280.0" y="400.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="mailService2" id="BPMNShape_mailService2">
+        <omgdc:Bounds height="61.0" width="111.0" x="610.0" y="400.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent2" id="BPMNShape_endevent2">
+        <omgdc:Bounds height="35.0" width="35.0" x="318.0" y="510.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="85.0" y="217.0"></omgdi:waypoint>
+        <omgdi:waypoint x="140.0" y="217.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="251.0" y="217.0"></omgdi:waypoint>
+        <omgdi:waypoint x="290.0" y="217.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3">
+        <omgdi:waypoint x="401.0" y="217.0"></omgdi:waypoint>
+        <omgdi:waypoint x="450.0" y="217.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow4" id="BPMNEdge_flow4">
+        <omgdi:waypoint x="505.0" y="248.0"></omgdi:waypoint>
+        <omgdi:waypoint x="505.0" y="300.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow5" id="BPMNEdge_flow5">
+        <omgdi:waypoint x="485.0" y="320.0"></omgdi:waypoint>
+        <omgdi:waypoint x="391.0" y="320.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="13.0" width="100.0" x="403.0" y="307.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow6" id="BPMNEdge_flow6">
+        <omgdi:waypoint x="335.0" y="351.0"></omgdi:waypoint>
+        <omgdi:waypoint x="335.0" y="400.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow8" id="BPMNEdge_flow8">
+        <omgdi:waypoint x="525.0" y="320.0"></omgdi:waypoint>
+        <omgdi:waypoint x="610.0" y="320.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="13.0" width="100.0" x="524.0" y="307.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow9" id="BPMNEdge_flow9">
+        <omgdi:waypoint x="665.0" y="351.0"></omgdi:waypoint>
+        <omgdi:waypoint x="665.0" y="400.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow10" id="BPMNEdge_flow10">
+        <omgdi:waypoint x="665.0" y="461.0"></omgdi:waypoint>
+        <omgdi:waypoint x="665.0" y="510.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow11" id="BPMNEdge_flow11">
+        <omgdi:waypoint x="335.0" y="461.0"></omgdi:waypoint>
+        <omgdi:waypoint x="335.0" y="510.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

@@ -4,6 +4,8 @@
     <startEvent id="startevent1" name="Start">
     	<extensionElements>
     		<activiti:formProperty id="leaveType_请假类型 Leave Type_1_string_tree_$$A" name="请假类型 Leave Type" type="string" variable="leaveType"/>
+    		        <activiti:formProperty id="adder_加签人 add Judger_1_string_psbi_$$E" name="加签人 add Judger" type="string" variable="adder"></activiti:formProperty>
+    		
     		<activiti:executionListener event="end" class="org.activiti.engine.impl.bpmn.listener.ScriptExecutionListener">
     			<activiti:field name="language">
     				<activiti:string>
@@ -13,8 +15,12 @@
     			<activiti:field name="script">
     				<activiti:string>
     					<![CDATA[
-    						def list = ['111','222','333']
+    						def list = ['111']
     						execution.setVariable('list', list)
+    						throw new Exception('' + identityService.createUserQuery().userId('a1111').singleResult())
+    						def employeeOpt = Optional.ofNullable(identityService.createUserQuery().userId('a1111').singleResult())
+    						throw new Exception('' + employeeOpt)
+    						def employeeName = employeeOpt.map({u ->  u.getLastName() + u.getFirstName()}).orElse('')
     					]]>
     				</activiti:string>
     			</activiti:field>
@@ -35,7 +41,7 @@
     			<activiti:field name="script">
     				<activiti:string>
     					<![CDATA[
-    						execution.setVariableLocal('corecomments','')
+    						//execution.setVariableLocal('corecomments','')
     					]]>
     				</activiti:string>
     			</activiti:field>

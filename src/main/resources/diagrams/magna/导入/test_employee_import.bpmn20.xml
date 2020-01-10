@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/pur">
+  <process id="employeeImportProcess" name="人员导入流程" isExecutable="true" activiti:candidateStarterGroups="admin">
+    <startEvent id="startevent1" name="Start" activiti:initiator="initiator">
+      <extensionElements>
+        <activiti:formProperty id="tbhdemployees_item" name="员工列表" variable="tbhdemployees_item" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdemployees_员工编号_employeeCode_1_string_t1_$$A" name="员工编号" type="string" variable="tbhdemployees_employeeCode_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdemployees_员工姓名_employeeName_2_string_t1_$$A" name="员工姓名" type="string" variable="tbhdemployees_employeeName_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdemployees_岗位_position_3_string_t1_$$A" name="岗位" type="string" variable="tbhdemployees_position_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdemployees_部门_department_4_enum_sbs_$$A" name="部门" type="enum" variable="tbhdemployees_department_t00" required="true">
+          <activiti:value id="部门A" name="部门A"></activiti:value>
+          <activiti:value id="部门B" name="部门B"></activiti:value>
+          <activiti:value id="部门C" name="部门C"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="tbhdemployees_上级领导_managerCode_5_t1_$$A" name="上级领导" type="string" variable="tbhdemployees_managerCode_t00" required="true"/>
+        <activiti:formProperty id="tbhdemployees_成本中心_costcenter_6_enum_sbs_$$A" name="成本中心" type="enum" variable="tbhdemployees_costcenter_t00" required="true">
+          <activiti:value id="成本中心A" name="成本中心A"></activiti:value>
+          <activiti:value id="成本中心B" name="成本中心B"></activiti:value>
+          <activiti:value id="成本中心C" name="成本中心C"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="tbhdemployees_是否成本中心负责人_isCostcenterPrincipal_7_enum_sbs_$$A" name="是否成本中心负责人" type="enum" variable="tbhdemployees_isCostcenterPrincipal_t00"  required="true">
+          <activiti:value id="N" name="N"></activiti:value>
+          <activiti:value id="Y" name="Y"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="tbhdemployees_邮箱_mail_8_string_t7_$$A" name="邮箱" type="string" variable="tbhdemployees_mail_t00" required="true"></activiti:formProperty>
+      	<activiti:executionListener event="end" class="org.activiti.engine.impl.bpmn.listener.ScriptExecutionListener">
+      		<activiti:field name="language">
+      			<activiti:string>
+      				<![CDATA[groovy]]>
+      			</activiti:string>
+      		</activiti:field>
+      		<activiti:field name="script">
+      			<activiti:string>
+      				<![CDATA[import groovy.json.JsonOutput
+					import groovy.json.JsonSlurper
+					import java.time.LocalDateTime
+      				import com.eorionsolution.bpms.extension.jdbc.JdbcUtils
+      				
+      				def jsonSlurper = new JsonSlurper()
+      				def employees = jsonSlurper.parseText(tbhdemployees_item_std)
+      				def now = LocalDateTime.now().toString()
+      				def details = []
+      				employees.each{
+      					def employee = [
+      						"EMPLOYEE_CODE_": it.employeeCode, "EMPLOYEE_NAME_": it.employeeName,
+      						"POSITION_": it.position, "DEPARTMENT_": it.department,
+      						"MANAGER_CODE_": it.managerCode, "COSTCENTER_": it.costcenter,
+      						"IS_COSTCENTER_PRINCIPAL_": it.isCostcenterPrincipal,"MAIL_": it.mail, 
+      						"CREATE_TIME_": now
+      					]
+      					details << ["insert": employee]
+      				}
+      				def detailsJson = JsonOutput.toJson(details)
+      				
+      				def insertJson = """
+{
+    "tableName":"MAGNA_EMPLOYEE_",
+    "type":0,
+    "details": $detailsJson
+}			
+"""
+					def result = JdbcUtils.batchInsert(JsonOutput.toJson(jsonSlurper.parseText(insertJson)))
+					if (result != 200) {
+						throw new org.activiti.engine.ActivitiIllegalArgumentException('Insert Record Exception. ')
+					}
+      				]]>
+      			</activiti:string>
+      		</activiti:field>
+      	</activiti:executionListener>
+      </extensionElements>
+    </startEvent>
+    <endEvent id="endevent1" name="End"></endEvent>
+    <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="endevent1"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_employeeImportProcess">
+    <bpmndi:BPMNPlane bpmnElement="employeeImportProcess" id="BPMNPlane_employeeImportProcess">
+      <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="230.0" y="230.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="420.0" y="230.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="265.0" y="247.0"></omgdi:waypoint>
+        <omgdi:waypoint x="420.0" y="247.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

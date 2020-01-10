@@ -1,18 +1,35 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/frm">
-  <process id="overtime_process" name="加班流程 Overtime Process" isExecutable="true" activiti:candidateStarterGroups="admin">
+  <process id="overtime_process" name="加班流程 Overtime Process" isExecutable="true" activiti:candidateStarterGroups="dpschool">
     <startEvent id="startevent1" name="Start" activiti:initiator="initiator">
       <extensionElements>
         <activiti:formProperty id="startDate_开始时间 Start_1_string_t5_$$A" name="开始时间 Start" type="string" variable="startDate" required="true"></activiti:formProperty>
         <activiti:formProperty id="endDate_结束时间 End_2_string_t5_$$A" name="结束时间 End" type="string" variable="endDate" required="true"></activiti:formProperty>
-        <activiti:formProperty id="overtimeDays_加班天数 Overtime Days_3_string_t11_$$A" name="加班天数 Overtime Days" type="string" variable="overtimeDays" required="true"></activiti:formProperty>
+        <activiti:formProperty id="overtimeDays_加班天数 Overtime Days_3_enum_sbs_$$A" name="加班天数 Overtime Days" type="enum" variable="overtimeDays">
+        	<activiti:value id="0.5" name="0.5"/>
+        	<activiti:value id="1.0" name="1.0"/>
+        	<activiti:value id="1.5" name="1.5"/>
+        	<activiti:value id="2.0" name="2.0"/>
+        	<activiti:value id="2.5" name="2.5"/>
+        	<activiti:value id="3.0" name="3.0"/>
+        </activiti:formProperty>
+        <activiti:formProperty id="otherOvertimeDays_其他加班天数 Other Overtime Days_4_string_t11_$$A" name="其他加班天数 Other Overtime Days" type="string" variable="otherOvertimeDays"/>
         <activiti:formProperty id="memo_备注 Memo_1_string_t2_$$B" name="备注 Memo" type="string" variable="memo"></activiti:formProperty>
         <activiti:executionListener event="end" class="org.activiti.engine.impl.bpmn.listener.ScriptExecutionListener">
           <activiti:field name="language">
             <activiti:string><![CDATA[groovy]]></activiti:string>
           </activiti:field>
           <activiti:field name="script">
-            <activiti:string><![CDATA[def days = overtimeDays.toBigDecimal().divide(BigDecimal.valueOf(0.5))
+            <activiti:string><![CDATA[
+            				if (!overtimeDays && !otherOvertimeDays) {
+            					throw new org.activiti.engine.ActivitiIllegalArgumentException('请填写"加班天数"（或"其他加班天数"） Please fill in "Overtime Days"(or "Other Overtime Days")')
+            				}
+            				def realOvertimeDays = overtimeDays
+            				if (otherOvertimeDays) {
+            					realOvertimeDays = otherOvertimeDays
+            				}
+            				execution.setVariable('realOvertimeDays', realOvertimeDays)
+            				def days = realOvertimeDays.toBigDecimal().divide(BigDecimal.valueOf(0.5))
     						def correctDays = days.remainder(BigDecimal.ONE).setScale(2) == BigDecimal.valueOf(0.00)
 			            	if (!correctDays) {
 			 					throw new org.activiti.engine.ActivitiIllegalArgumentException('加班的最小单位为0.5天 The minimum unit for overtime is 0.5 days.')
@@ -41,7 +58,7 @@
     <serviceTask id="eimService" name="EIM Service" activiti:class="com.eorionsolution.riying.bpms.javaservice.http.RestAPIService"></serviceTask>
     <scriptTask id="scripttask1" name="resolve EIM data " scriptFormat="groovy" activiti:autoStoreVariables="false">
       <script>
-      <![CDATA[import groovy.json.JsonSlurper
+      import groovy.json.JsonSlurper
     		if (_http_response_status_code!=200) {
     			throw new org.activiti.engine.ActivitiIllegalArgumentException('call metabase failed!')
     		}
@@ -55,7 +72,7 @@
     			throw new org.activiti.engine.ActivitiIllegalArgumentException('请在EIM中维护您的"直线领导"信息 Please maintain your "Manager" information in EIM. ')
     		}
     		execution.setVariable('managerSn', employee.MANAGER_SN_)
-    		]]>
+    		
       </script>
     </scriptTask>
     <userTask id="usertask1" name="加班申请审批 Overtime Application Approval" activiti:assignee="${managerSn}" activiti:dueDate="P1D" activiti:priority="8080">
@@ -67,7 +84,7 @@
         <activiti:formProperty id="corecomments_审批意见 Comments_1_string_t2_$$B" name="审批意见 Comments" type="string" variable="corecomments"></activiti:formProperty>
         <activiti:formProperty id="startDate_开始时间 Start_1_string_t5_$$VA" name="开始时间 Start" type="string" variable="startDate" required="true"></activiti:formProperty>
         <activiti:formProperty id="endDate_结束时间 End_2_string_t5_$$VA" name="结束时间 End" type="string" variable="endDate" required="true"></activiti:formProperty>
-        <activiti:formProperty id="overtimeDays_加班天数 Overtime Days_3_string_t11_$$VA" name="加班天数 Overtime Days" type="string" variable="overtimeDays" required="true"></activiti:formProperty>
+        <activiti:formProperty id="overtimeDays_加班天数 Overtime Days_3_string_t11_$$VA" name="加班天数 Overtime Days" type="string" variable="realOvertimeDays"/>
         <activiti:formProperty id="memo_备注 Memo_1_string_t2_$$VB" name="备注 Memo" type="string" variable="memo"></activiti:formProperty>
         <activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
           <activiti:field name="language">
@@ -90,7 +107,7 @@
     <exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway"></exclusiveGateway>
     <scriptTask id="scripttask2" name="failure notification" scriptFormat="groovy" activiti:autoStoreVariables="false">
       <script>
-      <![CDATA[import groovy.json.JsonSlurper
+      import groovy.json.JsonSlurper
     		import groovy.json.JsonOutput
     		
     		def jsonSlurper = new JsonSlurper()
@@ -123,12 +140,12 @@
 			execution.setVariable("_http_url", mailUrl)
 			execution.setVariable("_http_response_body", '')
 			execution.setVariable("_http_response_status_code", '')
-    	]]>
+    	
     	</script>
     </scriptTask>
     <scriptTask id="scripttask3" name="success notification" scriptFormat="groovy" activiti:autoStoreVariables="false">
       <script>
-      <![CDATA[
+      
     	import groovy.json.JsonSlurper
     		import groovy.json.JsonOutput
     		import com.eorionsolution.bpms.extension.jdbc.JdbcUtils
@@ -166,7 +183,7 @@
 			execution.setVariable("_http_response_status_code", '')
 			
 			//insert overtime record
-			def overtimeDays = overtimeDays.toDouble()
+			def overtimeDays = realOvertimeDays.toDouble()
 			def now = LocalDateTime.now().toString()
 			def insertJson = """
 {
@@ -190,14 +207,18 @@
 			if (result != 200) {
 				throw new org.activiti.engine.ActivitiIllegalArgumentException('加班记录异常 Insert Record Exception. ')
 			}
-    	]]>
+    	
     	</script>
     </scriptTask>
     <serviceTask id="mailService1" name="Mail Service" activiti:class="com.eorionsolution.riying.bpms.javaservice.http.RestAPIService"></serviceTask>
     <serviceTask id="mailService2" name="Mail Service" activiti:class="com.eorionsolution.riying.bpms.javaservice.http.RestAPIService"></serviceTask>
-    <sequenceFlow id="flow5" sourceRef="exclusivegateway1" targetRef="scripttask3"></sequenceFlow>
+    <sequenceFlow id="flow5" name="agree" sourceRef="exclusivegateway1" targetRef="scripttask3">
+    	<conditionExpression xsi:type="tFormalExpression"><![CDATA[${coreaction == '同意 Agree'}]]></conditionExpression>
+    </sequenceFlow>
     <sequenceFlow id="flow6" sourceRef="scripttask3" targetRef="mailService1"></sequenceFlow>
-    <sequenceFlow id="flow8" sourceRef="exclusivegateway1" targetRef="scripttask2"></sequenceFlow>
+    <sequenceFlow id="flow8" name="refuse" sourceRef="exclusivegateway1" targetRef="scripttask2">
+    	<conditionExpression xsi:type="tFormalExpression"><![CDATA[${coreaction == '拒绝 Refuse'}]]></conditionExpression>
+    </sequenceFlow>
     <sequenceFlow id="flow9" sourceRef="scripttask2" targetRef="mailService2"></sequenceFlow>
     <sequenceFlow id="flow10" sourceRef="mailService2" targetRef="endevent1"></sequenceFlow>
     <endEvent id="endevent2" name="End"></endEvent>
@@ -257,6 +278,9 @@
       <bpmndi:BPMNEdge bpmnElement="flow5" id="BPMNEdge_flow5">
         <omgdi:waypoint x="485.0" y="320.0"></omgdi:waypoint>
         <omgdi:waypoint x="391.0" y="320.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="13.0" width="100.0" x="403.0" y="307.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow6" id="BPMNEdge_flow6">
         <omgdi:waypoint x="335.0" y="351.0"></omgdi:waypoint>
@@ -265,6 +289,9 @@
       <bpmndi:BPMNEdge bpmnElement="flow8" id="BPMNEdge_flow8">
         <omgdi:waypoint x="525.0" y="320.0"></omgdi:waypoint>
         <omgdi:waypoint x="610.0" y="320.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="13.0" width="100.0" x="524.0" y="307.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow9" id="BPMNEdge_flow9">
         <omgdi:waypoint x="665.0" y="351.0"></omgdi:waypoint>
