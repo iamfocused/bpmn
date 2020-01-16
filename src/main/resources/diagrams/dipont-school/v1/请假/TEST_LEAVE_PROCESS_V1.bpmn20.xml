@@ -7,7 +7,7 @@
         <activiti:formProperty id="startDate_开始时间 Start_1_string_t5_$$B" name="开始时间 Start" type="string" variable="startDate" required="true"></activiti:formProperty>
         <activiti:formProperty id="endDate_结束时间 End_2_string_t5_$$B" name="结束时间 End" type="string" variable="endDate" required="true"></activiti:formProperty>
         <activiti:formProperty id="leaveDays_请假天数 Leave Days_3_string_t11_$$B" name="请假天数 Leave Days" type="string" variable="leaveDays" required="true"></activiti:formProperty>
-        <activiti:formProperty id="leaveReason_请假原因 Leave Reason_1_string_t2_$$C" name="请假原因 Leave Reason" type="string" variable="leaveReason"></activiti:formProperty>
+        <activiti:formProperty id="leaveReason_请假原因 Leave Reason_1_string_t2_$$C" name="请假原因 Leave Reason" type="string" variable="leaveReason" required="true"></activiti:formProperty>
         <activiti:formProperty id="needSubstitute_是否需要代课 Need Substitute_2_enum_rbv_$$C" name="是否需要代课 Need Substitute" type="enum" variable="needSubstitute">
           <activiti:value id="需要 Need" name="需要 Need"></activiti:value>
           <activiti:value id="不需要 Need Not" name="不需要 Need Not"></activiti:value>
@@ -328,6 +328,8 @@
     		import groovy.json.JsonOutput
     		import com.eorionsolution.bpms.extension.jdbc.JdbcUtils
     		import java.time.LocalDateTime
+    		import java.text.DateFormat
+			import java.text.SimpleDateFormat
     		
     		def jsonSlurper = new JsonSlurper()
     		def leaveType = jsonSlurper.parseText(leaveType).code
@@ -367,6 +369,12 @@
 			//insert leave record
 			def leaveDays = leaveDays.toDouble()
 			def now = LocalDateTime.now().toString()
+			
+			def df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+			df.setTimeZone(TimeZone.getTimeZone("GMT+8"))
+			def start = df.format(new Date(startDate.toLong()))
+			def end = df.format(new Date(endDate.toLong()))
+			
 			def insertJson = """
 {
     "tableName":"DP_LEAVE_RECORDS_",
@@ -379,6 +387,8 @@
                 "LEAVE_DAYS_": $leaveDays,
                 "PROC_INST_ID_":"$procInstId",
                 "ENABLE_":true,
+                "START_":"$start",
+                "END_": "$end",
                 "CREATE_TIME_":"$now"
             }
         }
@@ -460,7 +470,7 @@
     <sequenceFlow id="flow21" sourceRef="timerintermediatecatchevent1" targetRef="scripttask7"></sequenceFlow>
     <sequenceFlow id="flow22" sourceRef="scripttask7" targetRef="mailService4"></sequenceFlow>
     <sequenceFlow id="flow23" sourceRef="mailService4" targetRef="usertask2"></sequenceFlow>
-    <userTask id="usertask2" name="Confirm revice" activiti:candidateUsers="${hrs}" activiti:dueDate="P1D" activiti:priority="8080">
+    <userTask id="usertask2" name="请假确认 Confirm Task" activiti:candidateUsers="${hrs}" activiti:dueDate="P1D" activiti:priority="8080">
       <extensionElements>
         <activiti:formProperty id="leaveType_请假类型 Leave Type_1_string_tree_$$A" name="请假类型 Leave Type" type="string" variable="leaveType" required="true"></activiti:formProperty>
         <activiti:formProperty id="startDate_开始时间 Start_1_string_t5_$$VB" name="开始时间 Start" type="string" variable="startDate" required="true"></activiti:formProperty>
@@ -482,6 +492,8 @@
 				    		import groovy.json.JsonOutput
 				    		import com.eorionsolution.bpms.extension.jdbc.JdbcUtils
 				    		import java.time.LocalDateTime
+				    		import java.text.DateFormat
+							import java.text.SimpleDateFormat
     						
     						def jsonSlurper = new JsonSlurper()
     						def execution = task.getExecution()
@@ -520,6 +532,11 @@
 									throw new org.activiti.engine.ActivitiIllegalArgumentException('请假记录异常 Update Record Exception. ')
 								}
 								//insert
+								def df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+								df.setTimeZone(TimeZone.getTimeZone("GMT+8"))
+								def start = df.format(new Date(startDate.toLong()))
+								def end = df.format(new Date(endDate.toLong()))
+								
 								def insertJson = """
 {
     "tableName":"DP_LEAVE_RECORDS_",
@@ -532,6 +549,8 @@
                 "LEAVE_DAYS_": $leaveDays,
                 "PROC_INST_ID_":"$procInstId",
                 "ENABLE_":true,
+                "START_": "$start",
+                "END_": "$end",
                 "CREATE_TIME_":"$now"
             }
         }
