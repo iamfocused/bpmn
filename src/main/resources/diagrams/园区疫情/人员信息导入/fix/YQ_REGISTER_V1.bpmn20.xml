@@ -1,0 +1,169 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/pur">
+  <process id="YQ_REGISTER_V1" name="园区人员信息流程" isExecutable="true" activiti:candidateStarterGroups="admin">
+    <startEvent id="startevent1" name="Start" activiti:initiator="initiator">
+    	<extensionElements>
+    		<activiti:formProperty id="contactPhone_联系电话_1_string_t10_$$A" name="联系电话" type="string" variable="contactPhone" required="true"/>
+    		<activiti:formProperty id="personName_人名_2_string_t1_$$A" name="人名" type="string" variable="personName" required="true"/>
+    		<activiti:formProperty id="businessName_企业名字_3_string_t1_$$A" name="企业名字" type="string" variable="businessName" required="true"/>
+    		<activiti:formProperty id="businessRoomNumber_企业房间号_4_string_t1_$$A" name="企业房间号" type="string" variable="businessRoomNumber" required="true"/>
+    		<activiti:formProperty id="idCard_身份证号码_5_string_t1_$$A" name="身份证号码" type="string" variable="idCard" required="true"/>
+    		<activiti:formProperty id="hometown_籍贯_6_string_t1_$$A" name="籍贯" type="string" variable="hometown" required="true"/>
+    		<activiti:formProperty id="departureLocation_返沪前出发地_7_string_t1_$$A" name="返沪前出发地" type="string" variable="departureLocation" required="true"/>
+    		<activiti:formProperty id="timeToEnterSh_入沪时间_8_string_t5_$$A" name="入沪时间" type="string" variable="timeToEnterSh" required="true"/>
+    		<activiti:formProperty id="isImportantAreas_出发地是否包含重点区域_9_enum_sbs_$$A" name="出发地是否包含重点区域" type="enum" variable="isImportantAreas" required="true">
+    			<activiti:value id="否" name="否"/>
+    			<activiti:value id="是" name="是"/>
+    		</activiti:formProperty>
+    		<activiti:formProperty id="singaturePath_签名文件_10_string_t9i_$$A" name="签名文件" type="string" variable="singaturePath"/>
+    	
+    		<activiti:executionListener event="end" class="org.activiti.engine.impl.bpmn.listener.ScriptExecutionListener">
+    			<activiti:field name="language">
+    				<activiti:string>
+    					<![CDATA[groovy]]>
+    				</activiti:string>
+    			</activiti:field>
+    			<activiti:field name="script">
+    				<activiti:string>
+    					<![CDATA[
+    						def park = 'DBXH01'
+    						execution.setVariable('park', park)
+    						
+    						def headerMap = new HashMap()
+ 							def param = java.net.URLEncoder.encode('[{"type":"category","target":["variable",["template-tag","idCard"]],"value":\"'+ idCard + '\"},' +
+        					'{"type":"category","target":["variable",["template-tag","park"]],"value":\"'+ park + '\"}]', "UTF-8")
+ 							execution.setVariable("_http_method", "GET")
+ 							execution.setVariable("_http_headers", headerMap)
+ 							execution.setVariable("_http_body", '')
+ 							execution.setVariable("_http_url", 'https://metabase.eorionsolution.com/public/question/ac9150a6-f24f-4192-bcd5-21250b3f478e.json?parameters=' + param)
+ 							execution.setVariable("_http_response_body", '')
+ 							execution.setVariable("_http_response_status_code", '')
+    					]]>
+    				</activiti:string>
+    			</activiti:field>
+    		</activiti:executionListener>
+    	</extensionElements>
+    </startEvent>
+    <serviceTask id="servicetask1" name="Query Service" activiti:class="com.eorionsolution.riying.bpms.javaservice.http.RestAPIService"></serviceTask>
+    <scriptTask id="scripttask1" name="Update Or Insert" activiti:autoStoreVariables="false" scriptFormat="groovy">
+    	<script>
+    	<![CDATA[import groovy.json.JsonSlurper
+    		import groovy.json.JsonOutput
+    		import com.eorionsolution.bpms.extension.jdbc.JdbcUtils
+    		import java.text.DateFormat
+			import java.text.SimpleDateFormat
+			
+			if (_http_response_status_code!=200) {
+    			throw new org.activiti.engine.ActivitiIllegalArgumentException('call metabase failed!')
+    		}
+    		def jsonSlurper = new JsonSlurper()
+    		def responseItems = jsonSlurper.parseText(_http_response_body)
+    		def count = responseItems.size()
+    		if (count != 1 && count != 0) {
+    			throw new org.activiti.engine.ActivitiIllegalArgumentException('data exception, return more than one row!')
+    		}
+    		def time = timeToEnterSh.toLong()
+    		def df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+    		def timeToSh = df.format(new Date(time))
+    		if (count == 0) {
+    			//insert
+    			def details = []
+    			def detail = new HashMap()
+    			def value = new HashMap()
+    			value.put('CONTACT_PHONE_', contactPhone)
+    			value.put('PERSON_NAME_', personName)
+    			value.put('BUSINESS_NAME_', businessName)
+    			value.put('BUSINESS_ROOM_NUMBER_', businessRoomNumber)
+    			value.put('ID_CARD_', idCard)
+    			value.put('HOMETOWN_', hometown)
+    			value.put('DEPARTURE_LOCATION_', departureLocation)
+				value.put('TIME_TO_ENTER_SH_', timeToSh)
+				value.put('IS_IMPORTANT_AREAS_',isImportantAreas)
+				value.put('SIGNATURE_PATH_',singaturePath)
+				value.put('PARK_', park)
+				detail.put('insert',value)
+				details << detail
+				def detailsJson = JsonOutput.toJson(details)
+    			def insertJson = """
+{
+    "tableName":"PERSON_INFO_",
+    "type":0,
+    "details": $detailsJson
+}			
+"""
+				def insertObj = jsonSlurper.parseText(insertJson)
+				def insertResult = JdbcUtils.batchInsert(JsonOutput.toJson(insertObj))
+				if (insertResult != 200) {
+					throw new org.activiti.engine.ActivitiIllegalArgumentException('Insert Error. ' + JsonOutput.toJson(insertObj))
+				}
+    		} else {
+    			//update
+    			def details = []
+    			def detail = new HashMap()
+    			detail.put("where", ["ID_CARD_":"$idCard"])
+    			def value = new HashMap()
+    			value.put('CONTACT_PHONE_', contactPhone)
+    			value.put('PERSON_NAME_', personName)
+    			value.put('BUSINESS_NAME_', businessName)
+    			value.put('BUSINESS_ROOM_NUMBER_', businessRoomNumber)
+    			value.put('ID_CARD_', idCard)
+    			value.put('HOMETOWN_', hometown)
+    			value.put('DEPARTURE_LOCATION_', departureLocation)
+				value.put('TIME_TO_ENTER_SH_',timeToSh)
+				value.put('IS_IMPORTANT_AREAS_',isImportantAreas)
+    			value.put('SIGNATURE_PATH_',singaturePath)
+    			value.put('PARK_', park)
+    			detail.put('update',value)
+    			details<<detail
+    			def detailsJson = JsonOutput.toJson(details)
+    			
+    			def updateJson = """
+{
+    "tableName":"PERSON_INFO_",
+    "type":1,
+    "details": $detailsJson
+}
+"""
+				def updateObj = jsonSlurper.parseText(updateJson)
+				def updateResult = JdbcUtils.batchUpdate(JsonOutput.toJson(updateObj))
+				if (updateResult != 200) {
+					throw new org.activiti.engine.ActivitiIllegalArgumentException('Update Error ' + JsonOutput.toJson(updateObj))
+				}
+    		}
+    	]]>
+    	</script>
+    </scriptTask>
+    <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="servicetask1"></sequenceFlow>
+    <sequenceFlow id="flow2" sourceRef="servicetask1" targetRef="scripttask1"></sequenceFlow>
+    <endEvent id="endevent1" name="End"></endEvent>
+    <sequenceFlow id="flow3" sourceRef="scripttask1" targetRef="endevent1"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_YQ_REGISTER_V1">
+    <bpmndi:BPMNPlane bpmnElement="YQ_REGISTER_V1" id="BPMNPlane_YQ_REGISTER_V1">
+      <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="40.0" y="190.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="servicetask1" id="BPMNShape_servicetask1">
+        <omgdc:Bounds height="61.0" width="111.0" x="130.0" y="177.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scripttask1" id="BPMNShape_scripttask1">
+        <omgdc:Bounds height="61.0" width="111.0" x="300.0" y="177.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="456.0" y="190.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="75.0" y="207.0"></omgdi:waypoint>
+        <omgdi:waypoint x="130.0" y="207.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="241.0" y="207.0"></omgdi:waypoint>
+        <omgdi:waypoint x="300.0" y="207.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3">
+        <omgdi:waypoint x="411.0" y="207.0"></omgdi:waypoint>
+        <omgdi:waypoint x="456.0" y="207.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

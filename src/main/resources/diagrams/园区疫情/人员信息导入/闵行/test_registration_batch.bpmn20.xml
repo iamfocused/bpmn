@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
+  <process id="test_registration_batch" name="园区人员信息批量导入流程" isExecutable="true" activiti:candidateStarterGroups="admin">
+    <startEvent id="startevent1" name="Start" activiti:initiator="initiator">
+    	<extensionElements>
+    		<activiti:formProperty id="park_园区_1_string_t1_$$A" name="园区" type="string" variable="park" required="true"/>
+    		
+    		<activiti:formProperty id="tbhdpersons_item" name="人员列表" variable="tbhdpersons_item" required="true"/>
+    		<activiti:formProperty id="tbhdpersons_姓名_name_1_string_t1_$$A" name="姓名" type="string" variable="tbhdpersons_name_t00" required="true"/>
+    		<activiti:formProperty id="tbhdpersons_年龄_age_2_string_t6_$$A" name="年龄" type="string" variable="tbhdpersons_age_t00" required="true"/>
+    		<activiti:formProperty id="tbhdpersons_性别_sex_3_enum_sbs_$$A" name="性别" type="enum" variable="tbhdpersons_sex_t00" required="true">
+    			<activiti:value id="男" name="男"/>
+    			<activiti:value id="女" name="女"/>
+    		</activiti:formProperty>
+    		<activiti:formProperty id="tbhdpersons_国籍_citizenship_4_string_t1_$$A" name="国籍" type="string" variable="tbhdpersons_citizenship_t00" required="true"/>
+    		<activiti:formProperty id="tbhdpersons_身份证号/护照号_idCard_5_string_t1_$$A" name="身份证号/护照号" type="string" variable="tbhdpersons_idCard_t00" required="true"/>
+			<activiti:formProperty id="tbhdpersons_联系方式（手机号码）_contactPhone_6_string_t10_$$A" name="联系方式（手机号码）" type="string" variable="tbhdpersons_contactPhone_t00" required="true"/>
+			<activiti:formProperty id="tbhdpersons_体温_temperature_7_enum_sbs_$$A" name="体温" type="enum" variable="tbhdpersons_temperature_t00" required="true">
+				<activiti:value id="正常" name="正常"/>
+				<activiti:value id="发热" name="发热"/>
+			</activiti:formProperty>
+			<activiti:formProperty id="tbhdpersons_目前健康状况_healthStatus_8_string_t1_$$A" name="目前健康状况" type="string" variable="tbhdpersons_healthStatus_t00" required="true"/>
+			<activiti:formProperty id="tbhdpersons_目前在沪居住地居委会_nowNeighborhoodCommittee_9_string_t1_$$A" name="目前在沪居住地居委会" type="string" variable="tbhdpersons_nowNeighborhoodCommittee_t00" required="true"/>
+			<activiti:formProperty id="tbhdpersons_目前在沪居住地小区名称_nowCommunityName_10_string_t1_$$A" name="目前在沪居住地小区名称" type="string" variable="tbhdpersons_nowCommunityName_t00" required="true"/>
+			<activiti:formProperty id="tbhdpersons_目前在沪居住具体地址_nowSpecificAddress_11_string_t2_$$A" name="目前在沪居住具体地址" type="string" variable="tbhdpersons_nowSpecificAddress_t00" required="true"/>
+			<activiti:formProperty id="tbhdpersons_目前在沪工作单位名称_nowWorkName_12_string_t1_$$A" name="目前在沪工作单位名称" type="string" variable="tbhdpersons_nowWorkName_t00" required="true"/>
+			<activiti:formProperty id="tbhdpersons_目前在沪工作单位地址（单位经营地址）_nowWorkAddress_13_string_t2_$$A" name="目前在沪工作单位地址（单位经营地址）" type="string" variable="tbhdpersons_nowWorkAddress_t00" required="true"/>
+			<activiti:formProperty id="tbhdpersons_出发省市_wayDepartureLocation_14_string_t1_$$A" name="出发省市" type="string" variable="tbhdpersons_wayDepartureLocation_t00" required="true"/>
+			<activiti:formProperty id="tbhdpersons_出发日期_wayDepartureDate_15_string_t5_$$A" name="出发日期" type="string" variable="tbhdpersons_wayDepartureDate_t00" required="true"/>
+			<activiti:formProperty id="tbhdpersons_到达上海日期_wayArrivalDate_16_string_t5_$$A" name="到达上海日期" type="string" variable="tbhdpersons_wayArrivalDate_t00" required="true"/>
+			<activiti:formProperty id="tbhdpersons_到达上海交通工具_wayTransportation_17_string_t1_$$A" name="到达上海交通工具" type="string" variable="tbhdpersons_wayTransportation_t00" required="true"/>
+			<activiti:formProperty id="tbhdpersons_火车班次车厢号/航班号/长途客车班次/汽车牌照_wayTransportationInfo_18_string_t1_$$A" name="火车班次车厢号/航班号/长途客车班次/汽车牌照" type="string" variable="tbhdpersons_wayTransportationInfo_t00" required="true"/>
+			<activiti:formProperty id="tbhdpersons_沿途是否停留_wayIsStay_19_enum_sbs_$$A" name="沿途是否停留" type="enum" variable="tbhdpersons_wayIsStay_t00" required="true">
+				<activiti:value id="否" name="否"/>
+				<activiti:value id="是" name="是"/>
+			</activiti:formProperty>
+			<activiti:formProperty id="tbhdpersons_停留地点_wayStayLocation_20_string_t1_$$A" name="停留地点" type="string" variable="tbhdpersons_wayStayLocation_t00"/>
+			<activiti:formProperty id="tbhdpersons_同行人姓名_wayPeerName_21_string_t1_$$A" name="同行人姓名" type="string" variable="tbhdpersons_wayPeerName_t00"/>
+			<activiti:formProperty id="tbhdpersons_同行人联系方式（手机号码）_wayPeerPhone_22_string_t10_$$A" name="同行人联系方式（手机号码）" type="string" variable="tbhdpersons_wayPeerPhone"/>
+			
+    	</extensionElements>
+    </startEvent>
+    <serviceTask id="servicetask1" name="Metabase Service"></serviceTask>
+    <scriptTask id="scripttask1" name="Batch Update Or Insert" activiti:autoStoreVariables="false"></scriptTask>
+    <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="servicetask1"></sequenceFlow>
+    <sequenceFlow id="flow2" sourceRef="servicetask1" targetRef="scripttask1"></sequenceFlow>
+    <endEvent id="endevent1" name="End"></endEvent>
+    <sequenceFlow id="flow3" sourceRef="scripttask1" targetRef="endevent1"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_test_registration_batch">
+    <bpmndi:BPMNPlane bpmnElement="test_registration_batch" id="BPMNPlane_test_registration_batch">
+      <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="50.0" y="200.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="servicetask1" id="BPMNShape_servicetask1">
+        <omgdc:Bounds height="61.0" width="111.0" x="140.0" y="187.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scripttask1" id="BPMNShape_scripttask1">
+        <omgdc:Bounds height="61.0" width="111.0" x="310.0" y="187.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="466.0" y="200.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="85.0" y="217.0"></omgdi:waypoint>
+        <omgdi:waypoint x="140.0" y="217.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="251.0" y="217.0"></omgdi:waypoint>
+        <omgdi:waypoint x="310.0" y="217.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3">
+        <omgdi:waypoint x="421.0" y="217.0"></omgdi:waypoint>
+        <omgdi:waypoint x="466.0" y="217.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

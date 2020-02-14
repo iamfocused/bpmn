@@ -139,11 +139,16 @@
     			throw new org.activiti.engine.ActivitiIllegalArgumentException('您的剩余假期数据异常 Your remaining vacation data is abnormal.')
     		}
     		def remainInfo = infoLi[0]
+    		def currentRemain = '-'
     		remainInfo.each{k,v ->
-    			if (leaveType.contains(k) && leaveDays.toLong() > v) {
-    				throw new org.activiti.engine.ActivitiIllegalArgumentException("剩余假期不足 Insufficient remaining holidays.")
+    			if (leaveType.contains(k)) {
+    				currentRemain = v - leaveDays.toDouble()
+    				if(leaveDays.toDouble() > v) {
+    					throw new org.activiti.engine.ActivitiIllegalArgumentException("剩余假期不足 Insufficient remaining holidays.")
+    				}
     			}
     		}
+    		execution.setVariable('oldRemain', currentRemain.toString())
     		
     		//attachements and Substitute check drools
     		def leaveType = jsonSlurper.parseText(leaveType).code
@@ -467,6 +472,7 @@
                 "ENABLE_":true,
                 "START_":"$start",
                 "END_": "$end",
+                "CURRENT_REMAIN_": "$oldRemain",
                 "CREATE_TIME_":"$now"
             }
         }
@@ -579,11 +585,16 @@
     			throw new org.activiti.engine.ActivitiIllegalArgumentException('您的剩余假期数据异常 Your remaining vacation data is abnormal.')
     		}
     		def remainInfo = infoLi[0]
+    		def currentRemain = '-'
     		remainInfo.each{k,v ->
-    			if (leaveType.contains(k) && leaveDays.toLong() > v) {
-    				throw new org.activiti.engine.ActivitiIllegalArgumentException("剩余假期不足 Insufficient remaining holidays.")
+    			if (leaveType.contains(k)) {
+    				currentRemain = v - leaveDays.toDouble()
+    				if (leaveDays.toDouble() > v) {
+    					throw new org.activiti.engine.ActivitiIllegalArgumentException("剩余假期不足 Insufficient remaining holidays.")
+    				}
     			}
     		}
+    		execution.setVariable('updateRemain',currentRemain.toString())
     		
     		//send mail
     		def mailStr = """
@@ -659,6 +670,7 @@
                 "ENABLE_":true,
                 "START_": "$start",
                 "END_": "$end",
+                "CURRENT_REMAIN_": "$updateRemain",
                 "CREATE_TIME_":"$now"
             }
         }

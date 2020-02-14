@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/pur">
+  <process id="test_registration_info" name="园区人员信息登记流程" isExecutable="true" activiti:candidateStarterGroups="admin">
+    <startEvent id="startevent1" name="Start" activiti:initiator="initiator">
+    	<extensionElements>
+    		<activiti:formProperty id="park_园区_1_string_t1_$$A" name="园区" type="string" variable="park" required="true"/>
+    		<activiti:formProperty id="name_姓名_2_string_t1_$$A" name="姓名" type="string" variable="name"/>
+    		<activiti:formProperty id="age_年龄_3_string_t6_$$A" name="年龄" type="string" variable="age"/>
+    		<activiti:formProperty id="sex_性别_4_enum_sbs_$$A" name="性别" type="enum" variable="sex">
+    			<activiti:value id="男" name="男"/>
+    			<activiti:value id="女" name="女"/>
+    		</activiti:formProperty>
+    		<activiti:formProperty id="citizenship_国籍_5_string_t1_$$A" name="国籍" type="string" variable="citizenship"/>
+    		<activiti:formProperty id="idCard_身份证号/护照号_6_string_t1_$$A" name="身份证号/护照号" type="string" variable="idCard" required="true"/>
+    		<activiti:formProperty id="contactPhone_联系方式（手机号码）_7_string_t10_$$A" name="联系方式（手机号码）" type="string" variable="contactPhone"/>
+    		<activiti:formProperty id="temperature_体温_8_enum_sbs_$$A" name="体温" type="enum" variable="temperature">
+    			<activiti:value id="正常" name="正常"/>
+    			<activiti:value id="发热" name="发热"/>
+    		</activiti:formProperty>
+    		<activiti:formProperty id="healthStatus_目前健康状况_9_string_t1_$$A" name="目前健康状况" type="string" variable="healthStatus"/>
+    		<activiti:formProperty id="nowNeighborhoodCommittee_目前在沪居住地居委会_10_string_t1_$$A" name="目前在沪居住地居委会" type="string" variable="nowNeighborhoodCommittee"/>
+    		<activiti:formProperty id="nowCommunityName_目前在沪居住地小区名称_11_string_t1_$$A" name="目前在沪居住地小区名称" type="string" variable="nowCommunityName"/>
+    		<activiti:formProperty id="nowSpecificAddress_目前在沪居住具体地址_12_string_t2_$$A" name="目前在沪居住具体地址" type="string" variable="nowSpecificAddress"/>
+    		<activiti:formProperty id="nowWorkName_目前在沪工作单位名称_13_string_t1_$$A" name="目前在沪工作单位名称" type="string" variable="nowWorkName"/>
+    		<activiti:formProperty id="nowWorkAddress_目前在沪工作单位地址（单位经营地址）_14_string_t2_$$A" name="目前在沪工作单位地址（单位经营地址）" type="string" variable="nowWorkAddress"/>
+    		<activiti:formProperty id="wayDepartureLocation_出发省市_15_string_t1_$$A" name="出发省市" type="string" variable="wayDepartureLocation"/>
+    		<activiti:formProperty id="wayDepartureDate_出发日期_16_string_t5_$$A" name="出发日期" type="string" variable="wayDepartureDate"/>
+    		<activiti:formProperty id="wayArrivalDate_到达上海日期_17_string_t5_$$A" name="到达上海日期" type="string" variable="wayArrivalDate"/>
+    		<activiti:formProperty id="wayTransportation_到达上海交通工具_18_string_t1_$$A" name="到达上海交通工具" type="string" variable="wayTransportation"/>
+    		<activiti:formProperty id="wayTransportationInfo_火车班次车厢号/航班号/长途客车班次/汽车牌照_19_string_t1_$$A" name="火车班次车厢号/航班号/长途客车班次/汽车牌照" type="string" variable="wayTransportationInfo"/>
+    		<activiti:formProperty id="wayIsStay_沿途是否停留_20_enum_sbs_$$A" name="沿途是否停留" type="enum" variable="wayIsStay">
+    			<activiti:value id="否" name="否"/>
+    			<activiti:value id="是" name="是"/>
+    		</activiti:formProperty>
+    		<activiti:formProperty id="wayStayLocation_停留地点_21_string_t1_$$A" name="停留地点" type="string" variable="wayStayLocation"/>
+    		<activiti:formProperty id="wayPeerName_同行人姓名_22_string_t1_$$A" name="同行人姓名" type="string" variable="wayPeerName"/>
+    		<activiti:formProperty id="wayPeerPhone_同行人联系方式（手机号码）_23_string_t10_$$A" name="同行人联系方式（手机号码）" type="string" variable="wayPeerPhone"/>
+    		<activiti:formProperty id="hiIsStay_是否停留/途径/旅游武汉_24_enum_sbs_$$A" name="是否停留/途径/旅游武汉" type="enum" variable="hiIsStay">
+    			<activiti:value id="否" name="否"/>
+    			<activiti:value id="是" name="是"/>
+    		</activiti:formProperty>
+    		<activiti:formProperty id="hiIsTouchWh_是否近距离接触过来自湖北省武汉市的发热伴有呼吸道症状患者_25_enum_sbs_$$A" name="是否近距离接触过来自湖北省武汉市的发热伴有呼吸道症状患者" type="enum" variable="hiIsTouchWh">
+    			<activiti:value id="否" name="否"/>
+    			<activiti:value id="是" name="是"/>
+    		</activiti:formProperty>
+    		<activiti:formProperty id="hiIsTouchSick_是否近距离接触过新型冠状病毒感染的肺炎疑似/确诊患者_26_enum_sbs_$$A" name="是否近距离接触过新型冠状病毒感染的肺炎疑似/确诊患者" type="enum" variable="hiIsTouchSick">
+    			<activiti:value id="否" name="否"/>
+    			<activiti:value id="是" name="是"/>
+    		</activiti:formProperty>
+    		<activiti:formProperty id="hiOther_其他特别情况_27_string_t1_$$A" name="其他特别情况" type="string" variable="hiOther"/>
+    		<activiti:formProperty id="hiNone_无上述接触情况_28_enum_sbs_$$A" name="无上述接触情况" type="enum" variable="hiNone">
+				<activiti:value id="是" name="是"/>
+    			<activiti:value id="否" name="否"/>
+    		</activiti:formProperty>
+    		<activiti:formProperty id="hometown_户籍地址_29_string_t2_$$A" name="户籍地址" type="string" variable="hometown"/>
+    		<activiti:formProperty id="signaturePath_签名文件_30_string_t9i_$$A" name="签名文件" type="string" variable="signaturePath"/>
+    		
+    		<activiti:executionListener event="end" class="org.activiti.engine.impl.bpmn.listener.ScriptExecutionListener">
+    			<activiti:field name="language">
+    				<activiti:string>
+    					<![CDATA[groovy]]>
+    				</activiti:string>
+    			</activiti:field>
+    			<activiti:field name="script">
+    				<activiti:string>
+    					<![CDATA[
+    						def headerMap = new HashMap()
+ 							def param=java.net.URLEncoder.encode('[' +
+					        '{"type":"category","target":["variable",["template-tag","idCard"]],"value":\"'+ idCard + '\"},' +
+					        '{"type":"category","target":["variable",["template-tag","park"]],"value":\"'+ park + '\"}' +
+					        ']', "UTF-8")
+ 							execution.setVariable("_http_method", "GET")
+ 							execution.setVariable("_http_headers", headerMap)
+ 							execution.setVariable("_http_body", '')
+ 							execution.setVariable("_http_url", 'https://metabase.eorionsolution.com/public/question/5566053d-756c-4122-9ed9-b6db9597d51f.json?parameters=' + param)
+ 							execution.setVariable("_http_response_body", '')
+ 							execution.setVariable("_http_response_status_code", '')
+    					]]>
+    				</activiti:string>
+    			</activiti:field>
+    		</activiti:executionListener>
+    	</extensionElements>
+    </startEvent>
+    <serviceTask id="servicetask1" name="MetabaseService" activiti:class="com.eorionsolution.riying.bpms.javaservice.http.RestAPIService"></serviceTask>
+    <scriptTask id="scripttask1" name="Update Or Insert" activiti:autoStoreVariables="false" scriptFormat="groovy">
+    	<script>
+    	<![CDATA[import groovy.json.JsonSlurper
+    		import groovy.json.JsonOutput
+    		import com.eorionsolution.bpms.extension.jdbc.JdbcUtils
+    		import java.text.DateFormat
+			import java.text.SimpleDateFormat
+			
+			if (_http_response_status_code!=200) {
+    			throw new org.activiti.engine.ActivitiIllegalArgumentException('call metabase failed!')
+    		}
+    		def jsonSlurper = new JsonSlurper()
+    		def responseItems = jsonSlurper.parseText(_http_response_body)
+    		def count = responseItems.size()
+    		if (count != 1 && count != 0) {
+    			throw new org.activiti.engine.ActivitiIllegalArgumentException('data exception, return more than one row!')
+    		}
+    		//def time = wayDepartureDate.toLong()
+    		//wayArrivalDate.toLong()
+    		def df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+    		//def timeToSh = df.format(new Date(time))
+    		
+    		if (count == 0) {
+    			//insert
+    			def details = []
+    			def detail = new HashMap()
+    			def value = new HashMap()
+    			value.put('PARK_', park)
+    			value.put('ID_CARD_', idCard)
+    			value.put('SIGNATURE_PATH_', signaturePath)
+    			ifNotEmptyPut(value, 'NAME_', name)
+    			ifNotEmptyPut(value, 'AGE_', age)
+    			ifNotEmptyPut(value, 'SEX_', sex)
+    			ifNotEmptyPut(value, 'CITIZENSHIP_', citizenship)
+    			ifNotEmptyPut(value, 'CONTACT_PHONE_', contactPhone)
+    			ifNotEmptyPut(value, 'TEMPERATURE_', temperature)
+    			ifNotEmptyPut(value, 'HEALTH_STATUS_', healthStatus)
+    			ifNotEmptyPut(value, 'NOW_NEIGHBORHOOD_COMMITTEE_', nowNeighborhoodCommittee)
+    			ifNotEmptyPut(value, 'NOW_COMMUNITY_NAME_', nowCommunityName)
+    			ifNotEmptyPut(value, 'NOW_SPECIFIC_ADDRESS_', nowSpecificAddress)
+    			ifNotEmptyPut(value, 'NOW_WORK_NAME_', nowWorkName)
+    			ifNotEmptyPut(value, 'NOW_WORK_ADDRESS_', nowWorkAddress)
+    			ifNotEmptyPut(value, 'WAY_DEPARTURE_LOCATION_', wayDepartureLocation)
+    			if (wayDepartureDate != null) {
+    				value.put('WAY_DEPARTURE_DATE_', df.format(new Date(wayDepartureDate.toLong())))
+    			}
+    			if (wayArrivalDate != null) {
+    				value.put('WAY_ARRIVAL_DATE_', df.format(new Date(wayArrivalDate.toLong())))
+    			}
+    			ifNotEmptyPut(value, 'WAY_TRANSPORTATION_', wayTransportation)
+    			ifNotEmptyPut(value, 'WAY_TRANSPORTATION_INFO_', wayTransportationInfo)
+    			ifNotEmptyPut(value, 'WAY_IS_STAY_', wayIsStay)
+    			ifNotEmptyPut(value, 'WAY_STAY_LOCATION_', wayStayLocation)
+    			ifNotEmptyPut(value, 'WAY_PEER_NAME_', wayPeerName)
+    			ifNotEmptyPut(value, 'WAY_PEER_PHONE_', wayPeerPhone)
+    			ifNotEmptyPut(value, 'HI_IS_STAY_', hiIsStay)
+    			ifNotEmptyPut(value, 'HI_IS_TOUCH_WH_', hiIsTouchWh)
+    			ifNotEmptyPut(value, 'HI_IS_TOUCH_SICK_', hiIsTouchSick)
+    			ifNotEmptyPut(value, 'HI_OTHER_', hiOther)
+    			ifNotEmptyPut(value, 'HI_NONE_', hiNone)
+    			ifNotEmptyPut(value, 'HOMETOWN_', hometown)
+    			
+    			detail.put('insert',value)
+				details << detail
+				def detailsJson = JsonOutput.toJson(details)
+    			def insertJson = """
+{
+    "tableName":"REGISTRATION_INFO_",
+    "type":0,
+    "details": $detailsJson
+}			
+"""
+				def insertObj = jsonSlurper.parseText(insertJson)
+				def insertResult = JdbcUtils.batchInsert(JsonOutput.toJson(insertObj))
+				if (insertResult != 200) {
+					throw new org.activiti.engine.ActivitiIllegalArgumentException('Insert Error. ' + JsonOutput.toJson(insertObj))
+				}
+    		} else {
+    			//update
+    			def details = []
+    			def detail = new HashMap()
+    			detail.put("where", ["ID_CARD_":"$idCard", "PARK_":"$park"])
+    			
+    			def value = new HashMap()
+    			value.put('PARK_', park)
+    			value.put('ID_CARD_', idCard)
+    			value.put('SIGNATURE_PATH_', signaturePath)
+    			ifNotEmptyPut(value, 'NAME_', name)
+    			ifNotEmptyPut(value, 'AGE_', age)
+    			ifNotEmptyPut(value, 'SEX_', sex)
+    			ifNotEmptyPut(value, 'CITIZENSHIP_', citizenship)
+    			ifNotEmptyPut(value, 'CONTACT_PHONE_', contactPhone)
+    			ifNotEmptyPut(value, 'TEMPERATURE_', temperature)
+    			ifNotEmptyPut(value, 'HEALTH_STATUS_', healthStatus)
+    			ifNotEmptyPut(value, 'NOW_NEIGHBORHOOD_COMMITTEE_', nowNeighborhoodCommittee)
+    			ifNotEmptyPut(value, 'NOW_COMMUNITY_NAME_', nowCommunityName)
+    			ifNotEmptyPut(value, 'NOW_SPECIFIC_ADDRESS_', nowSpecificAddress)
+    			ifNotEmptyPut(value, 'NOW_WORK_NAME_', nowWorkName)
+    			ifNotEmptyPut(value, 'NOW_WORK_ADDRESS_', nowWorkAddress)
+    			ifNotEmptyPut(value, 'WAY_DEPARTURE_LOCATION_', wayDepartureLocation)
+    			if (wayDepartureDate != null) {
+    				value.put('WAY_DEPARTURE_DATE_', df.format(new Date(wayDepartureDate.toLong())))
+    			}
+    			if (wayArrivalDate != null) {
+    				value.put('WAY_ARRIVAL_DATE_', df.format(new Date(wayArrivalDate.toLong())))
+    			}
+    			ifNotEmptyPut(value, 'WAY_TRANSPORTATION_', wayTransportation)
+    			ifNotEmptyPut(value, 'WAY_TRANSPORTATION_INFO_', wayTransportationInfo)
+    			ifNotEmptyPut(value, 'WAY_IS_STAY_', wayIsStay)
+    			ifNotEmptyPut(value, 'WAY_STAY_LOCATION_', wayStayLocation)
+    			ifNotEmptyPut(value, 'WAY_PEER_NAME_', wayPeerName)
+    			ifNotEmptyPut(value, 'WAY_PEER_PHONE_', wayPeerPhone)
+    			ifNotEmptyPut(value, 'HI_IS_STAY_', hiIsStay)
+    			ifNotEmptyPut(value, 'HI_IS_TOUCH_WH_', hiIsTouchWh)
+    			ifNotEmptyPut(value, 'HI_IS_TOUCH_SICK_', hiIsTouchSick)
+    			ifNotEmptyPut(value, 'HI_OTHER_', hiOther)
+    			ifNotEmptyPut(value, 'HI_NONE_', hiNone)
+    			ifNotEmptyPut(value, 'HOMETOWN_', hometown)
+    			detail.put('update',value)
+    			details<<detail
+    			def detailsJson = JsonOutput.toJson(details)
+    			
+    			def updateJson = """
+{
+    "tableName":"REGISTRATION_INFO_",
+    "type":1,
+    "details": $detailsJson
+}
+"""
+				def updateObj = jsonSlurper.parseText(updateJson)
+				def updateResult = JdbcUtils.batchUpdate(JsonOutput.toJson(updateObj))
+				if (updateResult != 200) {
+					throw new org.activiti.engine.ActivitiIllegalArgumentException('Update Error ' + JsonOutput.toJson(updateObj))
+				}
+    		}
+    		
+    		static void ifNotEmptyPut(HashMap map, String k, String v){
+			    if (v != null) {
+			        map.put(k, v)
+			    }
+			}
+    	]]>
+    	</script>
+    </scriptTask>
+    <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="servicetask1"></sequenceFlow>
+    <sequenceFlow id="flow2" sourceRef="servicetask1" targetRef="scripttask1"></sequenceFlow>
+    <endEvent id="endevent1" name="End"></endEvent>
+    <sequenceFlow id="flow3" sourceRef="scripttask1" targetRef="endevent1"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_test_registration_info">
+    <bpmndi:BPMNPlane bpmnElement="test_registration_info" id="BPMNPlane_test_registration_info">
+      <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="50.0" y="190.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="servicetask1" id="BPMNShape_servicetask1">
+        <omgdc:Bounds height="65.0" width="115.0" x="150.0" y="175.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scripttask1" id="BPMNShape_scripttask1">
+        <omgdc:Bounds height="65.0" width="115.0" x="320.0" y="175.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="480.0" y="190.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="85.0" y="207.0"></omgdi:waypoint>
+        <omgdi:waypoint x="150.0" y="207.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="265.0" y="207.0"></omgdi:waypoint>
+        <omgdi:waypoint x="320.0" y="207.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3">
+        <omgdi:waypoint x="435.0" y="207.0"></omgdi:waypoint>
+        <omgdi:waypoint x="480.0" y="207.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>
