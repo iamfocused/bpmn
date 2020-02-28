@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/pur">
+  <process id="testDeviceInfo" name="设备信息录入流程" isExecutable="true" activiti:candidateStarterGroups="admin,processadmin@@13@@">
+    <documentation>设备信息</documentation>
+    <startEvent id="startevent1" name="Start" activiti:initiator="initiator">
+      <extensionElements>
+        <activiti:formProperty id="deviceCode_设备编号_1_string_t1_$$A" name="设备编号" type="string" variable="deviceCode" required="true"></activiti:formProperty>
+        <activiti:formProperty id="deviceSpec_设备型号_2_string_t1_$$A" name="设备型号" type="string" variable="deviceSpec" required="true"></activiti:formProperty>
+        <activiti:formProperty id="deviceName_设备名称_3_string_t1_$$A" name="设备名称" type="string" variable="deviceName" required="true"></activiti:formProperty>
+        <activiti:formProperty id="deviceDesc_设备描述_4_string_t2_$$A" name="设备描述" type="string" variable="deviceDesc"></activiti:formProperty>
+        <activiti:formProperty id="deviceType_设备类型_1_string_t1_$$B" name="设备类型" type="string" variable="deviceType"></activiti:formProperty>
+        <activiti:formProperty id="deviceVendor_设备厂商_2_string_t1_$$B" name="设备厂商" type="string" variable="deviceVendor"></activiti:formProperty>
+        <activiti:formProperty id="brandName_品牌名称_3_string_t1_$$B" name="品牌名称" type="string" variable="brandName"></activiti:formProperty>
+        <activiti:formProperty id="manufactureDate_出厂日期_1_string_t3_$$B" name="出厂日期" type="string" variable="manufactureDate"></activiti:formProperty>
+        <activiti:formProperty id="installationDate_安装日期_2_string_t3_$$B" name="安装日期" type="string" variable="installationDate"></activiti:formProperty>
+        <activiti:formProperty id="spindlePower_主轴功率 kW_3_string_t11_$$B" name="主轴功率 kW" type="string" variable="spindlePower"></activiti:formProperty>
+        <activiti:formProperty id="runningCost_运行成本 元/小时_4_string_cny_$$B" name="运行成本 元/小时" type="string" variable="runningCost"></activiti:formProperty>
+        <activiti:formProperty id="deviceStatus_设备状态_1_string_t1_$$B" name="设备状态" type="string" variable="deviceStatus"></activiti:formProperty>
+        <activiti:formProperty id="stateDesc_状态说明_2_string_t2_$$B" name="状态说明" type="string" variable="stateDesc"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetails_item" name="关键部件" type="string" variable="tbhddetails_item"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetails_物料编号_meterialCode_1_string_auto_$$A" name="物料编号" type="string" variable="tbhddetails_meterialCode_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetails_物料型号_meterialSpec_2_string_t1_$$HA" name="物料型号" type="string" variable="tbhddetails_meterialSpec_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetails_物料名称_meterialName_3_string_t1_$$HA" name="物料名称" type="string" variable="tbhddetails_meterialName_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetails_数量_quantity_4_string_t6_$$A" name="数量" type="string" variable="tbhddetails_quantity_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetails_保养周期 天_maintenanceCycle_5_string_t6_$$A" name="保养周期 天" type="string" variable="tbhddetails_maintenanceCycle_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetails_更换周期 天_replacementCycle_6_string_t6_$$A" name="更换周期 天" type="string" variable="tbhddetails_replacementCycle_t00"></activiti:formProperty>
+        <activiti:executionListener event="end" class="org.activiti.engine.impl.bpmn.listener.ScriptExecutionListener">
+          <activiti:field name="language">
+            <activiti:string><![CDATA[groovy]]></activiti:string>
+          </activiti:field>
+          <activiti:field name="script">
+            <activiti:string><![CDATA[import groovy.json.JsonSlurper
+      						import groovy.json.JsonOutput
+      						import java.util.stream.Collectors
+      					
+      						def jsonSlurper = new JsonSlurper()
+      						
+      						def std = jsonSlurper.parseText(tbhddetails_item_std)
+      						if (std.size() == 0) {
+      							return
+	      					}
+	      					std.each{
+	      						def procInstId = it.meterialCode.code
+	      						it.meterialSpec = findValueByVarName(historyService,procInstId, 'meterialSpec')
+	      						it.meterialName = findValueByVarName(historyService,procInstId, 'meterialName')
+	      					}
+	      					execution.setVariable('tbhddetails_item_std', JsonOutput.toJson(std))
+	      					
+	      					def items = jsonSlurper.parseText(tbhddetails_item)
+	      					items.each {k,v ->
+							    if (k == 'rows') {
+							        v.each {
+							        	def procInstId = it[0].code
+							            it[1] = findValueByVarName(historyService,procInstId, 'meterialSpec')
+							            it[2] = findValueByVarName(historyService,procInstId, 'meterialName')
+							        }
+							    }
+							}
+							execution.setVariable('tbhddetails_item', JsonOutput.toJson(items))
+	      					
+	      					static String findValueByVarName(def historyService, String procInstId, String variableName) {
+							    def vars = historyService.createHistoricVariableInstanceQuery().processInstanceId(procInstId).list()
+							    def values = vars.stream().filter({var -> variableName.equals(var?.getVariableName())}).map({var -> var.getValue()}).collect(java.util.stream.Collectors.toList())
+							    if (values.isEmpty()) {
+									throw new org.activiti.engine.ActivitiIllegalArgumentException('数据获取失败' + procInstId + ',' + variableName)
+							    }
+							    return values[0]
+							}]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </startEvent>
+    <endEvent id="endevent1" name="End"></endEvent>
+    <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="endevent1"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_testDeviceInfo">
+    <bpmndi:BPMNPlane bpmnElement="testDeviceInfo" id="BPMNPlane_testDeviceInfo">
+      <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="60.0" y="220.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="340.0" y="220.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="95.0" y="237.0"></omgdi:waypoint>
+        <omgdi:waypoint x="340.0" y="237.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

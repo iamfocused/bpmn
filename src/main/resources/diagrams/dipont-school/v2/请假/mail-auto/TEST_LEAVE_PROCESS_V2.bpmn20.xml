@@ -1,0 +1,1014 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/frm">
+  <process id="leave_process" name="请假流程 Leave Process" isExecutable="true" activiti:candidateStarterGroups="dpschool">
+    <startEvent id="startevent1" name="Start" activiti:initiator="initiator">
+      <extensionElements>
+        <activiti:formProperty id="leaveType_请假类型 Leave Type_1_string_tree_$$A" name="请假类型 Leave Type" type="string" variable="leaveType" required="true"></activiti:formProperty>
+        <activiti:formProperty id="startDate_开始时间 Start_1_string_t5_$$B" name="开始时间 Start" type="string" variable="startDate" required="true"></activiti:formProperty>
+        <activiti:formProperty id="endDate_结束时间 End_2_string_t5_$$B" name="结束时间 End" type="string" variable="endDate" required="true"></activiti:formProperty>
+        <activiti:formProperty id="leaveDays_请假天数 Leave Days_3_string_t11_$$B" name="请假天数 Leave Days" type="string" variable="leaveDays" required="true"></activiti:formProperty>
+        <activiti:formProperty id="leaveReason_请假原因 Leave Reason_1_string_t2_$$C" name="请假原因 Leave Reason" type="string" variable="leaveReason" required="true"></activiti:formProperty>
+        <activiti:formProperty id="attachments_证明文件 Certified Documents_2_string_t9i_$$C" name="证明文件 Certified Documents" type="string" variable="attachements"></activiti:formProperty>
+        <activiti:formProperty id="needSubstitute_是否需要代课 Need Substitute_2_enum_rbv_$$D" name="是否需要代课（教学类员工填写） Need Substitute(For Teaching Staff)" type="enum" variable="needSubstitute">
+          <activiti:value id="需要 Need" name="需要 Need"></activiti:value>
+          <activiti:value id="不需要 Need Not" name="不需要 Need Not"></activiti:value>
+        </activiti:formProperty>
+        <activiti:executionListener event="end" class="org.activiti.engine.impl.bpmn.listener.ScriptExecutionListener">
+          <activiti:field name="language">
+            <activiti:string><![CDATA[groovy]]></activiti:string>
+          </activiti:field>
+          <activiti:field name="script">
+            <activiti:string><![CDATA[import java.time.Instant
+							import java.time.LocalDateTime
+							import java.time.ZoneId
+							import java.time.ZoneOffset
+							import groovy.json.JsonSlurper
+            				import java.text.DateFormat
+							import java.text.SimpleDateFormat
+							
+							def startDateStamp = startDate.toLong()
+    						def endDateStamp = endDate.toLong()
+    						if (startDateStamp > endDateStamp) {
+    							throw new org.activiti.engine.ActivitiIllegalArgumentException('请假开始时间必须小于结束时间 Leave start time must be less than end time.')
+    						}
+    						def days = leaveDays.toBigDecimal().divide(BigDecimal.valueOf(0.5))
+    						def correctDays = days.remainder(BigDecimal.ONE).setScale(2) == BigDecimal.valueOf(0.00)
+			            	if (!correctDays) {
+			 					throw new org.activiti.engine.ActivitiIllegalArgumentException('请假天数的最小单位为0.5天 The minimum unit for leave is 0.5 days.')
+			 				}
+			 				//跨学年请假申请不允许，建议分两次申请TODO
+			 				def startYear = LocalDateTime.ofInstant(Instant.ofEpochMilli(startDateStamp), ZoneId.of("+8")).getYear()
+			 				def tag = LocalDateTime.of(startYear, 8, 1, 0, 0, 0).toInstant(ZoneOffset.of("+8")).toEpochMilli()
+			 				if (!((startDateStamp < tag && endDateStamp < tag) || (startDateStamp > tag && endDateStamp))) {
+								throw new org.activiti.engine.ActivitiIllegalArgumentException('跨学年的请假申请请分开申请 Application for leave across school years please apply separately.')
+							}
+							
+							//init common variable
+							def employeeOpt = Optional.ofNullable(identityService.createUserQuery().userId(initiator).singleResult())
+    						def employeeName = employeeOpt.map({u ->  u.getLastName() + u.getFirstName()}).orElse('')
+    						DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")
+    						def startTime = new Date(startDateStamp)
+ 							def endTime = new Date(endDateStamp)
+ 							df.setTimeZone(TimeZone.getTimeZone("GMT+8"))
+ 							
+    						execution.setVariable('employeeName', employeeName)
+    						execution.setVariable('startTime', df.format(startTime))
+ 							execution.setVariable('endTime', df.format(endTime))
+ 							execution.setVariable('procInstId', execution.getProcessInstanceId())
+ 							execution.setVariable('mailUrl', 'https://commonservices.eorionsolution.com/mailsender/mail/v2/mail')
+ 							execution.setVariable('mailFrom', 'develop@eorionsolution.com')
+ 							execution.setVariable('approvalNoticeDroolsUrl', 'https://commonservices.eorionsolution.com/decisiontables/v1/fire/school_leave_days.xls')
+ 							execution.setVariable('checkAttachementsUrl', 'https://commonservices.eorionsolution.com/decisiontables/v1/fire/school_leave_attachments.xls')
+ 							execution.setVariable('remainDaysMetabaseUrl', 'https://metabase.eorionsolution.com/public/question/7c56bf6f-7385-48f2-92dd-3059d4791640.json?parameters=')
+ 							
+ 							//construct 'get employee info' request
+ 							def headerMap = new HashMap()
+ 							def param=java.net.URLEncoder.encode('[{"type":"category","target":["variable",["template-tag","sn"]],"value":\"'+ initiator+ '\"}]', "UTF-8")
+ 							execution.setVariable("_http_method", "GET")
+ 							execution.setVariable("_http_headers", headerMap)
+ 							execution.setVariable("_http_body", '')
+ 							execution.setVariable("_http_url", 'https://metabase.eorionsolution.com/public/question/7929af70-378b-49ad-b0ae-3dfbabcd26ea.json?parameters=' + param)
+ 							execution.setVariable("_http_response_body", '')
+ 							execution.setVariable("_http_response_status_code", '')]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </startEvent>
+    <serviceTask id="eimService1" name="EIM Service Get Employee Info" activiti:class="com.eorionsolution.riying.bpms.javaservice.http.RestAPIService"></serviceTask>
+    <serviceTask id="eimService2" name="EIM Service Get Remain Days" activiti:class="com.eorionsolution.riying.bpms.javaservice.http.RestAPIService"></serviceTask>
+    <serviceTask id="droolsService1" name="Drools Service Get Approval Info" activiti:class="com.eorionsolution.riying.bpms.javaservice.http.RestAPIService"></serviceTask>
+    <serviceTask id="droolsService2" name="Drools Service Get Attachment Info" activiti:class="com.eorionsolution.riying.bpms.javaservice.http.RestAPIService"></serviceTask>
+    <scriptTask id="scripttask1" name="Get Employee Info" scriptFormat="groovy" activiti:autoStoreVariables="false">
+      <script>
+    	import groovy.json.JsonSlurper
+    		
+    		//get employee info
+    		if (_http_response_status_code!=200) {
+    			throw new org.activiti.engine.ActivitiIllegalArgumentException('call metabase for manager info failed!')
+    		}
+    		def jsonSlurper = new JsonSlurper()
+    		def employeeLi = jsonSlurper.parseText(_http_response_body)
+    		if (employeeLi.size() != 1) {
+    			throw new org.activiti.engine.ActivitiIllegalArgumentException('当前您的数据不存在EIM中 Your information does not exist in the EIM.')
+    		}
+    		def employeeInfo = employeeLi[0]
+    		if (!employeeInfo.managerSn || employeeInfo.managerSn.trim() == '') {
+    			throw new org.activiti.engine.ActivitiIllegalArgumentException('请在EIM中维护您的"直线领导"信息 Please maintain your "Manager" information in EIM. ')
+    		}
+    		if (!employeeInfo.sltSn || employeeInfo.sltSn.trim() == '') {
+    			throw new org.activiti.engine.ActivitiIllegalArgumentException('请在EIM中维护您的"直属SLT"信息 Please maintain your "SLT" information in EIM. ')
+    		}
+    		if (!employeeInfo.employeeType || employeeInfo.employeeType.trim() == '') {
+    			throw new org.activiti.engine.ActivitiIllegalArgumentException('请在EIM中维护您的"员工类型"信息 Please maintain your "Employee Type" information in EIM. ')
+    		}
+    		//save employee info
+    		execution.setVariable('managerSn', employeeInfo.managerSn)
+    		execution.setVariable('sltSn', employeeInfo.sltSn)
+    		execution.setVariable('employeeType', employeeInfo.employeeType)
+    		
+    		//call meatabase for remain days
+    		def headerMap = new HashMap()
+			def param=java.net.URLEncoder.encode('[{"type":"category","target":["variable",["template-tag","sn"]],"value":\"'+ initiator+ '\"}]', "UTF-8")
+			execution.setVariable("_http_method", "GET")
+			execution.setVariable("_http_headers", headerMap)
+			execution.setVariable("_http_body", '')
+			execution.setVariable("_http_url", remainDaysMetabaseUrl + param)
+			execution.setVariable("_http_response_body", '')
+			execution.setVariable("_http_response_status_code", '')
+    	
+    	</script>
+    </scriptTask>
+    <scriptTask id="scripttask2" name="Get Remain Days and Judge" scriptFormat="groovy" activiti:autoStoreVariables="false">
+      <script>
+    	import groovy.json.JsonSlurper
+    		
+    		//get remain days
+    		if (_http_response_status_code!=200) {
+    			throw new org.activiti.engine.ActivitiIllegalArgumentException('call metabase for remain days info failed!')
+    		}
+    		def jsonSlurper = new JsonSlurper()
+    		def infoLi = jsonSlurper.parseText(_http_response_body)
+    		if (infoLi.size() != 1) {
+    			throw new org.activiti.engine.ActivitiIllegalArgumentException('您的剩余假期数据异常 Your remaining vacation data is abnormal.')
+    		}
+    		def remainInfo = infoLi[0]
+    		def currentRemain = '-'
+    		remainInfo.each{k,v -&gt;
+    			if (leaveType.contains(k)) {
+    				currentRemain = v - leaveDays.toDouble()
+    				if(leaveDays.toDouble() &gt; v) {
+    					throw new org.activiti.engine.ActivitiIllegalArgumentException("剩余假期不足 Insufficient remaining holidays.")
+    				}
+    			}
+    		}
+    		execution.setVariable('oldRemain', currentRemain.toString())
+    		
+    		//attachements and Substitute check drools
+    		def leaveType = jsonSlurper.parseText(leaveType).code
+			def body = "[{\"leaveType\":\"$leaveType\"}]"
+			def headerMap = new java.util.HashMap()
+			headerMap.put("Content-Type","application/json")
+			
+			execution.setVariable("_http_method", "POST")				
+			execution.setVariable("_http_headers", headerMap)
+			execution.setVariable("_http_body", body)
+			execution.setVariable("_http_url", checkAttachementsUrl);
+			execution.setVariable("_http_response_body", '')
+		    execution.setVariable("_http_response_status_code", '')	
+    	
+    	</script>
+    </scriptTask>
+    <scriptTask id="scripttask3" name="Get Attachment Info" scriptFormat="groovy" activiti:autoStoreVariables="false">
+      <script>
+    	import groovy.json.JsonSlurper
+    		//get check info -- need attachement  need pick Substitute
+    		if (_http_response_status_code!=200) {
+    			throw new org.activiti.engine.ActivitiIllegalArgumentException('call drools for check failed!')
+    		}
+    		def jsonSlurper = new JsonSlurper()
+    		def checkInfoLi = jsonSlurper.parseText(_http_response_body)
+    		if (checkInfoLi.size() != 1) {
+    			throw new org.activiti.engine.ActivitiIllegalArgumentException('drools 数据异常 drools for check data exception.')
+    		}
+    		def checkInfo = checkInfoLi[0]
+    		def optionMap = new HashMap()
+    		optionMap.put('need', checkInfo.need?:'N')
+    		optionMap.put('needAfter', checkInfo.needAfter?:'N')
+    		optionMap.put('needNot', checkInfo.needNot?:'N')
+    		def count = optionMap.values().count{it=='Y'}
+    		if (count != 1) {
+    			throw new org.activiti.engine.ActivitiIllegalArgumentException('drools leave check response data error, plz fill "school_leave_check.xls".')
+    		}
+    		optionMap.each{k,v -&gt;
+    			execution.setVariable(k, v)
+    		}
+    		def emptyAttachements = jsonSlurper.parseText(attachements).isEmpty()
+    		execution.setVariable('emptyAttachements', emptyAttachements)
+    		if (checkInfo.need == 'Y' &amp;&amp; emptyAttachements) {
+    			throw new org.activiti.engine.ActivitiIllegalArgumentException('请上传"证明文件" Please upload "Certified Documents"')
+    		}
+    		
+    		//approval drools
+    		def body = "[{\"leaveDays\":\"$leaveDays\",\"employeeType\":\"$employeeType\"}]"
+    		def headerMap = new java.util.HashMap()
+			headerMap.put("Content-Type","application/json")
+			
+			execution.setVariable("_http_method", "POST")				
+			execution.setVariable("_http_headers", headerMap)
+			execution.setVariable("_http_body", body)
+			execution.setVariable("_http_url", approvalNoticeDroolsUrl);
+			execution.setVariable("_http_response_body", '')
+		    execution.setVariable("_http_response_status_code", '')	
+    	
+    	</script>
+    </scriptTask>
+    <scriptTask id="scripttask4" name="Get Approval Info" scriptFormat="groovy" activiti:autoStoreVariables="false">
+      <script>
+    	import groovy.json.JsonSlurper
+    		import groovy.json.JsonOutput
+    		if (_http_response_status_code != 200) {
+    			throw new org.activiti.engine.ActivitiIllegalArgumentException('call drools for approval failed.')
+    		}
+    		def jsonSlurper = new JsonSlurper()
+    		def approvalInfoLi = jsonSlurper.parseText(_http_response_body)
+    		if (approvalInfoLi.size() != 1) {
+    			throw new org.activiti.engine.ActivitiIllegalArgumentException('drools 数据异常 drools for approval exception.')
+    		}
+    		def approvalInfo = approvalInfoLi[0]
+    		//check
+    		if (!approvalInfo.hrs || approvalInfo.hrs.trim() == '') {
+    			throw new org.activiti.engine.ActivitiIllegalArgumentException('请在Drools中维护人事人员 Please maintain personnel in Drools.')
+    		}
+    		if (!approvalInfo.admins || approvalInfo.admins.trim() == '') {
+    			throw new org.activiti.engine.ActivitiIllegalArgumentException('请在Drools中维护行政人员 Please maintain administrative staff in Drools.')
+    		}
+    		if (!approvalInfo.needPickSubs || approvalInfo.needPickSubs.trim() == '') {
+    			throw new org.activiti.engine.ActivitiIllegalArgumentException('请在Drools中维护是否需要代课 Please maintain substitute info in Drools.')
+    		}
+    		if (!approvalInfo.needSTL || approvalInfo.needSTL.trim() == '') {
+    			throw new org.activiti.engine.ActivitiIllegalArgumentException('Please maintain "needSTL" in Drools.')
+    		}
+    		if (approvalInfo.employeeType == '教学类人员' &amp;&amp; (!approvalInfo.schedulers || approvalInfo.schedulers.trim() == '')) {
+    			throw new org.activiti.engine.ActivitiIllegalArgumentException('请在Drools中维护排课负责人信息 Please maintain substitute info in Drools.')
+    		}
+    		if (approvalInfo.needPickSubs == 'Y' &amp;&amp; (execution.getVariable('needSubstitute') == null || approvalInfo.schedulers == null || approvalInfo.schedulers.trim() == '')) {
+    			throw new org.activiti.engine.ActivitiIllegalArgumentException('请填写"是否需要代课" Please fill "Need Substitute".')
+    		}
+    		//notices
+    		def notices = new HashSet()
+    		notices.addAll(approvalInfo.hrs.split(','))
+    		notices.addAll(approvalInfo.admins.split(','))
+    		if (approvalInfo.schoolmasters &amp;&amp; approvalInfo.schoolmasters.trim() != '') {
+    			notices.addAll(approvalInfo.schoolmasters.split(','))
+    		}
+    		//approvers
+    		def approvers = []
+    		approvers&lt;&lt;managerSn
+    		if (approvalInfo.needSTL == 'Y' &amp;&amp; sltSn != managerSn) {
+    			approvers&lt;&lt;sltSn
+    		}
+    		
+    		execution.setVariable('notices', JsonOutput.toJson(notices))
+    		execution.setVariable('hrs', approvalInfo.hrs)
+    		if (approvalInfo.needPickSubs == 'Y') {
+				execution.setVariable('schedulers', JsonOutput.toJson(approvalInfo.schedulers.split(',')))    		
+    		}
+    		execution.setVariable('approvers', approvers)
+    		
+    		execution.setVariable('needPickSubs', approvalInfo.needPickSubs)
+    		
+    	
+    	</script>
+    </scriptTask>
+    <userTask id="usertask1" name="请假申请审批 Leave Application Approval" activiti:assignee="${approver}" activiti:dueDate="P1D" activiti:priority="8080">
+      <extensionElements>
+        <activiti:formProperty id="coreaction_审批结果 Approval_1_enum_rbv_$$A" name="审批结果 Approval" type="enum" variable="coreaction" required="true">
+          <activiti:value id="同意 Agree" name="同意 Agree"></activiti:value>
+          <activiti:value id="拒绝 Refuse" name="拒绝 Refuse"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="corecomments_审批意见 Comments_1_string_t2_$$B" name="审批意见 Comments" type="string" variable="corecomments"></activiti:formProperty>
+        <activiti:formProperty id="leaveType_请假类型 Leave Type_1_string_tree_$$VA" name="请假类型 Leave Type" type="string" variable="leaveType" required="true"></activiti:formProperty>
+        <activiti:formProperty id="startDate_开始时间 Start_1_string_t5_$$VB" name="开始时间 Start" type="string" variable="startDate" required="true"></activiti:formProperty>
+        <activiti:formProperty id="endDate_结束时间 End_2_string_t5_$$VB" name="结束时间 End" type="string" variable="endDate" required="true"></activiti:formProperty>
+        <activiti:formProperty id="leaveDays_请假天数 Leave Days_3_string_t11_$$VB" name="请假天数 Leave Days" type="string" variable="leaveDays" required="true"></activiti:formProperty>
+        <activiti:formProperty id="leaveReason_请假原因 Leave Reason_1_string_t2_$$VC" name="请假原因 Leave Reason" type="string" variable="leaveReason" required="true"></activiti:formProperty>
+        <activiti:formProperty id="attachments_证明文件 Certified Documents_2_string_t9i_$$VC" name="证明文件 Certified Documents" type="string" variable="attachements"></activiti:formProperty>
+        <activiti:formProperty id="needSubstitute_是否需要代课 Need Substitute_2_enum_rbv_$$VD" name="是否需要代课（教学类员工填写） Need Substitute(For Teaching Staff)" type="enum" variable="needSubstitute">
+          <activiti:value id="需要 Need" name="需要 Need"></activiti:value>
+          <activiti:value id="不需要 Need Not" name="不需要 Need Not"></activiti:value>
+        </activiti:formProperty>
+        <activiti:taskListener event="create" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+          <activiti:field name="language">
+            <activiti:string><![CDATA[groovy]]></activiti:string>
+          </activiti:field>
+          <activiti:field name="script">
+            <activiti:string><![CDATA[def execution = task.getExecution()
+        					execution.setVariableLocal('corecomments','')]]></activiti:string>
+          </activiti:field>
+        </activiti:taskListener>
+        <activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+          <activiti:field name="language">
+            <activiti:string><![CDATA[groovy]]></activiti:string>
+          </activiti:field>
+          <activiti:field name="script">
+            <activiti:string><![CDATA[def execution = task.getExecution()
+        					if (coreaction == '拒绝 Refuse') {
+			            		def employeeOpt = Optional.ofNullable(identityService.createUserQuery().userId(task.getAssignee()).singleResult())
+			    				def employeeName = employeeOpt.map({u ->  u.getLastName() + u.getFirstName()}).orElse('')
+			            		execution.setVariable('refuseUserName', employeeName)
+			            		execution.setVariable('refuseReason', corecomments?:'')
+			            	}]]></activiti:string>
+          </activiti:field>
+        </activiti:taskListener>
+      </extensionElements>
+      <multiInstanceLoopCharacteristics isSequential="true" activiti:collection="approvers" activiti:elementVariable="approver">
+        <completionCondition>${coreaction == '拒绝 Refuse'}</completionCondition>
+      </multiInstanceLoopCharacteristics>
+    </userTask>
+    <scriptTask id="scripttask5" name="send mail about refuse info" scriptFormat="groovy" activiti:autoStoreVariables="false">
+      <script>
+    	import groovy.json.JsonSlurper
+    		import groovy.json.JsonOutput
+    		
+    		def jsonSlurper = new JsonSlurper()
+    		def mailStr = """
+{
+  "mail":{
+    "templateName":"school_oa",
+    "subject": "请假未通过通知",
+    "templateData":{
+      "type2":"1",
+      "refuseUserName": "$refuseUserName",
+      "refuseReason": "$refuseReason"
+    },
+    "from":"$mailFrom",
+    "to":[
+      "$initiator"
+    ]
+  }
+}    		
+"""
+			def mailBodyObj = jsonSlurper.parseText(mailStr)
+			def mailBody = JsonOutput.toJson(mailBodyObj)
+			execution.setVariable('refuseMailBody',mailBody)
+			
+			execution.setVariable("_http_method", "POST")
+			def headerMap = new HashMap()
+			headerMap.put("Content-Type","application/json")
+			execution.setVariable("_http_headers", headerMap)
+			execution.setVariable("_http_body", mailBody)
+			execution.setVariable("_http_url", mailUrl)
+			execution.setVariable("_http_response_body", '')
+			execution.setVariable("_http_response_status_code", '')
+    	
+    	</script>
+    </scriptTask>
+    <serviceTask id="mailService1" name="Mail Service1" activiti:class="com.eorionsolution.riying.bpms.javaservice.http.RestAPIService"></serviceTask>
+    <exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway"></exclusiveGateway>
+    <exclusiveGateway id="exclusivegateway2" name="Exclusive Gateway"></exclusiveGateway>
+    <scriptTask id="scripttask6" name="send mail about substitute info" scriptFormat="groovy" activiti:autoStoreVariables="false">
+      <script>
+    	import groovy.json.JsonSlurper
+    		import groovy.json.JsonOutput
+    		def jsonSlurper = new JsonSlurper()
+    		def leaveType = jsonSlurper.parseText(leaveType).code
+    		def mailStr = """
+{
+  "mail":{
+    "templateName":"school_oa",
+    "subject": "排课通知",
+    "templateData":{
+      "type1":"1",
+      "employeeName": "$employeeName",
+      "startTime": "$startTime",
+      "endTime": "$endTime",
+      "leaveDays": "$leaveDays",
+      "leaveType": "$leaveType"
+    },
+    "from":"$mailFrom",
+    "to": $schedulers
+  }
+}    		
+"""
+    		def mailBodyObj = jsonSlurper.parseText(mailStr)
+			def mailBody = JsonOutput.toJson(mailBodyObj)
+			execution.setVariable('substituteMailBody',mailBody)
+			
+			execution.setVariable("_http_method", "POST")
+			def headerMap = new HashMap()
+			headerMap.put("Content-Type","application/json")
+			execution.setVariable("_http_headers", headerMap)
+			execution.setVariable("_http_body", mailBody)
+			execution.setVariable("_http_url", mailUrl)
+			execution.setVariable("_http_response_body", '')
+			execution.setVariable("_http_response_status_code", '')
+    	
+    	</script>
+    </scriptTask>
+    <serviceTask id="mailService2" name="Mail Service2" activiti:class="com.eorionsolution.riying.bpms.javaservice.http.RestAPIService"></serviceTask>
+    <scriptTask id="scripttask7" name="send mail about leave to related personnel" scriptFormat="groovy" activiti:autoStoreVariables="false">
+      <script>
+    	import groovy.json.JsonSlurper
+    		import groovy.json.JsonOutput
+    		import com.eorionsolution.bpms.extension.jdbc.JdbcUtils
+    		import java.time.LocalDateTime
+    		import java.text.DateFormat
+			import java.text.SimpleDateFormat
+			
+			def jsonSlurper = new JsonSlurper()
+    		def leaveType = jsonSlurper.parseText(leaveType).code
+    		execution.setVariable('oldLeaveType', leaveType)
+    		def mailStr = """
+{
+  "mail":{
+    "templateName":"school_oa",
+    "subject": "$employeeName 请假申请已通过",
+    "templateData":{
+      "type3":"1",
+      "employeeName": "$employeeName",
+      "startTime": "$startTime",
+      "endTime": "$endTime",
+      "leaveDays": "$leaveDays",
+      "leaveType": "$leaveType"
+    },
+    "from":"$mailFrom",
+    "to":$notices,
+    "cc":["$initiator"]
+  }
+}    		
+"""
+    		def mailBodyObj = jsonSlurper.parseText(mailStr)
+			def mailBody = JsonOutput.toJson(mailBodyObj)
+			execution.setVariable('noticeMailBody',mailBody)
+			
+			execution.setVariable("_http_method", "POST")
+			def headerMap = new HashMap()
+			headerMap.put("Content-Type","application/json")
+			execution.setVariable("_http_headers", headerMap)
+			execution.setVariable("_http_body", mailBody)
+			execution.setVariable("_http_url", mailUrl)
+			execution.setVariable("_http_response_body", '')
+			execution.setVariable("_http_response_status_code", '')
+			
+			//save record
+			def leaveDays = leaveDays.toDouble()
+			def now = LocalDateTime.now().toString()
+			def df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+			df.setTimeZone(TimeZone.getTimeZone("GMT+8"))
+			def start = df.format(new Date(startDate.toLong()))
+			def end = df.format(new Date(endDate.toLong()))
+			def insertJson = """
+{
+    "tableName":"DP_LEAVE_RECORDS_",
+    "type":0,
+    "details":[
+        {
+            "insert":{
+                "SN_":"$initiator",
+                "LEAVE_TYPE_":"$leaveType",
+                "LEAVE_DAYS_": $leaveDays,
+                "PROC_INST_ID_":"$procInstId",
+                "ENABLE_":true,
+                "START_":"$start",
+                "END_": "$end",
+                "CURRENT_REMAIN_": "$oldRemain",
+                "CREATE_TIME_":"$now"
+            }
+        }
+    ]
+}			
+"""
+			def result = JdbcUtils.batchInsert(JsonOutput.toJson(jsonSlurper.parseText(insertJson)))
+			if (result != 200) {
+				throw new org.activiti.engine.ActivitiIllegalArgumentException('请假记录异常 Insert Record Exception. ')
+			}
+    	
+    	</script>
+    </scriptTask>
+    <serviceTask id="mailService3" name="Mail Service3" activiti:class="com.eorionsolution.riying.bpms.javaservice.http.RestAPIService"></serviceTask>
+    <exclusiveGateway id="exclusivegateway3" name="Exclusive Gateway"></exclusiveGateway>
+    <intermediateCatchEvent id="timerintermediatecatchevent1" name="TimerCatchEvent">
+      <timerEventDefinition>
+        <timeDate>${endTime}</timeDate>
+      </timerEventDefinition>
+    </intermediateCatchEvent>
+    <scriptTask id="scripttask8" name="send mail to staff provide attachment" scriptFormat="groovy" activiti:autoStoreVariables="false">
+      <script>
+    	import groovy.json.JsonSlurper
+    		import groovy.json.JsonOutput
+    		
+    		def jsonSlurper = new JsonSlurper()
+    		def hrsJson = JsonOutput.toJson(hrs.split(','))
+    		def mailStr = """
+{
+  "mail":{
+    "templateName":"school_oa",
+    "subject": "提交请假证明文件提醒",
+    "templateData":{
+      "type4":"1",
+      "employeeName": "$employeeName"
+    },
+    "from":"$mailFrom",
+    "to":["$initiator"],
+    "cc":$hrsJson
+  }
+}    		
+"""
+			def mailBodyObj = jsonSlurper.parseText(mailStr)
+			def mailBody = JsonOutput.toJson(mailBodyObj)
+			execution.setVariable('provideFileMailBody',mailBody)
+			
+			execution.setVariable("_http_method", "POST")
+			def headerMap = new HashMap()
+			headerMap.put("Content-Type","application/json")
+			execution.setVariable("_http_headers", headerMap)
+			execution.setVariable("_http_body", mailBody)
+			execution.setVariable("_http_url", mailUrl)
+			execution.setVariable("_http_response_body", '')
+			execution.setVariable("_http_response_status_code", '')
+    	
+    	</script>
+    </scriptTask>
+    <serviceTask id="mailService4" name="Mail Service4" activiti:class="com.eorionsolution.riying.bpms.javaservice.http.RestAPIService"></serviceTask>
+    <userTask id="usertask2" name="请假确认 Confirm Task" activiti:candidateUsers="${hrs}" activiti:dueDate="P1D" activiti:priority="8080">
+      <extensionElements>
+        <activiti:formProperty id="leaveType_请假类型 Leave Type_1_string_tree_$$A" name="请假类型 Leave Type" type="string" variable="leaveType" required="true"></activiti:formProperty>
+        <activiti:formProperty id="attachments_证明文件 Certified Documents_2_string_t9i_$$C" name="证明文件 Certified Documents" type="string" variable="attachements"></activiti:formProperty>
+        <activiti:formProperty id="startDate_开始时间 Start_1_string_t5_$$VB" name="开始时间 Start" type="string" variable="startDate" required="true"></activiti:formProperty>
+        <activiti:formProperty id="endDate_结束时间 End_2_string_t5_$$VB" name="结束时间 End" type="string" variable="endDate" required="true"></activiti:formProperty>
+        <activiti:formProperty id="leaveDays_请假天数 Leave Days_3_string_t11_$$VB" name="请假天数 Leave Days" type="string" variable="leaveDays" required="true"></activiti:formProperty>
+        <activiti:formProperty id="leaveReason_请假原因 Leave Reason_1_string_t2_$$VC" name="请假原因 Leave Reason" type="string" variable="leaveReason" required="true"></activiti:formProperty>
+        <activiti:formProperty id="attachments_证明文件 Certified Documents_2_string_t9i_$$VC" name="证明文件 Certified Documents" type="string" variable="attachements"></activiti:formProperty>
+        <activiti:formProperty id="needSubstitute_是否需要代课 Need Substitute_2_enum_rbv_$$VD" name="是否需要代课（教学类员工填写） Need Substitute(For Teaching Staff)" type="enum" variable="needSubstitute">
+          <activiti:value id="需要 Need" name="需要 Need"></activiti:value>
+          <activiti:value id="不需要 Need Not" name="不需要 Need Not"></activiti:value>
+        </activiti:formProperty>
+        <activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+          <activiti:field name="language">
+            <activiti:string><![CDATA[groovy]]></activiti:string>
+          </activiti:field>
+          <activiti:field name="script">
+            <activiti:string><![CDATA[import groovy.json.JsonSlurper
+        					def execution = task.getExecution()
+        					def jsonSlurper = new JsonSlurper()
+        					def nowLeaveType = jsonSlurper.parseText(leaveType).code
+        					def changedType = (nowLeaveType != oldLeaveType)
+        					execution.setVariable('nowLeaveType', nowLeaveType)
+        					execution.setVariable('changedType', changedType)]]></activiti:string>
+          </activiti:field>
+        </activiti:taskListener>
+      </extensionElements>
+    </userTask>
+    <exclusiveGateway id="exclusivegateway4" name="Exclusive Gateway"></exclusiveGateway>
+    <scriptTask id="scripttask9" name="Get Remain Days and Judge And Send Mail" scriptFormat="groovy" activiti:autoStoreVariables="false">
+      <script>
+    	import groovy.json.JsonSlurper
+   			import groovy.json.JsonOutput
+    		import com.eorionsolution.bpms.extension.jdbc.JdbcUtils
+    		import java.time.LocalDateTime
+    		import java.text.DateFormat
+			import java.text.SimpleDateFormat
+    		
+    		//get remain days
+    		if (_http_response_status_code!=200) {
+    			throw new org.activiti.engine.ActivitiIllegalArgumentException('call metabase for remain days info failed!')
+    		}
+    		def jsonSlurper = new JsonSlurper()
+    		def infoLi = jsonSlurper.parseText(_http_response_body)
+    		if (infoLi.size() != 1) {
+    			throw new org.activiti.engine.ActivitiIllegalArgumentException('您的剩余假期数据异常 Your remaining vacation data is abnormal.')
+    		}
+    		def remainInfo = infoLi[0]
+    		def currentRemain = '-'
+    		remainInfo.each{k,v -&gt;
+    			if (leaveType.contains(k)) {
+    				currentRemain = v - leaveDays.toDouble()
+    				if (leaveDays.toDouble() &gt; v) {
+    					throw new org.activiti.engine.ActivitiIllegalArgumentException("剩余假期不足 Insufficient remaining holidays.")
+    				}
+    			}
+    		}
+    		execution.setVariable('updateRemain',currentRemain.toString())
+    		
+    		//send mail
+    		def mailStr = """
+{
+  "mail":{
+    "templateName":"school_oa",
+    "subject": "请假类型已修改",
+    "templateData":{
+      "type5":"1",
+      "oldLeaveType": "$oldLeaveType",
+      "newLeaveType": "$nowLeaveType",
+      "startTime": "$startTime",
+      "endTime": "$endTime",
+      "leaveDays": "$leaveDays"
+    },
+    "from":"$mailFrom",
+    "to":["$initiator"]
+  }
+}    		
+"""
+			def mailBodyObj = jsonSlurper.parseText(mailStr)
+			def mailBody = JsonOutput.toJson(mailBodyObj)
+			execution.setVariable('changeLeaveTypeMailBody',mailBody)
+			execution.setVariable("_http_method", "POST")
+			def headerMap = new HashMap()
+			headerMap.put("Content-Type","application/json")
+			execution.setVariable("_http_headers", headerMap)
+			execution.setVariable("_http_body", mailBody)
+			execution.setVariable("_http_url", mailUrl)
+			execution.setVariable("_http_response_body", '')
+			execution.setVariable("_http_response_status_code", '')
+    		
+    		//update data
+    		def leaveDays = leaveDays.toDouble()
+    		def now = LocalDateTime.now().toString()
+    		//update
+			def updateJson = """
+{
+    "tableName":"DP_LEAVE_RECORDS_",
+    "type":1,
+    "details":[
+        {
+            "update":{
+                "ENABLE_":false, "UPDATE_TIME_":"$now"
+            },
+            "where":{
+            	"PROC_INST_ID_":"$procInstId", "ENABLE_": true, "SN_":"$initiator"
+            }
+        }
+    ]
+}
+"""
+			def updateResult = JdbcUtils.batchUpdate(JsonOutput.toJson(jsonSlurper.parseText(updateJson)))
+			if (updateResult != 200) {
+				throw new org.activiti.engine.ActivitiIllegalArgumentException('请假记录异常 Update Record Exception. ')
+			}
+			//insert
+			def df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+			df.setTimeZone(TimeZone.getTimeZone("GMT+8"))
+			def start = df.format(new Date(startDate.toLong()))
+			def end = df.format(new Date(endDate.toLong()))
+			def insertJson = """
+{
+    "tableName":"DP_LEAVE_RECORDS_",
+    "type":0,
+    "details":[
+        {
+            "insert":{
+                "SN_":"$initiator",
+                "LEAVE_TYPE_":"$nowLeaveType",
+                "LEAVE_DAYS_": $leaveDays,
+                "PROC_INST_ID_":"$procInstId",
+                "ENABLE_":true,
+                "START_": "$start",
+                "END_": "$end",
+                "CURRENT_REMAIN_": "$updateRemain",
+                "CREATE_TIME_":"$now"
+            }
+        }
+    ]
+}			
+"""
+			def insertResult = JdbcUtils.batchInsert(JsonOutput.toJson(jsonSlurper.parseText(insertJson)));
+			if (insertResult != 200) {
+				throw new org.activiti.engine.ActivitiIllegalArgumentException('请假记录异常 Insert Record Exception. ')
+			}
+						
+    	
+    	</script>
+    </scriptTask>
+    <serviceTask id="mailService5" name="Mail Service5" activiti:class="com.eorionsolution.riying.bpms.javaservice.http.RestAPIService"></serviceTask>
+    <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="eimService1"></sequenceFlow>
+    <sequenceFlow id="flow2" sourceRef="eimService1" targetRef="scripttask1"></sequenceFlow>
+    <sequenceFlow id="flow3" sourceRef="scripttask1" targetRef="eimService2"></sequenceFlow>
+    <sequenceFlow id="flow4" sourceRef="eimService2" targetRef="scripttask2"></sequenceFlow>
+    <sequenceFlow id="flow5" sourceRef="scripttask2" targetRef="droolsService2"></sequenceFlow>
+    <sequenceFlow id="flow6" sourceRef="droolsService2" targetRef="scripttask3"></sequenceFlow>
+    <sequenceFlow id="flow7" sourceRef="scripttask3" targetRef="droolsService1"></sequenceFlow>
+    <sequenceFlow id="flow8" sourceRef="droolsService1" targetRef="scripttask4"></sequenceFlow>
+    <sequenceFlow id="flow9" sourceRef="scripttask4" targetRef="usertask1"></sequenceFlow>
+    <sequenceFlow id="flow10" sourceRef="usertask1" targetRef="exclusivegateway1"></sequenceFlow>
+    <sequenceFlow id="flow11" name="refuse" sourceRef="exclusivegateway1" targetRef="scripttask5">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${coreaction == '拒绝 Refuse'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow12" sourceRef="scripttask5" targetRef="mailService1"></sequenceFlow>
+    <endEvent id="refuseEnd" name="End"></endEvent>
+    <sequenceFlow id="flow13" sourceRef="mailService1" targetRef="refuseEnd"></sequenceFlow>
+    <sequenceFlow id="flow14" name="agree" sourceRef="exclusivegateway1" targetRef="exclusivegateway2">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${coreaction == '同意 Agree'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow15" name="substitute" sourceRef="exclusivegateway2" targetRef="scripttask6">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${needPickSubs == 'Y' && needSubstitute == '需要 Need'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow16" sourceRef="scripttask6" targetRef="mailService2"></sequenceFlow>
+    <sequenceFlow id="flow17" name="need not substitute" sourceRef="exclusivegateway2" targetRef="scripttask7">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${needPickSubs != 'Y' || needSubstitute != '需要 Need'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow18" sourceRef="mailService2" targetRef="scripttask7"></sequenceFlow>
+    <sequenceFlow id="flow19" sourceRef="scripttask7" targetRef="mailService3"></sequenceFlow>
+    <sequenceFlow id="flow20" sourceRef="mailService3" targetRef="exclusivegateway3"></sequenceFlow>
+    <sequenceFlow id="flow21" name="need provide attachment" sourceRef="exclusivegateway3" targetRef="timerintermediatecatchevent1">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${needAfter == 'Y' && emptyAttachements}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow22" sourceRef="timerintermediatecatchevent1" targetRef="scripttask8"></sequenceFlow>
+    <sequenceFlow id="flow23" sourceRef="scripttask8" targetRef="mailService4"></sequenceFlow>
+    <sequenceFlow id="flow24" sourceRef="mailService4" targetRef="usertask3"></sequenceFlow>
+    <sequenceFlow id="flow25" name="need not add attachment" sourceRef="exclusivegateway3" targetRef="usertask2">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${needAfter != 'Y' || !emptyAttachements}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow26" sourceRef="usertask2" targetRef="exclusivegateway4"></sequenceFlow>
+    <sequenceFlow id="flow27" name="changed leave type" sourceRef="exclusivegateway4" targetRef="scripttask10">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${changedType}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow28" sourceRef="scripttask9" targetRef="mailService5"></sequenceFlow>
+    <endEvent id="successEnd" name="End"></endEvent>
+    <sequenceFlow id="flow29" sourceRef="mailService5" targetRef="successEnd"></sequenceFlow>
+    <sequenceFlow id="flow30" name="not changed leave type" sourceRef="exclusivegateway4" targetRef="successEnd">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${!changedType}]]></conditionExpression>
+    </sequenceFlow>
+    <serviceTask id="eimService3" name="EIM Service Get Remain Days" activiti:class="com.eorionsolution.riying.bpms.javaservice.http.RestAPIService"></serviceTask>
+    <scriptTask id="scripttask10" name="Construct Eim Sevice Body" scriptFormat="groovy" activiti:autoStoreVariables="false">
+      <script>
+    	
+    		//call meatabase for remain days
+    		def headerMap = new HashMap()
+			def param=java.net.URLEncoder.encode('[{"type":"category","target":["variable",["template-tag","sn"]],"value":\"'+ initiator+ '\"}]', "UTF-8")
+			execution.setVariable("_http_method", "GET")
+			execution.setVariable("_http_headers", headerMap)
+			execution.setVariable("_http_body", '')
+			execution.setVariable("_http_url", remainDaysMetabaseUrl + param)
+			execution.setVariable("_http_response_body", '')
+			execution.setVariable("_http_response_status_code", '')
+    	
+    	</script>
+    </scriptTask>
+    <sequenceFlow id="flow31" sourceRef="scripttask10" targetRef="eimService3"></sequenceFlow>
+    <sequenceFlow id="flow32" sourceRef="eimService3" targetRef="scripttask9"></sequenceFlow>
+    <userTask id="usertask3" name="提供证明材料 Provide Certified Documents" activiti:assignee="${initiator}" activiti:dueDate="P1D" activiti:priority="8080">
+      <extensionElements>
+        <activiti:formProperty id="leaveType_请假类型 Leave Type_1_string_tree_$$VA" name="请假类型 Leave Type" type="string" variable="leaveType" required="true"></activiti:formProperty>
+        <activiti:formProperty id="startDate_开始时间 Start_1_string_t5_$$VB" name="开始时间 Start" type="string" variable="startDate" required="true"></activiti:formProperty>
+        <activiti:formProperty id="endDate_结束时间 End_2_string_t5_$$VB" name="结束时间 End" type="string" variable="endDate" required="true"></activiti:formProperty>
+        <activiti:formProperty id="leaveDays_请假天数 Leave Days_3_string_t11_$$VB" name="请假天数 Leave Days" type="string" variable="leaveDays" required="true"></activiti:formProperty>
+        <activiti:formProperty id="leaveReason_请假原因 Leave Reason_1_string_t2_$$VC" name="请假原因 Leave Reason" type="string" variable="leaveReason" required="true"></activiti:formProperty>
+        <activiti:formProperty id="attachments_证明文件 Certified Documents_2_string_t9i_$$C" name="证明文件 Certified Documents" type="string" variable="attachements"></activiti:formProperty>
+        <activiti:formProperty id="needSubstitute_是否需要代课 Need Substitute_2_enum_rbv_$$VD" name="是否需要代课（教学类员工填写） Need Substitute(For Teaching Staff)" type="enum" variable="needSubstitute">
+          <activiti:value id="需要 Need" name="需要 Need"></activiti:value>
+          <activiti:value id="不需要 Need Not" name="不需要 Need Not"></activiti:value>
+        </activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <sequenceFlow id="flow33" sourceRef="usertask3" targetRef="usertask2"></sequenceFlow>
+    <boundaryEvent id="boundarytimer2" name="Timer" attachedToRef="usertask3" cancelActivity="true">
+      <timerEventDefinition>
+        <timeDuration>PT30S</timeDuration>
+      </timerEventDefinition>
+    </boundaryEvent>
+    <sequenceFlow id="flow34" sourceRef="boundarytimer2" targetRef="usertask2"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_leave_process">
+    <bpmndi:BPMNPlane bpmnElement="leave_process" id="BPMNPlane_leave_process">
+      <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="50.0" y="60.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="eimService1" id="BPMNShape_eimService1">
+        <omgdc:Bounds height="61.0" width="111.0" x="110.0" y="47.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="eimService2" id="BPMNShape_eimService2">
+        <omgdc:Bounds height="61.0" width="111.0" x="370.0" y="47.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="droolsService1" id="BPMNShape_droolsService1">
+        <omgdc:Bounds height="61.0" width="111.0" x="510.0" y="140.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="droolsService2" id="BPMNShape_droolsService2">
+        <omgdc:Bounds height="61.0" width="111.0" x="640.0" y="47.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scripttask1" id="BPMNShape_scripttask1">
+        <omgdc:Bounds height="61.0" width="111.0" x="240.0" y="47.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scripttask2" id="BPMNShape_scripttask2">
+        <omgdc:Bounds height="61.0" width="111.0" x="500.0" y="47.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scripttask3" id="BPMNShape_scripttask3">
+        <omgdc:Bounds height="61.0" width="111.0" x="640.0" y="140.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scripttask4" id="BPMNShape_scripttask4">
+        <omgdc:Bounds height="61.0" width="111.0" x="370.0" y="140.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask1" id="BPMNShape_usertask1">
+        <omgdc:Bounds height="61.0" width="111.0" x="230.0" y="140.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scripttask5" id="BPMNShape_scripttask5">
+        <omgdc:Bounds height="61.0" width="111.0" x="100.0" y="230.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="mailService1" id="BPMNShape_mailService1">
+        <omgdc:Bounds height="61.0" width="111.0" x="100.0" y="320.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway1" id="BPMNShape_exclusivegateway1">
+        <omgdc:Bounds height="40.0" width="40.0" x="265.0" y="240.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway2" id="BPMNShape_exclusivegateway2">
+        <omgdc:Bounds height="40.0" width="40.0" x="400.0" y="240.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scripttask6" id="BPMNShape_scripttask6">
+        <omgdc:Bounds height="61.0" width="111.0" x="510.0" y="230.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="mailService2" id="BPMNShape_mailService2">
+        <omgdc:Bounds height="61.0" width="111.0" x="650.0" y="230.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scripttask7" id="BPMNShape_scripttask7">
+        <omgdc:Bounds height="61.0" width="111.0" x="365.0" y="320.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="mailService3" id="BPMNShape_mailService3">
+        <omgdc:Bounds height="61.0" width="111.0" x="365.0" y="420.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway3" id="BPMNShape_exclusivegateway3">
+        <omgdc:Bounds height="40.0" width="40.0" x="400.0" y="530.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="timerintermediatecatchevent1" id="BPMNShape_timerintermediatecatchevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="482.0" y="533.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scripttask8" id="BPMNShape_scripttask8">
+        <omgdc:Bounds height="61.0" width="111.0" x="557.0" y="520.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="mailService4" id="BPMNShape_mailService4">
+        <omgdc:Bounds height="61.0" width="111.0" x="705.0" y="520.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask2" id="BPMNShape_usertask2">
+        <omgdc:Bounds height="61.0" width="111.0" x="365.0" y="620.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway4" id="BPMNShape_exclusivegateway4">
+        <omgdc:Bounds height="40.0" width="40.0" x="265.0" y="630.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scripttask9" id="BPMNShape_scripttask9">
+        <omgdc:Bounds height="61.0" width="111.0" x="110.0" y="820.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="mailService5" id="BPMNShape_mailService5">
+        <omgdc:Bounds height="61.0" width="111.0" x="110.0" y="907.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="refuseEnd" id="BPMNShape_refuseEnd">
+        <omgdc:Bounds height="35.0" width="35.0" x="138.0" y="420.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="successEnd" id="BPMNShape_successEnd">
+        <omgdc:Bounds height="35.0" width="35.0" x="268.0" y="920.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="eimService3" id="BPMNShape_eimService3">
+        <omgdc:Bounds height="61.0" width="111.0" x="110.0" y="730.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scripttask10" id="BPMNShape_scripttask10">
+        <omgdc:Bounds height="61.0" width="111.0" x="110.0" y="620.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask3" id="BPMNShape_usertask3">
+        <omgdc:Bounds height="61.0" width="111.0" x="705.0" y="620.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="boundarytimer2" id="BPMNShape_boundarytimer2">
+        <omgdc:Bounds height="30.0" width="30.0" x="745.0" y="670.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="85.0" y="77.0"></omgdi:waypoint>
+        <omgdi:waypoint x="110.0" y="77.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="221.0" y="77.0"></omgdi:waypoint>
+        <omgdi:waypoint x="240.0" y="77.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3">
+        <omgdi:waypoint x="351.0" y="77.0"></omgdi:waypoint>
+        <omgdi:waypoint x="370.0" y="77.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow4" id="BPMNEdge_flow4">
+        <omgdi:waypoint x="481.0" y="77.0"></omgdi:waypoint>
+        <omgdi:waypoint x="500.0" y="77.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow5" id="BPMNEdge_flow5">
+        <omgdi:waypoint x="611.0" y="77.0"></omgdi:waypoint>
+        <omgdi:waypoint x="640.0" y="77.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow6" id="BPMNEdge_flow6">
+        <omgdi:waypoint x="695.0" y="108.0"></omgdi:waypoint>
+        <omgdi:waypoint x="695.0" y="140.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow7" id="BPMNEdge_flow7">
+        <omgdi:waypoint x="640.0" y="170.0"></omgdi:waypoint>
+        <omgdi:waypoint x="621.0" y="170.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow8" id="BPMNEdge_flow8">
+        <omgdi:waypoint x="510.0" y="170.0"></omgdi:waypoint>
+        <omgdi:waypoint x="481.0" y="170.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow9" id="BPMNEdge_flow9">
+        <omgdi:waypoint x="370.0" y="170.0"></omgdi:waypoint>
+        <omgdi:waypoint x="341.0" y="170.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow10" id="BPMNEdge_flow10">
+        <omgdi:waypoint x="285.0" y="201.0"></omgdi:waypoint>
+        <omgdi:waypoint x="285.0" y="240.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow11" id="BPMNEdge_flow11">
+        <omgdi:waypoint x="265.0" y="260.0"></omgdi:waypoint>
+        <omgdi:waypoint x="211.0" y="260.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="13.0" width="31.0" x="223.0" y="268.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow12" id="BPMNEdge_flow12">
+        <omgdi:waypoint x="155.0" y="291.0"></omgdi:waypoint>
+        <omgdi:waypoint x="155.0" y="320.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow13" id="BPMNEdge_flow13">
+        <omgdi:waypoint x="155.0" y="381.0"></omgdi:waypoint>
+        <omgdi:waypoint x="155.0" y="420.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow14" id="BPMNEdge_flow14">
+        <omgdi:waypoint x="305.0" y="260.0"></omgdi:waypoint>
+        <omgdi:waypoint x="400.0" y="260.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="13.0" width="29.0" x="314.0" y="268.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow15" id="BPMNEdge_flow15">
+        <omgdi:waypoint x="440.0" y="260.0"></omgdi:waypoint>
+        <omgdi:waypoint x="510.0" y="260.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="13.0" width="48.0" x="449.0" y="268.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow16" id="BPMNEdge_flow16">
+        <omgdi:waypoint x="621.0" y="260.0"></omgdi:waypoint>
+        <omgdi:waypoint x="650.0" y="260.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow17" id="BPMNEdge_flow17">
+        <omgdi:waypoint x="420.0" y="280.0"></omgdi:waypoint>
+        <omgdi:waypoint x="420.0" y="320.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="13.0" width="93.0" x="321.0" y="291.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow18" id="BPMNEdge_flow18">
+        <omgdi:waypoint x="705.0" y="291.0"></omgdi:waypoint>
+        <omgdi:waypoint x="705.0" y="350.0"></omgdi:waypoint>
+        <omgdi:waypoint x="476.0" y="350.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow19" id="BPMNEdge_flow19">
+        <omgdi:waypoint x="420.0" y="381.0"></omgdi:waypoint>
+        <omgdi:waypoint x="420.0" y="420.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow20" id="BPMNEdge_flow20">
+        <omgdi:waypoint x="420.0" y="481.0"></omgdi:waypoint>
+        <omgdi:waypoint x="420.0" y="530.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow21" id="BPMNEdge_flow21">
+        <omgdi:waypoint x="440.0" y="550.0"></omgdi:waypoint>
+        <omgdi:waypoint x="482.0" y="550.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="39.0" width="100.0" x="439.0" y="511.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow22" id="BPMNEdge_flow22">
+        <omgdi:waypoint x="517.0" y="550.0"></omgdi:waypoint>
+        <omgdi:waypoint x="557.0" y="550.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow23" id="BPMNEdge_flow23">
+        <omgdi:waypoint x="668.0" y="550.0"></omgdi:waypoint>
+        <omgdi:waypoint x="705.0" y="550.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow24" id="BPMNEdge_flow24">
+        <omgdi:waypoint x="760.0" y="581.0"></omgdi:waypoint>
+        <omgdi:waypoint x="760.0" y="620.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow25" id="BPMNEdge_flow25">
+        <omgdi:waypoint x="420.0" y="570.0"></omgdi:waypoint>
+        <omgdi:waypoint x="420.0" y="620.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="39.0" width="100.0" x="420.0" y="569.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow26" id="BPMNEdge_flow26">
+        <omgdi:waypoint x="365.0" y="650.0"></omgdi:waypoint>
+        <omgdi:waypoint x="305.0" y="650.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow27" id="BPMNEdge_flow27">
+        <omgdi:waypoint x="265.0" y="650.0"></omgdi:waypoint>
+        <omgdi:waypoint x="221.0" y="650.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="13.0" width="96.0" x="223.0" y="620.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow28" id="BPMNEdge_flow28">
+        <omgdi:waypoint x="165.0" y="881.0"></omgdi:waypoint>
+        <omgdi:waypoint x="165.0" y="907.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow29" id="BPMNEdge_flow29">
+        <omgdi:waypoint x="221.0" y="937.0"></omgdi:waypoint>
+        <omgdi:waypoint x="268.0" y="937.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow30" id="BPMNEdge_flow30">
+        <omgdi:waypoint x="285.0" y="670.0"></omgdi:waypoint>
+        <omgdi:waypoint x="285.0" y="920.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="39.0" width="100.0" x="290.0" y="681.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow31" id="BPMNEdge_flow31">
+        <omgdi:waypoint x="165.0" y="681.0"></omgdi:waypoint>
+        <omgdi:waypoint x="165.0" y="730.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow32" id="BPMNEdge_flow32">
+        <omgdi:waypoint x="165.0" y="791.0"></omgdi:waypoint>
+        <omgdi:waypoint x="165.0" y="820.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow33" id="BPMNEdge_flow33">
+        <omgdi:waypoint x="705.0" y="650.0"></omgdi:waypoint>
+        <omgdi:waypoint x="476.0" y="650.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow34" id="BPMNEdge_flow34">
+        <omgdi:waypoint x="760.0" y="700.0"></omgdi:waypoint>
+        <omgdi:waypoint x="759.0" y="741.0"></omgdi:waypoint>
+        <omgdi:waypoint x="420.0" y="741.0"></omgdi:waypoint>
+        <omgdi:waypoint x="420.0" y="681.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

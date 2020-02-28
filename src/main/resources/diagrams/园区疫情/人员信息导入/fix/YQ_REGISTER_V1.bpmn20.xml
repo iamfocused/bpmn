@@ -100,7 +100,7 @@
     			//update
     			def details = []
     			def detail = new HashMap()
-    			detail.put("where", ["ID_CARD_":"$idCard"])
+    			detail.put("where", ["ID_CARD_":"$it.idCard","PARK_":"$park"])//["ID_CARD_":"$idCard"])
     			def value = new HashMap()
     			value.put('CONTACT_PHONE_', contactPhone)
     			value.put('PERSON_NAME_', personName)

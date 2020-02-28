@@ -1,0 +1,93 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/pur">
+  <process id="testMeterialInfo" name="物料信息录入流程" isExecutable="true" activiti:candidateStarterGroups="admin,processadmin@@13@@">
+    <documentation>物料信息</documentation>
+    <startEvent id="startevent1" name="Start" activiti:initiator="initiator">
+      <extensionElements>
+        <activiti:formProperty id="meterialCode_物料编号_1_string_t1_$$A" name="物料编号" type="string" variable="meterialCode" required="true"></activiti:formProperty>
+        <activiti:formProperty id="meterialSpec_物料型号_2_string_t1_$$A" name="物料型号" type="string" variable="meterialSpec" required="true"></activiti:formProperty>
+        <activiti:formProperty id="meterialName_物料名称_3_string_t1_$$A" name="物料名称" type="string" variable="meterialName" required="true"></activiti:formProperty>
+        <activiti:formProperty id="meterialType_物料类型_4_string_t1_$$A" name="物料类型" type="string" variable="meterialType"></activiti:formProperty>
+        <activiti:formProperty id="mainMeterial_主要材料_5_string_t1_$$A" name="主要材料" type="string" variable="mainMeterial"></activiti:formProperty>
+        <activiti:formProperty id="calculateType_核算类型_1_string_t1_$$B" name="核算类型" type="string" variable="calculateType"></activiti:formProperty>
+        <activiti:formProperty id="productGroup_产品组别_2_string_t1_$$B" name="产品组别" type="string" variable="productGroup"></activiti:formProperty>
+        <activiti:formProperty id="brandName_品牌名称_3_string_t1_$$B" name="品牌名称" type="string" variable="brandName"></activiti:formProperty>
+        <activiti:formProperty id="vendorName_厂商名称_4_string_t1_$$B" name="厂商名称" type="string" variable="vendorName"></activiti:formProperty>
+        <activiti:formProperty id="majorSupplier_主要供应商_1_string_t1_$$C" name="主要供应商" type="string" variable="majorSupplier"></activiti:formProperty>
+        <activiti:formProperty id="majorSupplierUnitPrice_主供采购单价 元_2_string_cny_$$C" name="主供采购单价" type="string" variable="majorSupplierUnitPrice"></activiti:formProperty>
+        <activiti:formProperty id="secondSupplier_次要供应商_3_string_t1_$$C" name="次要供应商" type="string" variable="secondSupplier"></activiti:formProperty>
+        <activiti:formProperty id="secondSupplierUnitPrice_次要供应商单价 元_4_string_cny_$$C" name="次要供应商单价 元" type="string" variable="secondSupplierUnitPrice"></activiti:formProperty>
+        <activiti:formProperty id="saleUnitPrice_销售单价 元_1_string_cny_$$D" name="销售单价 元" type="string" variable="saleUnitPrice"></activiti:formProperty>
+        <activiti:formProperty id="quantity_安全库存数量_2_string_t6_$$D" name="安全库存数量" type="string" variable="quantity"></activiti:formProperty>
+        <activiti:formProperty id="2dDrawingNumber_二维图号_3_string_t1_$$D" name="二维图号" type="string" variable="2dDrawingNumber"></activiti:formProperty>
+        <activiti:formProperty id="3dModel_三位模型_4_string_t1_$$D" name="三位模型" type="string" variable="3dModel"></activiti:formProperty>
+        <activiti:formProperty id="attachments_附件_5_string_t9_$$D" name="附件" type="string" variable="attachments"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetails_item" name="物料组成" type="string" variable="tbhddetails_item"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetails_物料编号_meterialCode_1_string_auto_$$A" name="物料编号" type="string" variable="tbhddetails_meterialCode_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetails_物料型号_meterialSpec_2_string_t1_$$HA" name="物料型号" type="string" variable="tbhddetails_meterialSpec_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetails_物料名称_meterialName_3_string_t1_$$HA" name="物料名称" type="string" variable="tbhddetails_meterialName_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetails_数量_quantity_4_string_t6_$$A" name="数量" type="string" variable="tbhddetails_quantity_t00" required="true"></activiti:formProperty>
+        <activiti:executionListener event="end" class="org.activiti.engine.impl.bpmn.listener.ScriptExecutionListener">
+          <activiti:field name="language">
+            <activiti:string><![CDATA[groovy]]></activiti:string>
+          </activiti:field>
+          <activiti:field name="script">
+            <activiti:string><![CDATA[import groovy.json.JsonSlurper
+      					import groovy.json.JsonOutput
+      					
+      					def jsonSlurper = new JsonSlurper()
+      					
+      					def std = jsonSlurper.parseText(tbhddetails_item_std)
+      					if (std.size() == 0) {
+      						return
+      					}
+      					std.each{
+      						def procInstId = it.meterialCode.code
+      						it.meterialSpec = findValueByVarName(historyService,procInstId, 'meterialSpec')
+      						it.meterialName = findValueByVarName(historyService,procInstId, 'meterialName')
+      					}
+      					
+      					execution.setVariable('tbhddetails_item_std', JsonOutput.toJson(std))
+      					
+      					def items = jsonSlurper.parseText(tbhddetails_item)
+      					items.each {k,v ->
+						    if (k == 'rows') {
+						        v.each {
+						        	def procInstId = it[0].code
+						            it[1] = findValueByVarName(historyService,procInstId, 'meterialSpec')
+						            it[2] = findValueByVarName(historyService,procInstId, 'meterialName')
+						        }
+						    }
+						}
+						execution.setVariable('tbhddetails_item', JsonOutput.toJson(items))
+      					
+      					static String findValueByVarName(def historyService, String procInstId, String variableName) {
+						    def vars = historyService.createHistoricVariableInstanceQuery().processInstanceId(procInstId).list()
+						    def values = vars.stream().filter({var -> variableName.equals(var?.getVariableName())}).map({var -> var.getValue()}).collect(java.util.stream.Collectors.toList())
+						    if (values.isEmpty()) {
+								throw new org.activiti.engine.ActivitiIllegalArgumentException('数据获取失败' + procInstId + ',' + variableName)
+						    }
+						    return values[0]
+						}]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </startEvent>
+    <endEvent id="endevent2" name="End"></endEvent>
+    <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="endevent2"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_testMeterialInfo">
+    <bpmndi:BPMNPlane bpmnElement="testMeterialInfo" id="BPMNPlane_testMeterialInfo">
+      <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="70.0" y="223.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent2" id="BPMNShape_endevent2">
+        <omgdc:Bounds height="35.0" width="35.0" x="350.0" y="223.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="105.0" y="240.0"></omgdi:waypoint>
+        <omgdi:waypoint x="350.0" y="240.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

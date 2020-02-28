@@ -1,0 +1,193 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/pur">
+  <process id="DEMO_YQ_IMPORT_V1" name="(demo)园区人员信息导入流程" isExecutable="true" activiti:candidateStarterGroups="admin,yq">
+    <startEvent id="startevent1" name="Start" activiti:initiator="initiator">
+    	<extensionElements>
+    		<activiti:formProperty id="tbhdpersons_item" name="人员列表" variable="tbhdpersons_item" required="true"/>
+    		<activiti:formProperty id="tbhdpersons_联系电话_contactPhone_1_string_t10_$$A" name="联系电话" type="string" variable="tbhdpersons_contactPhone_t00" required="true"/>
+    		<activiti:formProperty id="tbhdpersons_人名_personName_2_string_t1_$$A" name="人名" type="string" variable="tbhdpersons_personName_t00" required="true"/>
+    		<activiti:formProperty id="tbhdpersons_企业名字_businessName_3_string_t1_$$A" name="企业名字" type="string" variable="tbhdpersons_businessName_t00" required="true"/>
+    		<activiti:formProperty id="tbhdpersons_企业房间号_businessRoomNumber_4_string_t1_$$A" name="企业房间号" type="string" variable="tbhdpersons_businessRoomNumber_t00" required="true"/>
+    		<activiti:formProperty id="tbhdpersons_身份证号码_idCard_5_string_t1_$$A" name="身份证号码" type="string" variable="tbhdpersons_idCard_t00" required="true"/>
+    		<activiti:formProperty id="tbhdpersons_籍贯_hometown_6_string_t1_$$A" name="籍贯" type="string" variable="tbhdpersons_hometown_t00" required="true"/>
+    		<activiti:formProperty id="tbhdpersons_返沪前出发地_departureLocation_7_string_t1_$$A" name="返沪前出发地" type="string" variable="tbhdpersons_departureLocation_t00" required="true"/>
+    		<activiti:formProperty id="tbhdpersons_入沪时间_timeToEnterSh_8_string_t5_$$A" name="入沪时间" type="string" variable="tbhdpersons_timeToEnterSh_t00" required="true"/>
+    		<activiti:formProperty id="tbhdpersons_出发地是否包含重点区域_isImportantAreas_9_enum_sbs_$$A" name="出发地是否包含重点区域" type="enum" variable="tbhdpersons_isImportantAreas" required="true">
+    			<activiti:value id="否" name="否"/>
+    			<activiti:value id="是" name="是"/>
+    		</activiti:formProperty>
+    		<!-- <activiti:formProperty id="tbhdpersons_同行人员有无疑似症状_peersHasSym_10_enum_sbs_$$A" name="同行人员有无疑似症状" type="enum" variable="tbhdpersons_peersHasSym_t00" required="true">
+    			<activiti:value id="否" name="否"/>
+    			<activiti:value id="是" name="是"/>
+    		</activiti:formProperty>
+    		<activiti:formProperty id="tbhdpersons_是否持有上海隔离证明_hasProofOfQuarantine_11_enum_sbs_$$A" name="是否持有上海隔离证明" type="enum" variable="tbhdpersons_hashProofOfQuarantine_t00" required="true">
+    			<activiti:value id="否" name="否"/>
+    			<activiti:value id="是" name="是"/>
+    		</activiti:formProperty> -->
+    		
+    		<activiti:executionListener event="end" class="org.activiti.engine.impl.bpmn.listener.ScriptExecutionListener">
+    			<activiti:field name="language">
+    				<activiti:string>
+    					<![CDATA[groovy]]>
+    				</activiti:string>
+    			</activiti:field>
+    			<activiti:field name="script">
+    				<activiti:string>
+    					<![CDATA[
+    						//call metabase find all exist persons
+    						import groovy.json.JsonSlurper
+    						
+    						def park = 'DEMO'
+    						execution.setVariable('park', park)
+    						def jsonSlurper = new JsonSlurper()
+    						def std = jsonSlurper.parseText(tbhdpersons_item_std)
+    						def idCards = std.collect{it.idCard}.join(',')
+    						
+    						def headerMap = new HashMap()
+ 							def param = java.net.URLEncoder.encode('[{"type":"category","target":["variable",["template-tag","park"]],"value":\"'+ park + '\"}]', "UTF-8")
+ 							execution.setVariable("_http_method", "GET")
+ 							execution.setVariable("_http_headers", headerMap)
+ 							execution.setVariable("_http_body", '')
+ 							execution.setVariable("_http_url", 'https://metabase.eorionsolution.com/public/question/891da5ca-ae90-401e-857d-226e01189f74.json?parameters=' + param)
+ 							execution.setVariable("_http_response_body", '')
+ 							execution.setVariable("_http_response_status_code", '')
+    					]]>
+    				</activiti:string>
+    			</activiti:field>
+    		</activiti:executionListener>
+    	</extensionElements>
+    </startEvent>
+    <serviceTask id="servicetask1" name="Query Service" activiti:class="com.eorionsolution.riying.bpms.javaservice.http.RestAPIService"/>
+    <scriptTask id="scripttask1" name="Group Exist And Not Exist" activiti:autoStoreVariables="false" scriptFormat="groovy">
+    	<script>
+    	<![CDATA[import groovy.json.JsonSlurper
+    		import groovy.json.JsonOutput
+    		import com.eorionsolution.bpms.extension.jdbc.JdbcUtils
+    		import java.text.DateFormat
+			import java.text.SimpleDateFormat
+    		
+    		if (_http_response_status_code!=200) {
+    			throw new org.activiti.engine.ActivitiIllegalArgumentException('call metabase failed!')
+    		}
+    		def jsonSlurper = new JsonSlurper()
+    		def responseItems = jsonSlurper.parseText(_http_response_body)
+    		def handleItems = jsonSlurper.parseText(tbhdpersons_item_std)
+    		
+    		def updateIdCards = responseItems.collect{it.ID_CARD_}
+    		def insertItems = handleItems.findAll{!updateIdCards.contains(it.idCard)}
+    		def updateItems = handleItems.findAll{updateIdCards.contains(it.idCard)}
+    		
+    		def insertDetails = new ArrayList()
+    		def updateDetails = new ArrayList()
+    		
+    		def item,value
+    		def condition
+    		updateItems.each {
+    			item = new HashMap()
+    			item.put('where', ["ID_CARD_":"$it.idCard","PARK_":"$park"])
+    			value = new HashMap()
+    			value.put('CONTACT_PHONE_', it.contactPhone)
+    			value.put('PERSON_NAME_', it.personName)
+    			value.put('BUSINESS_NAME_', it.businessName)
+    			value.put('BUSINESS_ROOM_NUMBER_', it.businessRoomNumber)
+    			value.put('ID_CARD_', it.idCard)
+    			value.put('HOMETOWN_', it.hometown)
+    			value.put('DEPARTURE_LOCATION_', it.departureLocation)
+    			def time = it.timeToEnterSh.toLong()
+    			def df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+				//df.setTimeZone(TimeZone.getTimeZone("GMT+8"))
+				value.put('TIME_TO_ENTER_SH_',df.format(new Date(time)))
+				value.put('IS_IMPORTANT_AREAS_',it.isImportantAreas)
+				value.put('PARK_', park)
+    			
+    			item.put('update', value)
+    			
+    			updateDetails << item
+    		}
+    		def updateDetailsJson = JsonOutput.toJson(updateDetails)
+    		def updateJson = """
+{
+    "tableName":"PERSON_INFO_",
+    "type":1,
+    "details":$updateDetailsJson
+}
+"""
+			if(updateDetails.size() != 0){
+				def updateResult = JdbcUtils.batchUpdate(JsonOutput.toJson(jsonSlurper.parseText(updateJson)))
+				if (updateResult != 200) {
+					throw new org.activiti.engine.ActivitiIllegalArgumentException('Update Error ')
+				}
+			}
+			// insert
+    		insertItems.each {
+    			item = new HashMap()
+    			value = new HashMap()
+    			value.put('CONTACT_PHONE_', it.contactPhone)
+    			value.put('PERSON_NAME_', it.personName)
+    			value.put('BUSINESS_NAME_', it.businessName)
+    			value.put('BUSINESS_ROOM_NUMBER_', it.businessRoomNumber)
+    			value.put('ID_CARD_', it.idCard)
+    			value.put('HOMETOWN_', it.hometown)
+    			value.put('DEPARTURE_LOCATION_', it.departureLocation)
+    			def time = it.timeToEnterSh.toLong()
+    			def df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+				//df.setTimeZone(TimeZone.getTimeZone("GMT+8"))
+				value.put('TIME_TO_ENTER_SH_',df.format(new Date(time)))
+				value.put('IS_IMPORTANT_AREAS_',it.isImportantAreas)
+				value.put('PARK_',park)
+    			
+    			item.put('insert', value)
+    			
+    			insertDetails<<item
+    		}
+    		def insertDetailsJson = JsonOutput.toJson(insertDetails)
+    		def insertJson = """
+{
+    "tableName":"PERSON_INFO_",
+    "type":0,
+    "details":$insertDetailsJson
+}			
+"""
+			if (insertDetails.size() != 0) {
+				def insertResult = JdbcUtils.batchInsert(JsonOutput.toJson(jsonSlurper.parseText(insertJson)))
+				if (insertResult != 200) {
+					throw new org.activiti.engine.ActivitiIllegalArgumentException('Insert Error. ' + JsonOutput.toJson(jsonSlurper.parseText(insertJson)))
+				}
+			}
+    	]]>
+    	</script>
+    </scriptTask>
+    <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="servicetask1"></sequenceFlow>
+    <sequenceFlow id="flow2" sourceRef="servicetask1" targetRef="scripttask1"></sequenceFlow>
+    <endEvent id="endevent1" name="End"></endEvent>
+    <sequenceFlow id="flow3" sourceRef="scripttask1" targetRef="endevent1"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_YQ_IMPORT_V1">
+    <bpmndi:BPMNPlane bpmnElement="DBXH01_IMPORT_V1" id="BPMNPlane_YQ_IMPORT_V1">
+      <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="80.0" y="170.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="servicetask1" id="BPMNShape_servicetask1">
+        <omgdc:Bounds height="65.0" width="115.0" x="180.0" y="155.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scripttask1" id="BPMNShape_scripttask1">
+        <omgdc:Bounds height="65.0" width="115.0" x="340.0" y="155.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="500.0" y="170.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="115.0" y="187.0"></omgdi:waypoint>
+        <omgdi:waypoint x="180.0" y="187.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="295.0" y="187.0"></omgdi:waypoint>
+        <omgdi:waypoint x="340.0" y="187.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3">
+        <omgdi:waypoint x="455.0" y="187.0"></omgdi:waypoint>
+        <omgdi:waypoint x="500.0" y="187.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

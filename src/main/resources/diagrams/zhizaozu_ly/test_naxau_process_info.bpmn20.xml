@@ -1,0 +1,218 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/frm">
+  <process id="naxauProcessInfo" name="工序信息" isExecutable="true" activiti:candidateStarterGroups="admin">
+    <documentation>工序信息</documentation>
+    <startEvent id="startevent1" name="Start" activiti:initiator="initiator">
+    	<extensionElements>
+    		<activiti:formProperty id="processCode_工序编码_1_string_t1_$$A" name="工序编码" type="string" variable="processCode" required="true"/>
+    		<activiti:formProperty id="processName_工序名称_2_string_t1_$$A" name="工序名称" type="string" variable="processName" required="true"/>
+    		<activiti:formProperty id="processDesc_工序概述_3_string_t2_$$A" name="工序概述" type="string" variable="processDesc" required="false"/>
+    		
+    		<activiti:formProperty id="processType_工序类型_1_enum_sbs_$$B" name="工序类型" type="enum" variable="processType" required="false">
+    			<activiti:value id="喷砂" name="喷砂"/>
+    			<activiti:value id="抛光" name="抛光"/>
+    			<activiti:value id="清洗" name="清洗"/>
+    			<activiti:value id="上挂" name="上挂"/>
+    			<activiti:value id="镀膜" name="镀膜"/>
+    			<activiti:value id="下挂" name="下挂"/>
+    			<activiti:value id="QC" name="QC"/>
+    			<activiti:value id="其他" name="其他"/>
+    		</activiti:formProperty>
+    		<activiti:formProperty id="deviceSpec_设备型号_2_string_auto_$$B" name="设备型号" type="string" variable="deviceSpec" required="false"/>
+    		<activiti:formProperty id="processFile_工序文件_3_string_t9i_$$B" name="工序文件" type="string" variable="processFile" required="false"/>
+    		
+    		<activiti:formProperty id="processProcess_工序制程_1_string_t1_$$C" name="工序制程" type="string" variable="processProcess" required="false"/>
+    		<activiti:formProperty id="processNote_工序备注_2_string_t2_$$C" name="工序备注" type="string" variable="processNote"/>
+			<!-- <activiti:formProperty id="processTime_工序时间 min_string_t11_$$C" name="工序时间 min" type="string" variable="processTime"/> --> 
+			
+			<activiti:formProperty id="processPreparation_工序编制_1_string_t1_$$D" name="工序编制" type="string" variable="processPreparation" required="false"/>
+    		<!-- <activiti:formProperty id="preparationDate_编制日期_2_string_t3_$$D" name="编制日期" type="string" variable="preparationDate" required="true"/> -->
+    		<activiti:formProperty id="processAudit_工序审核_3_string_t1_$$D" name="工序审核" type="string" variable="processAudit" required="false"/>
+    		<!-- <activiti:formProperty id="auditDate_审核日期_4_string_t3_$$D" name="审核日期" type="string" variable="auditDate" required="true"/> -->
+    		
+    		<activiti:formProperty id="tbhdworksteps_item" name="工步表" type="string" variable="tbhdworksteps_item"/>
+    		<activiti:formProperty id="tbhdworksteps_工步号_stepNo_1_string_t1_$$A" name="工步号" type="string" variable="tbhdworksteps_stepNo_t00" required="false"/>
+    		<activiti:formProperty id="tbhdworksteps_工步名称_stepName_2_string_t1_$$A" name="工步名称" type="string" variable="tbhdworksteps_stepName_t00" required="false"/>
+    		<activiti:formProperty id="tbhdworksteps_工步时间 min_stepTime_3_string_t11_$$A" name="工步时间 min" type="string" variable="tbhdworksteps_stepTime_t00"/>
+    		<activiti:formProperty id="tbhdworksteps_工步描述_stepDesc_4_string_t2_$$A" name="工步描述" type="string" variable="tbhdworksteps_stepDesc_t00"/>
+    		
+    	</extensionElements>
+    </startEvent>
+    <userTask id="usertask1" name="审核查看" activiti:assignee="${initiator}" activiti:dueDate="P1D" activiti:priority="8080">
+    	<extensionElements>
+    		<activiti:formProperty id="coreaction_审核_1_enum_rbv_$$A" name="审核" type="enum" variable="coreaction" required="true">
+	        	<activiti:value id="同意" name="同意"></activiti:value>
+	        	<activiti:value id="拒绝" name="拒绝"></activiti:value>
+	        </activiti:formProperty>
+	        <activiti:formProperty id="corecomments_审核意见_2_string_t2_$$A" name="审核意见" type="string" variable="corecomments"/>
+    	
+    		<activiti:formProperty id="processCode_工序编码_1_string_t1_$$VA" name="工序编码" type="string" variable="processCode" required="true"/>
+    		<activiti:formProperty id="processName_工序名称_2_string_t1_$$VA" name="工序名称" type="string" variable="processName" required="true"/>
+    		<activiti:formProperty id="processDesc_工序概述_3_string_t2_$$VA" name="工序概述" type="string" variable="processDesc" required="false"/>
+    		
+    		<activiti:formProperty id="processType_工序类型_1_enum_sbs_$$VB" name="工序类型" type="enum" variable="processType" required="false">
+    			<activiti:value id="喷砂" name="喷砂"/>
+    			<activiti:value id="抛光" name="抛光"/>
+    			<activiti:value id="清洗" name="清洗"/>
+    			<activiti:value id="上挂" name="上挂"/>
+    			<activiti:value id="镀膜" name="镀膜"/>
+    			<activiti:value id="下挂" name="下挂"/>
+    			<activiti:value id="QC" name="QC"/>
+    			<activiti:value id="其他" name="其他"/>
+    		</activiti:formProperty>
+    		<activiti:formProperty id="deviceSpec_设备型号_2_string_auto_$$VB" name="设备型号" type="string" variable="deviceSpec" required="false"/>
+    		<activiti:formProperty id="processFile_工序文件_3_string_t9i_$$VB" name="工序文件" type="string" variable="processFile" required="false"/>
+    		
+    		<activiti:formProperty id="processProcess_工序制程_1_string_t1_$$VC" name="工序制程" type="string" variable="processProcess" required="false"/>
+    		<activiti:formProperty id="processNote_工序备注_2_string_t2_$$VC" name="工序备注" type="string" variable="processNote"/>
+			<activiti:formProperty id="processTime_工序时间 min_3_string_t11_$$VC" name="工序时间 min" type="string" variable="processTime"/> 
+			
+			<activiti:formProperty id="processPreparation_工序编制_1_string_t1_$$VD" name="工序编制" type="string" variable="processPreparation" required="false"/>
+    		<activiti:formProperty id="preparationDate_编制日期_2_string_t3_$$VD" name="编制日期" type="string" variable="preparationDate" required="false"/>
+    		<activiti:formProperty id="processAudit_工序审核_3_string_t1_$$VD" name="工序审核" type="string" variable="processAudit" required="false"/>
+    		<!-- <activiti:formProperty id="auditDate_审核日期_4_string_t3_$$VD" name="审核日期" type="string" variable="auditDate" required="true"/> -->
+    		
+    		<activiti:formProperty id="tbhdworksteps_item_$$VA" name="工步表" type="string" variable="tbhdworksteps_item"/>
+    		<activiti:formProperty id="tbhdworksteps_工步号_stepNo_1_string_t1_$$A" name="工步号" type="string" variable="tbhdworksteps_stepNo_t00" required="false"/>
+    		<activiti:formProperty id="tbhdworksteps_工步名称_stepName_2_string_t1_$$A" name="工步名称" type="string" variable="tbhdworksteps_stepName_t00" required="false"/>
+    		<activiti:formProperty id="tbhdworksteps_工步时间 min_stepTime_3_string_t11_$$A" name="工步时间 min" type="string" variable="tbhdworksteps_stepTime_t00"/>
+    		<activiti:formProperty id="tbhdworksteps_工步描述_stepDesc_4_string_t2_$$A" name="工步描述" type="string" variable="tbhdworksteps_stepDesc_t00"/>
+    		
+    		<activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+    			<activiti:field name="language">
+    				<activiti:string>
+    					<![CDATA[groovy]]>
+    				</activiti:string>
+    			</activiti:field>
+    			<activiti:field name="script">
+    				<activiti:string>
+    					<![CDATA[
+    						def execution = task.getExecution()
+							def auditDate = new Date().toInstant().toEpochMilli().toString()
+							execution.setVariable('auditDate', auditDate)
+							if (coreaction == '同意') {
+								execution.setVariable('valid', 'Y')
+							}						
+    					]]>
+    				</activiti:string>
+    			</activiti:field>
+    		</activiti:taskListener>
+    		<activiti:taskListener event="create" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+    			<activiti:field name="language">
+    				<activiti:string>
+    					<![CDATA[groovy]]>
+    				</activiti:string>
+    			</activiti:field>
+    			<activiti:field name="script">
+    				<activiti:string>
+    					<![CDATA[
+    						def execution = task.getExecution()
+							execution.setVariable('valid', 'N')						
+    					]]>
+    				</activiti:string>
+    			</activiti:field>
+    		</activiti:taskListener>
+    	</extensionElements>
+    </userTask>
+    <scriptTask id="scripttask1" name="处理脚本" activiti:autoStoreVariables="false" scriptFormat="groovy">
+    	<script>
+    	<![CDATA[
+			import groovy.json.JsonSlurper
+			
+			def jsonSlurper = new JsonSlurper()
+			//计算工序时间
+			def processTime = 0
+			def std = jsonSlurper.parseText(tbhdworksteps_item_std)
+			
+			if (std.size() > 0) {
+				processTime = std.sum {(it.stepTime?:'0').toDouble()}
+			}
+			
+			execution.setVariable('processTime', processTime.toString())
+			
+			//编制日期
+			def preparationDate = new Date().toInstant().toEpochMilli().toString()
+			execution.setVariable('preparationDate', preparationDate)
+    	]]>
+    	</script>
+    </scriptTask>
+    <userTask id="usertask2" name="修改工序信息" activiti:assignee="${initiator}" activiti:dueDate="P1D" activiti:priority="8080">
+    	<extensionElements>
+    		<activiti:formProperty id="processCode_工序编码_1_string_t1_$$A" name="工序编码" type="string" variable="processCode" required="true"/>
+    		<activiti:formProperty id="processName_工序名称_2_string_t1_$$A" name="工序名称" type="string" variable="processName" required="true"/>
+    		<activiti:formProperty id="processDesc_工序概述_3_string_t2_$$A" name="工序概述" type="string" variable="processDesc" required="false"/>
+    		
+    		<activiti:formProperty id="processType_工序类型_1_enum_sbs_$$B" name="工序类型" type="enum" variable="processType" required="false">
+    			<activiti:value id="喷砂" name="喷砂"/>
+    			<activiti:value id="抛光" name="抛光"/>
+    			<activiti:value id="清洗" name="清洗"/>
+    			<activiti:value id="上挂" name="上挂"/>
+    			<activiti:value id="镀膜" name="镀膜"/>
+    			<activiti:value id="下挂" name="下挂"/>
+    			<activiti:value id="QC" name="QC"/>
+    			<activiti:value id="其他" name="其他"/>
+    		</activiti:formProperty>
+    		<activiti:formProperty id="deviceSpec_设备型号_2_string_auto_$$B" name="设备型号" type="string" variable="deviceSpec" required="false"/>
+    		<activiti:formProperty id="processFile_工序文件_3_string_t9i_$$B" name="工序文件" type="string" variable="processFile" required="false"/>
+    		
+    		<activiti:formProperty id="processProcess_工序制程_1_string_t1_$$C" name="工序制程" type="string" variable="processProcess" required="false"/>
+    		<activiti:formProperty id="processNote_工序备注_2_string_t2_$$C" name="工序备注" type="string" variable="processNote"/>
+			<activiti:formProperty id="processTime_工序时间 min_3_string_t11_$$C" name="工序时间 min" type="string" variable="processTime"/> 
+			
+			<activiti:formProperty id="processPreparation_工序编制_1_string_t1_$$D" name="工序编制" type="string" variable="processPreparation" required="false"/>
+    		<activiti:formProperty id="preparationDate_编制日期_2_string_t3_$$VD" name="编制日期" type="string" variable="preparationDate" required="false"/>
+    		<activiti:formProperty id="processAudit_工序审核_3_string_t1_$$D" name="工序审核" type="string" variable="processAudit" required="false"/>
+    		<activiti:formProperty id="auditDate_审核日期_4_string_t3_$$VD" name="审核日期" type="string" variable="auditDate" required="false"/>
+    		
+    		<activiti:formProperty id="tbhdworksteps_item" name="工步表" type="string" variable="tbhdworksteps_item"/>
+    		<activiti:formProperty id="tbhdworksteps_工步号_stepNo_1_string_t1_$$A" name="工步号" type="string" variable="tbhdworksteps_stepNo_t00" required="false"/>
+    		<activiti:formProperty id="tbhdworksteps_工步名称_stepName_2_string_t1_$$A" name="工步名称" type="string" variable="tbhdworksteps_stepName_t00" required="false"/>
+    		<activiti:formProperty id="tbhdworksteps_工步时间 min_stepTime_3_string_t11_$$A" name="工步时间 min" type="string" variable="tbhdworksteps_stepTime_t00"/>
+    		<activiti:formProperty id="tbhdworksteps_工步描述_stepDesc_4_string_t2_$$A" name="工步描述" type="string" variable="tbhdworksteps_stepDesc_t00"/>
+    		
+    		<activiti:formProperty id="coreaction_审核_1_enum_rbv_$$VA" name="审核" type="enum" variable="coreaction" required="true">
+	        	<activiti:value id="同意" name="同意"></activiti:value>
+	        	<activiti:value id="拒绝" name="拒绝"></activiti:value>
+	        </activiti:formProperty>
+	        <activiti:formProperty id="corecomments_审核意见_2_string_t2_$$VA" name="审核意见" type="string" variable="corecomments"/>
+    	</extensionElements>
+    </userTask>
+    <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="scripttask1"></sequenceFlow>
+    <sequenceFlow id="flow2" sourceRef="scripttask1" targetRef="usertask1"></sequenceFlow>
+    <sequenceFlow id="flow3" sourceRef="usertask1" targetRef="usertask2"></sequenceFlow>
+    <sequenceFlow id="flow4" sourceRef="usertask2" targetRef="scripttask1"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_naxauProcessInfo">
+    <bpmndi:BPMNPlane bpmnElement="naxauProcessInfo" id="BPMNPlane_naxauProcessInfo">
+      <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="70.0" y="230.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask1" id="BPMNShape_usertask1">
+        <omgdc:Bounds height="61.0" width="111.0" x="310.0" y="217.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scripttask1" id="BPMNShape_scripttask1">
+        <omgdc:Bounds height="61.0" width="111.0" x="140.0" y="217.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask2" id="BPMNShape_usertask2">
+        <omgdc:Bounds height="61.0" width="111.0" x="310.0" y="330.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="105.0" y="247.0"></omgdi:waypoint>
+        <omgdi:waypoint x="140.0" y="247.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="251.0" y="247.0"></omgdi:waypoint>
+        <omgdi:waypoint x="310.0" y="247.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3">
+        <omgdi:waypoint x="365.0" y="278.0"></omgdi:waypoint>
+        <omgdi:waypoint x="365.0" y="330.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow4" id="BPMNEdge_flow4">
+        <omgdi:waypoint x="310.0" y="360.0"></omgdi:waypoint>
+        <omgdi:waypoint x="195.0" y="360.0"></omgdi:waypoint>
+        <omgdi:waypoint x="195.0" y="278.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

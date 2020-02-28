@@ -1,0 +1,289 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/pur">
+  <process id="testProcessInfo" name="工序信息录入流程" isExecutable="true" activiti:candidateStarterGroups="admin,processadmin@@13@@">
+    <documentation>工序信息</documentation>
+    <startEvent id="startevent1" name="Start" activiti:initiator="initiator">
+    	<extensionElements>
+    		<activiti:formProperty id="processCode_工序编码_1_string_t1_$$A" name="工序编码" type="string" variable="processCode" required="true"/>
+    		<activiti:formProperty id="processName_工序名称_2_string_t1_$$A" name="工序名称" type="string" variable="processName" required="true"/>
+    		<activiti:formProperty id="processDesc_工序描述_3_string_t2_$$A" name="工序描述" type="string" variable="processDesc" required="false"/>
+    		
+    		<activiti:formProperty id="processType_工序类型_1_enum_sbs_$$B" name="工序类型" type="enum" variable="processType" required="false">
+    			<activiti:value id="车削" name="车削"/>
+    			<activiti:value id="铣削" name="铣削"/>
+    			<activiti:value id="磨削" name="磨削"/>
+    			<activiti:value id="电加工" name="电加工"/>
+    			<activiti:value id="其他" name="其他"/>
+    		</activiti:formProperty>
+    		<activiti:formProperty id="deviceSpec_设备型号_2_string_auto_$$B" name="设备型号" type="string" variable="deviceSpec" required="false"/>
+    		
+    		<activiti:formProperty id="clampingQuantity_装夹件数_1_string_t6_$$C" name="装夹件数" type="string" variable="clampingQuantity" required="false"/>
+    		<activiti:formProperty id="personnelOperationTime_人员操作时间 秒_2_string_t11_$$C" name="人员操作时间 秒" type="string" variable="personnelOperationTime" required="false"/>
+    		<activiti:formProperty id="manualDetectionTime_人工检测时间 秒_3_string_t11_$$C" name="人工检测时间 秒" type="string" variable="manualDetectionTime" required="false"/>
+    		
+    		<activiti:formProperty id="processPreparation_工序编制_1_string_t1_$$D" name="工序编制" type="string" variable="processPreparation" required="false"/>
+    		<!-- <activiti:formProperty id="preparationDate_编制日期_2_string_t3_$$D" name="编制日期" type="string" variable="preparationDate" required="false"/> -->
+    		<activiti:formProperty id="processAudit_工序审核_3_string_t1_$$D" name="工序审核" type="string" variable="processAudit" required="false"/>
+    		<!-- <activiti:formProperty id="auditDate_审核日期_4_string_t3_$$D" name="审核日期" type="string" variable="auditDate" required="false"/> -->
+    		<activiti:formProperty id="attachments_附件_5_string_t9_$$D" name="附件" type="string" variable="attachments"/>
+    		
+    		<activiti:formProperty id="tbhdworksteps_item" name="工步" type="string" variable="tbhdworksteps_item"/>
+			<activiti:formProperty id="tbhdworksteps_工步序号_workStepNo_1_string_t1_$$A" name="工步序号" type="string" variable="thbdworksteps_workStepNo_t00" required="true"/>
+			<activiti:formProperty id="tbhdworksteps_物料编号_meterialCode_2_string_auto_$$A" name="刀组编号" type="string" variable="tbhdworksteps_meterialCode_t00" required="false"/>
+			<activiti:formProperty id="tbhdworksteps_刀组名称_knifeGroupName_3_string_t1_$$HA" name="刀组名称" type="string" variable="tbhdworksteps_knifeGroupName_t00"/>
+			<activiti:formProperty id="tbhdworksteps_工步描述_workStepDesc_4_string_t2_$$A" name="工步描述" type="string" variable="tbhdworksteps_workStepDesc_t00" required="false"/>
+			
+			<activiti:formProperty id="tbhdworksteps_切削速度 m/min_cuttingSpeed_5_string_t11_$$A" name="切削速度 m/min" type="string" variable="tbhdworksteps_cuttingSpeed_t00" required="false"/>
+			<activiti:formProperty id="tbhdworksteps_切削直径 mm_cuttingDiameter_6_string_t11_$$A" name="切削直径 mm" type="string" variable="tbhdworksteps_cuttingDiameter_t00" required="false"/>
+			<activiti:formProperty id="tbhdworksteps_每转进给量 mm/rev_feedPerRevolution_7_string_t11_$$A" name="每转进给量 mm/rev" type="string" variable="tbhdworksteps_feedPerRevolution_t00" required="false"/>
+			
+			<activiti:formProperty id="tbhdworksteps_转速 rev/min_rotatingSpeed_8_string_t11_$$A" name="转速 rev/min" type="string" variable="tbhdworksteps_rotatingSpeed_t00" required="false"/>
+			<activiti:formProperty id="tbhdworksteps_进给速度 rev/min_feedSpeed_9_string_t11_$$A" name="进给速度 rev/min" type="string" variable="tbhdworksteps_feedSpeed_t00" required="false"/>
+			<activiti:formProperty id="tbhdworksteps_刀具寿命_knifeLife_10_string_t11_$$A" name="刀具寿命" type="string" variable="tbhdworksteps_knifeLife_t00" required="false"/>
+			
+			<activiti:formProperty id="tbhdworksteps_工进时间 秒_workingTime_11_string_t11_$$A" name="工进时间 秒" type="string" variable="tbhdworksteps_workingTime_t00" required="false"/>
+			<activiti:formProperty id="tbhdworksteps_换刀时间 秒_knifeChangeTime_12_string_t11_$$A" name="换刀时间 秒" type="string" variable="tbhdworksteps_knifeChangeTime_t00" required="false"/>
+			<activiti:formProperty id="tbhdworksteps_辅助时间 秒_auxiliaryTime_13_string_t11_$$A" name="辅助时间 秒" type="string" variable="tbhdworksteps_auxiliaryTime_t00" required="false"/>
+			<activiti:formProperty id="tbhdworksteps_其他时间 秒_otherTime_14_string_t11_$$A" name="其他时间 秒" type="string" variable="tbhdworksteps_otherTime_t00" required="false"/>
+			
+    	</extensionElements>
+    </startEvent>
+    <scriptTask id="scripttask1" name="处理脚本" scriptFormat="groovy" activiti:autoStoreVariables="false">
+    	<script>
+    	<![CDATA[import groovy.json.JsonSlurper
+    		import groovy.json.JsonOutput
+    	
+    		def processingTime = 0.0
+    		def processTime = 0.0
+    		def jsonSlurper = new JsonSlurper()
+    		def std = jsonSlurper.parseText(tbhdworksteps_item_std)
+    		
+    		std.each {
+    			def procInstId = it.meterialCode?.code
+    			if (procInstId)
+    				it.knifeGroupName = findValueByVarName(historyService,procInstId, 'meterialName')
+    			
+    			if (it.workingTime) {
+			        processingTime += it.workingTime.toDouble()
+			    }
+			    if (it.knifeChangeTime) {
+			        processingTime += it.knifeChangeTime.toDouble()
+			    }
+			    if (it.auxiliaryTime) {
+			        processingTime += it.auxiliaryTime.toDouble()
+			    }
+			    if (it.otherTime) {
+			        processingTime += it.otherTime.toDouble()
+			    }
+    		}
+    		processTime = processingTime + (personnelOperationTime?:0).toDouble() + (manualDetectionTime?:0).toDouble()
+    		execution.setVariable('tbhdworksteps_item_std', JsonOutput.toJson(std))
+			execution.setVariable('processingTime', processingTime.toString())
+			execution.setVariable('processTime', processTime.toString())
+			
+			def items = jsonSlurper.parseText(tbhdworksteps_item)
+			items.each {k,v ->
+			    if (k == 'rows') {
+			        v.each {
+			        	def procInstId = it[1]?.code
+			        	if (procInstId)
+			            	it[2] = findValueByVarName(historyService,procInstId, 'meterialName')
+			        }
+			    }
+			}
+			execution.setVariable('tbhdworksteps_item', JsonOutput.toJson(items))
+			
+			//编制日期
+			def preparationDate = new Date().toInstant().toEpochMilli().toString()
+			execution.setVariable('preparationDate', preparationDate)
+    		
+    		static String findValueByVarName(def historyService, String procInstId, String variableName) {
+			    def vars = historyService.createHistoricVariableInstanceQuery().processInstanceId(procInstId).list()
+			    def values = vars.stream().filter({var -> variableName.equals(var?.getVariableName())}).map({var -> var.getValue()}).collect(java.util.stream.Collectors.toList())
+			    if (values.isEmpty()) {
+					throw new org.activiti.engine.ActivitiIllegalArgumentException('数据获取失败' + procInstId + ',' + variableName)
+			    }
+			    return values[0]
+			}
+    	]]>
+    	</script>
+    </scriptTask>
+    <userTask id="usertask1" name="审核工序" activiti:assignee="${initiator}" activiti:dueDate="P1D" activiti:priority="8080">
+    	<extensionElements>
+    		<activiti:formProperty id="coreaction_审核_1_enum_rbv_$$A" name="审核" type="enum" variable="coreaction" required="true">
+	        	<activiti:value id="同意" name="同意"></activiti:value>
+	        	<activiti:value id="拒绝" name="拒绝"></activiti:value>
+	        </activiti:formProperty>
+	        <activiti:formProperty id="corecomments_审核意见_2_string_t2_$$A" name="审核意见" type="string" variable="corecomments"/>
+	        
+			<activiti:formProperty id="processCode_工序编码_1_string_t1_$$VA" name="工序编码" type="string" variable="processCode" required="true"/>
+    		<activiti:formProperty id="processName_工序名称_2_string_t1_$$VA" name="工序名称" type="string" variable="processName" required="true"/>
+    		<activiti:formProperty id="processDesc_工序描述_3_string_t2_$$VA" name="工序描述" type="string" variable="processDesc" required="false"/>
+    		
+    		<activiti:formProperty id="processType_工序类型_1_enum_sbs_$$VB" name="工序类型" type="enum" variable="processType" required="false">
+    			<activiti:value id="车削" name="车削"/>
+    			<activiti:value id="铣削" name="铣削"/>
+    			<activiti:value id="磨削" name="磨削"/>
+    			<activiti:value id="电加工" name="电加工"/>
+    			<activiti:value id="其他" name="其他"/>
+    		</activiti:formProperty>
+    		<activiti:formProperty id="deviceSpec_设备型号_2_string_auto_$$VB" name="设备型号" type="string" variable="deviceSpec" required="false"/>
+    		
+    		<activiti:formProperty id="clampingQuantity_装夹件数_1_string_t6_$$VC" name="装夹件数" type="string" variable="clampingQuantity" required="false"/>
+    		<activiti:formProperty id="personnelOperationTime_人员操作时间 秒_2_string_t11_$$VC" name="人员操作时间 秒" type="string" variable="personnelOperationTime" required="false"/>
+    		<activiti:formProperty id="manualDetectionTime_人工检测时间 秒_3_string_t11_$$VC" name="人工检测时间 秒" type="string" variable="manualDetectionTime" required="false"/>
+    		<activiti:formProperty id="processingTime_加工时间 秒_4_string_t11_$$VC" name="加工时间 秒" type="string" variable="processingTime"/>
+    		<activiti:formProperty id="processTime_工序时间 秒_5_string_t11_$$VC" name="工序时间 秒" type="string" variable="processTime"/>
+    		
+    		<activiti:formProperty id="processPreparation_工序编制_1_string_t1_$$VD" name="工序编制" type="string" variable="processPreparation" required="false"/>
+    		<activiti:formProperty id="preparationDate_编制日期_2_string_t3_$$VD" name="编制日期" type="string" variable="preparationDate" required="false"/>
+    		<activiti:formProperty id="processAudit_工序审核_3_string_t1_$$VD" name="工序审核" type="string" variable="processAudit" required="false"/>
+    		<!-- <activiti:formProperty id="auditDate_审核日期_4_string_t3_$$VD" name="审核日期" type="string" variable="auditDate" required="false"/> -->
+    		<activiti:formProperty id="attachments_附件_5_string_t9_$$VD" name="附件" type="string" variable="attachments"/>
+    		
+    		<activiti:formProperty id="tbhdworksteps_item_$$VA" name="工步" type="string" variable="tbhdworksteps_item"/>
+			<activiti:formProperty id="tbhdworksteps_工步序号_workStepNo_1_string_t1_$$A" name="工步序号" type="string" variable="thbdworksteps_workStepNo_t00" required="true"/>
+			<activiti:formProperty id="tbhdworksteps_物料编号_meterialCode_2_string_auto_$$A" name="刀组编号" type="string" variable="tbhdworksteps_meterialCode_t00" required="false"/>
+			<activiti:formProperty id="tbhdworksteps_刀组名称_knifeGroupName_3_string_t1_$$A" name="刀组名称" type="string" variable="tbhdworksteps_knifeGroupName_t00"/>
+			<activiti:formProperty id="tbhdworksteps_工步描述_workStepDesc_4_string_t2_$$A" name="工步描述" type="string" variable="tbhdworksteps_workStepDesc_t00" required="false"/>
+			
+			<activiti:formProperty id="tbhdworksteps_切削速度 m/min_cuttingSpeed_5_string_t11_$$A" name="切削速度 m/min" type="string" variable="tbhdworksteps_cuttingSpeed_t00" required="false"/>
+			<activiti:formProperty id="tbhdworksteps_切削直径 mm_cuttingDiameter_6_string_t11_$$A" name="切削直径 mm" type="string" variable="tbhdworksteps_cuttingDiameter_t00" required="false"/>
+			<activiti:formProperty id="tbhdworksteps_每转进给量 mm/rev_feedPerRevolution_7_string_t11_$$A" name="每转进给量 mm/rev" type="string" variable="tbhdworksteps_feedPerRevolution_t00" required="false"/>
+			
+			<activiti:formProperty id="tbhdworksteps_转速 rev/min_rotatingSpeed_8_string_t11_$$A" name="转速 rev/min" type="string" variable="tbhdworksteps_rotatingSpeed_t00" required="false"/>
+			<activiti:formProperty id="tbhdworksteps_进给速度 rev/min_feedSpeed_9_string_t11_$$A" name="进给速度 rev/min" type="string" variable="tbhdworksteps_feedSpeed_t00" required="false"/>
+			<activiti:formProperty id="tbhdworksteps_刀具寿命_knifeLife_10_string_t11_$$A" name="刀具寿命" type="string" variable="tbhdworksteps_knifeLife_t00" required="false"/>
+			
+			<activiti:formProperty id="tbhdworksteps_工进时间 秒_workingTime_11_string_t11_$$A" name="工进时间 秒" type="string" variable="tbhdworksteps_workingTime_t00" required="false"/>
+			<activiti:formProperty id="tbhdworksteps_换刀时间 秒_knifeChangeTime_12_string_t11_$$A" name="换刀时间 秒" type="string" variable="tbhdworksteps_knifeChangeTime_t00" required="false"/>
+			<activiti:formProperty id="tbhdworksteps_辅助时间 秒_auxiliaryTime_13_string_t11_$$A" name="辅助时间 秒" type="string" variable="tbhdworksteps_auxiliaryTime_t00" required="false"/>
+			<activiti:formProperty id="tbhdworksteps_其他时间 秒_otherTime_14_string_t11_$$A" name="其他时间 秒" type="string" variable="tbhdworksteps_otherTime_t00" required="false"/>
+			
+			<activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+    			<activiti:field name="language">
+    				<activiti:string>
+    					<![CDATA[groovy]]>
+    				</activiti:string>
+    			</activiti:field>
+    			<activiti:field name="script">
+    				<activiti:string>
+    					<![CDATA[
+    						def execution = task.getExecution()
+							def auditDate = new Date().toInstant().toEpochMilli().toString()
+							execution.setVariable('auditDate', auditDate)
+							if (coreaction == '同意') {
+								execution.setVariable('valid', 'Y')
+							}						
+    					]]>
+    				</activiti:string>
+    			</activiti:field>
+    		</activiti:taskListener>
+    		<activiti:taskListener event="create" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+    			<activiti:field name="language">
+    				<activiti:string>
+    					<![CDATA[groovy]]>
+    				</activiti:string>
+    			</activiti:field>
+    			<activiti:field name="script">
+    				<activiti:string>
+    					<![CDATA[
+    						def execution = task.getExecution()
+							execution.setVariable('valid', 'N')						
+    					]]>
+    				</activiti:string>
+    			</activiti:field>
+    		</activiti:taskListener>
+    	</extensionElements>
+    </userTask>
+    <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="scripttask1"></sequenceFlow>
+    <sequenceFlow id="flow2" sourceRef="scripttask1" targetRef="usertask1"></sequenceFlow>
+    <sequenceFlow id="flow3" sourceRef="usertask1" targetRef="usertask2"></sequenceFlow>
+    <userTask id="usertask2" name="修改工序信息" activiti:assignee="${initiator}" activiti:dueDate="P1D" activiti:priority="8080">
+    	<extensionElements>
+    		<activiti:formProperty id="coreaction_审核_1_enum_rbv_$$VA" name="审核" type="enum" variable="coreaction" required="true">
+	        	<activiti:value id="同意" name="同意"></activiti:value>
+	        	<activiti:value id="拒绝" name="拒绝"></activiti:value>
+	        </activiti:formProperty>
+	        <activiti:formProperty id="corecomments_审核意见_2_string_t2_$$VA" name="审核意见" type="string" variable="corecomments"/>
+	        
+    		<activiti:formProperty id="processCode_工序编码_1_string_t1_$$A" name="工序编码" type="string" variable="processCode" required="true"/>
+    		<activiti:formProperty id="processName_工序名称_2_string_t1_$$A" name="工序名称" type="string" variable="processName" required="true"/>
+    		<activiti:formProperty id="processDesc_工序描述_3_string_t2_$$A" name="工序描述" type="string" variable="processDesc" required="false"/>
+    		
+    		<activiti:formProperty id="processType_工序类型_1_enum_sbs_$$B" name="工序类型" type="enum" variable="processType" required="false">
+    			<activiti:value id="车削" name="车削"/>
+    			<activiti:value id="铣削" name="铣削"/>
+    			<activiti:value id="磨削" name="磨削"/>
+    			<activiti:value id="电加工" name="电加工"/>
+    			<activiti:value id="其他" name="其他"/>
+    		</activiti:formProperty>
+    		<activiti:formProperty id="deviceSpec_设备型号_2_string_auto_$$B" name="设备型号" type="string" variable="deviceSpec" required="false"/>
+    		
+    		<activiti:formProperty id="clampingQuantity_装夹件数_1_string_t6_$$C" name="装夹件数" type="string" variable="clampingQuantity" required="false"/>
+    		<activiti:formProperty id="personnelOperationTime_人员操作时间 秒_2_string_t11_$$C" name="人员操作时间 秒" type="string" variable="personnelOperationTime" required="false"/>
+    		<activiti:formProperty id="manualDetectionTime_人工检测时间 秒_3_string_t11_$$C" name="人工检测时间 秒" type="string" variable="manualDetectionTime" required="false"/>
+    		
+    		<activiti:formProperty id="processPreparation_工序编制_1_string_t1_$$D" name="工序编制" type="string" variable="processPreparation" required="false"/>
+    		<!-- <activiti:formProperty id="preparationDate_编制日期_2_string_t3_$$D" name="编制日期" type="string" variable="preparationDate" required="false"/> -->
+    		<activiti:formProperty id="processAudit_工序审核_3_string_t1_$$D" name="工序审核" type="string" variable="processAudit" required="false"/>
+    		<activiti:formProperty id="auditDate_审核日期_4_string_t3_$$VD" name="审核日期" type="string" variable="auditDate" required="false"/>
+    		<activiti:formProperty id="attachments_附件_5_string_t9_$$D" name="附件" type="string" variable="attachments"/>
+    		
+    		<activiti:formProperty id="tbhdworksteps_item" name="工步" type="string" variable="tbhdworksteps_item"/>
+			<activiti:formProperty id="tbhdworksteps_工步序号_workStepNo_1_string_t1_$$A" name="工步序号" type="string" variable="thbdworksteps_workStepNo_t00" required="true"/>
+			<activiti:formProperty id="tbhdworksteps_物料编号_meterialCode_2_string_auto_$$A" name="刀组编号" type="string" variable="tbhdworksteps_meterialCode_t00" required="false"/>
+			<activiti:formProperty id="tbhdworksteps_刀组名称_knifeGroupName_3_string_t1_$$HA" name="刀组名称" type="string" variable="tbhdworksteps_knifeGroupName_t00"/>
+			<activiti:formProperty id="tbhdworksteps_工步描述_workStepDesc_4_string_t2_$$A" name="工步描述" type="string" variable="tbhdworksteps_workStepDesc_t00" required="false"/>
+			
+			<activiti:formProperty id="tbhdworksteps_切削速度 m/min_cuttingSpeed_5_string_t11_$$A" name="切削速度 m/min" type="string" variable="tbhdworksteps_cuttingSpeed_t00" required="false"/>
+			<activiti:formProperty id="tbhdworksteps_切削直径 mm_cuttingDiameter_6_string_t11_$$A" name="切削直径 mm" type="string" variable="tbhdworksteps_cuttingDiameter_t00" required="false"/>
+			<activiti:formProperty id="tbhdworksteps_每转进给量 mm/rev_feedPerRevolution_7_string_t11_$$A" name="每转进给量 mm/rev" type="string" variable="tbhdworksteps_feedPerRevolution_t00" required="false"/>
+			
+			<activiti:formProperty id="tbhdworksteps_转速 rev/min_rotatingSpeed_8_string_t11_$$A" name="转速 rev/min" type="string" variable="tbhdworksteps_rotatingSpeed_t00" required="false"/>
+			<activiti:formProperty id="tbhdworksteps_进给速度 rev/min_feedSpeed_9_string_t11_$$A" name="进给速度 rev/min" type="string" variable="tbhdworksteps_feedSpeed_t00" required="false"/>
+			<activiti:formProperty id="tbhdworksteps_刀具寿命_knifeLife_10_string_t11_$$A" name="刀具寿命" type="string" variable="tbhdworksteps_knifeLife_t00" required="false"/>
+			
+			<activiti:formProperty id="tbhdworksteps_工进时间 秒_workingTime_11_string_t11_$$A" name="工进时间 秒" type="string" variable="tbhdworksteps_workingTime_t00" required="false"/>
+			<activiti:formProperty id="tbhdworksteps_换刀时间 秒_knifeChangeTime_12_string_t11_$$A" name="换刀时间 秒" type="string" variable="tbhdworksteps_knifeChangeTime_t00" required="false"/>
+			<activiti:formProperty id="tbhdworksteps_辅助时间 秒_auxiliaryTime_13_string_t11_$$A" name="辅助时间 秒" type="string" variable="tbhdworksteps_auxiliaryTime_t00" required="false"/>
+			<activiti:formProperty id="tbhdworksteps_其他时间 秒_otherTime_14_string_t11_$$A" name="其他时间 秒" type="string" variable="tbhdworksteps_otherTime_t00" required="false"/>
+			
+    	</extensionElements>
+    </userTask>
+    <sequenceFlow id="flow4" sourceRef="usertask2" targetRef="scripttask1"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_testProcessInfo">
+    <bpmndi:BPMNPlane bpmnElement="testProcessInfo" id="BPMNPlane_testProcessInfo">
+      <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="60.0" y="200.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scripttask1" id="BPMNShape_scripttask1">
+        <omgdc:Bounds height="61.0" width="111.0" x="160.0" y="187.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask1" id="BPMNShape_usertask1">
+        <omgdc:Bounds height="61.0" width="111.0" x="320.0" y="187.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask2" id="BPMNShape_usertask2">
+        <omgdc:Bounds height="61.0" width="111.0" x="320.0" y="300.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="95.0" y="217.0"></omgdi:waypoint>
+        <omgdi:waypoint x="160.0" y="217.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="271.0" y="217.0"></omgdi:waypoint>
+        <omgdi:waypoint x="320.0" y="217.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3">
+        <omgdi:waypoint x="375.0" y="248.0"></omgdi:waypoint>
+        <omgdi:waypoint x="375.0" y="300.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow4" id="BPMNEdge_flow4">
+        <omgdi:waypoint x="320.0" y="330.0"></omgdi:waypoint>
+        <omgdi:waypoint x="215.0" y="330.0"></omgdi:waypoint>
+        <omgdi:waypoint x="215.0" y="248.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

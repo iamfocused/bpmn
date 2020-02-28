@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/frm">
+  <process id="naxauDeviceInfo" name="设备录入" isExecutable="true" activiti:candidateStarterGroups="admin">
+    <documentation>设备录入</documentation>
+    <startEvent id="startevent1" name="Start" activiti:initiator="initiator">
+    	<extensionElements>
+    		<activiti:formProperty id="deviceCode_设备编号_1_string_t1_$$A" name="设备编号" type="string" variable="deviceCode" required="true"/>
+            <activiti:formProperty id="deviceSpec_设备型号_2_string_t1_$$A" name="设备型号" type="string" variable="deviceSpec" required="true"/>
+            <activiti:formProperty id="deviceName_设备名称_3_string_t1_$$A" name="设备名称" type="string" variable="deviceName" required="true"/>
+            <activiti:formProperty id="deviceDesc_设备描述_4_string_t2_$$A" name="设备描述" type="string" variable="deviceDesc"/>
+    	</extensionElements>
+    </startEvent>
+    <endEvent id="endevent1" name="End"></endEvent>
+    <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="endevent1"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_naxauDeviceInfo">
+    <bpmndi:BPMNPlane bpmnElement="naxauDeviceInfo" id="BPMNPlane_naxauDeviceInfo">
+      <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="50.0" y="240.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="130.0" y="240.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="85.0" y="257.0"></omgdi:waypoint>
+        <omgdi:waypoint x="130.0" y="257.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>
