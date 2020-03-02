@@ -1,0 +1,522 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/del">
+  <process id="SRM_execute" name="SRM采购计划执行" isExecutable="true" activiti:candidateStarterGroups="PUMGR,admin">
+    <startEvent id="startevent1" name="Start" activiti:initiator="initiator">
+    	<extensionElements>
+    		<activiti:formProperty id="chooseplan_选择采购计划_1_string_tree_$$A" name="选择采购计划" type="string" variable="chooseplan" required="true"/>
+    		<activiti:formProperty id="executionNote_备注_2_string_t2_string_$$A" name="备注" type="string" variable="executionNote"/>
+    		
+    		<activiti:executionListener event="end" class="org.activiti.engine.impl.bpmn.listener.ScriptExecutionListener">
+    			<activiti:field name="language">
+    				<activiti:string>
+    					<![CDATA[groovy]]>
+    				</activiti:string>
+    			</activiti:field>
+    			<activiti:field name="script">
+    				<activiti:string>
+    					<![CDATA[import groovy.json.JsonSlurper
+    						import groovy.json.JsonOutput
+    						
+    						//采购计划信息获取
+    						def jsonSlurper = new JsonSlurper()
+    						def planProcessInstId = jsonSlurper.parseText(chooseplan).code
+    						execution.setVariable('planProcInstId', planProcessInstId)
+    						execution.setVariable('procInstId', execution.getProcessInstanceId())
+    						
+    						execution.setVariable('tbhddetail_item', findValueByVarName(historyService, planProcessInstId, 'tbhddetail_item'))
+    						execution.setVariable('tbhddetail_item_std', findValueByVarName(historyService, planProcessInstId, 'tbhddetail_item_std'))
+    						
+    						execution.setVariable('planFrom', findValueByVarName(historyService, planProcessInstId, 'planFrom'))
+    						execution.setVariable('planTo', findValueByVarName(historyService, planProcessInstId, 'planTo'))
+    						execution.setVariable('planNote', findValueByVarName(historyService, planProcessInstId, 'planNote'))
+    						
+    						static String findValueByVarName(def historyService, String procInstId, String variableName) {
+							    def vars = historyService.createHistoricVariableInstanceQuery().processInstanceId(procInstId).list()
+							    def values = vars.stream().filter({var -> variableName.equals(var?.getVariableName())}).map({var -> var.getValue()}).collect(java.util.stream.Collectors.toList())
+							    if (values.isEmpty()) {
+									throw new org.activiti.engine.ActivitiIllegalArgumentException('数据获取失败' + procInstId + ',' + variableName)
+							    }
+							    return values[0]
+							}
+    					]]>
+    				</activiti:string>
+    			</activiti:field>
+    		</activiti:executionListener>
+    	</extensionElements>
+    </startEvent>
+    
+    <userTask id="usertask1" name="填写本次需求量" activiti:assignee="${initiator}" activiti:dueDate="P1D" activiti:priority="8080">
+    	<extensionElements>
+    		<activiti:formProperty id="planfrom_计划开始_1_string_t3_$$VA" name="计划开始时间" type="string" variable="planFrom" required="true"/>
+    		<activiti:formProperty id="planto_计划结束_2_string_t3_$$VA" name="计划结束时间" type="string" variable="planTo" required="true"/>
+    		<activiti:formProperty id="planNote_计划备注_3_string_t2_$$VA" name="计划备注" type="string" variable="planNote"/>
+    		
+    		<activiti:formProperty id="tbhddetail_item" name="采购计划明细 Detail" type="string" variable="tbhddetail_item" required="true"/>
+    		<activiti:formProperty id="tbhddetail_计划主题_subject_1_string_t1_$$VA" name="计划主题" variable="tbhddetail_subject_t00"/>
+    		<activiti:formProperty id="tbhddetail_供应商id_vndid_2_string_t1_$$VA" name="供应商id" variable="tbhddetail_vndid_t00"/>
+    		<activiti:formProperty id="tbhddetail_物料信息_matinfo_3_string_tree_$$VA" name="物料信息" type="string" variable="tbhddetail_matinfo_t00"/>
+    		<activiti:formProperty id="tbhddetail_计划数量_planqty_4_string_t11_$$VA" name="计划数量" type="string" variable="tbhddetail_planqty_t00"/>
+    		<activiti:formProperty id="tbhddetail_剩余数量_remainqty_5_string_t11_$$VA" name="剩余数量" type="string" variable="tbhddetail_remainqty_t00"/>
+    		<activiti:formProperty id="tbhddetail_单价_prcprice_6_string_t11_$$VA" name="单价" type="string" variable="tbhddetail_prcprice_t00"/>
+    		<activiti:formProperty id="tbhddetail_订货日期_orderdate_7_string_t3_$$A" name="订货日期" type="string" variable="tbhddetail_orderdate_t00" required="true"/>
+    		<activiti:formProperty id="tbhddetail_订货数量_orderqty_8_string_t11_$$A" name="订货数量" type="string" variable="tbhddetail_orderqty_t00" required="true"/>
+    		<activiti:formProperty id="tbhddetail_系统批次_sysBatch_9_string_t1_$$HA" name="系统批次" type="string" variable="tbhddetail_sysBatch_t00"/>
+    		<activiti:formProperty id="tbhddetail_手工批次_batch_10_string_t1_$$HA" name="手工批次" type="string" variable="tbhddetail_batch_t00"/>
+    		<activiti:formProperty id="tbhddetail_实际送货数量_deliveryqty_11_string_t11_$$HA" name="实际送货数量" type="string" variable="tbhddetail_deliveryqty_t00"/>
+    		<activiti:formProperty id="tbhddetail_送货日期_deliverydate_12_string_t3_$$HA" name="送货日期" type="string" variable="tbhddetail_deliverydate_t00"/>
+    		<activiti:formProperty id="tbhddetail_车次_trainnumber_13_enum_sbs_$$HA" name="车次" type="enum" variable="tbhddetail_trainnumber_t00">
+				<activiti:value id="车次1" name="车次1"/>
+				<activiti:value id="车次2" name="车次2"/>
+				<activiti:value id="车次3" name="车次3"/>
+				<activiti:value id="车次4" name="车次4"/> 	
+      		</activiti:formProperty>
+    		<activiti:formProperty id="tbhddetail_到货日期_arrivaldate_14_string_t3_$$HA" name="到货日期" type="string" variable="tbhddetail_arrivaldate_t00"/>
+    		<activiti:formProperty id="tbhddetail_合格数_accnumber_15_string_t11_$$HA" name="合格数" type="string" variable="tbhddetail_accnumber_t00"/>
+    		<activiti:formProperty id="tbhddetail_不合格数_defnumber_16_string_t11_$$HA" name="不合格数" type="string" variable="tbhddetail_defnumber_t00"/>
+    		<activiti:formProperty id="tbhddetail_不合格总金额_defAmount_17_string_t11_$$HA" name="不合格总金额" type="string" variable="tbhddetail_defAmount_t00"/>
+    		<activiti:formProperty id="tbhddetail_实际总金额_amount_18_string_t11_$$HA" name="实际总金额" type="string" variable="tbhddetail_amount_t00"/>
+      		
+      		<activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+      			<activiti:field name="language">
+      				<activiti:string>
+      					<![CDATA[groovy]]>
+      				</activiti:string>
+      			</activiti:field>
+      			<activiti:field name="script">
+      				<activiti:string>
+      					<![CDATA[import com.eorionsolution.bpms.extension.rest.RestAPI
+      						import groovy.json.JsonSlurper
+    						import groovy.json.JsonOutput
+    						import java.text.SimpleDateFormat
+    						import java.text.DateFormat
+      						
+      						def execution = task.getExecution()
+      						def jsonSlurper = new JsonSlurper()
+      						DateFormat df = new SimpleDateFormat("yyyyMMddHHmmss")
+      						
+      						//生成系统批次
+      						def std = jsonSlurper.parseText(tbhddetail_item_std)
+      						def item = jsonSlurper.parseText(tbhddetail_item)
+      						std.each{
+      							if (!it.orderdate) {
+      								throw new org.activiti.engine.ActivitiIllegalArgumentException('请填写订货日期')
+      							}
+      							if (!it.orderqty) {
+      								throw new org.activiti.engine.ActivitiIllegalArgumentException('请填写订货数量')
+      							}
+      							it.sysBatch = df.format(new Date(it.orderdate.toLong()))
+      						}
+      						item.each {k,v ->
+      							if (k == 'rows') {
+      								v.each {
+      									it[8] = df.format(new Date(it[6].toLong()))
+      								}
+      							}
+      						}
+      						execution.setVariable('tbhddetail_item_std', JsonOutput.toJson(std))
+      						execution.setVariable('tbhddetail_item', JsonOutput.toJson(item))
+      						
+      						//微信通知供应商
+      						def restParam = new HashMap<String,Object>()
+				    		def headerMap = new HashMap<String,String>()
+				    		
+				    		def bodyMap = new HashMap()
+							bodyMap.put('touser', 'baocaixue@eorionsolution.com')
+							bodyMap.put('agentid',1000005)
+							bodyMap.put('title', 'magna已发起采购需求')
+							bodyMap.put('description', '供应商提醒：magna有采购需求，请尽快于BPMS确认')
+							bodyMap.put('url','https://bpms.eorionsolution.com/bpmssrm/task.html?processInstanceId=' + procInstId)
+							def body = JsonOutput.toJson(bodyMap)
+				    		
+				    		headerMap.put("Content-Type","application/json")			
+							restParam.put("_http_method","POST")
+							restParam.put("_http_headers",headerMap)
+							restParam.put("_http_url", 'https://bpms.eorionsolution.com/wso2esb/wechat/message/send');
+							restParam.put("_http_body", body)
+				    		def result = RestAPI.execute(restParam)
+				    		
+				    		if (!result._http_response_status_code || !result._http_response_status_code.toString().startsWith("2")) {
+				    			throw new org.activiti.engine.ActivitiIllegalArgumentException('微信通知失败，请联系管理员')
+				    		}
+      					]]>
+      				</activiti:string>
+      			</activiti:field>
+      		</activiti:taskListener>
+    	</extensionElements>
+    </userTask>
+    <userTask id="usertask2" name="供应商发货" activiti:assignee="${initiator}" activiti:dueDate="P1D" activiti:priority="8080">
+    	<extensionElements>
+    		<activiti:formProperty id="planfrom_计划开始_1_string_t3_$$VA" name="计划开始时间" type="string" variable="planFrom" required="true"/>
+    		<activiti:formProperty id="planto_计划结束_2_string_t3_$$VA" name="计划结束时间" type="string" variable="planTo" required="true"/>
+    		<activiti:formProperty id="planNote_计划备注_3_string_t2_$$VA" name="计划备注" type="string" variable="planNote"/>
+    		
+    		<activiti:formProperty id="tbhddetail_item" name="采购计划明细 Detail" type="string" variable="tbhddetail_item" required="true"/>
+    		<activiti:formProperty id="tbhddetail_计划主题_subject_1_string_t1_$$VA" name="计划主题" variable="tbhddetail_subject_t00"/>
+    		<activiti:formProperty id="tbhddetail_供应商id_vndid_2_string_t1_$$VA" name="供应商id" variable="tbhddetail_vndid_t00"/>
+    		<activiti:formProperty id="tbhddetail_物料信息_matinfo_3_string_tree_$$VA" name="物料信息" type="string" variable="tbhddetail_matinfo_t00"/>
+    		<activiti:formProperty id="tbhddetail_计划数量_planqty_4_string_t11_$$VA" name="计划数量" type="string" variable="tbhddetail_planqty_t00"/>
+    		<activiti:formProperty id="tbhddetail_剩余数量_remainqty_5_string_t11_$$VA" name="剩余数量" type="string" variable="tbhddetail_remainqty_t00"/>
+    		<activiti:formProperty id="tbhddetail_单价_prcprice_6_string_t11_$$VA" name="单价" type="string" variable="tbhddetail_prcprice_t00"/>
+    		<activiti:formProperty id="tbhddetail_订货日期_orderdate_7_string_t3_$$VA" name="订货日期" type="string" variable="tbhddetail_orderdate_t00"/>
+    		<activiti:formProperty id="tbhddetail_订货数量_orderqty_8_string_t11_$$VA" name="订货数量" type="string" variable="tbhddetail_orderqty_t00"/>
+    		<activiti:formProperty id="tbhddetail_系统批次_sysBatch_9_string_t1_$$VA" name="系统批次" type="string" variable="tbhddetail_sysBatch_t00"/>
+    		<activiti:formProperty id="tbhddetail_手工批次_batch_10_string_t1_$$A" name="手工批次" type="string" variable="tbhddetail_batch_t00"/>
+    		<activiti:formProperty id="tbhddetail_实际送货数量_deliveryqty_11_string_t11_$$A" name="实际送货数量" type="string" variable="tbhddetail_deliveryqty_t00" required="true"/>
+    		<activiti:formProperty id="tbhddetail_送货日期_deliverydate_12_string_t3_$$A" name="送货日期" type="string" variable="tbhddetail_deliverydate_t00" required="true"/>
+    		<activiti:formProperty id="tbhddetail_车次_trainnumber_13_enum_sbs_$$A" name="车次" type="enum" variable="tbhddetail_trainnumber_t00" required="true">
+				<activiti:value id="车次1" name="车次1"/>
+				<activiti:value id="车次2" name="车次2"/>
+				<activiti:value id="车次3" name="车次3"/>
+				<activiti:value id="车次4" name="车次4"/> 	
+      		</activiti:formProperty>
+    		<activiti:formProperty id="tbhddetail_到货日期_arrivaldate_14_string_t3_$$HA" name="到货日期" type="string" variable="tbhddetail_arrivaldate_t00"/>
+    		<activiti:formProperty id="tbhddetail_合格数_accnumber_15_string_t11_$$HA" name="合格数" type="string" variable="tbhddetail_accnumber_t00"/>
+    		<activiti:formProperty id="tbhddetail_不合格数_defnumber_16_string_t11_$$HA" name="不合格数" type="string" variable="tbhddetail_defnumber_t00"/>
+    		<activiti:formProperty id="tbhddetail_不合格总金额_defAmount_17_string_t11_$$HA" name="不合格总金额" type="string" variable="tbhddetail_defAmount_t00"/>
+    		<activiti:formProperty id="tbhddetail_实际总金额_amount_18_string_t11_$$HA" name="实际总金额" type="string" variable="tbhddetail_amount_t00"/>
+    	
+    		<activiti:taskListener event="create" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+    			<activiti:field name="language">
+    				<activiti:string>
+    					<![CDATA[groovy]]>
+    				</activiti:string>
+    			</activiti:field>
+    			<activiti:field name="script">
+    				<activiti:string>
+    					<![CDATA[import java.time.LocalDateTime
+							import java.time.ZoneOffset
+							import java.time.temporal.TemporalAdjusters
+							import javax.crypto.Mac
+							import javax.crypto.spec.SecretKeySpec
+							import java.security.InvalidKeyException
+							
+							def execution = task.getExecution()
+							//车次运送量报表
+							def today = LocalDateTime.now()
+							def firstDay = LocalDateTime.of(today.getYear(), today.getMonthValue(), 1,0,0,0)
+							def lastDay = today.with(TemporalAdjusters.lastDayOfMonth())
+							lastDay = lastDay.withHour(23)
+							lastDay = lastDay.withMinute(59)
+							lastDay = lastDay.withSecond(59)
+							
+							def from_ = firstDay.toInstant(ZoneOffset.of("+8")).toEpochMilli().toString()
+							def to_ = lastDay.toInstant(ZoneOffset.of("+8")).toEpochMilli().toString()
+							
+							def hmac_sha256(String secretKey, String data) {
+							    try {
+							        Mac mac = Mac.getInstance("HmacSHA256")
+							        SecretKeySpec secretKeySpec = new SecretKeySpec(secretKey.getBytes(), "HmacSHA256")
+							        mac.init(secretKeySpec)
+							        byte[] digest = mac.doFinal(data.getBytes())
+							        return digest
+							    } catch (InvalidKeyException e) {
+							        throw new RuntimeException("Invalid key exception while converting to HMacSHA256")
+							    }
+							}
+							def METABASE_SITE_URL = "https://metabase.eorionsolution.com"
+							def METABASE_SECRET_KEY = "8322aa8500b6ae07df7590b25d1bff56cb5e631dc829704c15cb66e80fed9f50"
+							def header = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9"
+							def playloadString = '{"resource":{"question":72},"params":{"from_":"'+ from_ +'" , '+ '"to_":"'+ to_ +'" }}'
+							def playload = Base64.getUrlEncoder().encodeToString(playloadString.bytes)
+							def secret =Base64.getUrlEncoder().encodeToString(hmac_sha256(METABASE_SECRET_KEY , header+'.'+playload))
+							
+							def url = METABASE_SITE_URL + "/embed/question/" + header+'.'+playload+'.'+secret + "#bordered=true&titled=true"
+		   					execution.setVariable('BBOT_BI_TRAIN_NUMBER',url)
+    					
+    					]]>
+    				</activiti:string>
+    			</activiti:field>
+    		</activiti:taskListener>
+    		<activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+    			<activiti:field name="language">
+    				<activiti:string>
+    					<![CDATA[groovy]]>
+    				</activiti:string>
+    			</activiti:field>
+    			<activiti:field name="script">
+    				<activiti:string>
+    					<![CDATA[import groovy.json.JsonSlurper
+            				import groovy.json.JsonOutput
+            				import com.eorionsolution.bpms.extension.rest.RestAPI
+    						
+    						def jsonSlurper = new JsonSlurper()
+    						def execution = task.getExecution()
+    						
+    						def std = jsonSlurper.parseText(tbhddetail_item_std)
+    						def warn = false
+    						std.each {
+    							if (!it.deliveryqty) {
+    								throw new org.activiti.engine.ActivitiIllegalArgumentException('请填写实际送货数量')
+    							}
+    							if (!it.deliverydate) {
+    								throw new org.activiti.engine.ActivitiIllegalArgumentException('请填写送货日期')
+    							}
+    							if (!it.trainnumber) {
+    								throw new org.activiti.engine.ActivitiIllegalArgumentException('请填写车次')
+    							}
+    							if (it.deliveryqty != it.orderqty) {
+    								warn = true
+    							}
+    						}
+    						
+    						//微信通知magna
+      						def restParam = new HashMap<String,Object>()
+				    		def headerMap = new HashMap<String,String>()
+				    		
+				    		def bodyMap = new HashMap()
+							bodyMap.put('touser', 'baocaixue@eorionsolution.com')
+							bodyMap.put('agentid',1000005)
+							bodyMap.put('title', '供应商发货通知')
+							bodyMap.put('description', warn?'WARN:请注意，本次发货数量不足，详情请于BPMS查看':'已发货')
+							bodyMap.put('url','https://bpms.eorionsolution.com/bpmssrm/task.html?processInstanceId=' + procInstId)
+							def body = JsonOutput.toJson(bodyMap)
+				    		
+				    		headerMap.put("Content-Type","application/json")			
+							restParam.put("_http_method","POST")
+							restParam.put("_http_headers",headerMap)
+							restParam.put("_http_url", 'https://bpms.eorionsolution.com/wso2esb/wechat/message/send');
+							restParam.put("_http_body", body)
+				    		def result = RestAPI.execute(restParam)
+				    		
+				    		if (!result._http_response_status_code || !result._http_response_status_code.toString().startsWith("2")) {
+				    			throw new org.activiti.engine.ActivitiIllegalArgumentException('微信通知失败，请联系管理员')
+				    		}
+    					]]>
+    				</activiti:string>
+    			</activiti:field>
+    		</activiti:taskListener>
+    	</extensionElements>
+    </userTask>
+    <userTask id="usertask3" name="质量检验" activiti:assignee="${initiator}" activiti:dueDate="P1D" activiti:priority="8080">
+    	<extensionElements>
+    		<activiti:formProperty id="planfrom_计划开始_1_string_t3_$$VA" name="计划开始时间" type="string" variable="planFrom" required="true"/>
+    		<activiti:formProperty id="planto_计划结束_2_string_t3_$$VA" name="计划结束时间" type="string" variable="planTo" required="true"/>
+    		<activiti:formProperty id="planNote_计划备注_3_string_t2_$$VA" name="计划备注" type="string" variable="planNote"/>
+    		
+    		<activiti:formProperty id="tbhddetail_item" name="采购计划明细 Detail" type="string" variable="tbhddetail_item" required="true"/>
+    		<activiti:formProperty id="tbhddetail_计划主题_subject_1_string_t1_$$VA" name="计划主题" variable="tbhddetail_subject_t00"/>
+    		<activiti:formProperty id="tbhddetail_供应商id_vndid_2_string_t1_$$VA" name="供应商id" variable="tbhddetail_vndid_t00"/>
+    		<activiti:formProperty id="tbhddetail_物料信息_matinfo_3_string_tree_$$VA" name="物料信息" type="string" variable="tbhddetail_matinfo_t00"/>
+    		<activiti:formProperty id="tbhddetail_计划数量_planqty_4_string_t11_$$VA" name="计划数量" type="string" variable="tbhddetail_planqty_t00"/>
+    		<activiti:formProperty id="tbhddetail_剩余数量_remainqty_5_string_t11_$$VA" name="剩余数量" type="string" variable="tbhddetail_remainqty_t00"/>
+    		<activiti:formProperty id="tbhddetail_单价_prcprice_6_string_t11_$$VA" name="单价" type="string" variable="tbhddetail_prcprice_t00"/>
+    		<activiti:formProperty id="tbhddetail_订货日期_orderdate_7_string_t3_$$VA" name="订货日期" type="string" variable="tbhddetail_orderdate_t00"/>
+    		<activiti:formProperty id="tbhddetail_订货数量_orderqty_8_string_t11_$$VA" name="订货数量" type="string" variable="tbhddetail_orderqty_t00"/>
+    		<activiti:formProperty id="tbhddetail_系统批次_sysBatch_9_string_t1_$$VA" name="系统批次" type="string" variable="tbhddetail_sysBatch_t00"/>
+    		<activiti:formProperty id="tbhddetail_手工批次_batch_10_string_t1_$$VA" name="手工批次" type="string" variable="tbhddetail_batch_t00"/>
+    		<activiti:formProperty id="tbhddetail_实际送货数量_deliveryqty_11_string_t11_$$VA" name="实际送货数量" type="string" variable="tbhddetail_deliveryqty_t00"/>
+    		<activiti:formProperty id="tbhddetail_送货日期_deliverydate_12_string_t3_$$VA" name="送货日期" type="string" variable="tbhddetail_deliverydate_t00"/>
+    		<activiti:formProperty id="tbhddetail_车次_trainnumber_13_enum_sbs_$$VA" name="车次" type="enum" variable="tbhddetail_trainnumber_t00">
+				<activiti:value id="车次1" name="车次1"/>
+				<activiti:value id="车次2" name="车次2"/>
+				<activiti:value id="车次3" name="车次3"/>
+				<activiti:value id="车次4" name="车次4"/> 	
+      		</activiti:formProperty>
+    		<activiti:formProperty id="tbhddetail_到货日期_arrivaldate_14_string_t3_$$A" name="到货日期" type="string" variable="tbhddetail_arrivaldate_t00" required="true"/>
+    		<activiti:formProperty id="tbhddetail_合格数_accnumber_15_string_t11_$$A" name="合格数" type="string" variable="tbhddetail_accnumber_t00" required="true"/>
+    		<activiti:formProperty id="tbhddetail_不合格数_defnumber_16_string_t11_$$A" name="不合格数" type="string" variable="tbhddetail_defnumber_t00" required="true"/>
+    		<activiti:formProperty id="tbhddetail_不合格总金额_defAmount_17_string_t11_$$HA" name="不合格总金额" type="string" variable="tbhddetail_defAmount_t00"/>
+    		<activiti:formProperty id="tbhddetail_实际总金额_amount_18_string_t11_$$HA" name="实际总金额" type="string" variable="tbhddetail_amount_t00"/>
+    		
+    		<activiti:taskListener event="create" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+    			<activiti:field name="language">
+    				<activiti:string>
+    					<![CDATA[groovy]]>
+    				</activiti:string>
+    			</activiti:field>
+    			<activiti:field name="script">
+    				<activiti:string>
+    					<![CDATA[import java.time.LocalDateTime
+							import java.time.ZoneOffset
+							import java.time.temporal.TemporalAdjusters
+							import javax.crypto.Mac
+							import javax.crypto.spec.SecretKeySpec
+							import java.security.InvalidKeyException
+							import groovy.json.JsonSlurper
+            				import groovy.json.JsonOutput
+							
+							def execution = task.getExecution()
+							def jsonSlurper = new JsonSlurper()
+							
+							//车次运送量报表
+							def today = LocalDateTime.now()
+							def firstDay = LocalDateTime.of(today.getYear(), today.getMonthValue(), 1,0,0,0)
+							def lastDay = today.with(TemporalAdjusters.lastDayOfMonth())
+							lastDay = lastDay.withHour(23)
+							lastDay = lastDay.withMinute(59)
+							lastDay = lastDay.withSecond(59)
+							
+							def from_ = firstDay.toInstant(ZoneOffset.of("+8")).toEpochMilli().toString()
+							def to_ = lastDay.toInstant(ZoneOffset.of("+8")).toEpochMilli().toString()
+							
+							def hmac_sha256(String secretKey, String data) {
+							    try {
+							        Mac mac = Mac.getInstance("HmacSHA256")
+							        SecretKeySpec secretKeySpec = new SecretKeySpec(secretKey.getBytes(), "HmacSHA256")
+							        mac.init(secretKeySpec)
+							        byte[] digest = mac.doFinal(data.getBytes())
+							        return digest
+							    } catch (InvalidKeyException e) {
+							        throw new RuntimeException("Invalid key exception while converting to HMacSHA256")
+							    }
+							}
+							def METABASE_SITE_URL = "https://metabase.eorionsolution.com"
+							def METABASE_SECRET_KEY = "8322aa8500b6ae07df7590b25d1bff56cb5e631dc829704c15cb66e80fed9f50"
+							def header = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9"
+							def playloadString = '{"resource":{"question":72},"params":{"from_":"'+ from_ +'" , '+ '"to_":"'+ to_ +'" }}'
+							def playload = Base64.getUrlEncoder().encodeToString(playloadString.bytes)
+							def secret =Base64.getUrlEncoder().encodeToString(hmac_sha256(METABASE_SECRET_KEY , header+'.'+playload))
+							
+							def url = METABASE_SITE_URL + "/embed/question/" + header+'.'+playload+'.'+secret + "#bordered=true&titled=true"
+		   					execution.setVariable('BBOT_BI_TRAIN_NUMBER',url)
+    					
+    						//pdf
+    						def pdf_std = jsonSlurper.parseText(tbhddetail_item_std)
+    						pdf_std.each{
+								it.put('VND_ID_',['code':it.vndid, 'name':it.vndid])
+								if(!it.batch) {
+									it.batch = it.sysBatch
+								}
+							}
+							execution.setVariable('pdf_std',JsonOutput.toJson(pdf_std))
+							
+							playloadString = '{"resource":{"question":69},"params":{"procInstId":\"'+ procInstId +'\"}}'
+							playload = Base64.getUrlEncoder().encodeToString(playloadString.bytes)
+							
+							secret =Base64.getUrlEncoder().encodeToString(hmac_sha256(METABASE_SECRET_KEY , header+'.'+playload))
+							url = METABASE_SITE_URL + "/embed/question/" + header+'.'+playload+'.'+secret + "#bordered=true&titled=true"
+		     				execution.setVariableLocal('BBOT_BI_PDF_LINK',url)
+    					]]>
+    				</activiti:string>
+    			</activiti:field>
+    		</activiti:taskListener>
+    		<activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+    			<activiti:field name="language">
+    				<activiti:string>
+    					<![CDATA[groovy]]>
+    				</activiti:string>
+    			</activiti:field>
+    			<activiti:field name="script">
+    				<activiti:string>
+    					<![CDATA[import groovy.json.JsonSlurper
+            				import groovy.json.JsonOutput
+            				
+    						//计算金额
+    						def jsonSlurper = new JsonSlurper()
+    						def item = jsonSlurper.parseText(tbhddetail_item)
+    						def std = jsonSlurper.parseText(tbhddetail_item_std)
+    						def execution = task.getExecution()
+    						std.each {
+    							if(!it.defnumber) {
+    								throw new org.activiti.engine.ActivitiIllegalArgumentException('请填写此次采购的不合格数量')
+    							}
+    							it.defAmount = (it.defnumber.toDouble() * it.prcprice.toDouble()).toString()
+    							if(!it.accnumber) {
+    								throw new org.activiti.engine.ActivitiIllegalArgumentException('请填写此次采购的合格数量')
+    							}
+    							it.amount = (it.accnumber.toDouble() * it.prcprice.toDouble()).toString()
+    							it.remainqty = it.remainqty.toBigDecimal().subtract(it.accnumber.toBigDecimal())
+    						}
+    						
+    						item.each { k,v ->
+    							if (k == 'rows') {
+    								v.each {
+    									it[4] = it[4].toBigDecimal().subtract(it[14].toBigDecimal())
+    									it[16] = (it[15].toDouble() * it[5].toDouble()).toString()
+    									it[17] = (it[14].toDouble() * it[5].toDouble()).toString()
+    								}
+    							}
+    						}
+    						execution.setVariable('tbhddetail_item_std', JsonOutput.toJson(std))
+    						execution.setVariable('tbhddetail_item', JsonOutput.toJson(item))
+    						execution.setVariable('valid', 'Y')
+    						
+    						//更新数量
+    						def planExecution = runtimeService.createExecutionQuery().processInstanceId(planProcInstId).executionId(planProcInstId).singleResult()
+    						def planStd = jsonSlurper.parseText(planExecution.getVariable('tbhddetail_item_std'))
+    						def planItem = jsonSlurper.parseText(planExecution.getVariable('tbhddetail_item'))
+    						
+    						for (int i = 0; i < planStd.size(); i++) {
+    							def item1 = planStd[i]
+    							def find = std.find{it.matinfo == item1.matinfo && it.vndid == item1.vndid}
+    							if (find) {
+    								def remain = item1.remainqty.toBigDecimal().subtract(find.accnumber.toBigDecimal())
+    								item1.remainqty = remain
+    								if (remain <= 0) {
+    									planStd.remove(i)
+    								}
+    							}
+    						}
+    						if(planStd.size() == 0) {
+    							//发送信息结束计划流程
+    							def execId = runtimeService.createExecutionQuery().processInstanceId(planProcInstId).messageEventSubscriptionName('zeroMsg').singleResult()
+    							Map<String, Object> map = new HashMap()
+	    						map.put("finished","Y")
+	    						runtimeService.messageEventReceived('zeroMsg', execId.getId(), map)
+    						}
+    						planItem.each {k,v ->
+    							if (k == 'rows') {
+    								for (int i=0; i<v.size(); i++) {
+    									def item1 = v[i]
+    									def find = std.find{it.vndid == item1[1] && it.matinfo == item1[2]}
+    									if (find) {
+    										def remain = item1[4].toBigDecimal().subtract(find.accnumber.toBigDecimal())
+    										item1[4] = remain
+    										if (remain <= 0) {
+    											v.remove(i)
+    										}
+    									}
+    								}
+    							}
+    						}
+    						
+    						planExecution.setVariable('tbhddetail_item',JsonOutput.toJson(planItem))
+    						planExecution.setVariable('tbhddetail_item_std',JsonOutput.toJson(planStd))
+    					]]>
+    				</activiti:string>
+    			</activiti:field>
+    		</activiti:taskListener>
+    	</extensionElements>
+    </userTask>
+    <endEvent id="endevent1" name="End"></endEvent>
+    <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="usertask1"></sequenceFlow>
+    <sequenceFlow id="flow2" sourceRef="usertask1" targetRef="usertask2"></sequenceFlow>
+    <sequenceFlow id="flow3" sourceRef="usertask2" targetRef="usertask3"></sequenceFlow>
+    <sequenceFlow id="flow4" sourceRef="usertask3" targetRef="endevent1"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_SRM_execute">
+    <bpmndi:BPMNPlane bpmnElement="SRM_execute" id="BPMNPlane_SRM_execute">
+      <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="50.0" y="160.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask1" id="BPMNShape_usertask1">
+        <omgdc:Bounds height="61.0" width="111.0" x="140.0" y="147.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask2" id="BPMNShape_usertask2">
+        <omgdc:Bounds height="61.0" width="111.0" x="300.0" y="147.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask3" id="BPMNShape_usertask3">
+        <omgdc:Bounds height="61.0" width="111.0" x="470.0" y="147.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="660.0" y="160.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="85.0" y="177.0"></omgdi:waypoint>
+        <omgdi:waypoint x="140.0" y="177.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="251.0" y="177.0"></omgdi:waypoint>
+        <omgdi:waypoint x="300.0" y="177.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3">
+        <omgdi:waypoint x="411.0" y="177.0"></omgdi:waypoint>
+        <omgdi:waypoint x="470.0" y="177.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow4" id="BPMNEdge_flow4">
+        <omgdi:waypoint x="581.0" y="177.0"></omgdi:waypoint>
+        <omgdi:waypoint x="660.0" y="177.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

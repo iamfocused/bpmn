@@ -1,0 +1,90 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/test">
+  <process id="SRM_VM" name="SRM_物料供应商" isExecutable="true" activiti:candidateStarterGroups="admin">
+    <startEvent id="s1" name="s1" activiti:initiator="initiator">
+      <extensionElements>
+        <activiti:formProperty id="material_物料id_1_string_tree_$$A" name="物料id" type="string" variable="matid" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_item" name="供应商物料明细" type="string" variable="tbhddetail_item" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_供应商id_vndid_1_string_tree_$$A" name="供应商id" type="string" variable="tbhddetail_vndid_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_供应状态_status_2_enum_sbs_$$A" name="供应状态" type="enum" variable="tbhddetail_status_t00">
+          <activiti:value id="供货中" name="供货中"></activiti:value>
+          <activiti:value id="停供" name="停供"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_采购提前期_lt_3_string_t1_$$A" name="采购提前期" type="string" variable="tbhddetail_lt_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_最小采购量_moq_4_string_t6_$$A" name="最小采购量" type="string" variable="tbhddetail_moq_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_优先级_priority_5_string_t1_$$A" name="优先级" type="string" variable="tbhddetail_priority_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_质量等级_ql_6_string_t1_$$A" name="质量等级" type="string" variable="tbhddetail_ql_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_有效期至_valdateto_7_string_t3_$$A" name="有效期至" type="string" variable="tbhddetail_valdateto_t00"></activiti:formProperty>
+      </extensionElements>
+    </startEvent>
+    <userTask id="T1" name="T1: 修改" activiti:assignee="${initiator}">
+      <extensionElements>
+        <activiti:formProperty id="coreaction_操作_1_enum_rbv_$$1" name="操作" type="enum" variable="coreaction_t01" required="true">
+          <activiti:value id="更新" name="更新"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="material_物料id_1_string_tree_$$VA" name="物料id" type="string" variable="matid" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_item" name="供应商物料明细" type="string" variable="tbhddetail_item" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_供应商id_vndid_1_string_tree_$$A" name="供应商id" type="string" variable="tbhddetail_vndid_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_供应状态_status_2_enum_sbs_$$A" name="供应状态" type="enum" variable="tbhddetail_status_t00">
+          <activiti:value id="供货中" name="供货中"></activiti:value>
+          <activiti:value id="停供" name="停供"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_采购提前期_lt_3_string_t1_$$A" name="采购提前期" type="string" variable="tbhddetail_lt_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_最小采购量_moq_4_string_t6_$$A" name="最小采购量" type="string" variable="tbhddetail_moq_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_优先级_priority_5_string_t1_$$A" name="优先级" type="string" variable="tbhddetail_priority_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_质量等级_ql_6_string_t1_$$A" name="质量等级" type="string" variable="tbhddetail_ql_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhddetail_有效期至_valdateto_7_string_t3_$$A" name="有效期至" type="string" variable="tbhddetail_valdateto_t00"></activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway"></exclusiveGateway>
+    <sequenceFlow id="SQ2" name="更新" sourceRef="exclusivegateway1" targetRef="T1">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${coreaction_t01 == '更新'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow1" sourceRef="s1" targetRef="T1"></sequenceFlow>
+    <endEvent id="e1" name="e1"></endEvent>
+    <sequenceFlow id="SQ1" name="结束" sourceRef="exclusivegateway1" targetRef="e1">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${coreaction_t01 == '结束'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow2" sourceRef="T1" targetRef="exclusivegateway1"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_SRM_MATERIAL_INSERT">
+    <bpmndi:BPMNPlane bpmnElement="SRM_MATERIAL_INSERT" id="BPMNPlane_SRM_MATERIAL_INSERT">
+      <bpmndi:BPMNShape bpmnElement="s1" id="BPMNShape_s1">
+        <omgdc:Bounds height="35.0" width="35.0" x="80.0" y="170.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="T1" id="BPMNShape_T1">
+        <omgdc:Bounds height="55.0" width="105.0" x="160.0" y="160.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway1" id="BPMNShape_exclusivegateway1">
+        <omgdc:Bounds height="40.0" width="40.0" x="310.0" y="167.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="e1" id="BPMNShape_e1">
+        <omgdc:Bounds height="35.0" width="35.0" x="600.0" y="171.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="SQ2" id="BPMNEdge_SQ2">
+        <omgdi:waypoint x="330.0" y="207.0"></omgdi:waypoint>
+        <omgdi:waypoint x="329.0" y="327.0"></omgdi:waypoint>
+        <omgdi:waypoint x="212.0" y="327.0"></omgdi:waypoint>
+        <omgdi:waypoint x="212.0" y="215.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="14.0" width="24.0" x="331.0" y="269.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="115.0" y="187.0"></omgdi:waypoint>
+        <omgdi:waypoint x="160.0" y="187.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="SQ1" id="BPMNEdge_SQ1">
+        <omgdi:waypoint x="350.0" y="187.0"></omgdi:waypoint>
+        <omgdi:waypoint x="600.0" y="188.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="14.0" width="100.0" x="450.0" y="194.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="265.0" y="187.0"></omgdi:waypoint>
+        <omgdi:waypoint x="310.0" y="187.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

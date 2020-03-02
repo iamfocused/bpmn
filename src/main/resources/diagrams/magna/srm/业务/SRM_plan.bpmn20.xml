@@ -1,0 +1,336 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/pla">
+  <message id="zeroMsg" name="zeroMsg"></message>
+  <process id="SRM_PLAN" name="SRM采购计划" isExecutable="true" activiti:candidateStarterGroups="PUMGR,admin">
+    <startEvent id="startevent1" name="Start" activiti:initiator="initiator">
+    	<extensionElements>
+    		<activiti:formProperty id="planfrom_计划开始_1_string_t3_$$A" name="计划开始时间" type="string" variable="planFrom" required="true"/>
+    		<activiti:formProperty id="planto_计划结束_2_string_t3_$$A" name="计划结束时间" type="string" variable="planTo" required="true"/>
+    		<activiti:formProperty id="planNote_计划备注_3_string_t2_$$A" name="计划备注" type="string" variable="planNote"/>
+    		
+    		<activiti:formProperty id="tbhddetail_item" name="采购计划明细 Detail" type="string" variable="tbhddetail_item" required="true"/>
+    		<activiti:formProperty id="tbhddetail_计划主题_subject_1_string_t1_$$HA" name="计划主题" variable="tbhddetail_subject_t00"/>
+    		<activiti:formProperty id="tbhddetail_供应商id_vndid_2_string_t1_$$HA" name="供应商id" variable="tbhddetail_vndid_t00"/>
+    		<activiti:formProperty id="tbhddetail_物料信息_matinfo_3_string_tree_$$A" name="物料信息" type="string" variable="tbhddetail_matinfo_t00" required="true"/>
+    		<activiti:formProperty id="tbhddetail_计划数量_planqty_4_string_t11_$$A" name="计划数量" type="string" variable="tbhddetail_planqty_t00" required="true"/>
+    		<activiti:formProperty id="tbhddetail_剩余数量_remainqty_5_string_t11_$$HA" name="剩余数量" type="string" variable="tbhddetail_remainqty_t00"/>
+    		<activiti:formProperty id="tbhddetail_单价_prcprice_6_string_t11_$$HA" name="单价" type="string" variable="tbhddetail_prcprice_t00"/>
+    		<activiti:formProperty id="tbhddetail_订货日期_orderdate_7_string_t3_$$HA" name="订货日期" type="string" variable="tbhddetail_orderdate_t00"/>
+    		<activiti:formProperty id="tbhddetail_订货数量_orderqty_8_string_t11_$$HA" name="订货数量" type="string" variable="tbhddetail_orderqty_t00"/>
+    		<activiti:formProperty id="tbhddetail_系统批次_sysBatch_9_string_t1_$$HA" name="系统批次" type="string" variable="tbhddetail_sysBatch_t00"/>
+    		<activiti:formProperty id="tbhddetail_手工批次_batch_10_string_t1_$$HA" name="手工批次" type="string" variable="tbhddetail_batch_t00"/>
+    		<activiti:formProperty id="tbhddetail_实际送货数量_deliveryqty_11_string_t11_$$HA" name="实际送货数量" type="string" variable="tbhddetail_deliveryqty_t00"/>
+    		<activiti:formProperty id="tbhddetail_送货日期_deliverydate_12_string_t3_$$HA" name="送货日期" type="string" variable="tbhddetail_deliverydate_t00"/>
+    		<activiti:formProperty id="tbhddetail_车次_trainnumber_13_enum_sbs_$$HA" name="车次" type="enum" variable="tbhddetail_trainnumber_t00">
+				<activiti:value id="车次1" name="车次1"/>
+				<activiti:value id="车次2" name="车次2"/>
+				<activiti:value id="车次3" name="车次3"/>
+				<activiti:value id="车次4" name="车次4"/> 	
+      		</activiti:formProperty>
+    		<activiti:formProperty id="tbhddetail_到货日期_arrivaldate_14_string_t3_$$HA" name="到货日期" type="string" variable="tbhddetail_arrivaldate_t00"/>
+    		<activiti:formProperty id="tbhddetail_合格数_accnumber_15_string_t11_$$HA" name="合格数" type="string" variable="tbhddetail_accnumber_t00"/>
+    		<activiti:formProperty id="tbhddetail_不合格数_defnumber_16_string_t11_$$HA" name="不合格数" type="string" variable="tbhddetail_defnumber_t00"/>
+    		<activiti:formProperty id="tbhddetail_不合格总金额_defAmount_17_string_t11_$$HA" name="不合格总金额" type="string" variable="tbhddetail_defAmount_t00"/>
+    		<activiti:formProperty id="tbhddetail_实际总金额_amount_18_string_t11_$$HA" name="实际总金额" type="string" variable="tbhddetail_amount_t00"/>
+    		
+    	</extensionElements>
+    </startEvent>
+    <scriptTask id="scripttask1" name="处理脚本通知供应商" activiti:autoStoreVariables="false" scriptFormat="groovy">
+    	<script>
+    	<![CDATA[import java.text.DateFormat
+			import java.text.SimpleDateFormat
+			import groovy.json.JsonSlurper
+			import groovy.json.JsonOutput
+			import com.eorionsolution.bpms.extension.rest.RestAPI
+			
+			def jsonSlurper = new JsonSlurper()
+			
+			//填充一些明细
+			def item = jsonSlurper.parseText(tbhddetail_item)
+			def std = jsonSlurper.parseText(tbhddetail_item_std)
+			def procInstId = execution.getProcessInstanceId()
+			execution.setVariable('procInstId', procInstId)
+			def busKey = execution.getBusinessKey()
+			execution.setVariable('busKey',busKey)
+			def subject = busKey + '/' + procInstId
+			
+			item.each {
+				if (it.key == 'rows') {
+					it.value.each {
+						it[0] = subject
+						it[1] = it[2].code
+						def name = it[2].name
+						it[4] = it[3]
+						it[5] = name[name.lastIndexOf("￥")+1..-1]
+					}
+				}
+			}
+			std.each {
+				it.subject = subject
+				it.vndid = it.matinfo.code
+				def name = it.matinfo.name
+				it.prcprice = name[name.lastIndexOf("￥")+1..-1]
+				it.remainqty = it.planqty
+			}
+			execution.setVariable('tbhddetail_item_std', JsonOutput.toJson(std))
+			execution.setVariable('tbhddetail_item', JsonOutput.toJson(item))
+			
+			//计划结束时间事件
+    		DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss")
+    		execution.setVariable('endTime', df.format(new Date(planTo.toLong())))
+    		
+    		//通知供应商
+    		def restParam = new HashMap<String,Object>()
+    		def headerMap = new HashMap<String,String>()
+    		
+    		def bodyMap = new HashMap()
+			bodyMap.put('touser', 'baocaixue@eorionsolution.com')
+			bodyMap.put('agentid',1000005)
+			bodyMap.put('title', 'magna采购计划通知')
+			bodyMap.put('description', '供应商提醒：magna有新的采购计划，请尽快于BPMS确认')
+			bodyMap.put('url','https://bpms.eorionsolution.com/bpmssrm/task.html?processInstanceId=' + procInstId)
+			def body = JsonOutput.toJson(bodyMap)
+    		
+    		headerMap.put("Content-Type","application/json")			
+			restParam.put("_http_method","POST")
+			restParam.put("_http_headers",headerMap)
+			restParam.put("_http_url", 'https://bpms.eorionsolution.com/wso2esb/wechat/message/send');
+			restParam.put("_http_body", body)
+    		def result = RestAPI.execute(restParam)
+    		
+    		if (!result._http_response_status_code || !result._http_response_status_code.toString().startsWith("2")) {
+    			throw new org.activiti.engine.ActivitiIllegalArgumentException('微信通知失败，请联系管理员')
+    		}
+    	]]>
+    	</script>
+    </scriptTask>
+    <userTask id="usertask1" name="供应商能否满足需求" activiti:assignee="${initiator}" activiti:dueDate="P1D" activiti:priority="8080">
+    	<extensionElements>
+    		<activiti:formProperty id="isok_能否满足计划需求_1_enum_rbv_$$A" name="供应商能否满足计划需求" required="true" type="enum" variable="isok">
+   				<activiti:value id="Y" name="可以满足需求"></activiti:value>
+   				<activiti:value id="N" name="不能满足需求"></activiti:value>
+    		</activiti:formProperty>
+    		<activiti:formProperty id="vendorNote_备注_2_string_t2_$$A" name="备注说明" type="string" variable="vendorNote"/>
+    		
+    		<activiti:formProperty id="planfrom_计划开始_1_string_t3_$$VA" name="计划开始时间" type="string" variable="planFrom" required="true"/>
+    		<activiti:formProperty id="planto_计划结束_2_string_t3_$$VA" name="计划结束时间" type="string" variable="planTo" required="true"/>
+    		<activiti:formProperty id="planNote_计划备注_3_string_t2_$$VA" name="计划备注" type="string" variable="planNote"/>
+    		
+    		<activiti:formProperty id="tbhddetail_item_$$VA" name="采购计划明细 Detail" type="string" variable="tbhddetail_item" required="true"/>
+    		<activiti:formProperty id="tbhddetail_计划主题_subject_1_string_t1_$$A" name="计划主题" variable="tbhddetail_subject_t00"/>
+    		<activiti:formProperty id="tbhddetail_供应商id_vndid_2_string_t1_$$A" name="供应商id" variable="tbhddetail_vndid_t00"/>
+    		<activiti:formProperty id="tbhddetail_物料信息_matinfo_3_string_tree_$$A" name="物料信息" type="string" variable="tbhddetail_matinfo_t00" required="true"/>
+    		<activiti:formProperty id="tbhddetail_计划数量_planqty_4_string_t11_$$A" name="计划数量" type="string" variable="tbhddetail_planqty_t00" required="true"/>
+    		<activiti:formProperty id="tbhddetail_剩余数量_remainqty_5_string_t11_$$HA" name="剩余数量" type="string" variable="tbhddetail_remainqty_t00"/>
+    		<activiti:formProperty id="tbhddetail_单价_prcprice_6_string_t11_$$A" name="单价" type="string" variable="tbhddetail_prcprice_t00"/>
+    		<activiti:formProperty id="tbhddetail_订货日期_orderdate_7_string_t3_$$HA" name="订货日期" type="string" variable="tbhddetail_orderdate_t00"/>
+    		<activiti:formProperty id="tbhddetail_订货数量_orderqty_8_string_t11_$$HA" name="订货数量" type="string" variable="tbhddetail_orderqty_t00"/>
+    		<activiti:formProperty id="tbhddetail_系统批次_sysBatch_9_string_t1_$$HA" name="系统批次" type="string" variable="tbhddetail_sysBatch_t00"/>
+    		<activiti:formProperty id="tbhddetail_手工批次_batch_10_string_t1_$$HA" name="手工批次" type="string" variable="tbhddetail_batch_t00"/>
+    		<activiti:formProperty id="tbhddetail_实际送货数量_deliveryqty_11_string_t11_$$HA" name="实际送货数量" type="string" variable="tbhddetail_deliveryqty_t00"/>
+    		<activiti:formProperty id="tbhddetail_送货日期_deliverydate_12_string_t3_$$HA" name="送货日期" type="string" variable="tbhddetail_deliverydate_t00"/>
+    		<activiti:formProperty id="tbhddetail_车次_trainnumber_13_enum_sbs_$$HA" name="车次" type="enum" variable="tbhddetail_trainnumber_t00">
+				<activiti:value id="车次1" name="车次1"/>
+				<activiti:value id="车次2" name="车次2"/>
+				<activiti:value id="车次3" name="车次3"/>
+				<activiti:value id="车次4" name="车次4"/> 	
+      		</activiti:formProperty>
+    		<activiti:formProperty id="tbhddetail_到货日期_arrivaldate_14_string_t3_$$HA" name="到货日期" type="string" variable="tbhddetail_arrivaldate_t00"/>
+    		<activiti:formProperty id="tbhddetail_合格数_accnumber_15_string_t11_$$HA" name="合格数" type="string" variable="tbhddetail_accnumber_t00"/>
+    		<activiti:formProperty id="tbhddetail_不合格数_defnumber_16_string_t11_$$HA" name="不合格数" type="string" variable="tbhddetail_defnumber_t00"/>
+    		<activiti:formProperty id="tbhddetail_不合格总金额_defAmount_17_string_t11_$$HA" name="不合格总金额" type="string" variable="tbhddetail_defAmount_t00"/>
+    		<activiti:formProperty id="tbhddetail_实际总金额_amount_18_string_t11_$$HA" name="实际总金额" type="string" variable="tbhddetail_amount_t00"/>
+      		
+      		<activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+      			<activiti:field name="language">
+      				<activiti:string>
+      					<![CDATA[groovy]]>
+      				</activiti:string>
+      			</activiti:field>
+      			<activiti:field name="script">
+      				<activiti:string>
+      					<![CDATA[import com.eorionsolution.bpms.extension.rest.RestAPI
+      						import groovy.json.JsonOutput
+      						
+      						def execution = task.getExecution()
+							if (isok == 'N') {
+								//通知magna
+								def restParam = new HashMap<String,Object>()
+								def headerMap = new HashMap<String,String>()
+								def bodyMap = new HashMap()
+								bodyMap.put('touser', 'baocaixue@eorionsolution.com')
+								bodyMap.put('agentid',1000005)
+								bodyMap.put('title', '采购计划-' + busKey + '，供应商不能满足需求')
+								bodyMap.put('description', '请尽快于BPMS修改采购计划')
+								bodyMap.put('url','https://bpms.eorionsolution.com/bpmssrm/task.html?processInstanceId=' + procInstId)
+								def body = JsonOutput.toJson(bodyMap)
+								
+								headerMap.put("Content-Type","application/json")			
+								restParam.put("_http_method","POST")
+								restParam.put("_http_headers",headerMap)
+								restParam.put("_http_url", 'https://bpms.eorionsolution.com/wso2esb/wechat/message/send');
+								restParam.put("_http_body", body)
+					    		def result = RestAPI.execute(restParam)
+					    		
+					    		if (!result._http_response_status_code || !result._http_response_status_code.toString().startsWith("2")) {
+					    			throw new org.activiti.engine.ActivitiIllegalArgumentException('微信通知失败，请联系管理员')
+					    		}
+							}      						
+      					]]>
+      				</activiti:string>
+      			</activiti:field>
+      		</activiti:taskListener>
+    	</extensionElements>
+    </userTask>
+    <userTask id="usertask2" name="manga修改计划-供应商不能满足需求" activiti:assignee="${initiator}" activiti:dueDate="P1D" activiti:priority="8080">
+    	<extensionElements>
+    		<activiti:formProperty id="planfrom_计划开始_1_string_t3_$$A" name="计划开始时间" type="string" variable="planFrom" required="true"/>
+    		<activiti:formProperty id="planto_计划结束_2_string_t3_$$A" name="计划结束时间" type="string" variable="planTo" required="true"/>
+    		<activiti:formProperty id="planNote_计划备注_3_string_t2_$$A" name="计划备注" type="string" variable="planNote"/>
+    		
+    		<activiti:formProperty id="tbhddetail_item" name="采购计划明细 Detail" type="string" variable="tbhddetail_item" required="true"/>
+    		<activiti:formProperty id="tbhddetail_计划主题_subject_1_string_t1_$$HA" name="计划主题" variable="tbhddetail_subject_t00"/>
+    		<activiti:formProperty id="tbhddetail_供应商id_vndid_2_string_t1_$$HA" name="供应商id" variable="tbhddetail_vndid_t00"/>
+    		<activiti:formProperty id="tbhddetail_物料信息_matinfo_3_string_tree_$$A" name="物料信息" type="string" variable="tbhddetail_matinfo_t00" required="true"/>
+    		<activiti:formProperty id="tbhddetail_计划数量_planqty_4_string_t11_$$A" name="计划数量" type="string" variable="tbhddetail_planqty_t00" required="true"/>
+    		<activiti:formProperty id="tbhddetail_剩余数量_remainqty_5_string_t11_$$HA" name="剩余数量" type="string" variable="tbhddetail_remainqty_t00"/>
+    		<activiti:formProperty id="tbhddetail_单价_prcprice_6_string_t11_$$HA" name="单价" type="string" variable="tbhddetail_prcprice_t00"/>
+    		<activiti:formProperty id="tbhddetail_订货日期_orderdate_7_string_t3_$$HA" name="订货日期" type="string" variable="tbhddetail_orderdate_t00"/>
+    		<activiti:formProperty id="tbhddetail_订货数量_orderqty_8_string_t11_$$HA" name="订货数量" type="string" variable="tbhddetail_orderqty_t00"/>
+    		<activiti:formProperty id="tbhddetail_系统批次_sysBatch_9_string_t1_$$HA" name="系统批次" type="string" variable="tbhddetail_sysBatch_t00"/>
+    		<activiti:formProperty id="tbhddetail_手工批次_batch_10_string_t1_$$HA" name="手工批次" type="string" variable="tbhddetail_batch_t00"/>
+    		<activiti:formProperty id="tbhddetail_实际送货数量_deliveryqty_11_string_t11_$$HA" name="实际送货数量" type="string" variable="tbhddetail_deliveryqty_t00"/>
+    		<activiti:formProperty id="tbhddetail_送货日期_deliverydate_12_string_t3_$$HA" name="送货日期" type="string" variable="tbhddetail_deliverydate_t00"/>
+    		<activiti:formProperty id="tbhddetail_车次_trainnumber_13_enum_sbs_$$HA" name="车次" type="enum" variable="tbhddetail_trainnumber_t00">
+				<activiti:value id="车次1" name="车次1"/>
+				<activiti:value id="车次2" name="车次2"/>
+				<activiti:value id="车次3" name="车次3"/>
+				<activiti:value id="车次4" name="车次4"/> 	
+      		</activiti:formProperty>
+    		<activiti:formProperty id="tbhddetail_到货日期_arrivaldate_14_string_t3_$$HA" name="到货日期" type="string" variable="tbhddetail_arrivaldate_t00"/>
+    		<activiti:formProperty id="tbhddetail_合格数_accnumber_15_string_t11_$$HA" name="合格数" type="string" variable="tbhddetail_accnumber_t00"/>
+    		<activiti:formProperty id="tbhddetail_不合格数_defnumber_16_string_t11_$$HA" name="不合格数" type="string" variable="tbhddetail_defnumber_t00"/>
+    		<activiti:formProperty id="tbhddetail_不合格总金额_defAmount_17_string_t11_$$HA" name="不合格总金额" type="string" variable="tbhddetail_defAmount_t00"/>
+    		<activiti:formProperty id="tbhddetail_实际总金额_amount_18_string_t11_$$HA" name="实际总金额" type="string" variable="tbhddetail_amount_t00"/>
+      		
+      		<activiti:formProperty id="isok_能否满足计划需求_1_enum_rbv_$$VA" name="供应商能否满足计划需求" required="true" type="enum" variable="isok">
+   				<activiti:value id="Y" name="可以满足需求"></activiti:value>
+   				<activiti:value id="N" name="不能满足需求"></activiti:value>
+    		</activiti:formProperty>
+    		<activiti:formProperty id="vendorNote_备注_2_string_t2_$$VA" name="备注说明" type="string" variable="vendorNote"/>
+    	</extensionElements>
+    </userTask>
+    <exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway"></exclusiveGateway>
+    <intermediateCatchEvent id="messageintermediatecatchevent1" name="剩余数量为0消息">
+      <messageEventDefinition messageRef="zeroMsg"></messageEventDefinition>
+    </intermediateCatchEvent>
+    <intermediateCatchEvent id="timerintermediatecatchevent1" name="计划时间到期">
+      <timerEventDefinition>
+      	<timeDate>${endTime}</timeDate>
+      </timerEventDefinition>
+    </intermediateCatchEvent>
+    <parallelGateway id="parallelgateway1" name="Parallel Gateway"></parallelGateway>
+    <endEvent id="TE1" name="TE1">
+      <terminateEventDefinition></terminateEventDefinition>
+    </endEvent>
+    <endEvent id="TE2" name="TE2">
+      <terminateEventDefinition></terminateEventDefinition>
+    </endEvent>
+    <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="scripttask1"></sequenceFlow>
+    <sequenceFlow id="flow2" sourceRef="scripttask1" targetRef="usertask1"></sequenceFlow>
+    <sequenceFlow id="flow3" sourceRef="usertask1" targetRef="exclusivegateway1"></sequenceFlow>
+    <sequenceFlow id="flow4" name="不能满足需求" sourceRef="exclusivegateway1" targetRef="usertask2">
+    	<conditionExpression><![CDATA[${isok == 'N'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow5" sourceRef="usertask2" targetRef="scripttask1"></sequenceFlow>
+    <sequenceFlow id="flow6" name="可以满足需求量" sourceRef="exclusivegateway1" targetRef="parallelgateway1">
+    	<conditionExpression><![CDATA[${isok == 'Y'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow7" sourceRef="parallelgateway1" targetRef="messageintermediatecatchevent1"></sequenceFlow>
+    <sequenceFlow id="flow8" sourceRef="messageintermediatecatchevent1" targetRef="TE1"></sequenceFlow>
+    <sequenceFlow id="flow9" sourceRef="parallelgateway1" targetRef="timerintermediatecatchevent1"></sequenceFlow>
+    <sequenceFlow id="flow10" sourceRef="timerintermediatecatchevent1" targetRef="TE2"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_SRM_PLAN">
+    <bpmndi:BPMNPlane bpmnElement="SRM_PLAN" id="BPMNPlane_SRM_PLAN">
+      <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="80.0" y="223.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scripttask1" id="BPMNShape_scripttask1">
+        <omgdc:Bounds height="61.0" width="111.0" x="190.0" y="210.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask1" id="BPMNShape_usertask1">
+        <omgdc:Bounds height="61.0" width="111.0" x="370.0" y="210.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask2" id="BPMNShape_usertask2">
+        <omgdc:Bounds height="61.0" width="111.0" x="190.0" y="340.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway1" id="BPMNShape_exclusivegateway1">
+        <omgdc:Bounds height="40.0" width="40.0" x="405.0" y="350.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="messageintermediatecatchevent1" id="BPMNShape_messageintermediatecatchevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="660.0" y="290.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="timerintermediatecatchevent1" id="BPMNShape_timerintermediatecatchevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="660.0" y="410.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="parallelgateway1" id="BPMNShape_parallelgateway1">
+        <omgdc:Bounds height="40.0" width="40.0" x="550.0" y="350.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="TE1" id="BPMNShape_TE1">
+        <omgdc:Bounds height="35.0" width="35.0" x="730.0" y="290.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="TE2" id="BPMNShape_TE2">
+        <omgdc:Bounds height="35.0" width="35.0" x="730.0" y="410.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="115.0" y="240.0"></omgdi:waypoint>
+        <omgdi:waypoint x="190.0" y="240.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="301.0" y="240.0"></omgdi:waypoint>
+        <omgdi:waypoint x="370.0" y="240.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3">
+        <omgdi:waypoint x="425.0" y="271.0"></omgdi:waypoint>
+        <omgdi:waypoint x="425.0" y="350.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow4" id="BPMNEdge_flow4">
+        <omgdi:waypoint x="405.0" y="370.0"></omgdi:waypoint>
+        <omgdi:waypoint x="301.0" y="370.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="100.0" x="307.0" y="350.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow5" id="BPMNEdge_flow5">
+        <omgdi:waypoint x="245.0" y="340.0"></omgdi:waypoint>
+        <omgdi:waypoint x="245.0" y="271.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow6" id="BPMNEdge_flow6">
+        <omgdi:waypoint x="445.0" y="370.0"></omgdi:waypoint>
+        <omgdi:waypoint x="550.0" y="370.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="100.0" x="444.0" y="350.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow7" id="BPMNEdge_flow7">
+        <omgdi:waypoint x="570.0" y="350.0"></omgdi:waypoint>
+        <omgdi:waypoint x="570.0" y="307.0"></omgdi:waypoint>
+        <omgdi:waypoint x="660.0" y="307.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow8" id="BPMNEdge_flow8">
+        <omgdi:waypoint x="695.0" y="307.0"></omgdi:waypoint>
+        <omgdi:waypoint x="730.0" y="307.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow9" id="BPMNEdge_flow9">
+        <omgdi:waypoint x="570.0" y="390.0"></omgdi:waypoint>
+        <omgdi:waypoint x="570.0" y="426.0"></omgdi:waypoint>
+        <omgdi:waypoint x="660.0" y="427.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow10" id="BPMNEdge_flow10">
+        <omgdi:waypoint x="695.0" y="427.0"></omgdi:waypoint>
+        <omgdi:waypoint x="730.0" y="427.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

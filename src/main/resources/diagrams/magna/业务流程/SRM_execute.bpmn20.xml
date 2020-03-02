@@ -94,6 +94,7 @@
     					bodyMap.put('agentid',1000005)
     					bodyMap.put('title', '订货方已发起采购需求')
     					bodyMap.put('description', '供应商提醒')
+    					//https://bpms.eorionsolution.com/bpmsrm/task.html?processInstanceId=
     					bodyMap.put('url','https://suppliez.eorionsolution.com/task.html?processInstanceId=' + procInstId)
 						
 						def body = JsonOutput.toJson(bodyMap)
