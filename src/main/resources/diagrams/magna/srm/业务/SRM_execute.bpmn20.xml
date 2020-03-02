@@ -183,7 +183,7 @@
     			</activiti:field>
     			<activiti:field name="script">
     				<activiti:string>
-    					<![CDATA[import java.time.LocalDateTime
+    					<![CDATA[import java.time.LocalDate
 							import java.time.ZoneOffset
 							import java.time.temporal.TemporalAdjusters
 							import javax.crypto.Mac
@@ -192,15 +192,15 @@
 							
 							def execution = task.getExecution()
 							//车次运送量报表
-							def today = LocalDateTime.now()
-							def firstDay = LocalDateTime.of(today.getYear(), today.getMonthValue(), 1,0,0,0)
+							def today = LocalDate.now()
+							def firstDay = LocalDate.of(today.getYear(), today.getMonthValue(), 1)
 							def lastDay = today.with(TemporalAdjusters.lastDayOfMonth())
-							lastDay = lastDay.withHour(23)
-							lastDay = lastDay.withMinute(59)
-							lastDay = lastDay.withSecond(59)
+							//lastDay = lastDay.withHour(23)
+							//lastDay = lastDay.withMinute(59)
+							//lastDay = lastDay.withSecond(59)
 							
-							def from_ = firstDay.toInstant(ZoneOffset.of("+8")).toEpochMilli().toString()
-							def to_ = lastDay.toInstant(ZoneOffset.of("+8")).toEpochMilli().toString()
+							def from_ = firstDay.toString()
+							def to_ = lastDay.toString()
 							
 							def hmac_sha256(String secretKey, String data) {
 							    try {
@@ -326,7 +326,7 @@
     			</activiti:field>
     			<activiti:field name="script">
     				<activiti:string>
-    					<![CDATA[import java.time.LocalDateTime
+    					<![CDATA[import java.time.LocalDate
 							import java.time.ZoneOffset
 							import java.time.temporal.TemporalAdjusters
 							import javax.crypto.Mac
@@ -339,15 +339,15 @@
 							def jsonSlurper = new JsonSlurper()
 							
 							//车次运送量报表
-							def today = LocalDateTime.now()
-							def firstDay = LocalDateTime.of(today.getYear(), today.getMonthValue(), 1,0,0,0)
+							def today = LocalDate.now()
+							def firstDay = LocalDate.of(today.getYear(), today.getMonthValue(), 1)
 							def lastDay = today.with(TemporalAdjusters.lastDayOfMonth())
-							lastDay = lastDay.withHour(23)
-							lastDay = lastDay.withMinute(59)
-							lastDay = lastDay.withSecond(59)
+							//lastDay = lastDay.withHour(23)
+							//lastDay = lastDay.withMinute(59)
+							//lastDay = lastDay.withSecond(59)
 							
-							def from_ = firstDay.toInstant(ZoneOffset.of("+8")).toEpochMilli().toString()
-							def to_ = lastDay.toInstant(ZoneOffset.of("+8")).toEpochMilli().toString()
+							def from_ = firstDay.toString()
+							def to_ = lastDay.toString()
 							
 							def hmac_sha256(String secretKey, String data) {
 							    try {
