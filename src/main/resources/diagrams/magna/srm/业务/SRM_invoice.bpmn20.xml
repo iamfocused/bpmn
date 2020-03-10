@@ -2,19 +2,15 @@
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/inv">
   <process id="SRM_invoice" name="SRM采购开票流程" isExecutable="true" activiti:candidateStarterGroups="FININV,admin">
     <startEvent id="S1" name="S1" activiti:initiator="initiator">
-    	<extensionElements>
-    		<activiti:formProperty id="executeFrom_开始时间_1_string_t3_$$A" name="开始时间" type="string" variable="executeFrom" required="true"/>
-    		<activiti:formProperty id="executeTo_结束时间_2_string_t3_$$A" name="结束时间" type="string" variable="executeTo" required="true"/>
-    		
-    		<activiti:executionListener event="end" class="org.activiti.engine.impl.bpmn.listener.ScriptExecutionListener">
-    			<activiti:field name="language">
-    				<activiti:string>
-    					<![CDATA[groovy]]>
-    				</activiti:string>
-    			</activiti:field>
-    			<activiti:field name="script">
-    				<activiti:string>
-    					<![CDATA[import com.eorionsolution.bpms.extension.rest.RestAPI
+      <extensionElements>
+        <activiti:formProperty id="executeFrom_开始时间_1_string_t5_$$A" name="开始时间" type="string" variable="executeFrom" required="true"></activiti:formProperty>
+        <activiti:formProperty id="executeTo_结束时间_2_string_t5_$$A" name="结束时间" type="string" variable="executeTo" required="true"></activiti:formProperty>
+        <activiti:executionListener event="end" class="org.activiti.engine.impl.bpmn.listener.ScriptExecutionListener">
+          <activiti:field name="language">
+            <activiti:string><![CDATA[groovy]]></activiti:string>
+          </activiti:field>
+          <activiti:field name="script">
+            <activiti:string><![CDATA[import com.eorionsolution.bpms.extension.rest.RestAPI
     						import groovy.json.JsonSlurper
     						import groovy.json.JsonOutput
     						
@@ -81,28 +77,23 @@
 				    		}
 				    		
 				    		execution.setVariable('dListJSON', JsonOutput.toJson(dList))
-				    		execution.setVariable('dList', dList)
-    					]]>
-    				</activiti:string>
-    			</activiti:field>
-    		</activiti:executionListener>
-    	</extensionElements>
+				    		execution.setVariable('dList', dList)]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
     </startEvent>
     <subProcess id="subprocess1" name="供应商分组开票">
       <multiInstanceLoopCharacteristics isSequential="false" activiti:collection="dList" activiti:elementVariable="info">
-      	<completionCondition>${nrOfCompletedInstances/nrOfInstances == 1}</completionCondition>
+        <completionCondition>${nrOfCompletedInstances/nrOfInstances == 1}</completionCondition>
       </multiInstanceLoopCharacteristics>
       <startEvent id="startevent2" name="Start">
-      	<extensionElements>
-      		<activiti:executionListener event="end" class="org.activiti.engine.impl.bpmn.listener.ScriptExecutionListener">
-      			<activiti:field name="language">
-      				<activiti:string>
-      					<![CDATA[groovy]]>
-      				</activiti:string>
-      			</activiti:field>
-      			<activiti:field name="script">
-      				<activiti:string>
-      					<![CDATA[import groovy.json.JsonOutput
+        <extensionElements>
+          <activiti:executionListener event="end" class="org.activiti.engine.impl.bpmn.listener.ScriptExecutionListener">
+            <activiti:field name="language">
+              <activiti:string><![CDATA[groovy]]></activiti:string>
+            </activiti:field>
+            <activiti:field name="script">
+              <activiti:string><![CDATA[import groovy.json.JsonOutput
       						import groovy.json.JsonSlurper
       						def jsonSlurper = new JsonSlurper()
       						def items = info[0]
@@ -110,56 +101,51 @@
       						execution.setVariableLocal('tbhddetail_item', items)
       						execution.setVariableLocal('tbhddetail_item_std', stds)
       						execution.setVariableLocal('procInstId', execution.getProcessInstanceId())
-      					]]>
-      				</activiti:string>
-      			</activiti:field>
-      		</activiti:executionListener>
-      	</extensionElements>
+      						execution.setVariableLocal('tbhdclaim_item','')
+      						execution.setVariableLocal('tbhdclaim_item_std', JsonOutput.toJson([]))
+      						]]></activiti:string>
+            </activiti:field>
+          </activiti:executionListener>
+        </extensionElements>
       </startEvent>
       <userTask id="usertask1" name="magna修改开票明细" activiti:assignee="${initiator}" activiti:dueDate="P1D" activiti:priority="8080">
-      	<extensionElements>
-      		<activiti:formProperty id="claim_选择是否索赔_1_enum_sbs_$$A" name="选择是否索赔" type="enum" variable="claim">
-      			<activiti:value id="Y" name="索赔"/>
-      			<activiti:value id="N" name="不需索赔"/>
-      		</activiti:formProperty>
-      		<activiti:formProperty id="curAmountSum_当前实际总金额_1_string_t11_$$VA" name="当前实际总金额" type="string" variable="curAmountSum"/>
-      		<activiti:formProperty id="curDefAmountSum_当前不合格总金额_2_string_t11_$$VA" name="当前不合格总金额" type="string" variable="curDefAmountSum"/>
-      		
-    		<activiti:formProperty id="tbhddetail_item" name="采购计划明细 Detail" type="string" variable="tbhddetail_item"/>
-    		<activiti:formProperty id="tbhddetail_计划主题_subject_1_string_t1_$$VA" name="计划主题" variable="tbhddetail_subject_t00"/>
-    		<activiti:formProperty id="tbhddetail_供应商id_vndid_2_string_t1_$$VA" name="供应商id" variable="tbhddetail_vndid_t00"/>
-    		<activiti:formProperty id="tbhddetail_物料信息_matinfo_3_string_tree_$$VA" name="物料信息" type="string" variable="tbhddetail_matinfo_t00"/>
-    		<activiti:formProperty id="tbhddetail_计划数量_planqty_4_string_t11_$$VA" name="计划数量" type="string" variable="tbhddetail_planqty_t00"/>
-    		<activiti:formProperty id="tbhddetail_剩余数量_remainqty_5_string_t11_$$VA" name="剩余数量" type="string" variable="tbhddetail_remainqty_t00"/>
-    		<activiti:formProperty id="tbhddetail_单价_prcprice_6_string_t11_$$VA" name="单价" type="string" variable="tbhddetail_prcprice_t00"/>
-    		<activiti:formProperty id="tbhddetail_订货日期_orderdate_7_string_t3_$$VA" name="订货日期" type="string" variable="tbhddetail_orderdate_t00"/>
-    		<activiti:formProperty id="tbhddetail_订货数量_orderqty_8_string_t11_$$VA" name="订货数量" type="string" variable="tbhddetail_orderqty_t00"/>
-    		<activiti:formProperty id="tbhddetail_系统批次_sysBatch_9_string_t1_$$VA" name="系统批次" type="string" variable="tbhddetail_sysBatch_t00"/>
-    		<activiti:formProperty id="tbhddetail_手工批次_batch_10_string_t1_$$VA" name="手工批次" type="string" variable="tbhddetail_batch_t00"/>
-    		<activiti:formProperty id="tbhddetail_实际送货数量_deliveryqty_11_string_t11_$$VA" name="实际送货数量" type="string" variable="tbhddetail_deliveryqty_t00"/>
-    		<activiti:formProperty id="tbhddetail_送货日期_deliverydate_12_string_t3_$$VA" name="送货日期" type="string" variable="tbhddetail_deliverydate_t00"/>
-    		<activiti:formProperty id="tbhddetail_车次_trainnumber_13_enum_sbs_$$VA" name="车次" type="enum" variable="tbhddetail_trainnumber_t00">
-				<activiti:value id="车次1" name="车次1"/>
-				<activiti:value id="车次2" name="车次2"/>
-				<activiti:value id="车次3" name="车次3"/>
-				<activiti:value id="车次4" name="车次4"/> 	
-      		</activiti:formProperty>
-    		<activiti:formProperty id="tbhddetail_到货日期_arrivaldate_14_string_t3_$$VA" name="到货日期" type="string" variable="tbhddetail_arrivaldate_t00"/>
-    		<activiti:formProperty id="tbhddetail_合格数_accnumber_15_string_t11_$$VA" name="合格数" type="string" variable="tbhddetail_accnumber_t00"/>
-    		<activiti:formProperty id="tbhddetail_不合格数_defnumber_16_string_t11_$$VA" name="不合格数" type="string" variable="tbhddetail_defnumber_t00"/>
-    		<activiti:formProperty id="tbhddetail_不合格总金额_defAmount_17_string_t11_$$VA" name="不合格总金额" type="string" variable="tbhddetail_defAmount_t00"/>
-    		<activiti:formProperty id="tbhddetail_实际总金额_amount_18_string_t11_$$A" name="实际总金额" type="string" variable="tbhddetail_amount_t00"/>
-      		
-      		<activiti:taskListener event="create" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
-      			<activiti:field name="language">
-      				<activiti:string>
-      					<![CDATA[groovy]]>
-      				</activiti:string>
-      			</activiti:field>
-      			<activiti:field name="script">
-      				<activiti:string>
-      					<![CDATA[
-      						import groovy.json.JsonSlurper
+        <extensionElements>
+          <activiti:formProperty id="claim_选择是否索赔_1_enum_sbs_$$A" name="选择是否索赔" type="enum" variable="claim">
+            <activiti:value id="Y" name="索赔"></activiti:value>
+            <activiti:value id="N" name="不需索赔"></activiti:value>
+          </activiti:formProperty>
+          <activiti:formProperty id="curAmountSum_当前实际总金额_1_string_cny_$$VA" name="当前实际总金额" type="string" variable="curAmountSum"></activiti:formProperty>
+          <activiti:formProperty id="curDefAmountSum_当前不合格总金额_2_string_cny_$$VA" name="当前不合格总金额" type="string" variable="curDefAmountSum"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_item" name="采购计划明细 Detail" type="string" variable="tbhddetail_item"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_计划主题_subject_1_string_t1_$$VA" name="计划主题" variable="tbhddetail_subject_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_供应商id_vndid_2_string_t1_$$VA" name="供应商id" variable="tbhddetail_vndid_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_物料信息_matinfo_3_string_tree_$$VA" name="物料信息" type="string" variable="tbhddetail_matinfo_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_计划数量_planqty_4_string_t11_$$VA" name="计划数量" type="string" variable="tbhddetail_planqty_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_剩余数量_remainqty_5_string_t11_$$VA" name="剩余数量" type="string" variable="tbhddetail_remainqty_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_单价_prcprice_6_string_t11_$$VA" name="单价" type="string" variable="tbhddetail_prcprice_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_要求送货时间_orderdate_7_string_t5_$$VA" name="要求送货时间" type="string" variable="tbhddetail_orderdate_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_订货数量_orderqty_8_string_t11_$$VA" name="订货数量" type="string" variable="tbhddetail_orderqty_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_系统批次_sysBatch_9_string_t1_$$VA" name="系统批次" type="string" variable="tbhddetail_sysBatch_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_手工批次_batch_10_string_t1_$$VA" name="手工批次" type="string" variable="tbhddetail_batch_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_实际送货数量_deliveryqty_11_string_t11_$$VA" name="实际送货数量" type="string" variable="tbhddetail_deliveryqty_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_送货时间_deliverydate_12_string_t5_$$VA" name="送货时间" type="string" variable="tbhddetail_deliverydate_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_车次_trainnumber_13_enum_sbs_$$VA" name="车次" type="enum" variable="tbhddetail_trainnumber_t00">
+            <activiti:value id="车次1" name="车次1"></activiti:value>
+            <activiti:value id="车次2" name="车次2"></activiti:value>
+            <activiti:value id="车次3" name="车次3"></activiti:value>
+            <activiti:value id="车次4" name="车次4"></activiti:value>
+          </activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_到货时间_arrivaldate_14_string_t5_$$VA" name="到货时间" type="string" variable="tbhddetail_arrivaldate_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_合格数_accnumber_15_string_t11_$$VA" name="合格数" type="string" variable="tbhddetail_accnumber_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_不合格数_defnumber_16_string_t11_$$VA" name="不合格数" type="string" variable="tbhddetail_defnumber_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_不合格总金额_defAmount_17_string_t11_$$VA" name="不合格总金额" type="string" variable="tbhddetail_defAmount_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_实际总金额_amount_18_string_t11_$$A" name="实际总金额" type="string" variable="tbhddetail_amount_t00"></activiti:formProperty>
+          <activiti:taskListener event="create" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+            <activiti:field name="language">
+              <activiti:string><![CDATA[groovy]]></activiti:string>
+            </activiti:field>
+            <activiti:field name="script">
+              <activiti:string><![CDATA[import groovy.json.JsonSlurper
     						import groovy.json.JsonOutput
       						
       						def execution = task.getExecution()
@@ -170,20 +156,15 @@
       						execution.setVariableLocal('curDefAmountSum', curDefAmountSum.toString())
       						def curAmountSum = std.sum{it.amount.toDouble()}
       						execution.setVariableLocal('curAmountSum', curAmountSum.toString())
-      					]]>
-      				</activiti:string>
-      			</activiti:field>
-      		</activiti:taskListener>
-      		<activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
-      			<activiti:field name="language">
-      				<activiti:string>
-      					<![CDATA[groovy]]>
-      				</activiti:string>
-      			</activiti:field>
-      			<activiti:field name="script">
-      				<activiti:string>
-      					<![CDATA[
-      						import groovy.json.JsonSlurper
+      						execution.setVariableLocal('claim','')]]></activiti:string>
+            </activiti:field>
+          </activiti:taskListener>
+          <activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+            <activiti:field name="language">
+              <activiti:string><![CDATA[groovy]]></activiti:string>
+            </activiti:field>
+            <activiti:field name="script">
+              <activiti:string><![CDATA[import groovy.json.JsonSlurper
     						import groovy.json.JsonOutput
       						
       						def execution = task.getExecution()
@@ -197,55 +178,46 @@
       						
       						if(!claim || claim.trim() == '') {
       							throw new org.activiti.engine.ActivitiIllegalArgumentException('请选择是否对供应商进行索赔')
-      						}
-      					]]>
-      				</activiti:string>
-      			</activiti:field>
-      		</activiti:taskListener>
-    	</extensionElements>
+      						}]]></activiti:string>
+            </activiti:field>
+          </activiti:taskListener>
+        </extensionElements>
       </userTask>
-      <exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway"></exclusiveGateway>
       <userTask id="usertask2" name="供应商填写单据编号" activiti:assignee="${initiator}" activiti:dueDate="P1D" activiti:priority="8080">
-      	<extensionElements>
-      		<activiti:formProperty id="invoicenumber_发票编号_1_string_t1_$$A" name="发票编号" type="string" required="true" variable="invoicenumber"/>
-      		
-      		<activiti:formProperty id="curAmountSum_当前实际总金额_1_string_t11_$$VA" name="当前实际总金额" type="string" variable="curAmountSum"/>
-      		<activiti:formProperty id="curDefAmountSum_当前不合格总金额_2_string_t11_$$VA" name="当前不合格总金额" type="string" variable="curDefAmountSum"/>
-      		
-    		<activiti:formProperty id="tbhddetail_item_$$VA" name="采购计划明细 Detail" type="string" variable="tbhddetail_item"/>
-    		<activiti:formProperty id="tbhddetail_计划主题_subject_1_string_t1_$$VA" name="计划主题" variable="tbhddetail_subject_t00"/>
-    		<activiti:formProperty id="tbhddetail_供应商id_vndid_2_string_t1_$$VA" name="供应商id" variable="tbhddetail_vndid_t00"/>
-    		<activiti:formProperty id="tbhddetail_物料信息_matinfo_3_string_tree_$$VA" name="物料信息" type="string" variable="tbhddetail_matinfo_t00"/>
-    		<activiti:formProperty id="tbhddetail_计划数量_planqty_4_string_t11_$$VA" name="计划数量" type="string" variable="tbhddetail_planqty_t00"/>
-    		<activiti:formProperty id="tbhddetail_剩余数量_remainqty_5_string_t11_$$VA" name="剩余数量" type="string" variable="tbhddetail_remainqty_t00"/>
-    		<activiti:formProperty id="tbhddetail_单价_prcprice_6_string_t11_$$VA" name="单价" type="string" variable="tbhddetail_prcprice_t00"/>
-    		<activiti:formProperty id="tbhddetail_订货日期_orderdate_7_string_t3_$$A" name="订货日期" type="string" variable="tbhddetail_orderdate_t00"/>
-    		<activiti:formProperty id="tbhddetail_订货数量_orderqty_8_string_t11_$$A" name="订货数量" type="string" variable="tbhddetail_orderqty_t00"/>
-    		<activiti:formProperty id="tbhddetail_系统批次_sysBatch_9_string_t1_$$VA" name="系统批次" type="string" variable="tbhddetail_sysBatch_t00"/>
-    		<activiti:formProperty id="tbhddetail_手工批次_batch_10_string_t1_$$VA" name="手工批次" type="string" variable="tbhddetail_batch_t00"/>
-    		<activiti:formProperty id="tbhddetail_实际送货数量_deliveryqty_11_string_t11_$$VA" name="实际送货数量" type="string" variable="tbhddetail_deliveryqty_t00"/>
-    		<activiti:formProperty id="tbhddetail_送货日期_deliverydate_12_string_t3_$$VA" name="送货日期" type="string" variable="tbhddetail_deliverydate_t00"/>
-    		<activiti:formProperty id="tbhddetail_车次_trainnumber_13_enum_sbs_$$VA" name="车次" type="enum" variable="tbhddetail_trainnumber_t00">
-				<activiti:value id="车次1" name="车次1"/>
-				<activiti:value id="车次2" name="车次2"/>
-				<activiti:value id="车次3" name="车次3"/>
-				<activiti:value id="车次4" name="车次4"/> 	
-      		</activiti:formProperty>
-    		<activiti:formProperty id="tbhddetail_到货日期_arrivaldate_14_string_t3_$$VA" name="到货日期" type="string" variable="tbhddetail_arrivaldate_t00"/>
-    		<activiti:formProperty id="tbhddetail_合格数_accnumber_15_string_t11_$$VA" name="合格数" type="string" variable="tbhddetail_accnumber_t00"/>
-    		<activiti:formProperty id="tbhddetail_不合格数_defnumber_16_string_t11_$$VA" name="不合格数" type="string" variable="tbhddetail_defnumber_t00"/>
-    		<activiti:formProperty id="tbhddetail_不合格总金额_defAmount_17_string_t11_$$VA" name="不合格总金额" type="string" variable="tbhddetail_defAmount_t00"/>
-    		<activiti:formProperty id="tbhddetail_实际总金额_amount_18_string_t11_$$A" name="实际总金额" type="string" variable="tbhddetail_amount_t00"/>
-      		
-      		<activiti:taskListener event="create" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
-      			<activiti:field name="language">
-      				<activiti:string>
-      					<![CDATA[groovy]]>
-      				</activiti:string>
-      			</activiti:field>
-      			<activiti:field name="script">
-      				<activiti:string>
-      					<![CDATA[import com.eorionsolution.bpms.extension.rest.RestAPI
+        <extensionElements>
+          <activiti:formProperty id="invoicenumber_发票编号_1_string_t1_$$A" name="发票编号" type="string" variable="invoicenumber" required="true"></activiti:formProperty>
+          <activiti:formProperty id="curAmountSum_当前实际总金额_1_string_cny_$$VA" name="当前实际总金额" type="string" variable="curAmountSum"></activiti:formProperty>
+          <activiti:formProperty id="curDefAmountSum_当前不合格总金额_2_string_cny_$$VA" name="当前不合格总金额" type="string" variable="curDefAmountSum"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_item_$$VA" name="采购计划明细 Detail" type="string" variable="tbhddetail_item"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_计划主题_subject_1_string_t1_$$VA" name="计划主题" variable="tbhddetail_subject_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_供应商id_vndid_2_string_t1_$$VA" name="供应商id" variable="tbhddetail_vndid_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_物料信息_matinfo_3_string_tree_$$VA" name="物料信息" type="string" variable="tbhddetail_matinfo_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_计划数量_planqty_4_string_t11_$$VA" name="计划数量" type="string" variable="tbhddetail_planqty_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_剩余数量_remainqty_5_string_t11_$$VA" name="剩余数量" type="string" variable="tbhddetail_remainqty_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_单价_prcprice_6_string_t11_$$VA" name="单价" type="string" variable="tbhddetail_prcprice_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_要求送货时间_orderdate_7_string_t5_$$A" name="要求送货时间" type="string" variable="tbhddetail_orderdate_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_订货数量_orderqty_8_string_t11_$$A" name="订货数量" type="string" variable="tbhddetail_orderqty_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_系统批次_sysBatch_9_string_t1_$$VA" name="系统批次" type="string" variable="tbhddetail_sysBatch_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_手工批次_batch_10_string_t1_$$VA" name="手工批次" type="string" variable="tbhddetail_batch_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_实际送货数量_deliveryqty_11_string_t11_$$VA" name="实际送货数量" type="string" variable="tbhddetail_deliveryqty_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_送货时间_deliverydate_12_string_t5_$$VA" name="送货时间" type="string" variable="tbhddetail_deliverydate_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_车次_trainnumber_13_enum_sbs_$$VA" name="车次" type="enum" variable="tbhddetail_trainnumber_t00">
+            <activiti:value id="车次1" name="车次1"></activiti:value>
+            <activiti:value id="车次2" name="车次2"></activiti:value>
+            <activiti:value id="车次3" name="车次3"></activiti:value>
+            <activiti:value id="车次4" name="车次4"></activiti:value>
+          </activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_到货时间_arrivaldate_14_string_t5_$$VA" name="到货时间" type="string" variable="tbhddetail_arrivaldate_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_合格数_accnumber_15_string_t11_$$VA" name="合格数" type="string" variable="tbhddetail_accnumber_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_不合格数_defnumber_16_string_t11_$$VA" name="不合格数" type="string" variable="tbhddetail_defnumber_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_不合格总金额_defAmount_17_string_t11_$$VA" name="不合格总金额" type="string" variable="tbhddetail_defAmount_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_实际总金额_amount_18_string_t11_$$A" name="实际总金额" type="string" variable="tbhddetail_amount_t00"></activiti:formProperty>
+          <activiti:taskListener event="create" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+            <activiti:field name="language">
+              <activiti:string><![CDATA[groovy]]></activiti:string>
+            </activiti:field>
+            <activiti:field name="script">
+              <activiti:string><![CDATA[import com.eorionsolution.bpms.extension.rest.RestAPI
       						import groovy.json.JsonSlurper
     						import groovy.json.JsonOutput
       						
@@ -274,57 +246,49 @@
 				    		
 				    		if (!result._http_response_status_code || !result._http_response_status_code.toString().startsWith("2")) {
 				    			throw new org.activiti.engine.ActivitiIllegalArgumentException('微信通知供应商填写发票失败，请联系管理员')
-				    		}
-      					]]>
-      				</activiti:string>
-      			</activiti:field>
-      		</activiti:taskListener>
-    	</extensionElements>
+				    		}]]></activiti:string>
+            </activiti:field>
+          </activiti:taskListener>
+        </extensionElements>
       </userTask>
-      <userTask id="usertask3" name="财务" activiti:assignee="${initiator}" activiti:dueDate="P1D" activiti:priority="8080">
-      	<extensionElements>
-      		<activiti:formProperty id="commit_提交财务_1_enum_rbv_$$A" name="提交财务" type="enum" required="true" variable="commit">
-    			<activiti:value id="提交" name="提交"></activiti:value>
-    		</activiti:formProperty>
-    		
-      		<activiti:formProperty id="invoicenumber_发票编号_1_string_t1_$$VA" name="发票编号" type="string" required="true" variable="invoicenumber"/>
-      		<activiti:formProperty id="curAmountSum_当前实际总金额_2_string_t11_$$VA" name="当前实际总金额" type="string" variable="curAmountSum"/>
-      		<activiti:formProperty id="curDefAmountSum_当前不合格总金额_3_string_t11_$$VA" name="当前不合格总金额" type="string" variable="curDefAmountSum"/>
-      		
-    		<activiti:formProperty id="tbhddetail_item_$$VA" name="采购计划明细 Detail" type="string" variable="tbhddetail_item"/>
-    		<activiti:formProperty id="tbhddetail_计划主题_subject_1_string_t1_$$VA" name="计划主题" variable="tbhddetail_subject_t00"/>
-    		<activiti:formProperty id="tbhddetail_供应商id_vndid_2_string_t1_$$VA" name="供应商id" variable="tbhddetail_vndid_t00"/>
-    		<activiti:formProperty id="tbhddetail_物料信息_matinfo_3_string_tree_$$VA" name="物料信息" type="string" variable="tbhddetail_matinfo_t00"/>
-    		<activiti:formProperty id="tbhddetail_计划数量_planqty_4_string_t11_$$VA" name="计划数量" type="string" variable="tbhddetail_planqty_t00"/>
-    		<activiti:formProperty id="tbhddetail_剩余数量_remainqty_5_string_t11_$$VA" name="剩余数量" type="string" variable="tbhddetail_remainqty_t00"/>
-    		<activiti:formProperty id="tbhddetail_单价_prcprice_6_string_t11_$$VA" name="单价" type="string" variable="tbhddetail_prcprice_t00"/>
-    		<activiti:formProperty id="tbhddetail_订货日期_orderdate_7_string_t3_$$A" name="订货日期" type="string" variable="tbhddetail_orderdate_t00"/>
-    		<activiti:formProperty id="tbhddetail_订货数量_orderqty_8_string_t11_$$A" name="订货数量" type="string" variable="tbhddetail_orderqty_t00"/>
-    		<activiti:formProperty id="tbhddetail_系统批次_sysBatch_9_string_t1_$$VA" name="系统批次" type="string" variable="tbhddetail_sysBatch_t00"/>
-    		<activiti:formProperty id="tbhddetail_手工批次_batch_10_string_t1_$$VA" name="手工批次" type="string" variable="tbhddetail_batch_t00"/>
-    		<activiti:formProperty id="tbhddetail_实际送货数量_deliveryqty_11_string_t11_$$VA" name="实际送货数量" type="string" variable="tbhddetail_deliveryqty_t00"/>
-    		<activiti:formProperty id="tbhddetail_送货日期_deliverydate_12_string_t3_$$VA" name="送货日期" type="string" variable="tbhddetail_deliverydate_t00"/>
-    		<activiti:formProperty id="tbhddetail_车次_trainnumber_13_enum_sbs_$$VA" name="车次" type="enum" variable="tbhddetail_trainnumber_t00">
-				<activiti:value id="车次1" name="车次1"/>
-				<activiti:value id="车次2" name="车次2"/>
-				<activiti:value id="车次3" name="车次3"/>
-				<activiti:value id="车次4" name="车次4"/> 	
-      		</activiti:formProperty>
-    		<activiti:formProperty id="tbhddetail_到货日期_arrivaldate_14_string_t3_$$VA" name="到货日期" type="string" variable="tbhddetail_arrivaldate_t00"/>
-    		<activiti:formProperty id="tbhddetail_合格数_accnumber_15_string_t11_$$VA" name="合格数" type="string" variable="tbhddetail_accnumber_t00"/>
-    		<activiti:formProperty id="tbhddetail_不合格数_defnumber_16_string_t11_$$VA" name="不合格数" type="string" variable="tbhddetail_defnumber_t00"/>
-    		<activiti:formProperty id="tbhddetail_不合格总金额_defAmount_17_string_t11_$$VA" name="不合格总金额" type="string" variable="tbhddetail_defAmount_t00"/>
-    		<activiti:formProperty id="tbhddetail_实际总金额_amount_18_string_t11_$$A" name="实际总金额" type="string" variable="tbhddetail_amount_t00"/>
-      		
-      		<activiti:taskListener event="create" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
-      			<activiti:field name="language">
-      				<activiti:string>
-      					<![CDATA[groovy]]>
-      				</activiti:string>
-      			</activiti:field>
-      			<activiti:field name="script">
-      				<activiti:string>
-      					<![CDATA[import com.eorionsolution.bpms.extension.rest.RestAPI
+      <userTask id="usertask3" name="财务查看单据信息" activiti:assignee="${initiator}" activiti:dueDate="P1D" activiti:priority="8080">
+        <extensionElements>
+          <activiti:formProperty id="commit_提交财务_1_enum_rbv_$$A" name="提交财务" type="enum" variable="commit" required="true">
+            <activiti:value id="提交" name="提交"></activiti:value>
+          </activiti:formProperty>
+          <activiti:formProperty id="invoicenumber_发票编号_1_string_t1_$$VA" name="发票编号" type="string" variable="invoicenumber" required="true"></activiti:formProperty>
+          <activiti:formProperty id="curAmountSum_当前实际总金额_2_string_cny_$$VA" name="当前实际总金额" type="string" variable="curAmountSum"></activiti:formProperty>
+          <activiti:formProperty id="curDefAmountSum_当前不合格总金额_3_string_cny_$$VA" name="当前不合格总金额" type="string" variable="curDefAmountSum"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_item_$$VA" name="采购计划明细 Detail" type="string" variable="tbhddetail_item"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_计划主题_subject_1_string_t1_$$VA" name="计划主题" variable="tbhddetail_subject_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_供应商id_vndid_2_string_t1_$$VA" name="供应商id" variable="tbhddetail_vndid_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_物料信息_matinfo_3_string_tree_$$VA" name="物料信息" type="string" variable="tbhddetail_matinfo_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_计划数量_planqty_4_string_t11_$$VA" name="计划数量" type="string" variable="tbhddetail_planqty_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_剩余数量_remainqty_5_string_t11_$$VA" name="剩余数量" type="string" variable="tbhddetail_remainqty_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_单价_prcprice_6_string_t11_$$VA" name="单价" type="string" variable="tbhddetail_prcprice_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_要求送货时间_orderdate_7_string_t5_$$A" name="要求送货时间" type="string" variable="tbhddetail_orderdate_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_订货数量_orderqty_8_string_t11_$$A" name="订货数量" type="string" variable="tbhddetail_orderqty_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_系统批次_sysBatch_9_string_t1_$$VA" name="系统批次" type="string" variable="tbhddetail_sysBatch_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_手工批次_batch_10_string_t1_$$VA" name="手工批次" type="string" variable="tbhddetail_batch_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_实际送货数量_deliveryqty_11_string_t11_$$VA" name="实际送货数量" type="string" variable="tbhddetail_deliveryqty_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_送货时间_deliverydate_12_string_t5_$$VA" name="送货时间" type="string" variable="tbhddetail_deliverydate_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_车次_trainnumber_13_enum_sbs_$$VA" name="车次" type="enum" variable="tbhddetail_trainnumber_t00">
+            <activiti:value id="车次1" name="车次1"></activiti:value>
+            <activiti:value id="车次2" name="车次2"></activiti:value>
+            <activiti:value id="车次3" name="车次3"></activiti:value>
+            <activiti:value id="车次4" name="车次4"></activiti:value>
+          </activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_到货时间_arrivaldate_14_string_t5_$$VA" name="到货时间" type="string" variable="tbhddetail_arrivaldate_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_合格数_accnumber_15_string_t11_$$VA" name="合格数" type="string" variable="tbhddetail_accnumber_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_不合格数_defnumber_16_string_t11_$$VA" name="不合格数" type="string" variable="tbhddetail_defnumber_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_不合格总金额_defAmount_17_string_t11_$$VA" name="不合格总金额" type="string" variable="tbhddetail_defAmount_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_实际总金额_amount_18_string_t11_$$A" name="实际总金额" type="string" variable="tbhddetail_amount_t00"></activiti:formProperty>
+          <activiti:taskListener event="create" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+            <activiti:field name="language">
+              <activiti:string><![CDATA[groovy]]></activiti:string>
+            </activiti:field>
+            <activiti:field name="script">
+              <activiti:string><![CDATA[import com.eorionsolution.bpms.extension.rest.RestAPI
       						import groovy.json.JsonSlurper
     						import groovy.json.JsonOutput
     						import javax.crypto.Mac
@@ -380,139 +344,200 @@
 							def secret =Base64.getUrlEncoder().encodeToString(hmac_sha256(METABASE_SECRET_KEY , header+'.'+playload))
 							
 							def url = METABASE_SITE_URL + "/embed/question/" + header+'.'+playload+'.'+secret + "#bordered=true&titled=true"
-		   					execution.setVariableLocal('BBOT_BI_FIN_DOWN',url)
-      					]]>
-      				</activiti:string>
-      			</activiti:field>
-      		</activiti:taskListener>
-    	</extensionElements>
+		   					execution.setVariableLocal('BBOT_BI_FIN_DOWN',url)]]></activiti:string>
+            </activiti:field>
+          </activiti:taskListener>
+        </extensionElements>
       </userTask>
-      <userTask id="usertask4" name="magna填写索赔信息" activiti:assignee="${initiator}" activiti:dueDate="P1D" activiti:priority="8080">
-      	<extensionElements>
-      		<activiti:formProperty id="claimNote_备注_1_string_t2_$$A" name="备注" type="string" variable="claimNote"/>
-      		<activiti:formProperty id="claimAttachments_附件_2_string_t9i_$$A" name="附件" type="string" variable="claimAttachments"/>
-      		
-      		<activiti:formProperty id="claim_选择是否索赔_1_enum_sbs_$$VA" name="选择是否索赔" type="enum" variable="claim">
-      			<activiti:value id="Y" name="索赔"/>
-      			<activiti:value id="N" name="不需索赔"/>
-      		</activiti:formProperty>
-      		<activiti:formProperty id="curAmountSum_当前实际总金额_2_string_t11_$$VA" name="当前实际总金额" type="string" variable="curAmountSum"/>
-      		<activiti:formProperty id="curDefAmountSum_当前不合格总金额_3_string_t11_$$VA" name="当前不合格总金额" type="string" variable="curDefAmountSum"/>
-    		<activiti:formProperty id="tbhddetail_item_$$VA" name="采购计划明细 Detail" type="string" variable="tbhddetail_item"/>
-    		<activiti:formProperty id="tbhddetail_计划主题_subject_1_string_t1_$$VA" name="计划主题" variable="tbhddetail_subject_t00"/>
-    		<activiti:formProperty id="tbhddetail_供应商id_vndid_2_string_t1_$$VA" name="供应商id" variable="tbhddetail_vndid_t00"/>
-    		<activiti:formProperty id="tbhddetail_物料信息_matinfo_3_string_tree_$$VA" name="物料信息" type="string" variable="tbhddetail_matinfo_t00"/>
-    		<activiti:formProperty id="tbhddetail_计划数量_planqty_4_string_t11_$$VA" name="计划数量" type="string" variable="tbhddetail_planqty_t00"/>
-    		<activiti:formProperty id="tbhddetail_剩余数量_remainqty_5_string_t11_$$VA" name="剩余数量" type="string" variable="tbhddetail_remainqty_t00"/>
-    		<activiti:formProperty id="tbhddetail_单价_prcprice_6_string_t11_$$VA" name="单价" type="string" variable="tbhddetail_prcprice_t00"/>
-    		<activiti:formProperty id="tbhddetail_订货日期_orderdate_7_string_t3_$$A" name="订货日期" type="string" variable="tbhddetail_orderdate_t00"/>
-    		<activiti:formProperty id="tbhddetail_订货数量_orderqty_8_string_t11_$$A" name="订货数量" type="string" variable="tbhddetail_orderqty_t00"/>
-    		<activiti:formProperty id="tbhddetail_系统批次_sysBatch_9_string_t1_$$VA" name="系统批次" type="string" variable="tbhddetail_sysBatch_t00"/>
-    		<activiti:formProperty id="tbhddetail_手工批次_batch_10_string_t1_$$VA" name="手工批次" type="string" variable="tbhddetail_batch_t00"/>
-    		<activiti:formProperty id="tbhddetail_实际送货数量_deliveryqty_11_string_t11_$$VA" name="实际送货数量" type="string" variable="tbhddetail_deliveryqty_t00"/>
-    		<activiti:formProperty id="tbhddetail_送货日期_deliverydate_12_string_t3_$$VA" name="送货日期" type="string" variable="tbhddetail_deliverydate_t00"/>
-    		<activiti:formProperty id="tbhddetail_车次_trainnumber_13_enum_sbs_$$VA" name="车次" type="enum" variable="tbhddetail_trainnumber_t00">
-				<activiti:value id="车次1" name="车次1"/>
-				<activiti:value id="车次2" name="车次2"/>
-				<activiti:value id="车次3" name="车次3"/>
-				<activiti:value id="车次4" name="车次4"/> 	
-      		</activiti:formProperty>
-    		<activiti:formProperty id="tbhddetail_到货日期_arrivaldate_14_string_t3_$$VA" name="到货日期" type="string" variable="tbhddetail_arrivaldate_t00"/>
-    		<activiti:formProperty id="tbhddetail_合格数_accnumber_15_string_t11_$$VA" name="合格数" type="string" variable="tbhddetail_accnumber_t00"/>
-    		<activiti:formProperty id="tbhddetail_不合格数_defnumber_16_string_t11_$$VA" name="不合格数" type="string" variable="tbhddetail_defnumber_t00"/>
-    		<activiti:formProperty id="tbhddetail_不合格总金额_defAmount_17_string_t11_$$VA" name="不合格总金额" type="string" variable="tbhddetail_defAmount_t00"/>
-    		<activiti:formProperty id="tbhddetail_实际总金额_amount_18_string_t11_$$A" name="实际总金额" type="string" variable="tbhddetail_amount_t00"/>
-      		
-      		<activiti:taskListener event="create" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
-      			<activiti:field name="language">
-      				<activiti:string>
-      					<![CDATA[groovy]]>
-      				</activiti:string>
-      			</activiti:field>
-      			<activiti:field name="script">
-      				<activiti:string>
-      					<![CDATA[
-      						def execution = task.getExecution()
+      <userTask id="usertask4" name="质检人员填写索赔信息" activiti:assignee="${initiator}" activiti:dueDate="P1D" activiti:priority="8080">
+        <extensionElements>
+          <activiti:formProperty id="claimNote_备注_1_string_t2_$$A" name="备注" type="string" variable="claimNote"></activiti:formProperty>
+          <activiti:formProperty id="claimAttachments_附件_2_string_t9i_$$A" name="附件" type="string" variable="claimAttachments"></activiti:formProperty>
+          
+          <activiti:formProperty id="tbhdclaim_item" name="索赔明细表" type="string" variable="tbhdclaim_item" required="true"/>
+          <activiti:formProperty id="tbhdclaim_供应商_vndid_1_string_t1_$$A" name="供应商" type="string" variable="tbhdclaim_vndid_t01"/>
+          <activiti:formProperty id="tbhdclaim_物料_matinfo_2_string_t1_$$A" name="物料" type="string" variable="tbhdclaim_matinfo_t01"/>
+          <activiti:formProperty id="tbhdclaim_单价_prcprice_3_string_t11_$$A" name="单价" type="string" variable="tbhdclaim_prcprice_t01"/>
+          <activiti:formProperty id="tbhdclaim_要求送货时间_orderdate_4_string_t5_$$A" name="要求送货时间" type="string" variable="tbhdclaim_orderdate_t01"/>
+          <activiti:formProperty id="tbhdclaim_此次订货数量_orderqty_5_string_t11_$$A" name="此次订货数量" type="string" variable="tbhdclaim_orderqty_t01"/>
+          <activiti:formProperty id="tbhdclaim_系统批次_sysBatch_6_string_t1_$$A" name="系统批次" type="string" variable="tbhdclaim_sysBatch_t01"/>
+          <activiti:formProperty id="tbhdclaim_手工批次_batch_7_string_t1_$$A" name="手工批次" type="string" variable="tbhdclaim_batch_t01"/>
+          <activiti:formProperty id="tbhdclaim_实际送货数量_deliveryqty_8_string_t11_$$A" name="实际送货数量" type="string" variable="tbhdclaim_deliveryqty_t01"/>
+          <activiti:formProperty id="tbhdclaim_送货时间_deliverydate_9_string_t5_$$A" name="送货时间" type="string" variable="tbhdclaim_deliverydate_t01"/>
+          <activiti:formProperty id="tbhdclaim_车次_trainnumber_10_string_t1_$$A" name="车次" type="string" variable="tbhdclaim_trainnumber_t01"/>
+          <activiti:formProperty id="tbhdclaim_到货时间_arrivaldate_11_string_t5_$$A" name="到货时间" type="string" variable="tbhdclaim_arrivaldate_t01"/>
+          <activiti:formProperty id="tbhdclaim_合格数_accnumber_12_string_t11_$$A" name="合格数" type="string" variable="tbhdclaim_accnumber_t01"/>
+          <activiti:formProperty id="tbhdclaim_实际总金额_amount_13_string_t11_$$A" name="实际总金额" type="string" variable="tbhdclaim_amount_t01"/>
+          <activiti:formProperty id="tbhdclaim_不合格数_defnumber_14_string_t11_$$A" name="不合格数" type="string" variable="tbhdclaim_defnumber_t01"/>
+          <activiti:formProperty id="tbhdclaim_不合格总金额_defAmount_15_string_t11_$$A" name="不合格总金额" type="string" variable="tbhdclaim_defAmount_t01"/>
+          <activiti:formProperty id="tbhdclaim_人力损失_manloss_16_string_t11_$$A" name="人力损失" type="string" variable="tbhdclaim_manloss_t01"/>
+          <activiti:formProperty id="tbhdclaim_生产损失_proloss_17_string_t11_$$A" name="生产损失" type="string" variable="tbhdclaim_proloss_t01"/>
+          <activiti:formProperty id="tbhdclaim_合计索赔_totalClaim_18_string_t11_$$A" name="合计索赔" type="string" variable="tbhdclaim_totalClaim_t01"/>
+          
+          <activiti:formProperty id="claim_选择是否索赔_1_enum_sbs_$$VA" name="选择是否索赔" type="enum" variable="claim">
+            <activiti:value id="Y" name="索赔"></activiti:value>
+            <activiti:value id="N" name="不需索赔"></activiti:value>
+          </activiti:formProperty>
+          <activiti:formProperty id="curAmountSum_当前实际总金额_2_string_cny_$$VA" name="当前实际总金额" type="string" variable="curAmountSum"></activiti:formProperty>
+          <activiti:formProperty id="curDefAmountSum_当前不合格总金额_3_string_cny_$$VA" name="当前不合格总金额" type="string" variable="curDefAmountSum"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_item_$$VA" name="采购计划明细 Detail" type="string" variable="tbhddetail_item"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_计划主题_subject_1_string_t1_$$VA" name="计划主题" variable="tbhddetail_subject_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_供应商id_vndid_2_string_t1_$$VA" name="供应商id" variable="tbhddetail_vndid_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_物料信息_matinfo_3_string_tree_$$VA" name="物料信息" type="string" variable="tbhddetail_matinfo_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_计划数量_planqty_4_string_t11_$$VA" name="计划数量" type="string" variable="tbhddetail_planqty_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_剩余数量_remainqty_5_string_t11_$$VA" name="剩余数量" type="string" variable="tbhddetail_remainqty_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_单价_prcprice_6_string_t11_$$VA" name="单价" type="string" variable="tbhddetail_prcprice_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_要求送货时间_orderdate_7_string_t5_$$A" name="要求送货时间" type="string" variable="tbhddetail_orderdate_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_订货数量_orderqty_8_string_t11_$$A" name="订货数量" type="string" variable="tbhddetail_orderqty_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_系统批次_sysBatch_9_string_t1_$$VA" name="系统批次" type="string" variable="tbhddetail_sysBatch_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_手工批次_batch_10_string_t1_$$VA" name="手工批次" type="string" variable="tbhddetail_batch_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_实际送货数量_deliveryqty_11_string_t11_$$VA" name="实际送货数量" type="string" variable="tbhddetail_deliveryqty_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_送货时间_deliverydate_12_string_t5_$$VA" name="送货时间" type="string" variable="tbhddetail_deliverydate_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_车次_trainnumber_13_enum_sbs_$$VA" name="车次" type="enum" variable="tbhddetail_trainnumber_t00">
+            <activiti:value id="车次1" name="车次1"></activiti:value>
+            <activiti:value id="车次2" name="车次2"></activiti:value>
+            <activiti:value id="车次3" name="车次3"></activiti:value>
+            <activiti:value id="车次4" name="车次4"></activiti:value>
+          </activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_到货时间_arrivaldate_14_string_t5_$$VA" name="到货时间" type="string" variable="tbhddetail_arrivaldate_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_合格数_accnumber_15_string_t11_$$VA" name="合格数" type="string" variable="tbhddetail_accnumber_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_不合格数_defnumber_16_string_t11_$$VA" name="不合格数" type="string" variable="tbhddetail_defnumber_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_不合格总金额_defAmount_17_string_t11_$$VA" name="不合格总金额" type="string" variable="tbhddetail_defAmount_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_实际总金额_amount_18_string_t11_$$A" name="实际总金额" type="string" variable="tbhddetail_amount_t00"></activiti:formProperty>
+          <activiti:taskListener event="create" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+            <activiti:field name="language">
+              <activiti:string><![CDATA[groovy]]></activiti:string>
+            </activiti:field>
+            <activiti:field name="script">
+              <activiti:string><![CDATA[import javax.crypto.Mac
+							import javax.crypto.spec.SecretKeySpec
+							import java.security.InvalidKeyException
+							
+              				def execution = task.getExecution()
+              				execution.setVariableLocal('downloadClaimStd', tbhddetail_item_std)
       						execution.setVariableLocal('claimNote', '')
       						execution.setVariableLocal('claimAttachments', '')
       						
-      					]]>
-      				</activiti:string>
-      			</activiti:field>
-      		</activiti:taskListener>
-      		<activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
-      			<activiti:field name="language">
-      				<activiti:string>
-      					<![CDATA[groovy]]>
-      				</activiti:string>
-      			</activiti:field>
-      			<activiti:field name="script">
-      				<activiti:string>
-      					<![CDATA[
-      						def execution = task.getExecution()
+      						//BBOT下载明细
+				    		def hmac_sha256(String secretKey, String data) {
+							    try {
+							        Mac mac = Mac.getInstance("HmacSHA256")
+							        SecretKeySpec secretKeySpec = new SecretKeySpec(secretKey.getBytes(), "HmacSHA256")
+							        mac.init(secretKeySpec)
+							        byte[] digest = mac.doFinal(data.getBytes())
+							        return digest
+							    } catch (InvalidKeyException e) {
+							        throw new RuntimeException("Invalid key exception while converting to HMacSHA256")
+							    }
+							}
+							def execId = execution.getId()
+							def METABASE_SITE_URL = "https://metabase.eorionsolution.com"
+							def METABASE_SECRET_KEY = "8322aa8500b6ae07df7590b25d1bff56cb5e631dc829704c15cb66e80fed9f50"
+							def header = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9"
+							def playloadString = '{"resource":{"question":170},"params":{"procInstId":"'+ procInstId +'" , '+ '"execId":"'+ execId +'" }}'
+							def playload = Base64.getUrlEncoder().encodeToString(playloadString.bytes)
+							def secret =Base64.getUrlEncoder().encodeToString(hmac_sha256(METABASE_SECRET_KEY , header+'.'+playload))
+							
+							def url = METABASE_SITE_URL + "/embed/question/" + header+'.'+playload+'.'+secret + "#bordered=true&titled=true"
+		   					execution.setVariableLocal('BBOT_BI_CLAIM_DOWN',url)
+      						]]></activiti:string>
+            </activiti:field>
+          </activiti:taskListener>
+          <activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+            <activiti:field name="language">
+              <activiti:string><![CDATA[groovy]]></activiti:string>
+            </activiti:field>
+            <activiti:field name="script">
+              <activiti:string><![CDATA[import groovy.json.JsonSlurper
+              				def jsonSlurper = new JsonSlurper()
+              				def execution = task.getExecution()
+              				def std = jsonSlurper.parseText(tbhdclaim_item_std)
+              				def claimSum = 0
+              				std.each{
+              					if(it.totalClaim){
+              						claimSum = claimSum + it.totalClaim.toDouble()
+              					}
+              				}
+              				execution.setVariableLocal('claimSum', claimSum.toString())
+              				
       						execution.setVariableLocal('claimNote', claimNote)
       						execution.setVariableLocal('claimAttachments', claimAttachments)
-      						
-      					]]>
-      				</activiti:string>
-      			</activiti:field>
-      		</activiti:taskListener>
-    	</extensionElements>
+      						execution.setVariableLocal('BBOT_BI_CLAIM_DOWN','')
+      						]]></activiti:string>
+            </activiti:field>
+          </activiti:taskListener>
+        </extensionElements>
       </userTask>
       <userTask id="usertask5" name="供应商确认索赔" activiti:assignee="${initiator}" activiti:dueDate="P1D" activiti:priority="8080">
-      	<extensionElements>
-      		<activiti:formProperty id="invoicenumber_发票编号_1_string_t1_$$A" name="发票编号" type="string" required="true" variable="invoicenumber"/>
-      		
-      		<activiti:formProperty id="claimNote_备注_1_string_t2_$$VA" name="备注" type="string" variable="claimNote"/>
-      		<activiti:formProperty id="claimAttachments_附件_2_string_t9i_$$VA" name="附件" type="string" variable="claimAttachments"/>
-      		
-      		<activiti:formProperty id="claim_选择是否索赔_3_enum_sbs_$$VA" name="选择是否索赔" type="enum" variable="claim">
-      			<activiti:value id="Y" name="索赔"/>
-      			<activiti:value id="N" name="不需索赔"/>
-      		</activiti:formProperty>
-      		<activiti:formProperty id="curAmountSum_当前实际总金额_4_string_t11_$$VA" name="当前实际总金额" type="string" variable="curAmountSum"/>
-      		<activiti:formProperty id="curDefAmountSum_当前不合格总金额_5_string_t11_$$VA" name="当前不合格总金额" type="string" variable="curDefAmountSum"/>
-      		
-    		<activiti:formProperty id="tbhddetail_item_$$VA" name="采购计划明细 Detail" type="string" variable="tbhddetail_item"/>
-    		<activiti:formProperty id="tbhddetail_计划主题_subject_1_string_t1_$$VA" name="计划主题" variable="tbhddetail_subject_t00"/>
-    		<activiti:formProperty id="tbhddetail_供应商id_vndid_2_string_t1_$$VA" name="供应商id" variable="tbhddetail_vndid_t00"/>
-    		<activiti:formProperty id="tbhddetail_物料信息_matinfo_3_string_tree_$$VA" name="物料信息" type="string" variable="tbhddetail_matinfo_t00"/>
-    		<activiti:formProperty id="tbhddetail_计划数量_planqty_4_string_t11_$$VA" name="计划数量" type="string" variable="tbhddetail_planqty_t00"/>
-    		<activiti:formProperty id="tbhddetail_剩余数量_remainqty_5_string_t11_$$VA" name="剩余数量" type="string" variable="tbhddetail_remainqty_t00"/>
-    		<activiti:formProperty id="tbhddetail_单价_prcprice_6_string_t11_$$VA" name="单价" type="string" variable="tbhddetail_prcprice_t00"/>
-    		<activiti:formProperty id="tbhddetail_订货日期_orderdate_7_string_t3_$$A" name="订货日期" type="string" variable="tbhddetail_orderdate_t00"/>
-    		<activiti:formProperty id="tbhddetail_订货数量_orderqty_8_string_t11_$$A" name="订货数量" type="string" variable="tbhddetail_orderqty_t00"/>
-    		<activiti:formProperty id="tbhddetail_系统批次_sysBatch_9_string_t1_$$VA" name="系统批次" type="string" variable="tbhddetail_sysBatch_t00"/>
-    		<activiti:formProperty id="tbhddetail_手工批次_batch_10_string_t1_$$VA" name="手工批次" type="string" variable="tbhddetail_batch_t00"/>
-    		<activiti:formProperty id="tbhddetail_实际送货数量_deliveryqty_11_string_t11_$$VA" name="实际送货数量" type="string" variable="tbhddetail_deliveryqty_t00"/>
-    		<activiti:formProperty id="tbhddetail_送货日期_deliverydate_12_string_t3_$$VA" name="送货日期" type="string" variable="tbhddetail_deliverydate_t00"/>
-    		<activiti:formProperty id="tbhddetail_车次_trainnumber_13_enum_sbs_$$VA" name="车次" type="enum" variable="tbhddetail_trainnumber_t00">
-				<activiti:value id="车次1" name="车次1"/>
-				<activiti:value id="车次2" name="车次2"/>
-				<activiti:value id="车次3" name="车次3"/>
-				<activiti:value id="车次4" name="车次4"/> 	
-      		</activiti:formProperty>
-    		<activiti:formProperty id="tbhddetail_到货日期_arrivaldate_14_string_t3_$$VA" name="到货日期" type="string" variable="tbhddetail_arrivaldate_t00"/>
-    		<activiti:formProperty id="tbhddetail_合格数_accnumber_15_string_t11_$$VA" name="合格数" type="string" variable="tbhddetail_accnumber_t00"/>
-    		<activiti:formProperty id="tbhddetail_不合格数_defnumber_16_string_t11_$$VA" name="不合格数" type="string" variable="tbhddetail_defnumber_t00"/>
-    		<activiti:formProperty id="tbhddetail_不合格总金额_defAmount_17_string_t11_$$VA" name="不合格总金额" type="string" variable="tbhddetail_defAmount_t00"/>
-    		<activiti:formProperty id="tbhddetail_实际总金额_amount_18_string_t11_$$A" name="实际总金额" type="string" variable="tbhddetail_amount_t00"/>
-      		
-      		<activiti:taskListener event="create" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
-      			<activiti:field name="language">
-      				<activiti:string>
-      					<![CDATA[groovy]]>
-      				</activiti:string>
-      			</activiti:field>
-      			<activiti:field name="script">
-      				<activiti:string>
-      					<![CDATA[import com.eorionsolution.bpms.extension.rest.RestAPI
+        <extensionElements>
+          <activiti:formProperty id="confirmClaim_确认索赔_1_enum_rbv_$$A" name="确认索赔" type="enum" variable="confirmClaim" required="true">
+          	<activiti:value id="Y" name="确认"></activiti:value>
+          </activiti:formProperty>
+          <activiti:formProperty id="claimNote_备注_1_string_t2_$$VA" name="备注" type="string" variable="claimNote"></activiti:formProperty>
+          <activiti:formProperty id="claimAttachments_附件_2_string_t9i_$$VA" name="附件" type="string" variable="claimAttachments"></activiti:formProperty>
+          <activiti:formProperty id="claim_选择是否索赔_3_enum_sbs_$$VA" name="选择是否索赔" type="enum" variable="claim">
+            <activiti:value id="Y" name="索赔"></activiti:value>
+            <activiti:value id="N" name="不需索赔"></activiti:value>
+          </activiti:formProperty>
+          <activiti:formProperty id="curAmountSum_当前实际总金额_4_string_cny_$$VA" name="当前实际总金额" type="string" variable="curAmountSum"></activiti:formProperty>
+          <activiti:formProperty id="curDefAmountSum_当前不合格总金额_5_string_cny_$$VA" name="当前不合格总金额" type="string" variable="curDefAmountSum"></activiti:formProperty>
+          <activiti:formProperty id="claimSum_索赔总金额_6_string_cny_$$VA" name="索赔总金额" type="string" variable="claimSum"/>
+          
+          <activiti:formProperty id="tbhdclaim_item_$$VA" name="索赔明细表" type="string" variable="tbhdclaim_item" required="true"/>
+          <activiti:formProperty id="tbhdclaim_供应商_vndid_1_string_t1_$$A" name="供应商" type="string" variable="tbhdclaim_vndid_t01"/>
+          <activiti:formProperty id="tbhdclaim_物料_matinfo_2_string_t1_$$A" name="物料" type="string" variable="tbhdclaim_matinfo_t01"/>
+          <activiti:formProperty id="tbhdclaim_单价_prcprice_3_string_t11_$$A" name="单价" type="string" variable="tbhdclaim_prcprice_t01"/>
+          <activiti:formProperty id="tbhdclaim_要求送货时间_orderdate_4_string_t5_$$A" name="要求送货时间" type="string" variable="tbhdclaim_orderdate_t01"/>
+          <activiti:formProperty id="tbhdclaim_此次订货数量_orderqty_5_string_t11_$$A" name="此次订货数量" type="string" variable="tbhdclaim_orderqty_t01"/>
+          <activiti:formProperty id="tbhdclaim_系统批次_sysBatch_6_string_t1_$$A" name="系统批次" type="string" variable="tbhdclaim_sysBatch_t01"/>
+          <activiti:formProperty id="tbhdclaim_手工批次_batch_7_string_t1_$$A" name="手工批次" type="string" variable="tbhdclaim_batch_t01"/>
+          <activiti:formProperty id="tbhdclaim_实际送货数量_deliveryqty_8_string_t11_$$A" name="实际送货数量" type="string" variable="tbhdclaim_deliveryqty_t01"/>
+          <activiti:formProperty id="tbhdclaim_送货时间_deliverydate_9_string_t5_$$A" name="送货时间" type="string" variable="tbhdclaim_deliverydate_t01"/>
+          <activiti:formProperty id="tbhdclaim_车次_trainnumber_10_string_t1_$$A" name="车次" type="string" variable="tbhdclaim_trainnumber_t01"/>
+          <activiti:formProperty id="tbhdclaim_到货时间_arrivaldate_11_string_t5_$$A" name="到货时间" type="string" variable="tbhdclaim_arrivaldate_t01"/>
+          <activiti:formProperty id="tbhdclaim_合格数_accnumber_12_string_t11_$$A" name="合格数" type="string" variable="tbhdclaim_accnumber_t01"/>
+          <activiti:formProperty id="tbhdclaim_实际总金额_amount_13_string_t11_$$A" name="实际总金额" type="string" variable="tbhdclaim_amount_t01"/>
+          <activiti:formProperty id="tbhdclaim_不合格数_defnumber_14_string_t11_$$A" name="不合格数" type="string" variable="tbhdclaim_defnumber_t01"/>
+          <activiti:formProperty id="tbhdclaim_不合格总金额_defAmount_15_string_t11_$$A" name="不合格总金额" type="string" variable="tbhdclaim_defAmount_t01"/>
+          <activiti:formProperty id="tbhdclaim_人力损失_manloss_16_string_t11_$$A" name="人力损失" type="string" variable="tbhdclaim_manloss_t01"/>
+          <activiti:formProperty id="tbhdclaim_生产损失_proloss_17_string_t11_$$A" name="生产损失" type="string" variable="tbhdclaim_proloss_t01"/>
+          <activiti:formProperty id="tbhdclaim_合计索赔_totalClaim_18_string_t11_$$A" name="合计索赔" type="string" variable="tbhdclaim_totalClaim_t01"/>
+          
+          <activiti:formProperty id="tbhddetail_item_$$VA" name="采购计划明细 Detail" type="string" variable="tbhddetail_item"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_计划主题_subject_1_string_t1_$$VA" name="计划主题" variable="tbhddetail_subject_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_供应商id_vndid_2_string_t1_$$VA" name="供应商id" variable="tbhddetail_vndid_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_物料信息_matinfo_3_string_tree_$$VA" name="物料信息" type="string" variable="tbhddetail_matinfo_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_计划数量_planqty_4_string_t11_$$VA" name="计划数量" type="string" variable="tbhddetail_planqty_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_剩余数量_remainqty_5_string_t11_$$VA" name="剩余数量" type="string" variable="tbhddetail_remainqty_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_单价_prcprice_6_string_t11_$$VA" name="单价" type="string" variable="tbhddetail_prcprice_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_要求送货时间_orderdate_7_string_t5_$$A" name="要求送货时间" type="string" variable="tbhddetail_orderdate_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_订货数量_orderqty_8_string_t11_$$A" name="订货数量" type="string" variable="tbhddetail_orderqty_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_系统批次_sysBatch_9_string_t1_$$VA" name="系统批次" type="string" variable="tbhddetail_sysBatch_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_手工批次_batch_10_string_t1_$$VA" name="手工批次" type="string" variable="tbhddetail_batch_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_实际送货数量_deliveryqty_11_string_t11_$$VA" name="实际送货数量" type="string" variable="tbhddetail_deliveryqty_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_送货时间_deliverydate_12_string_t5_$$VA" name="送货时间" type="string" variable="tbhddetail_deliverydate_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_车次_trainnumber_13_enum_sbs_$$VA" name="车次" type="enum" variable="tbhddetail_trainnumber_t00">
+            <activiti:value id="车次1" name="车次1"></activiti:value>
+            <activiti:value id="车次2" name="车次2"></activiti:value>
+            <activiti:value id="车次3" name="车次3"></activiti:value>
+            <activiti:value id="车次4" name="车次4"></activiti:value>
+          </activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_到货时间_arrivaldate_14_string_t5_$$VA" name="到货时间" type="string" variable="tbhddetail_arrivaldate_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_合格数_accnumber_15_string_t11_$$VA" name="合格数" type="string" variable="tbhddetail_accnumber_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_不合格数_defnumber_16_string_t11_$$VA" name="不合格数" type="string" variable="tbhddetail_defnumber_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_不合格总金额_defAmount_17_string_t11_$$VA" name="不合格总金额" type="string" variable="tbhddetail_defAmount_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_实际总金额_amount_18_string_t11_$$A" name="实际总金额" type="string" variable="tbhddetail_amount_t00"></activiti:formProperty>
+          <activiti:taskListener event="create" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+            <activiti:field name="language">
+              <activiti:string><![CDATA[groovy]]></activiti:string>
+            </activiti:field>
+            <activiti:field name="script">
+              <activiti:string><![CDATA[import com.eorionsolution.bpms.extension.rest.RestAPI
       						import groovy.json.JsonSlurper
     						import groovy.json.JsonOutput
       						
       						def execution = task.getExecution()
       						def jsonSlurper = new JsonSlurper()
-      						execution.setVariableLocal('invoicenumber', '')
       						
       						//通知供应商填写发票编号
       						def restParam = new HashMap<String,Object>()
@@ -521,8 +546,8 @@
 				    		def bodyMap = new HashMap()
 							bodyMap.put('touser', 'baocaixue@eorionsolution.com')
 							bodyMap.put('agentid',1000005)
-							bodyMap.put('title', 'magna对于此次开票有索赔')
-							bodyMap.put('description', '请于BPMS填写发票编号并确认索赔')
+							bodyMap.put('title', 'magna有开票索赔')
+							bodyMap.put('description', '请于BPMS确认索赔')
 							bodyMap.put('url','https://bpms.eorionsolution.com/bpmssrm/task.html?processInstanceId=' + procInstId)
 							def body = JsonOutput.toJson(bodyMap)
 				    		
@@ -535,80 +560,83 @@
 				    		
 				    		if (!result._http_response_status_code || !result._http_response_status_code.toString().startsWith("2")) {
 				    			throw new org.activiti.engine.ActivitiIllegalArgumentException('微信通知供应商索赔失败，请联系管理员')
-				    		}
-      					]]>
-      				</activiti:string>
-      			</activiti:field>
-      		</activiti:taskListener>
-      		<activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
-      			<activiti:field name="language">
-      				<activiti:string>
-      					<![CDATA[groovy]]>
-      				</activiti:string>
-      			</activiti:field>
-      			<activiti:field name="script">
-      				<activiti:string>
-      					<![CDATA[
-      						def execution = task.getExecution()
-      						execution.setVariableLocal('invoicenumber', invoicenumber)
-      					]]>
-      				</activiti:string>
-      			</activiti:field>
-      		</activiti:taskListener>
-    	</extensionElements>
+				    		}]]></activiti:string>
+            </activiti:field>
+          </activiti:taskListener>
+          <activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+            <activiti:field name="language">
+              <activiti:string><![CDATA[groovy]]></activiti:string>
+            </activiti:field>
+            <activiti:field name="script">
+              <activiti:string><![CDATA[def execution = task.getExecution()
+      						]]></activiti:string>
+            </activiti:field>
+          </activiti:taskListener>
+        </extensionElements>
       </userTask>
-      <userTask id="usertask6" name="财务" activiti:assignee="${initiator}" activiti:dueDate="P1D" activiti:priority="8080">
-      	<extensionElements>
-      		<activiti:formProperty id="commit_提交财务_1_enum_rbv_$$A" name="提交财务" type="enum" required="true" variable="commit">
-    			<activiti:value id="提交" name="提交"></activiti:value>
-    		</activiti:formProperty>
-    		
-      		<activiti:formProperty id="invoicenumber_发票编号_1_string_t1_$$VA" name="发票编号" type="string" required="true" variable="invoicenumber"/>
-      		
-      		<activiti:formProperty id="claimNote_备注_2_string_t2_$$VA" name="备注" type="string" variable="claimNote"/>
-      		<activiti:formProperty id="claimAttachments_附件_3_string_t9i_$$VA" name="附件" type="string" variable="claimAttachments"/>
-      		
-      		<activiti:formProperty id="claim_选择是否索赔_4_enum_sbs_$$VA" name="选择是否索赔" type="enum" variable="claim">
-      			<activiti:value id="Y" name="索赔"/>
-      			<activiti:value id="N" name="不需索赔"/>
-      		</activiti:formProperty>
-      		<activiti:formProperty id="curAmountSum_当前实际总金额_5_string_t11_$$VA" name="当前实际总金额" type="string" variable="curAmountSum"/>
-      		<activiti:formProperty id="curDefAmountSum_当前不合格总金额_6_string_t11_$$VA" name="当前不合格总金额" type="string" variable="curDefAmountSum"/>
-      		
-    		<activiti:formProperty id="tbhddetail_item_$$VA" name="采购计划明细 Detail" type="string" variable="tbhddetail_item"/>
-    		<activiti:formProperty id="tbhddetail_计划主题_subject_1_string_t1_$$VA" name="计划主题" variable="tbhddetail_subject_t00"/>
-    		<activiti:formProperty id="tbhddetail_供应商id_vndid_2_string_t1_$$VA" name="供应商id" variable="tbhddetail_vndid_t00"/>
-    		<activiti:formProperty id="tbhddetail_物料信息_matinfo_3_string_tree_$$VA" name="物料信息" type="string" variable="tbhddetail_matinfo_t00"/>
-    		<activiti:formProperty id="tbhddetail_计划数量_planqty_4_string_t11_$$VA" name="计划数量" type="string" variable="tbhddetail_planqty_t00"/>
-    		<activiti:formProperty id="tbhddetail_剩余数量_remainqty_5_string_t11_$$VA" name="剩余数量" type="string" variable="tbhddetail_remainqty_t00"/>
-    		<activiti:formProperty id="tbhddetail_单价_prcprice_6_string_t11_$$VA" name="单价" type="string" variable="tbhddetail_prcprice_t00"/>
-    		<activiti:formProperty id="tbhddetail_订货日期_orderdate_7_string_t3_$$A" name="订货日期" type="string" variable="tbhddetail_orderdate_t00"/>
-    		<activiti:formProperty id="tbhddetail_订货数量_orderqty_8_string_t11_$$A" name="订货数量" type="string" variable="tbhddetail_orderqty_t00"/>
-    		<activiti:formProperty id="tbhddetail_系统批次_sysBatch_9_string_t1_$$VA" name="系统批次" type="string" variable="tbhddetail_sysBatch_t00"/>
-    		<activiti:formProperty id="tbhddetail_手工批次_batch_10_string_t1_$$VA" name="手工批次" type="string" variable="tbhddetail_batch_t00"/>
-    		<activiti:formProperty id="tbhddetail_实际送货数量_deliveryqty_11_string_t11_$$VA" name="实际送货数量" type="string" variable="tbhddetail_deliveryqty_t00"/>
-    		<activiti:formProperty id="tbhddetail_送货日期_deliverydate_12_string_t3_$$VA" name="送货日期" type="string" variable="tbhddetail_deliverydate_t00"/>
-    		<activiti:formProperty id="tbhddetail_车次_trainnumber_13_enum_sbs_$$VA" name="车次" type="enum" variable="tbhddetail_trainnumber_t00">
-				<activiti:value id="车次1" name="车次1"/>
-				<activiti:value id="车次2" name="车次2"/>
-				<activiti:value id="车次3" name="车次3"/>
-				<activiti:value id="车次4" name="车次4"/> 	
-      		</activiti:formProperty>
-    		<activiti:formProperty id="tbhddetail_到货日期_arrivaldate_14_string_t3_$$VA" name="到货日期" type="string" variable="tbhddetail_arrivaldate_t00"/>
-    		<activiti:formProperty id="tbhddetail_合格数_accnumber_15_string_t11_$$VA" name="合格数" type="string" variable="tbhddetail_accnumber_t00"/>
-    		<activiti:formProperty id="tbhddetail_不合格数_defnumber_16_string_t11_$$VA" name="不合格数" type="string" variable="tbhddetail_defnumber_t00"/>
-    		<activiti:formProperty id="tbhddetail_不合格总金额_defAmount_17_string_t11_$$VA" name="不合格总金额" type="string" variable="tbhddetail_defAmount_t00"/>
-    		<activiti:formProperty id="tbhddetail_实际总金额_amount_18_string_t11_$$A" name="实际总金额" type="string" variable="tbhddetail_amount_t00"/>
-      		
-      		<activiti:taskListener event="create" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
-      			<activiti:field name="language">
-      				<activiti:string>
-      					<![CDATA[groovy]]>
-      				</activiti:string>
-      			</activiti:field>
-      			<activiti:field name="script">
-      				<activiti:string>
-      					<![CDATA[import com.eorionsolution.bpms.extension.rest.RestAPI
+      <userTask id="usertask6" name="财务查看索赔信息" activiti:assignee="${initiator}" activiti:dueDate="P1D" activiti:priority="8080">
+        <extensionElements>
+          <activiti:formProperty id="commit_提交_1_enum_rbv_$$A" name="提交" type="enum" variable="commit" required="true">
+            <activiti:value id="提交" name="提交"></activiti:value>
+          </activiti:formProperty>
+          <activiti:formProperty id="claimNote_备注_1_string_t2_$$VA" name="备注" type="string" variable="claimNote"></activiti:formProperty>
+          <activiti:formProperty id="claimAttachments_附件_2_string_t9i_$$VA" name="附件" type="string" variable="claimAttachments"></activiti:formProperty>
+          <activiti:formProperty id="claim_选择是否索赔_3_enum_sbs_$$VA" name="选择是否索赔" type="enum" variable="claim">
+            <activiti:value id="Y" name="索赔"></activiti:value>
+            <activiti:value id="N" name="不需索赔"></activiti:value>
+          </activiti:formProperty>
+          <activiti:formProperty id="curAmountSum_当前实际总金额_4_string_cny_$$VA" name="当前实际总金额" type="string" variable="curAmountSum"></activiti:formProperty>
+          <activiti:formProperty id="curDefAmountSum_当前不合格总金额_5_string_cny_$$VA" name="当前不合格总金额" type="string" variable="curDefAmountSum"></activiti:formProperty>
+          <activiti:formProperty id="claimSum_索赔总金额_6_string_cny_$$VA" name="索赔总金额" type="string" variable="claimSum"/>
+          <activiti:formProperty id="tbhdclaim_item_$$VA" name="索赔明细表" type="string" variable="tbhdclaim_item" required="true"/>
+          <activiti:formProperty id="tbhdclaim_供应商_vndid_1_string_t1_$$A" name="供应商" type="string" variable="tbhdclaim_vndid_t01"/>
+          <activiti:formProperty id="tbhdclaim_物料_matinfo_2_string_t1_$$A" name="物料" type="string" variable="tbhdclaim_matinfo_t01"/>
+          <activiti:formProperty id="tbhdclaim_单价_prcprice_3_string_t11_$$A" name="单价" type="string" variable="tbhdclaim_prcprice_t01"/>
+          <activiti:formProperty id="tbhdclaim_要求送货时间_orderdate_4_string_t5_$$A" name="要求送货时间" type="string" variable="tbhdclaim_orderdate_t01"/>
+          <activiti:formProperty id="tbhdclaim_此次订货数量_orderqty_5_string_t11_$$A" name="此次订货数量" type="string" variable="tbhdclaim_orderqty_t01"/>
+          <activiti:formProperty id="tbhdclaim_系统批次_sysBatch_6_string_t1_$$A" name="系统批次" type="string" variable="tbhdclaim_sysBatch_t01"/>
+          <activiti:formProperty id="tbhdclaim_手工批次_batch_7_string_t1_$$A" name="手工批次" type="string" variable="tbhdclaim_batch_t01"/>
+          <activiti:formProperty id="tbhdclaim_实际送货数量_deliveryqty_8_string_t11_$$A" name="实际送货数量" type="string" variable="tbhdclaim_deliveryqty_t01"/>
+          <activiti:formProperty id="tbhdclaim_送货时间_deliverydate_9_string_t5_$$A" name="送货时间" type="string" variable="tbhdclaim_deliverydate_t01"/>
+          <activiti:formProperty id="tbhdclaim_车次_trainnumber_10_string_t1_$$A" name="车次" type="string" variable="tbhdclaim_trainnumber_t01"/>
+          <activiti:formProperty id="tbhdclaim_到货时间_arrivaldate_11_string_t5_$$A" name="到货时间" type="string" variable="tbhdclaim_arrivaldate_t01"/>
+          <activiti:formProperty id="tbhdclaim_合格数_accnumber_12_string_t11_$$A" name="合格数" type="string" variable="tbhdclaim_accnumber_t01"/>
+          <activiti:formProperty id="tbhdclaim_实际总金额_amount_13_string_t11_$$A" name="实际总金额" type="string" variable="tbhdclaim_amount_t01"/>
+          <activiti:formProperty id="tbhdclaim_不合格数_defnumber_14_string_t11_$$A" name="不合格数" type="string" variable="tbhdclaim_defnumber_t01"/>
+          <activiti:formProperty id="tbhdclaim_不合格总金额_defAmount_15_string_t11_$$A" name="不合格总金额" type="string" variable="tbhdclaim_defAmount_t01"/>
+          <activiti:formProperty id="tbhdclaim_人力损失_manloss_16_string_t11_$$A" name="人力损失" type="string" variable="tbhdclaim_manloss_t01"/>
+          <activiti:formProperty id="tbhdclaim_生产损失_proloss_17_string_t11_$$A" name="生产损失" type="string" variable="tbhdclaim_proloss_t01"/>
+          <activiti:formProperty id="tbhdclaim_合计索赔_totalClaim_18_string_t11_$$A" name="合计索赔" type="string" variable="tbhdclaim_totalClaim_t01"/>
+          <activiti:formProperty id="tbhddetail_item_$$VA" name="采购计划明细 Detail" type="string" variable="tbhddetail_item"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_计划主题_subject_1_string_t1_$$VA" name="计划主题" variable="tbhddetail_subject_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_供应商id_vndid_2_string_t1_$$VA" name="供应商id" variable="tbhddetail_vndid_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_物料信息_matinfo_3_string_tree_$$VA" name="物料信息" type="string" variable="tbhddetail_matinfo_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_计划数量_planqty_4_string_t11_$$VA" name="计划数量" type="string" variable="tbhddetail_planqty_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_剩余数量_remainqty_5_string_t11_$$VA" name="剩余数量" type="string" variable="tbhddetail_remainqty_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_单价_prcprice_6_string_t11_$$VA" name="单价" type="string" variable="tbhddetail_prcprice_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_要求送货时间_orderdate_7_string_t5_$$A" name="要求送货时间" type="string" variable="tbhddetail_orderdate_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_订货数量_orderqty_8_string_t11_$$A" name="订货数量" type="string" variable="tbhddetail_orderqty_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_系统批次_sysBatch_9_string_t1_$$VA" name="系统批次" type="string" variable="tbhddetail_sysBatch_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_手工批次_batch_10_string_t1_$$VA" name="手工批次" type="string" variable="tbhddetail_batch_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_实际送货数量_deliveryqty_11_string_t11_$$VA" name="实际送货数量" type="string" variable="tbhddetail_deliveryqty_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_送货时间_deliverydate_12_string_t5_$$VA" name="送货时间" type="string" variable="tbhddetail_deliverydate_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_车次_trainnumber_13_enum_sbs_$$VA" name="车次" type="enum" variable="tbhddetail_trainnumber_t00">
+            <activiti:value id="车次1" name="车次1"></activiti:value>
+            <activiti:value id="车次2" name="车次2"></activiti:value>
+            <activiti:value id="车次3" name="车次3"></activiti:value>
+            <activiti:value id="车次4" name="车次4"></activiti:value>
+          </activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_到货时间_arrivaldate_14_string_t5_$$VA" name="到货时间" type="string" variable="tbhddetail_arrivaldate_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_合格数_accnumber_15_string_t11_$$VA" name="合格数" type="string" variable="tbhddetail_accnumber_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_不合格数_defnumber_16_string_t11_$$VA" name="不合格数" type="string" variable="tbhddetail_defnumber_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_不合格总金额_defAmount_17_string_t11_$$VA" name="不合格总金额" type="string" variable="tbhddetail_defAmount_t00"></activiti:formProperty>
+          <activiti:formProperty id="tbhddetail_实际总金额_amount_18_string_t11_$$A" name="实际总金额" type="string" variable="tbhddetail_amount_t00"></activiti:formProperty>
+          <activiti:taskListener event="create" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+            <activiti:field name="language">
+              <activiti:string><![CDATA[groovy]]></activiti:string>
+            </activiti:field>
+            <activiti:field name="script">
+              <activiti:string><![CDATA[import com.eorionsolution.bpms.extension.rest.RestAPI
       						import groovy.json.JsonSlurper
     						import groovy.json.JsonOutput
     						import javax.crypto.Mac
@@ -620,6 +648,7 @@
       						def execId = execution.getId()//procInstId
       						
       						execution.setVariableLocal('downloadStd', tbhddetail_item_std)
+      						execution.setVariableLocal('downloadClaimStd', tbhdclaim_item_std)
       						
       						//通知财务
       						def restParam = new HashMap<String,Object>()
@@ -628,7 +657,7 @@
 				    		def bodyMap = new HashMap()
 							bodyMap.put('touser', 'baocaixue@eorionsolution.com')
 							bodyMap.put('agentid',1000005)
-							bodyMap.put('title', '财务通知：供应商已填写发票，此次有相应索赔')
+							bodyMap.put('title', '财务通知：供应商索赔任务已到达')
 							bodyMap.put('description', '请于BPMS提交任务，确认索赔')
 							bodyMap.put('url','https://bpms.eorionsolution.com/bpmssrm/task.html?processInstanceId=' + procInstId)
 							def body = JsonOutput.toJson(bodyMap)
@@ -664,28 +693,36 @@
 							def secret =Base64.getUrlEncoder().encodeToString(hmac_sha256(METABASE_SECRET_KEY , header+'.'+playload))
 							
 							def url = METABASE_SITE_URL + "/embed/question/" + header+'.'+playload+'.'+secret + "#bordered=true&titled=true"
-		   					execution.setVariableLocal('BBOT_BI_FIN_DOWN',url)
-      					]]>
-      				</activiti:string>
-      			</activiti:field>
-      		</activiti:taskListener>
-    	</extensionElements>
+		   					//execution.setVariableLocal('BBOT_BI_FIN1_DOWN',url)
+		   					
+		   					//索赔下载
+		   					playloadString = '{"resource":{"question":171},"params":{"procInstId":"'+ procInstId +'" , '+ '"execId":"'+ execId +'" }}'
+		   					playload = Base64.getUrlEncoder().encodeToString(playloadString.bytes)
+		   					secret =Base64.getUrlEncoder().encodeToString(hmac_sha256(METABASE_SECRET_KEY , header+'.'+playload))
+		   					url = METABASE_SITE_URL + "/embed/question/" + header+'.'+playload+'.'+secret + "#bordered=true&titled=true"
+		   					execution.setVariableLocal('BBOT_BI_FIN_CLAIM_DOWN',url)
+		   					]]></activiti:string>
+            </activiti:field>
+          </activiti:taskListener>
+        </extensionElements>
       </userTask>
       <sequenceFlow id="flow2" sourceRef="startevent2" targetRef="usertask1"></sequenceFlow>
-      <sequenceFlow id="flow3" sourceRef="usertask1" targetRef="exclusivegateway1"></sequenceFlow>
-      <sequenceFlow id="flow4" name="需要索赔" sourceRef="exclusivegateway1" targetRef="usertask4">
-      	<conditionExpression xsi:type="tFormalExpression"><![CDATA[${claim == 'Y'}]]></conditionExpression>
+      <sequenceFlow id="flow3" sourceRef="usertask1" targetRef="inclusivegateway1"></sequenceFlow>
+      <sequenceFlow id="flow4" name="需要索赔" sourceRef="inclusivegateway1" targetRef="usertask4">
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${claim == 'Y'}]]></conditionExpression>
       </sequenceFlow>
       <sequenceFlow id="flow5" sourceRef="usertask4" targetRef="usertask5"></sequenceFlow>
       <sequenceFlow id="flow6" sourceRef="usertask5" targetRef="usertask6"></sequenceFlow>
       <endEvent id="E1" name="E1"></endEvent>
-      <sequenceFlow id="flow7" sourceRef="usertask6" targetRef="E1"></sequenceFlow>
-      <sequenceFlow id="flow8" name="不需索赔" sourceRef="exclusivegateway1" targetRef="usertask2">
-      	<conditionExpression xsi:type="tFormalExpression"><![CDATA[${claim == 'N'}]]></conditionExpression>
+      <sequenceFlow id="flow7" sourceRef="usertask6" targetRef="inclusivegateway2"></sequenceFlow>
+      <sequenceFlow id="flow8" name="需要开票" sourceRef="inclusivegateway1" targetRef="usertask2">
+        <conditionExpression xsi:type="tFormalExpression"><![CDATA[${true}]]></conditionExpression>
       </sequenceFlow>
       <sequenceFlow id="flow9" sourceRef="usertask2" targetRef="usertask3"></sequenceFlow>
-      <endEvent id="E2" name="E2"></endEvent>
-      <sequenceFlow id="flow10" sourceRef="usertask3" targetRef="E2"></sequenceFlow>
+      <sequenceFlow id="flow10" sourceRef="usertask3" targetRef="inclusivegateway2"></sequenceFlow>
+      <inclusiveGateway id="inclusivegateway1" name="Exclusive Gateway"></inclusiveGateway>
+      <inclusiveGateway id="inclusivegateway2" name="Exclusive Gateway"></inclusiveGateway>
+      <sequenceFlow id="flow12" sourceRef="inclusivegateway2" targetRef="E1"></sequenceFlow>
     </subProcess>
     <sequenceFlow id="flow1" sourceRef="S1" targetRef="subprocess1"></sequenceFlow>
     <endEvent id="E3" name="E3"></endEvent>
@@ -705,9 +742,6 @@
       <bpmndi:BPMNShape bpmnElement="usertask1" id="BPMNShape_usertask1">
         <omgdc:Bounds height="61.0" width="111.0" x="180.0" y="187.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="exclusivegateway1" id="BPMNShape_exclusivegateway1">
-        <omgdc:Bounds height="40.0" width="40.0" x="320.0" y="197.0"></omgdc:Bounds>
-      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="usertask2" id="BPMNShape_usertask2">
         <omgdc:Bounds height="61.0" width="111.0" x="390.0" y="260.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
@@ -724,10 +758,13 @@
         <omgdc:Bounds height="61.0" width="111.0" x="680.0" y="127.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="E1" id="BPMNShape_E1">
-        <omgdc:Bounds height="35.0" width="35.0" x="836.0" y="140.0"></omgdc:Bounds>
+        <omgdc:Bounds height="35.0" width="35.0" x="820.0" y="225.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="E2" id="BPMNShape_E2">
-        <omgdc:Bounds height="35.0" width="35.0" x="706.0" y="273.0"></omgdc:Bounds>
+      <bpmndi:BPMNShape bpmnElement="inclusivegateway1" id="BPMNShape_inclusivegateway1">
+        <omgdc:Bounds height="40.0" width="40.0" x="320.0" y="197.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="inclusivegateway2" id="BPMNShape_inclusivegateway2">
+        <omgdc:Bounds height="40.0" width="40.0" x="715.0" y="222.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="E3" id="BPMNShape_E3">
         <omgdc:Bounds height="35.0" width="35.0" x="926.0" y="203.0"></omgdc:Bounds>
@@ -745,7 +782,7 @@
         <omgdi:waypoint x="340.0" y="156.0"></omgdi:waypoint>
         <omgdi:waypoint x="390.0" y="157.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="16.0" width="100.0" x="289.0" y="121.0"></omgdc:Bounds>
+          <omgdc:Bounds height="16.0" width="44.0" x="289.0" y="121.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow5" id="BPMNEdge_flow5">
@@ -757,15 +794,15 @@
         <omgdi:waypoint x="680.0" y="157.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow7" id="BPMNEdge_flow7">
-        <omgdi:waypoint x="791.0" y="157.0"></omgdi:waypoint>
-        <omgdi:waypoint x="836.0" y="157.0"></omgdi:waypoint>
+        <omgdi:waypoint x="735.0" y="188.0"></omgdi:waypoint>
+        <omgdi:waypoint x="735.0" y="222.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow8" id="BPMNEdge_flow8">
         <omgdi:waypoint x="340.0" y="237.0"></omgdi:waypoint>
         <omgdi:waypoint x="340.0" y="289.0"></omgdi:waypoint>
         <omgdi:waypoint x="390.0" y="290.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="16.0" width="100.0" x="296.0" y="300.0"></omgdc:Bounds>
+          <omgdc:Bounds height="16.0" width="44.0" x="296.0" y="300.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow9" id="BPMNEdge_flow9">
@@ -774,7 +811,12 @@
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow10" id="BPMNEdge_flow10">
         <omgdi:waypoint x="661.0" y="290.0"></omgdi:waypoint>
-        <omgdi:waypoint x="706.0" y="290.0"></omgdi:waypoint>
+        <omgdi:waypoint x="736.0" y="290.0"></omgdi:waypoint>
+        <omgdi:waypoint x="735.0" y="262.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow12" id="BPMNEdge_flow12">
+        <omgdi:waypoint x="755.0" y="242.0"></omgdi:waypoint>
+        <omgdi:waypoint x="820.0" y="242.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
         <omgdi:waypoint x="65.0" y="217.0"></omgdi:waypoint>

@@ -12,8 +12,13 @@
     			<activiti:value id="车削" name="车削"/>
     			<activiti:value id="铣削" name="铣削"/>
     			<activiti:value id="磨削" name="磨削"/>
+    			<activiti:value id="钣金" name="钣金"/>
+    			<activiti:value id="焊接" name="焊接"/>
+    			<activiti:value id="去毛刺" name="去毛刺"/>
     			<activiti:value id="电加工" name="电加工"/>
-    			<activiti:value id="其他" name="其他"/>
+    			<activiti:value id="热处理" name="热处理"/>
+    			<activiti:value id="表面处理" name="表面处理"/>
+    			<activiti:value id="其它" name="其它"/>
     		</activiti:formProperty>
     		<activiti:formProperty id="deviceSpec_设备型号_2_string_auto_$$B" name="设备型号" type="string" variable="deviceSpec" required="false"/>
     		
@@ -124,8 +129,13 @@
     			<activiti:value id="车削" name="车削"/>
     			<activiti:value id="铣削" name="铣削"/>
     			<activiti:value id="磨削" name="磨削"/>
+    			<activiti:value id="钣金" name="钣金"/>
+    			<activiti:value id="焊接" name="焊接"/>
+    			<activiti:value id="去毛刺" name="去毛刺"/>
     			<activiti:value id="电加工" name="电加工"/>
-    			<activiti:value id="其他" name="其他"/>
+    			<activiti:value id="热处理" name="热处理"/>
+    			<activiti:value id="表面处理" name="表面处理"/>
+    			<activiti:value id="其它" name="其它"/>
     		</activiti:formProperty>
     		<activiti:formProperty id="deviceSpec_设备型号_2_string_auto_$$VB" name="设备型号" type="string" variable="deviceSpec" required="false"/>
     		
@@ -215,8 +225,13 @@
     			<activiti:value id="车削" name="车削"/>
     			<activiti:value id="铣削" name="铣削"/>
     			<activiti:value id="磨削" name="磨削"/>
+    			<activiti:value id="钣金" name="钣金"/>
+    			<activiti:value id="焊接" name="焊接"/>
+    			<activiti:value id="去毛刺" name="去毛刺"/>
     			<activiti:value id="电加工" name="电加工"/>
-    			<activiti:value id="其他" name="其他"/>
+    			<activiti:value id="热处理" name="热处理"/>
+    			<activiti:value id="表面处理" name="表面处理"/>
+    			<activiti:value id="其它" name="其它"/>
     		</activiti:formProperty>
     		<activiti:formProperty id="deviceSpec_设备型号_2_string_auto_$$B" name="设备型号" type="string" variable="deviceSpec" required="false"/>
     		

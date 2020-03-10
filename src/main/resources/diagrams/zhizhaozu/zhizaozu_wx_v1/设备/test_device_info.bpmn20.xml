@@ -8,14 +8,31 @@
         <activiti:formProperty id="deviceSpec_设备型号_2_string_t1_$$A" name="设备型号" type="string" variable="deviceSpec" required="true"></activiti:formProperty>
         <activiti:formProperty id="deviceName_设备名称_3_string_t1_$$A" name="设备名称" type="string" variable="deviceName" required="true"></activiti:formProperty>
         <activiti:formProperty id="deviceDesc_设备描述_4_string_t2_$$A" name="设备描述" type="string" variable="deviceDesc"></activiti:formProperty>
-        <activiti:formProperty id="deviceType_设备类型_1_string_t1_$$B" name="设备类型" type="string" variable="deviceType"></activiti:formProperty>
+        <activiti:formProperty id="deviceType_设备类型_1_enum_sbs_$$B" name="设备类型" type="enum" variable="deviceType">
+        	<activiti:value id="车削类机床" name="车削类机床"/>
+        	<activiti:value id="铣削类机床" name="铣削类机床"/>
+        	<activiti:value id="车铣复合类" name="车铣复合类"/>
+        	<activiti:value id="磨削类机床" name="磨削类机床"/>
+        	<activiti:value id="电加工机床" name="电加工机床"/>
+        	<activiti:value id="钣金类设备" name="钣金类设备"/>
+        	<activiti:value id="热处理设备" name="热处理设备"/>
+        	<activiti:value id="焊接设备" name="焊接设备"/>
+        	<activiti:value id="表面处理" name="表面处理"/>
+        	<activiti:value id="手工处理" name="手工处理"/>
+        	<activiti:value id="其它" name="其它"/>
+        </activiti:formProperty>
         <activiti:formProperty id="deviceVendor_设备厂商_2_string_t1_$$B" name="设备厂商" type="string" variable="deviceVendor"></activiti:formProperty>
         <activiti:formProperty id="brandName_品牌名称_3_string_t1_$$B" name="品牌名称" type="string" variable="brandName"></activiti:formProperty>
         <activiti:formProperty id="manufactureDate_出厂日期_1_string_t3_$$B" name="出厂日期" type="string" variable="manufactureDate"></activiti:formProperty>
         <activiti:formProperty id="installationDate_安装日期_2_string_t3_$$B" name="安装日期" type="string" variable="installationDate"></activiti:formProperty>
         <activiti:formProperty id="spindlePower_主轴功率 kW_3_string_t11_$$B" name="主轴功率 kW" type="string" variable="spindlePower"></activiti:formProperty>
         <activiti:formProperty id="runningCost_运行成本 元/小时_4_string_cny_$$B" name="运行成本 元/小时" type="string" variable="runningCost"></activiti:formProperty>
-        <activiti:formProperty id="deviceStatus_设备状态_1_string_t1_$$B" name="设备状态" type="string" variable="deviceStatus"></activiti:formProperty>
+        <activiti:formProperty id="deviceStatus_设备状态_1_enum_sbs_$$B" name="设备状态" type="string" variable="deviceStatus">
+        	<activiti:value id="正常" name="正常"/>
+        	<activiti:value id="维保" name="维保"/>
+        	<activiti:value id="停用" name="停用"/>
+        	<activiti:value id="其它" name="其它"/>
+        </activiti:formProperty>
         <activiti:formProperty id="stateDesc_状态说明_2_string_t2_$$B" name="状态说明" type="string" variable="stateDesc"></activiti:formProperty>
         <activiti:formProperty id="tbhddetails_item" name="关键部件" type="string" variable="tbhddetails_item"></activiti:formProperty>
         <activiti:formProperty id="tbhddetails_物料编号_meterialCode_1_string_auto_$$A" name="物料编号" type="string" variable="tbhddetails_meterialCode_t00" required="true"></activiti:formProperty>

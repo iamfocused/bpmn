@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/pur">
-  <process id="testMeterialInfo" name="物料信息录入流程" isExecutable="true" activiti:candidateStarterGroups="admin,processadmin@@13@@">
+  <process id="testMeterialInfo" name="物料信息录入流程" isExecutable="true" activiti:candidateStarterGroups="admin,admin@@8@@">
     <documentation>物料信息</documentation>
     <startEvent id="startevent1" name="Start" activiti:initiator="initiator">
       <extensionElements>
@@ -9,7 +9,18 @@
         <activiti:formProperty id="meterialName_物料名称_3_string_t1_$$A" name="物料名称" type="string" variable="meterialName" required="true"></activiti:formProperty>
         <activiti:formProperty id="meterialType_物料类型_4_string_t1_$$A" name="物料类型" type="string" variable="meterialType"></activiti:formProperty>
         <activiti:formProperty id="mainMeterial_主要材料_5_string_t1_$$A" name="主要材料" type="string" variable="mainMeterial"></activiti:formProperty>
-        <activiti:formProperty id="calculateType_核算类型_1_string_t1_$$B" name="核算类型" type="string" variable="calculateType"></activiti:formProperty>
+        <activiti:formProperty id="calculateType_核算类型_1_enum_sbs_$$B" name="核算类型" type="enum" variable="calculateType">
+        	<activiti:value id="产成品" name="产成品"/>
+        	<activiti:value id="半成品" name="半成品"/>
+        	<activiti:value id="原材料" name="原材料"/>
+        	<activiti:value id="生产工具" name="生产工具"/>
+        	<activiti:value id="生产辅料" name="生产辅料"/>
+        	<activiti:value id="备品备件" name="备品备件"/>
+        	<activiti:value id="包装材料" name="包装材料"/>
+        	<activiti:value id="劳保用品" name="劳保用品"/>
+        	<activiti:value id="办公用品" name="办公用品"/>
+        	<activiti:value id="其它" name="其它"/>
+        </activiti:formProperty>
         <activiti:formProperty id="productGroup_产品组别_2_string_t1_$$B" name="产品组别" type="string" variable="productGroup"></activiti:formProperty>
         <activiti:formProperty id="brandName_品牌名称_3_string_t1_$$B" name="品牌名称" type="string" variable="brandName"></activiti:formProperty>
         <activiti:formProperty id="vendorName_厂商名称_4_string_t1_$$B" name="厂商名称" type="string" variable="vendorName"></activiti:formProperty>

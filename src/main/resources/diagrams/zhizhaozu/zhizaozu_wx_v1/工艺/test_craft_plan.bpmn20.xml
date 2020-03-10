@@ -15,9 +15,9 @@
     		<activiti:formProperty id="unitWorkTime_单位工作时间 小时_3_string_t11_$$C" name="单位工作时间 小时" type="string" variable="unitWorkTime" required="false"/>
     		<activiti:formProperty id="productionLines_规划产线数_4_string_t11_$$C" name="规划产线数" type="string" variable="productionLines" required="false"/>
     		
-    		<activiti:formProperty id="craftPreparation_工艺编制_1_string_t1_$$D" name="工艺编制" type="string" variable="craftPreparation" required="false"/>
+    		<!-- <activiti:formProperty id="craftPreparation_工艺编制_1_string_t1_$$D" name="工艺编制" type="string" variable="craftPreparation" required="false"/> -->
     		<!-- <activiti:formProperty id="preparationDate_编制日期_2_string_t3_$$D" name="编制日期" type="string" variable="preparationDate" required="false"/> -->
-    		<activiti:formProperty id="craftAudit_工艺审核_3_string_t1_$$D" name="工艺审核" type="string" variable="craftAudit" required="false"/>
+    		<!-- <activiti:formProperty id="craftAudit_工艺审核_3_string_t1_$$D" name="工艺审核" type="string" variable="craftAudit" required="false"/> -->
     		<!-- <activiti:formProperty id="auditDate_审核日期_4_string_t3_$$D" name="审核日期" type="string" variable="auditDate" required="false"/> -->
     		
     		<activiti:formProperty id="tbhdprocess_item" name="工序" type="string" variable="tbhdprocess_item"/>
@@ -87,6 +87,9 @@
     		//编制日期
 			def preparationDate = new Date().toInstant().toEpochMilli().toString()
 			execution.setVariable('preparationDate', preparationDate)
+			//工艺编制
+			def cUser = identityService.createUserQuery().userId(initiator).singleResult()
+			execution.setVariable('craftPreparation', cUser.getLastName() + " " + cUser.getFirstName())
     		
     		static String findValueByVarName(def historyService, String procInstId, String variableName) {
 			    def vars = historyService.createHistoricVariableInstanceQuery().processInstanceId(procInstId).list()
@@ -127,7 +130,7 @@
     		
     		<activiti:formProperty id="craftPreparation_工艺编制_1_string_t1_$$VD" name="工艺编制" type="string" variable="craftPreparation"/>
     		<activiti:formProperty id="preparationDate_编制日期_2_string_t3_$$VD" name="编制日期" type="string" variable="preparationDate"/>
-    		<activiti:formProperty id="craftAudit_工艺审核_3_string_t1_$$VD" name="工艺审核" type="string" variable="craftAudit"/>
+    		<!-- <activiti:formProperty id="craftAudit_工艺审核_3_string_t1_$$VD" name="工艺审核" type="string" variable="craftAudit"/> -->
     		<!-- <activiti:formProperty id="auditDate_审核日期_4_string_t3_$$VD" name="审核日期" type="string" variable="auditDate" required="true"/> -->
     		
     		<activiti:formProperty id="tbhdprocess_item_$$VA" name="工序" type="string" variable="tbhdprocess_item"/>
@@ -150,6 +153,9 @@
     						def execution = task.getExecution()
 							def auditDate = new Date().toInstant().toEpochMilli().toString()
 							execution.setVariable('auditDate', auditDate)
+							def assi = task.getAssignee()
+							def aUser = identityService.createUserQuery().userId(assi).singleResult()
+							execution.setVariable('craftAudit', aUser.getLastName() + " " + aUser.getFirstName())
 							if (coreaction == '同意') {
 								execution.setVariable('valid', 'Y')
 							}						
@@ -193,7 +199,7 @@
     		<activiti:formProperty id="unitWorkTime_单位工作时间 小时_3_string_t11_$$C" name="单位工作时间 小时" type="string" variable="unitWorkTime"/>
     		<activiti:formProperty id="productionLines_规划产线数_4_string_t11_$$C" name="规划产线数" type="string" variable="productionLines"/>
     		
-    		<activiti:formProperty id="craftPreparation_工艺编制_1_string_t1_$$D" name="工艺编制" type="string" variable="craftPreparation"/>
+    		<!-- <activiti:formProperty id="craftPreparation_工艺编制_1_string_t1_$$D" name="工艺编制" type="string" variable="craftPreparation"/> -->
     		<!-- <activiti:formProperty id="preparationDate_编制日期_2_string_t3_$$D" name="编制日期" type="string" variable="preparationDate"/ -->
     		<activiti:formProperty id="craftAudit_工艺审核_3_string_t1_$$D" name="工艺审核" type="string" variable="craftAudit" required="true"/>
     		<activiti:formProperty id="auditDate_审核日期_4_string_t3_$$VD" name="审核日期" type="string" variable="auditDate"/>

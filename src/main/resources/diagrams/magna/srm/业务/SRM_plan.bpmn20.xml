@@ -4,8 +4,8 @@
   <process id="SRM_PLAN" name="SRM采购计划" isExecutable="true" activiti:candidateStarterGroups="PUMGR,admin">
     <startEvent id="startevent1" name="Start" activiti:initiator="initiator">
     	<extensionElements>
-    		<activiti:formProperty id="planfrom_计划开始_1_string_t3_$$A" name="计划开始时间" type="string" variable="planFrom" required="true"/>
-    		<activiti:formProperty id="planto_计划结束_2_string_t3_$$A" name="计划结束时间" type="string" variable="planTo" required="true"/>
+    		<activiti:formProperty id="planfrom_计划开始_1_string_t5_$$A" name="计划开始时间" type="string" variable="planFrom" required="true"/>
+    		<activiti:formProperty id="planto_计划结束_2_string_t5_$$A" name="计划结束时间" type="string" variable="planTo" required="true"/>
     		<activiti:formProperty id="planNote_计划备注_3_string_t2_$$A" name="计划备注" type="string" variable="planNote"/>
     		
     		<activiti:formProperty id="tbhddetail_item" name="采购计划明细 Detail" type="string" variable="tbhddetail_item" required="true"/>
@@ -15,19 +15,19 @@
     		<activiti:formProperty id="tbhddetail_计划数量_planqty_4_string_t11_$$A" name="计划数量" type="string" variable="tbhddetail_planqty_t00" required="true"/>
     		<activiti:formProperty id="tbhddetail_剩余数量_remainqty_5_string_t11_$$HA" name="剩余数量" type="string" variable="tbhddetail_remainqty_t00"/>
     		<activiti:formProperty id="tbhddetail_单价_prcprice_6_string_t11_$$HA" name="单价" type="string" variable="tbhddetail_prcprice_t00"/>
-    		<activiti:formProperty id="tbhddetail_订货日期_orderdate_7_string_t3_$$HA" name="订货日期" type="string" variable="tbhddetail_orderdate_t00"/>
+    		<activiti:formProperty id="tbhddetail_要求送货时间_orderdate_7_string_t5_$$HA" name="要求送货时间" type="string" variable="tbhddetail_orderdate_t00"/>
     		<activiti:formProperty id="tbhddetail_订货数量_orderqty_8_string_t11_$$HA" name="订货数量" type="string" variable="tbhddetail_orderqty_t00"/>
     		<activiti:formProperty id="tbhddetail_系统批次_sysBatch_9_string_t1_$$HA" name="系统批次" type="string" variable="tbhddetail_sysBatch_t00"/>
     		<activiti:formProperty id="tbhddetail_手工批次_batch_10_string_t1_$$HA" name="手工批次" type="string" variable="tbhddetail_batch_t00"/>
     		<activiti:formProperty id="tbhddetail_实际送货数量_deliveryqty_11_string_t11_$$HA" name="实际送货数量" type="string" variable="tbhddetail_deliveryqty_t00"/>
-    		<activiti:formProperty id="tbhddetail_送货日期_deliverydate_12_string_t3_$$HA" name="送货日期" type="string" variable="tbhddetail_deliverydate_t00"/>
+    		<activiti:formProperty id="tbhddetail_送货时间_deliverydate_12_string_t5_$$HA" name="送货时间" type="string" variable="tbhddetail_deliverydate_t00"/>
     		<activiti:formProperty id="tbhddetail_车次_trainnumber_13_enum_sbs_$$HA" name="车次" type="enum" variable="tbhddetail_trainnumber_t00">
 				<activiti:value id="车次1" name="车次1"/>
 				<activiti:value id="车次2" name="车次2"/>
 				<activiti:value id="车次3" name="车次3"/>
 				<activiti:value id="车次4" name="车次4"/> 	
       		</activiti:formProperty>
-    		<activiti:formProperty id="tbhddetail_到货日期_arrivaldate_14_string_t3_$$HA" name="到货日期" type="string" variable="tbhddetail_arrivaldate_t00"/>
+    		<activiti:formProperty id="tbhddetail_到货时间_arrivaldate_14_string_t5_$$HA" name="到货时间" type="string" variable="tbhddetail_arrivaldate_t00"/>
     		<activiti:formProperty id="tbhddetail_合格数_accnumber_15_string_t11_$$HA" name="合格数" type="string" variable="tbhddetail_accnumber_t00"/>
     		<activiti:formProperty id="tbhddetail_不合格数_defnumber_16_string_t11_$$HA" name="不合格数" type="string" variable="tbhddetail_defnumber_t00"/>
     		<activiti:formProperty id="tbhddetail_不合格总金额_defAmount_17_string_t11_$$HA" name="不合格总金额" type="string" variable="tbhddetail_defAmount_t00"/>
@@ -112,8 +112,8 @@
     		</activiti:formProperty>
     		<activiti:formProperty id="vendorNote_备注_2_string_t2_$$A" name="备注说明" type="string" variable="vendorNote"/>
     		
-    		<activiti:formProperty id="planfrom_计划开始_1_string_t3_$$VA" name="计划开始时间" type="string" variable="planFrom" required="true"/>
-    		<activiti:formProperty id="planto_计划结束_2_string_t3_$$VA" name="计划结束时间" type="string" variable="planTo" required="true"/>
+    		<activiti:formProperty id="planfrom_计划开始_1_string_t5_$$VA" name="计划开始时间" type="string" variable="planFrom" required="true"/>
+    		<activiti:formProperty id="planto_计划结束_2_string_t5_$$VA" name="计划结束时间" type="string" variable="planTo" required="true"/>
     		<activiti:formProperty id="planNote_计划备注_3_string_t2_$$VA" name="计划备注" type="string" variable="planNote"/>
     		
     		<activiti:formProperty id="tbhddetail_item_$$VA" name="采购计划明细 Detail" type="string" variable="tbhddetail_item" required="true"/>
@@ -123,19 +123,19 @@
     		<activiti:formProperty id="tbhddetail_计划数量_planqty_4_string_t11_$$A" name="计划数量" type="string" variable="tbhddetail_planqty_t00" required="true"/>
     		<activiti:formProperty id="tbhddetail_剩余数量_remainqty_5_string_t11_$$HA" name="剩余数量" type="string" variable="tbhddetail_remainqty_t00"/>
     		<activiti:formProperty id="tbhddetail_单价_prcprice_6_string_t11_$$A" name="单价" type="string" variable="tbhddetail_prcprice_t00"/>
-    		<activiti:formProperty id="tbhddetail_订货日期_orderdate_7_string_t3_$$HA" name="订货日期" type="string" variable="tbhddetail_orderdate_t00"/>
+    		<activiti:formProperty id="tbhddetail_要求送货时间_orderdate_7_string_t5_$$HA" name="要求送货时间" type="string" variable="tbhddetail_orderdate_t00"/>
     		<activiti:formProperty id="tbhddetail_订货数量_orderqty_8_string_t11_$$HA" name="订货数量" type="string" variable="tbhddetail_orderqty_t00"/>
     		<activiti:formProperty id="tbhddetail_系统批次_sysBatch_9_string_t1_$$HA" name="系统批次" type="string" variable="tbhddetail_sysBatch_t00"/>
     		<activiti:formProperty id="tbhddetail_手工批次_batch_10_string_t1_$$HA" name="手工批次" type="string" variable="tbhddetail_batch_t00"/>
     		<activiti:formProperty id="tbhddetail_实际送货数量_deliveryqty_11_string_t11_$$HA" name="实际送货数量" type="string" variable="tbhddetail_deliveryqty_t00"/>
-    		<activiti:formProperty id="tbhddetail_送货日期_deliverydate_12_string_t3_$$HA" name="送货日期" type="string" variable="tbhddetail_deliverydate_t00"/>
+    		<activiti:formProperty id="tbhddetail_送货时间_deliverydate_12_string_t5_$$HA" name="送货时间" type="string" variable="tbhddetail_deliverydate_t00"/>
     		<activiti:formProperty id="tbhddetail_车次_trainnumber_13_enum_sbs_$$HA" name="车次" type="enum" variable="tbhddetail_trainnumber_t00">
 				<activiti:value id="车次1" name="车次1"/>
 				<activiti:value id="车次2" name="车次2"/>
 				<activiti:value id="车次3" name="车次3"/>
 				<activiti:value id="车次4" name="车次4"/> 	
       		</activiti:formProperty>
-    		<activiti:formProperty id="tbhddetail_到货日期_arrivaldate_14_string_t3_$$HA" name="到货日期" type="string" variable="tbhddetail_arrivaldate_t00"/>
+    		<activiti:formProperty id="tbhddetail_到货时间_arrivaldate_14_string_t5_$$HA" name="到货时间" type="string" variable="tbhddetail_arrivaldate_t00"/>
     		<activiti:formProperty id="tbhddetail_合格数_accnumber_15_string_t11_$$HA" name="合格数" type="string" variable="tbhddetail_accnumber_t00"/>
     		<activiti:formProperty id="tbhddetail_不合格数_defnumber_16_string_t11_$$HA" name="不合格数" type="string" variable="tbhddetail_defnumber_t00"/>
     		<activiti:formProperty id="tbhddetail_不合格总金额_defAmount_17_string_t11_$$HA" name="不合格总金额" type="string" variable="tbhddetail_defAmount_t00"/>
@@ -180,12 +180,50 @@
       				</activiti:string>
       			</activiti:field>
       		</activiti:taskListener>
+      		<activiti:taskListener event="create" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+      			<activiti:field name="language">
+      				<activiti:string>
+      					<![CDATA[groovy]]>
+      				</activiti:string>
+      			</activiti:field>
+      			<activiti:field name="script">
+      				<activiti:string>
+      					<![CDATA[import javax.crypto.Mac
+							import javax.crypto.spec.SecretKeySpec
+							import java.security.InvalidKeyException
+							
+      						def execution = task.getExecution()
+      						//initiator
+      						def hmac_sha256(String secretKey, String data) {
+							    try {
+							        Mac mac = Mac.getInstance("HmacSHA256")
+							        SecretKeySpec secretKeySpec = new SecretKeySpec(secretKey.getBytes(), "HmacSHA256")
+							        mac.init(secretKeySpec)
+							        byte[] digest = mac.doFinal(data.getBytes())
+							        return digest
+							    } catch (InvalidKeyException e) {
+							        throw new RuntimeException("Invalid key exception while converting to HMacSHA256")
+							    }
+							}
+							def METABASE_SITE_URL = "https://metabase.eorionsolution.com"
+							def METABASE_SECRET_KEY = "8322aa8500b6ae07df7590b25d1bff56cb5e631dc829704c15cb66e80fed9f50"
+							def header = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9"
+							def playloadString = '{"resource":{"question":168},"params":{"vId":"'+ initiator +'" }}'
+							def playload = Base64.getUrlEncoder().encodeToString(playloadString.bytes)
+							def secret =Base64.getUrlEncoder().encodeToString(hmac_sha256(METABASE_SECRET_KEY , header+'.'+playload))
+							
+							def url = METABASE_SITE_URL + "/embed/question/" + header+'.'+playload+'.'+secret + "#bordered=true&titled=true"
+		   					execution.setVariableLocal('BBOT_BI_V_PLANS',url)
+      					]]>
+      				</activiti:string>
+      			</activiti:field>
+      		</activiti:taskListener>
     	</extensionElements>
     </userTask>
     <userTask id="usertask2" name="manga修改计划-供应商不能满足需求" activiti:assignee="${initiator}" activiti:dueDate="P1D" activiti:priority="8080">
     	<extensionElements>
-    		<activiti:formProperty id="planfrom_计划开始_1_string_t3_$$A" name="计划开始时间" type="string" variable="planFrom" required="true"/>
-    		<activiti:formProperty id="planto_计划结束_2_string_t3_$$A" name="计划结束时间" type="string" variable="planTo" required="true"/>
+    		<activiti:formProperty id="planfrom_计划开始_1_string_t5_$$A" name="计划开始时间" type="string" variable="planFrom" required="true"/>
+    		<activiti:formProperty id="planto_计划结束_2_string_t5_$$A" name="计划结束时间" type="string" variable="planTo" required="true"/>
     		<activiti:formProperty id="planNote_计划备注_3_string_t2_$$A" name="计划备注" type="string" variable="planNote"/>
     		
     		<activiti:formProperty id="tbhddetail_item" name="采购计划明细 Detail" type="string" variable="tbhddetail_item" required="true"/>
@@ -195,19 +233,19 @@
     		<activiti:formProperty id="tbhddetail_计划数量_planqty_4_string_t11_$$A" name="计划数量" type="string" variable="tbhddetail_planqty_t00" required="true"/>
     		<activiti:formProperty id="tbhddetail_剩余数量_remainqty_5_string_t11_$$HA" name="剩余数量" type="string" variable="tbhddetail_remainqty_t00"/>
     		<activiti:formProperty id="tbhddetail_单价_prcprice_6_string_t11_$$HA" name="单价" type="string" variable="tbhddetail_prcprice_t00"/>
-    		<activiti:formProperty id="tbhddetail_订货日期_orderdate_7_string_t3_$$HA" name="订货日期" type="string" variable="tbhddetail_orderdate_t00"/>
+    		<activiti:formProperty id="tbhddetail_要求送货时间_orderdate_7_string_t5_$$HA" name="要求送货时间" type="string" variable="tbhddetail_orderdate_t00"/>
     		<activiti:formProperty id="tbhddetail_订货数量_orderqty_8_string_t11_$$HA" name="订货数量" type="string" variable="tbhddetail_orderqty_t00"/>
     		<activiti:formProperty id="tbhddetail_系统批次_sysBatch_9_string_t1_$$HA" name="系统批次" type="string" variable="tbhddetail_sysBatch_t00"/>
     		<activiti:formProperty id="tbhddetail_手工批次_batch_10_string_t1_$$HA" name="手工批次" type="string" variable="tbhddetail_batch_t00"/>
     		<activiti:formProperty id="tbhddetail_实际送货数量_deliveryqty_11_string_t11_$$HA" name="实际送货数量" type="string" variable="tbhddetail_deliveryqty_t00"/>
-    		<activiti:formProperty id="tbhddetail_送货日期_deliverydate_12_string_t3_$$HA" name="送货日期" type="string" variable="tbhddetail_deliverydate_t00"/>
+    		<activiti:formProperty id="tbhddetail_送货时间_deliverydate_12_string_t5_$$HA" name="送货时间" type="string" variable="tbhddetail_deliverydate_t00"/>
     		<activiti:formProperty id="tbhddetail_车次_trainnumber_13_enum_sbs_$$HA" name="车次" type="enum" variable="tbhddetail_trainnumber_t00">
 				<activiti:value id="车次1" name="车次1"/>
 				<activiti:value id="车次2" name="车次2"/>
 				<activiti:value id="车次3" name="车次3"/>
 				<activiti:value id="车次4" name="车次4"/> 	
       		</activiti:formProperty>
-    		<activiti:formProperty id="tbhddetail_到货日期_arrivaldate_14_string_t3_$$HA" name="到货日期" type="string" variable="tbhddetail_arrivaldate_t00"/>
+    		<activiti:formProperty id="tbhddetail_到货时间_arrivaldate_14_string_t3_$$HA" name="到货时间" type="string" variable="tbhddetail_arrivaldate_t00"/>
     		<activiti:formProperty id="tbhddetail_合格数_accnumber_15_string_t11_$$HA" name="合格数" type="string" variable="tbhddetail_accnumber_t00"/>
     		<activiti:formProperty id="tbhddetail_不合格数_defnumber_16_string_t11_$$HA" name="不合格数" type="string" variable="tbhddetail_defnumber_t00"/>
     		<activiti:formProperty id="tbhddetail_不合格总金额_defAmount_17_string_t11_$$HA" name="不合格总金额" type="string" variable="tbhddetail_defAmount_t00"/>
