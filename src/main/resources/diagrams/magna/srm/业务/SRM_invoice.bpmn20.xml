@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/inv">
-  <process id="SRM_invoice" name="SRM采购开票流程" isExecutable="true" activiti:candidateStarterGroups="FININV,admin">
+  <process id="SRM_invoice" name="SRM结算" isExecutable="true" activiti:candidateStarterGroups="FININV,admin">
     <startEvent id="S1" name="S1" activiti:initiator="initiator">
       <extensionElements>
         <activiti:formProperty id="executeFrom_开始时间_1_string_t5_$$A" name="开始时间" type="string" variable="executeFrom" required="true"></activiti:formProperty>
@@ -108,7 +108,7 @@
           </activiti:executionListener>
         </extensionElements>
       </startEvent>
-      <userTask id="usertask1" name="magna修改开票明细" activiti:assignee="${initiator}" activiti:dueDate="P1D" activiti:priority="8080">
+      <userTask id="usertask1" name="结算：magna修改开票明细" activiti:assignee="${initiator}" activiti:dueDate="P1D" activiti:priority="8080">
         <extensionElements>
           <activiti:formProperty id="claim_选择是否索赔_1_enum_sbs_$$A" name="选择是否索赔" type="enum" variable="claim">
             <activiti:value id="Y" name="索赔"></activiti:value>
@@ -183,7 +183,7 @@
           </activiti:taskListener>
         </extensionElements>
       </userTask>
-      <userTask id="usertask2" name="供应商填写单据编号" activiti:assignee="${initiator}" activiti:dueDate="P1D" activiti:priority="8080">
+      <userTask id="usertask2" name="结算：供应商填写单据编号" activiti:assignee="${initiator}" activiti:dueDate="P1D" activiti:priority="8080">
         <extensionElements>
           <activiti:formProperty id="invoicenumber_发票编号_1_string_t1_$$A" name="发票编号" type="string" variable="invoicenumber" required="true"></activiti:formProperty>
           <activiti:formProperty id="curAmountSum_当前实际总金额_1_string_cny_$$VA" name="当前实际总金额" type="string" variable="curAmountSum"></activiti:formProperty>
@@ -251,7 +251,7 @@
           </activiti:taskListener>
         </extensionElements>
       </userTask>
-      <userTask id="usertask3" name="财务查看单据信息" activiti:assignee="${initiator}" activiti:dueDate="P1D" activiti:priority="8080">
+      <userTask id="usertask3" name="结算：财务查看单据信息" activiti:assignee="${initiator}" activiti:dueDate="P1D" activiti:priority="8080">
         <extensionElements>
           <activiti:formProperty id="commit_提交财务_1_enum_rbv_$$A" name="提交财务" type="enum" variable="commit" required="true">
             <activiti:value id="提交" name="提交"></activiti:value>
@@ -349,7 +349,7 @@
           </activiti:taskListener>
         </extensionElements>
       </userTask>
-      <userTask id="usertask4" name="质检人员填写索赔信息" activiti:assignee="${initiator}" activiti:dueDate="P1D" activiti:priority="8080">
+      <userTask id="usertask4" name="结算：质检人员填写索赔信息" activiti:assignee="${initiator}" activiti:dueDate="P1D" activiti:priority="8080">
         <extensionElements>
           <activiti:formProperty id="claimNote_备注_1_string_t2_$$A" name="备注" type="string" variable="claimNote"></activiti:formProperty>
           <activiti:formProperty id="claimAttachments_附件_2_string_t9i_$$A" name="附件" type="string" variable="claimAttachments"></activiti:formProperty>
@@ -468,7 +468,7 @@
           </activiti:taskListener>
         </extensionElements>
       </userTask>
-      <userTask id="usertask5" name="供应商确认索赔" activiti:assignee="${initiator}" activiti:dueDate="P1D" activiti:priority="8080">
+      <userTask id="usertask5" name="结算：确认索赔" activiti:assignee="${initiator}" activiti:dueDate="P1D" activiti:priority="8080">
         <extensionElements>
           <activiti:formProperty id="confirmClaim_确认索赔_1_enum_rbv_$$A" name="确认索赔" type="enum" variable="confirmClaim" required="true">
           	<activiti:value id="Y" name="确认"></activiti:value>
@@ -574,7 +574,7 @@
           </activiti:taskListener>
         </extensionElements>
       </userTask>
-      <userTask id="usertask6" name="财务查看索赔信息" activiti:assignee="${initiator}" activiti:dueDate="P1D" activiti:priority="8080">
+      <userTask id="usertask6" name="结算：财务查看索赔信息" activiti:assignee="${initiator}" activiti:dueDate="P1D" activiti:priority="8080">
         <extensionElements>
           <activiti:formProperty id="commit_提交_1_enum_rbv_$$A" name="提交" type="enum" variable="commit" required="true">
             <activiti:value id="提交" name="提交"></activiti:value>

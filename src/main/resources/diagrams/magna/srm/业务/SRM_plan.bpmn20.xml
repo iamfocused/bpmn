@@ -104,7 +104,7 @@
     	]]>
     	</script>
     </scriptTask>
-    <userTask id="usertask1" name="供应商能否满足需求" activiti:assignee="${initiator}" activiti:dueDate="P1D" activiti:priority="8080">
+    <userTask id="usertask1" name="采购计划：确认需求" activiti:assignee="${initiator}" activiti:dueDate="P1D" activiti:priority="8080">
     	<extensionElements>
     		<activiti:formProperty id="isok_能否满足计划需求_1_enum_rbv_$$A" name="供应商能否满足计划需求" required="true" type="enum" variable="isok">
    				<activiti:value id="Y" name="可以满足需求"></activiti:value>
@@ -220,7 +220,7 @@
       		</activiti:taskListener>
     	</extensionElements>
     </userTask>
-    <userTask id="usertask2" name="manga修改计划-供应商不能满足需求" activiti:assignee="${initiator}" activiti:dueDate="P1D" activiti:priority="8080">
+    <userTask id="usertask2" name="采购计划：修改计划" activiti:assignee="${initiator}" activiti:dueDate="P1D" activiti:priority="8080">
     	<extensionElements>
     		<activiti:formProperty id="planfrom_计划开始_1_string_t5_$$A" name="计划开始时间" type="string" variable="planFrom" required="true"/>
     		<activiti:formProperty id="planto_计划结束_2_string_t5_$$A" name="计划结束时间" type="string" variable="planTo" required="true"/>

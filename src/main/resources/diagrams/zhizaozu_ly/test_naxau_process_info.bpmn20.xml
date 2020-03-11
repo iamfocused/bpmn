@@ -25,9 +25,9 @@
     		<activiti:formProperty id="processNote_工序备注_2_string_t2_$$C" name="工序备注" type="string" variable="processNote"/>
 			<!-- <activiti:formProperty id="processTime_工序时间 min_string_t11_$$C" name="工序时间 min" type="string" variable="processTime"/> --> 
 			
-			<activiti:formProperty id="processPreparation_工序编制_1_string_t1_$$D" name="工序编制" type="string" variable="processPreparation" required="false"/>
+			<!-- <activiti:formProperty id="processPreparation_工序编制_1_string_t1_$$D" name="工序编制" type="string" variable="processPreparation" required="false"/> -->
     		<!-- <activiti:formProperty id="preparationDate_编制日期_2_string_t3_$$D" name="编制日期" type="string" variable="preparationDate" required="true"/> -->
-    		<activiti:formProperty id="processAudit_工序审核_3_string_t1_$$D" name="工序审核" type="string" variable="processAudit" required="false"/>
+    		<!-- <activiti:formProperty id="processAudit_工序审核_3_string_t1_$$D" name="工序审核" type="string" variable="processAudit" required="false"/> -->
     		<!-- <activiti:formProperty id="auditDate_审核日期_4_string_t3_$$D" name="审核日期" type="string" variable="auditDate" required="true"/> -->
     		
     		<activiti:formProperty id="tbhdworksteps_item" name="工步表" type="string" variable="tbhdworksteps_item"/>
@@ -36,6 +36,31 @@
     		<activiti:formProperty id="tbhdworksteps_工步时间 min_stepTime_3_string_t11_$$A" name="工步时间 min" type="string" variable="tbhdworksteps_stepTime_t00"/>
     		<activiti:formProperty id="tbhdworksteps_工步描述_stepDesc_4_string_t2_$$A" name="工步描述" type="string" variable="tbhdworksteps_stepDesc_t00"/>
     		
+    		<activiti:executionListener event="end" class="org.activiti.engine.impl.bpmn.listener.ScriptExecutionListener">
+    			<activiti:field name="language">
+    				<activiti:string>
+    					<![CDATA[groovy]]>
+    				</activiti:string>
+    			</activiti:field>
+    			<activiti:field name="script">
+    				<activiti:string>
+    					<![CDATA[
+    						//编制日期
+							def preparationDate = new Date().toInstant().toEpochMilli().toString()
+							execution.setVariable('preparationDate', preparationDate)
+						
+							//编制
+    						def user = identityService.createUserQuery().userId(initiator).singleResult()
+    						
+    						def processPreparation = user.getLastName() + " " + user.getFirstName()
+    						execution.setVariable('processPreparation', processPreparation)
+    						
+    						def procInstId = execution.getProcessInstanceId()
+    						execution.setVariable('procInstId', procInstId)
+    					]]>
+    				</activiti:string>
+    			</activiti:field>
+    		</activiti:executionListener>
     	</extensionElements>
     </startEvent>
     <userTask id="usertask1" name="审核查看" activiti:assignee="${initiator}" activiti:dueDate="P1D" activiti:priority="8080">
@@ -69,7 +94,7 @@
 			
 			<activiti:formProperty id="processPreparation_工序编制_1_string_t1_$$VD" name="工序编制" type="string" variable="processPreparation" required="false"/>
     		<activiti:formProperty id="preparationDate_编制日期_2_string_t3_$$VD" name="编制日期" type="string" variable="preparationDate" required="false"/>
-    		<activiti:formProperty id="processAudit_工序审核_3_string_t1_$$VD" name="工序审核" type="string" variable="processAudit" required="false"/>
+    		<!-- <activiti:formProperty id="processAudit_工序审核_3_string_t1_$$VD" name="工序审核" type="string" variable="processAudit" required="false"/> -->
     		<!-- <activiti:formProperty id="auditDate_审核日期_4_string_t3_$$VD" name="审核日期" type="string" variable="auditDate" required="true"/> -->
     		
     		<activiti:formProperty id="tbhdworksteps_item_$$VA" name="工步表" type="string" variable="tbhdworksteps_item"/>
@@ -90,6 +115,13 @@
     						def execution = task.getExecution()
 							def auditDate = new Date().toInstant().toEpochMilli().toString()
 							execution.setVariable('auditDate', auditDate)
+							
+							//审核
+							def u = task.getAssignee()
+    						def user = identityService.createUserQuery().userId(u).singleResult()
+    						def processAudit = user.getLastName() + " " + user.getFirstName()
+    						execution.setVariable('processAudit', processAudit)
+    						
 							if (coreaction == '同意') {
 								execution.setVariable('valid', 'Y')
 							}						
@@ -119,6 +151,19 @@
     	<![CDATA[
 			import groovy.json.JsonSlurper
 			
+			def count = runtimeService.createProcessInstanceQuery()
+								.processDefinitionKey(execution.getProcessDefinition().getKey())
+								.active()
+								.variableValueEquals("processCode", processCode)
+								.list()
+								.parallelStream()
+								.map({it.getId()})
+								.filter({it != procInstId})
+								.count()
+			if (count != 0) {
+				throw new org.activiti.engine.ActivitiIllegalArgumentException('工序编码重复')
+			}
+			
 			def jsonSlurper = new JsonSlurper()
 			//计算工序时间
 			def processTime = 0
@@ -130,9 +175,6 @@
 			
 			execution.setVariable('processTime', processTime.toString())
 			
-			//编制日期
-			def preparationDate = new Date().toInstant().toEpochMilli().toString()
-			execution.setVariable('preparationDate', preparationDate)
     	]]>
     	</script>
     </scriptTask>
@@ -159,9 +201,9 @@
     		<activiti:formProperty id="processNote_工序备注_2_string_t2_$$C" name="工序备注" type="string" variable="processNote"/>
 			<activiti:formProperty id="processTime_工序时间 min_3_string_t11_$$C" name="工序时间 min" type="string" variable="processTime"/> 
 			
-			<activiti:formProperty id="processPreparation_工序编制_1_string_t1_$$D" name="工序编制" type="string" variable="processPreparation" required="false"/>
-    		<activiti:formProperty id="preparationDate_编制日期_2_string_t3_$$VD" name="编制日期" type="string" variable="preparationDate" required="false"/>
-    		<activiti:formProperty id="processAudit_工序审核_3_string_t1_$$D" name="工序审核" type="string" variable="processAudit" required="false"/>
+			<!-- <activiti:formProperty id="processPreparation_工序编制_1_string_t1_$$D" name="工序编制" type="string" variable="processPreparation" required="false"/> -->
+    		<!-- <activiti:formProperty id="preparationDate_编制日期_2_string_t3_$$VD" name="编制日期" type="string" variable="preparationDate" required="false"/> -->
+    		<activiti:formProperty id="processAudit_工序审核_3_string_t1_$$VD" name="工序审核" type="string" variable="processAudit" required="false"/>
     		<activiti:formProperty id="auditDate_审核日期_4_string_t3_$$VD" name="审核日期" type="string" variable="auditDate" required="false"/>
     		
     		<activiti:formProperty id="tbhdworksteps_item" name="工步表" type="string" variable="tbhdworksteps_item"/>
@@ -175,6 +217,30 @@
 	        	<activiti:value id="拒绝" name="拒绝"></activiti:value>
 	        </activiti:formProperty>
 	        <activiti:formProperty id="corecomments_审核意见_2_string_t2_$$VA" name="审核意见" type="string" variable="corecomments"/>
+    		
+    		<activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+    			<activiti:field name="language">
+    				<activiti:string>
+    					<![CDATA[groovy]]>
+    				</activiti:string>
+    			</activiti:field>
+    			<activiti:field name="script">
+    				<activiti:string>
+    					<![CDATA[
+    						//编制
+    						def u = task.getAssignee()
+    						def execution = task.getExecution()
+    						def user = identityService.createUserQuery().userId(u).singleResult()
+    						
+    						def processPreparation = user.getLastName() + " " + user.getFirstName()
+    						execution.setVariable('processPreparation', processPreparation)
+    						//编制日期
+    						def preparationDate = new Date().toInstant().toEpochMilli().toString()
+    						execution.setVariable('preparationDate', preparationDate)
+    					]]>
+    				</activiti:string>
+    			</activiti:field>
+    		</activiti:taskListener>
     	</extensionElements>
     </userTask>
     <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="scripttask1"></sequenceFlow>

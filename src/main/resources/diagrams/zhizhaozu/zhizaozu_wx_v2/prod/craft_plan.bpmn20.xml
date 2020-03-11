@@ -28,6 +28,29 @@
     		<activiti:formProperty id="tbhdprocess_工序类型_processType_4_string_t1_$$HA" name="工序类型" type="string" variable="tbhdprocess_processType_t00"/>
     		<activiti:formProperty id="tbhdprocess_装夹件数_clampingQuantity_5_string_t6_$$HA" name="装夹件数" type="string" variable="tbhdprocess_clampingQuantity_t00"/>
     		<activiti:formProperty id="tbhdprocess_工序时间 秒_processTime_6_string_t11_$$HA" name="工序时间" type="string" variable="tbhdprocess_processTime_t00"/>
+    	
+    		<activiti:executionListener event="end" class="org.activiti.engine.impl.bpmn.listener.ScriptExecutionListener">
+    			<activiti:field name="language">
+    				<activiti:string>
+    					<![CDATA[groovy]]>
+    				</activiti:string>
+    			</activiti:field>
+    			<activiti:field name="script">
+    				<activiti:string>
+    					<![CDATA[
+    						//编制日期
+							def preparationDate = new Date().toInstant().toEpochMilli().toString()
+							execution.setVariable('preparationDate', preparationDate)
+							//工艺编制
+							def cUser = identityService.createUserQuery().userId(initiator).singleResult()
+							execution.setVariable('craftPreparation', cUser.getLastName() + " " + cUser.getFirstName())
+							
+							def procInstId = execution.getProcessInstanceId()
+    						execution.setVariable('procInstId', procInstId)
+    					]]>
+    				</activiti:string>
+    			</activiti:field>
+    		</activiti:executionListener>
     	</extensionElements>
     </startEvent>
     <scriptTask id="scripttask1" name="处理脚本" activiti:autoStoreVariables="false" scriptFormat="groovy">
@@ -39,24 +62,19 @@
     		def jsonSlurper = new JsonSlurper()
     		
     		//工艺编码校验
-			def checkCCodeUrl = "https://my.zhizaozu.com/metabase/public/question/c965ce17-ee23-4517-b405-fc3865176a72.json?parameters="
-			def restParam1 = new HashMap()
-			def headerMap1 = new HashMap()
-			headerMap1.put("Content-Type","application/json")
-			restParam1.put("_http_method","GET")
-			restParam1.put("_http_headers",headerMap1)
-			def param1=java.net.URLEncoder.encode('[{"type":"category","target":["variable",["template-tag","cCode"]],"value":\"'+ craftCode + '\"}]', "UTF-8")
-			restParam1.put("_http_url", checkCCodeUrl + param1)
-			restParam1.put("_http_body", '')
-			def result1 = RestAPI.execute(restParam1)
-			if (!result1._http_response_status_code || !result1._http_response_status_code.toString().startsWith("2")) {
-    			throw new org.activiti.engine.ActivitiIllegalArgumentException('metabase校验工艺编码调用失败')
-    		}
+			def count = runtimeService.createProcessInstanceQuery()
+								.processDefinitionKey(execution.getProcessDefinition().getKey())
+								.active()
+								.variableValueEquals("craftCode", craftCode)
+								.list()
+								.parallelStream()
+								.map({it.getId()})
+								.filter({it != procInstId})
+								.count()
+			if (count != 0) {
+				throw new org.activiti.engine.ActivitiIllegalArgumentException('工艺编码编码重复')
+			}
     		
-    		def resps1 = jsonSlurper.parseText(result1._http_response_body)
-    		if (resps1.size() != 0) {
-    			throw new org.activiti.engine.ActivitiIllegalArgumentException('工艺编码重复')
-    		}
     		//填充物料信息
     		def searchMeterialUrl = "https://my.zhizaozu.com/metabase/public/question/9d7db483-e5ed-4c41-acb5-b4a220d9e203.json?parameters="
     		def mCode = jsonSlurper.parseText(meterialCode?:'{"":""}').name
@@ -119,13 +137,6 @@
     		execution.setVariable('craftBeat', String.format("%.2f", craftBeat))
     		def capacityTest = 3600*(productionLines?:0).toDouble()*(workDays?:0).toDouble()*(shiftTimes?:0).toDouble()*((unitWorkTime?:0).toDouble()/(craftBeat?:1))
     		execution.setVariable('capacityTest', String.format("%.2f", capacityTest))
-    		
-    		//编制日期
-			def preparationDate = new Date().toInstant().toEpochMilli().toString()
-			execution.setVariable('preparationDate', preparationDate)
-			//工艺编制
-			def cUser = identityService.createUserQuery().userId(initiator).singleResult()
-			execution.setVariable('craftPreparation', cUser.getLastName() + " " + cUser.getFirstName())
     		
     		static String findValueByVarName(def historyService, String procInstId, String variableName) {
 			    def vars = historyService.createHistoricVariableInstanceQuery().processInstanceId(procInstId).list()
@@ -249,6 +260,27 @@
     		<activiti:formProperty id="tbhdprocess_工序类型_processType_4_string_t1_$$HA" name="工序类型" type="string" variable="tbhdprocess_processType_t00"/>
     		<activiti:formProperty id="tbhdprocess_装夹件数_clampingQuantity_5_string_t6_$$HA" name="装夹件数" type="string" variable="tbhdprocess_clampingQuantity_t00"/>
     		<activiti:formProperty id="tbhdprocess_工序时间 秒_processTime_6_string_t11_$$HA" name="工序时间" type="string" variable="tbhdprocess_processTime_t00"/>
+    		<activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+    			<activiti:field name="language">
+    				<activiti:string>
+    					<![CDATA[groovy]]>
+    				</activiti:string>
+    			</activiti:field>
+    			<activiti:field name="script">
+    				<activiti:string>
+    					<![CDATA[
+    						def execution = task.getExecution()
+    						def u = task.getAssignee()
+    						//编制日期
+							def preparationDate = new Date().toInstant().toEpochMilli().toString()
+							execution.setVariable('preparationDate', preparationDate)
+							//工艺编制
+							def cUser = identityService.createUserQuery().userId(u).singleResult()
+							execution.setVariable('craftPreparation', cUser.getLastName() + " " + cUser.getFirstName())
+    					]]>
+    				</activiti:string>
+    			</activiti:field>
+    		</activiti:taskListener>
     	</extensionElements>
     </userTask>
     <boundaryEvent id="boundarymessage1" name="Message" attachedToRef="usertask1" cancelActivity="true">

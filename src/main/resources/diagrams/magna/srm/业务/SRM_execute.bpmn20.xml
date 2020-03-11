@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/del">
-  <process id="SRM_execute" name="SRM采购计划执行" isExecutable="true" activiti:candidateStarterGroups="PUMGR,admin">
+  <process id="SRM_execute" name="SRM采购执行" isExecutable="true" activiti:candidateStarterGroups="PUMGR,admin">
     <startEvent id="startevent1" name="Start" activiti:initiator="initiator">
     	<extensionElements>
     		<activiti:formProperty id="chooseplan_选择采购计划_1_string_tree_$$A" name="选择采购计划" type="string" variable="chooseplan" required="true"/>
@@ -45,7 +45,7 @@
     	</extensionElements>
     </startEvent>
     
-    <userTask id="usertask1" name="填写本次需求量" activiti:assignee="${initiator}" activiti:dueDate="P1D" activiti:priority="8080">
+    <userTask id="usertask1" name="采购执行：填写需求量" activiti:assignee="${initiator}" activiti:dueDate="P1D" activiti:priority="8080">
     	<extensionElements>
     		<activiti:formProperty id="planfrom_计划开始_1_string_t5_$$VA" name="计划开始时间" type="string" variable="planFrom" required="true"/>
     		<activiti:formProperty id="planto_计划结束_2_string_t5_$$VA" name="计划结束时间" type="string" variable="planTo" required="true"/>
@@ -144,7 +144,7 @@
       		</activiti:taskListener>
     	</extensionElements>
     </userTask>
-    <userTask id="usertask2" name="供应商发货" activiti:assignee="${initiator}" activiti:dueDate="P1D" activiti:priority="8080">
+    <userTask id="usertask2" name="采购执行：发货" activiti:assignee="${initiator}" activiti:dueDate="P1D" activiti:priority="8080">
     	<extensionElements>
     		<activiti:formProperty id="planfrom_计划开始_1_string_t5_$$VA" name="计划开始时间" type="string" variable="planFrom" required="true"/>
     		<activiti:formProperty id="planto_计划结束_2_string_t5_$$VA" name="计划结束时间" type="string" variable="planTo" required="true"/>
@@ -295,7 +295,7 @@
     		</activiti:taskListener>
     	</extensionElements>
     </userTask>
-    <userTask id="usertask3" name="质量检验" activiti:assignee="${initiator}" activiti:dueDate="P1D" activiti:priority="8080">
+    <userTask id="usertask3" name="采购执行：质检" activiti:assignee="${initiator}" activiti:dueDate="P1D" activiti:priority="8080">
     	<extensionElements>
     		<activiti:formProperty id="planfrom_计划开始_1_string_t5_$$VA" name="计划开始时间" type="string" variable="planFrom" required="true"/>
     		<activiti:formProperty id="planto_计划结束_2_string_t5_$$VA" name="计划结束时间" type="string" variable="planTo" required="true"/>

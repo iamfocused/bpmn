@@ -5,7 +5,7 @@
     <startEvent id="S1" name="S1" activiti:initiator="initiator">
     	<extensionElements>
     		<activiti:formProperty id="productionPlanNo_生产计划单号_2_string_auto_$$A" name="生产计划单号" type="string" variable="productionPlanNo"/>
-    		<activiti:formProperty id="meterialCode_物料编号_3_string_auto_$$A" name="物料编号" type="string" variable="meterialCode"/>
+    		<activiti:formProperty id="meterialCode_物料编码_3_string_auto_$$A" name="物料编码" type="string" variable="meterialCode"/>
     		<activiti:formProperty id="coreactionProductionQuantity_生产数量_5_string_t6_$$A" name="生产数量" type="string" variable="coreactionProductionQuantity" required="true"/>
     		<activiti:formProperty id="craftCode_工艺编号_6_string_tree_$$A" name="工艺编号" type="string" variable="craftCode" required="true"/>
     		
@@ -94,7 +94,7 @@
     	<extensionElements>
     		<activiti:formProperty id="productionProcessNo_生产加工单号_1_string_t1_$$VA" name="生产加工单号" type="string" variable="productionProcessNo"/>
     		<activiti:formProperty id="productionPlanNo_生产计划单号_2_string_auto_$$VA" name="生产计划单号" type="string" variable="productionPlanNo"/>
-    		<activiti:formProperty id="meterialCode_物料编号_3_string_auto_$$VA" name="物料编号" type="string" variable="meterialCode"/>
+    		<activiti:formProperty id="meterialCode_物料编码_3_string_auto_$$VA" name="物料编码" type="string" variable="meterialCode"/>
     		<activiti:formProperty id="coreactionProductionQuantity_生产数量_5_string_t6_$$VA" name="生产数量" type="string" variable="coreactionProductionQuantity"/>
     		<activiti:formProperty id="craftCode_工艺编号_6_string_tree_$$VA" name="工艺编号" type="string" variable="craftCode"/>
     		
@@ -220,8 +220,8 @@
           <activiti:formProperty id="processCheckCode_工序检验单号_8_string_t1_$$A" name="工序检验单号" type="string" variable="processCheckCode"></activiti:formProperty>
           <!-- <activiti:formProperty id="reportDate_报工时间_9_string_t5_$$A" name="报工时间" type="string" variable="reportDate" required="true"></activiti:formProperty> -->
           <activiti:formProperty id="productionProcessNo_生产加工单号_1_string_t1_$$VA" name="生产加工单号" type="string" variable="productionProcessNo" required="true"></activiti:formProperty>
-          <activiti:formProperty id="productionPlanNo_生产计划单号_2_string_t1_$$VA" name="生产计划单号" type="string" variable="productionPlanNo" required="true"></activiti:formProperty>
-          <activiti:formProperty id="meterialCode_物料编号_3_string_auto_$$VA" name="物料编号" type="string" variable="meterialCode" required="true"></activiti:formProperty>
+          <activiti:formProperty id="productionPlanNo_生产计划单号_2_string_auto_$$VA" name="生产计划单号" type="string" variable="productionPlanNo" required="true"></activiti:formProperty>
+          <activiti:formProperty id="meterialCode_物料编码_3_string_auto_$$VA" name="物料编码" type="string" variable="meterialCode" required="true"></activiti:formProperty>
           <activiti:formProperty id="meterialSpec_物料型号_4_string_auto_$$VA" name="物料型号" type="string" variable="meterialSpec"></activiti:formProperty>
           <activiti:formProperty id="coreactionProductionQuantity_生产数量_5_string_t6_$$VA" name="生产数量" type="string" variable="coreactionProductionQuantity" required="true"></activiti:formProperty>
           <activiti:formProperty id="curRemain_当前剩余数量_6_string_t1_$$VC" name="当前剩余数量" type="string" variable="curRemain"></activiti:formProperty>

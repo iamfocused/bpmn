@@ -21,7 +21,7 @@
         <activiti:formProperty id="vndsccode_认证码_1_string_t1_$$A" name="认证码" type="string" variable="VND_SC_CODE_"></activiti:formProperty>
       </extensionElements>
     </startEvent>
-    <userTask id="T1" name="T1: 修改" activiti:assignee="${initiator}">
+    <userTask id="T1" name="供应商：修改" activiti:assignee="${initiator}">
       <extensionElements>
         <activiti:formProperty id="coreaction_操作_1_enum_rbv_$$A" name="操作" type="enum" variable="coreaction_t01" required="true">
           <activiti:value id="更新" name="更新"></activiti:value>

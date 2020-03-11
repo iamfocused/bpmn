@@ -93,9 +93,6 @@
     						def procInstId = execution.getProcessInstanceId()
     						execution.setVariable('procInstId', procInstId)
     						execution.setVariable('msgName', 'processUpdate')
-    						def checkPCodeUrl = "https://my.zhizaozu.com/metabase/public/question/556dd7ec-ae79-4f71-97ec-980eea466c74.json?parameters="
-    						execution.setVariable('checkPCodeUrl', checkPCodeUrl)
-    						
     					]]>
     				</activiti:string>
     			</activiti:field>
@@ -113,22 +110,18 @@
     		def jsonSlurper = new JsonSlurper()
     		
     		//工序编码校验
-			def restParam = new HashMap()
-			def headerMap = new HashMap()
-			headerMap.put("Content-Type","application/json")
-			restParam.put("_http_method","GET")
-			restParam.put("_http_headers",headerMap)
-			def param=java.net.URLEncoder.encode('[{"type":"category","target":["variable",["template-tag","pCode"]],"value":\"'+ processCode + '\"}]', "UTF-8")
-			restParam.put("_http_url", checkPCodeUrl + param)
-			restParam.put("_http_body", '')
-			def result = RestAPI.execute(restParam)
-			if (!result._http_response_status_code || !result._http_response_status_code.toString().startsWith("2")) {
-    			throw new org.activiti.engine.ActivitiIllegalArgumentException('metabase校验工序编码调用失败')
-    		}
-    		def resps = jsonSlurper.parseText(result._http_response_body)
-    		if (resps.size() != 0) {
-    			throw new org.activiti.engine.ActivitiIllegalArgumentException('工序编码重复')
-    		}
+			def count = runtimeService.createProcessInstanceQuery()
+								.processDefinitionKey(execution.getProcessDefinition().getKey())
+								.active()
+								.variableValueEquals("processCode", processCode)
+								.list()
+								.parallelStream()
+								.map({it.getId()})
+								.filter({it != procInstId})
+								.count()
+			if (count != 0) {
+				throw new org.activiti.engine.ActivitiIllegalArgumentException('工序编码重复')
+			}
     		
     		//填充工步并计算值
     		def tbhdworksteps_item_std = jsonSlurper.parseText(tbhdworksteps_item_std)
@@ -362,6 +355,12 @@
     </userTask>
     <userTask id="usertask2" name="修改工序" activiti:assignee="${initiator}" activiti:dueDate="P1D" activiti:priority="8080">
     	<extensionElements>
+    		<activiti:formProperty id="coreaction_审核_1_enum_rbv_$$VA" name="审核" type="enum" variable="coreaction" required="true">
+	        	<activiti:value id="同意" name="同意"></activiti:value>
+	        	<activiti:value id="拒绝" name="拒绝"></activiti:value>
+	        </activiti:formProperty>
+	        <activiti:formProperty id="corecomments_审核意见_2_string_t2_$$VA" name="审核意见" type="string" variable="corecomments"/>
+	        
     		<activiti:formProperty id="processCode_工序编码_1_string_t1_$$A" name="工序编码" type="string" variable="processCode" required="true"/>
     		<activiti:formProperty id="processName_工序名称_2_string_t1_$$A" name="工序名称" type="string" variable="processName" required="true"/>
     		<activiti:formProperty id="processDesc_工序描述_3_string_t2_$$A" name="工序描述" type="string" variable="processDesc" required="false"/>
@@ -386,8 +385,8 @@
     		
     		<!-- <activiti:formProperty id="processPreparation_工序编制_1_string_t1_$$D" name="工序编制" type="string" variable="processPreparation" required="false"/> -->
     		<!-- <activiti:formProperty id="preparationDate_编制日期_2_string_t3_$$D" name="编制日期" type="string" variable="preparationDate" required="false"/> -->
-    		<!-- <activiti:formProperty id="processAudit_工序审核_3_string_t1_$$D" name="工序审核" type="string" variable="processAudit" required="false"/> -->
-    		<!-- <activiti:formProperty id="auditDate_审核日期_4_string_t3_$$D" name="审核日期" type="string" variable="auditDate" required="false"/> -->
+    		<activiti:formProperty id="processAudit_工序审核_3_string_t1_$$VD" name="工序审核" type="string" variable="processAudit" required="false"/>
+    		<activiti:formProperty id="auditDate_审核日期_4_string_t3_$$VD" name="审核日期" type="string" variable="auditDate" required="false"/>
     		<activiti:formProperty id="attachments_附件_5_string_t9_$$D" name="附件" type="string" variable="attachments"/>
     		
     		<activiti:formProperty id="tbhdworksteps_item" name="工步详情" type="string" variable="tbhdworksteps_item"/>

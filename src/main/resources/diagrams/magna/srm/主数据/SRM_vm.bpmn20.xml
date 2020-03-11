@@ -17,7 +17,7 @@
         <activiti:formProperty id="tbhddetail_有效期至_valdateto_7_string_t3_$$A" name="有效期至" type="string" variable="tbhddetail_valdateto_t00"></activiti:formProperty>
       </extensionElements>
     </startEvent>
-    <userTask id="T1" name="T1: 修改" activiti:assignee="${initiator}">
+    <userTask id="T1" name="物料供应商：修改" activiti:assignee="${initiator}">
       <extensionElements>
         <activiti:formProperty id="coreaction_操作_1_enum_rbv_$$1" name="操作" type="enum" variable="coreaction_t01" required="true">
           <activiti:value id="更新" name="更新"></activiti:value>

@@ -25,9 +25,9 @@
     		<activiti:formProperty id="note_备注_5_string_t2_$$B" name="备注" type="string" variable="note"/>
     		<!-- <activiti:formProperty id="craftTime_工艺时间 h_6_string_t11_$$B" name="工艺时间 h" type="string" variable="craftTime"/> -->
     		
-    		<activiti:formProperty id="craftPreparation_工艺编制_1_string_t1_$$C" name="工艺编制" type="string" variable="craftPreparation"/>
+    		<!-- <activiti:formProperty id="craftPreparation_工艺编制_1_string_t1_$$C" name="工艺编制" type="string" variable="craftPreparation"/> -->
     		<!-- <activiti:formProperty id="preparationDate_编制日期_2_string_t3_$$C" name="编制日期" type="string" variable="preparationDate"/> -->
-    		<activiti:formProperty id="craftAudit_工艺审核_3_string_t1_$$C" name="工艺审核" type="string" variable="craftAudit"/>
+    		<!-- <activiti:formProperty id="craftAudit_工艺审核_3_string_t1_$$C" name="工艺审核" type="string" variable="craftAudit"/> -->
     		<!-- <activiti:formProperty id="auditDate_审核日期_4_string_t3_$$C" name="审核日期" type="string" variable="auditDate"/> -->
     	
     		<activiti:formProperty id="tbhdprocess_item" name="工序" type="string" variable="tbhdprocess_item"/>
@@ -36,6 +36,29 @@
     		<activiti:formProperty id="tbhdprocess_工序名称_processName_3_string_t1_$$HA" name="工序名称" type="string" variable="tbhdprocess_processName_t00"/>
     		<activiti:formProperty id="tbhdprocess_工序时间 min_processTime_4_string_t11_$$HA" name="工序时间 min" type="string" variable="tbhdprocess_processTime_t00"/>
     		<activiti:formProperty id="tbhdprocess_工序备注_processNote_5_string_t2_$$HA" name="工序备注" type="string" variable="tbhdprocess_processNote_t00"/>
+    	
+    		<activiti:executionListener event="end" class="org.activiti.engine.impl.bpmn.listener.ScriptExecutionListener">
+    			<activiti:field name="language">
+    				<activiti:string>
+    					<![CDATA[groovy]]>
+    				</activiti:string>
+    			</activiti:field>
+    			<activiti:field name="script">
+    				<activiti:string>
+    					<![CDATA[
+    						//编制日期
+							def preparationDate = new Date().toInstant().toEpochMilli().toString()
+							execution.setVariable('preparationDate', preparationDate)
+						
+							//编制
+    						def user = identityService.createUserQuery().userId(initiator).singleResult()
+    						
+    						def craftPreparation = user.getLastName() + " " + user.getFirstName()
+    						execution.setVariable('craftPreparation', craftPreparation)
+    					]]>
+    				</activiti:string>
+    			</activiti:field>
+    		</activiti:executionListener>
     	</extensionElements>
     </startEvent>
     <userTask id="usertask1" name="审核查看" activiti:assignee="${initiator}" activiti:dueDate="P1D" activiti:priority="8080">
@@ -69,7 +92,7 @@
     		
     		<activiti:formProperty id="craftPreparation_工艺编制_1_string_t1_$$VC" name="工艺编制" type="string" variable="craftPreparation"/>
     		<activiti:formProperty id="preparationDate_编制日期_2_string_t3_$$VC" name="编制日期" type="string" variable="preparationDate"/>
-    		<activiti:formProperty id="craftAudit_工艺审核_3_string_t1_$$VC" name="工艺审核" type="string" variable="craftAudit"/>
+    		<!-- <activiti:formProperty id="craftAudit_工艺审核_3_string_t1_$$VC" name="工艺审核" type="string" variable="craftAudit"/> -->
     		<!-- <activiti:formProperty id="auditDate_审核日期_4_string_t3_$$VC" name="审核日期" type="string" variable="auditDate"/> -->
     	
     		<activiti:formProperty id="tbhdprocess_item_$$VA" name="工序" type="string" variable="tbhdprocess_item"/>
@@ -91,6 +114,10 @@
     						def execution = task.getExecution()
 							def auditDate = new Date().toInstant().toEpochMilli().toString()
 							execution.setVariable('auditDate', auditDate)
+							//工艺编制
+							def u = task.getAssignee()
+							def cUser = identityService.createUserQuery().userId(u).singleResult()
+							execution.setVariable('craftAudit', cUser.getLastName() + " " + cUser.getFirstName())
 							if (coreaction == '同意') {
 								execution.setVariable('valid', 'Y')
 							}						
@@ -195,9 +222,9 @@
     		<activiti:formProperty id="note_备注_5_string_t2_$$B" name="备注" type="string" variable="note"/>
     		<!-- <activiti:formProperty id="craftTime_工艺时间 h_6_string_t11_$$B" name="工艺时间 h" type="string" variable="craftTime"/> -->
     		
-    		<activiti:formProperty id="craftPreparation_工艺编制_1_string_t1_$$C" name="工艺编制" type="string" variable="craftPreparation"/>
+    		<!-- <activiti:formProperty id="craftPreparation_工艺编制_1_string_t1_$$C" name="工艺编制" type="string" variable="craftPreparation"/> -->
     		<!-- <activiti:formProperty id="preparationDate_编制日期_2_string_t3_$$C" name="编制日期" type="string" variable="preparationDate"/> -->
-    		<activiti:formProperty id="craftAudit_工艺审核_3_string_t1_$$C" name="工艺审核" type="string" variable="craftAudit"/>
+    		<activiti:formProperty id="craftAudit_工艺审核_3_string_t1_$$VC" name="工艺审核" type="string" variable="craftAudit"/>
     		<activiti:formProperty id="auditDate_审核日期_4_string_t3_$$VC" name="审核日期" type="string" variable="auditDate"/>
     	
     		<activiti:formProperty id="tbhdprocess_item" name="工序" type="string" variable="tbhdprocess_item"/>
@@ -206,6 +233,28 @@
     		<activiti:formProperty id="tbhdprocess_工序名称_processName_3_string_t1_$$HA" name="工序名称" type="string" variable="tbhdprocess_processName_t00"/>
     		<activiti:formProperty id="tbhdprocess_工序时间 min_processTime_4_string_t11_$$HA" name="工序时间 min" type="string" variable="tbhdprocess_processTime_t00"/>
     		<activiti:formProperty id="tbhdprocess_工序备注_processNote_5_string_t2_$$HA" name="工序备注" type="string" variable="tbhdprocess_processNote_t00"/>
+    	
+    		<activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+    			<activiti:field name="language">
+    				<activiti:string>
+    					<![CDATA[groovy]]>
+    				</activiti:string>
+    			</activiti:field>
+    			<activiti:field name="script">
+    				<activiti:string>
+    					<![CDATA[
+    						def execution = task.getExecution()
+    						//编制日期
+							def preparationDate = new Date().toInstant().toEpochMilli().toString()
+							execution.setVariable('preparationDate', preparationDate)
+							//工艺编制
+							def u = task.getAssignee()
+							def cUser = identityService.createUserQuery().userId(u).singleResult()
+							execution.setVariable('craftPreparation', cUser.getLastName() + " " + cUser.getFirstName())
+    					]]>
+    				</activiti:string>
+    			</activiti:field>
+    		</activiti:taskListener>
     	</extensionElements>
     </userTask>
     <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="scripttask1"></sequenceFlow>

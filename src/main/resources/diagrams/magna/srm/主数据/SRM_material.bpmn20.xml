@@ -21,7 +21,7 @@
         <activiti:formProperty id="matversion_版本号_1_string_t1_$$A" name="版本号" type="string" variable="MAT_VERSION_"></activiti:formProperty>
       </extensionElements>
     </startEvent>
-    <userTask id="T1" name="T1: 修改" activiti:assignee="${initiator}">
+    <userTask id="T1" name="物料：修改" activiti:assignee="${initiator}">
       <extensionElements>
         <activiti:formProperty id="coreaction_操作_1_enum_rbv_$$A" name="操作" type="enum" variable="coreaction_t01" required="true">
           <activiti:value id="更新" name="更新"></activiti:value>
