@@ -328,7 +328,7 @@
 							        .active()
 							        .variableValueEquals(procInstId, procInstId)
 							        .list()
-							        .parallelStream()
+							        .stream()
 							        .map({it.getId()})
 							        .distinct()
 							        .forEach({

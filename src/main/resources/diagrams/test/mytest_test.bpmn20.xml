@@ -6,17 +6,30 @@
     <scriptTask id="scripttask1" name="User Task" activiti:autoStoreVariables="false" scriptFormat="groovy">
     	<script>
     	<![CDATA[
-    		import com.eorionsolution.bpms.extension.rest.RestAPI
+    		import java.util.stream.Collectors;
     		
-    		def checkPCodeUrl = "https://metabase.eorionsolution.com/public/question/4cfb6b3f-1242-45f7-9ce1-b9d97e19b12f.json?parameters="
-			def restParam = new HashMap()
-			def headerMap = new HashMap()
-			headerMap.put("Content-Type","application/json")
-			restParam.put("_http_method","GET")
-			restParam.put("_http_headers",headerMap)
-			def param=java.net.URLEncoder.encode('[{"type":"category","target":["variable",["template-tag","pCode"]],"value":\"'+ '1' + '\"}]', "UTF-8")
-			restParam.put("_http_url", checkPCodeUrl + param)
-			restParam.put("_http_body", '')
+    		def msgName='processUpdate'
+    		def result = runtimeService.createProcessInstanceQuery()
+			        .active()
+			        .processDefinitionKey("craftPlan")
+			        .active()
+			        .variableValueEquals('1353679', '1353679')
+			        .list()
+			        .stream()
+			        .map({it.getId()})
+			        .distinct()
+			        .forEach({
+			            def exe = runtimeService.createExecutionQuery()
+			            				.processInstanceId(it)
+			            				.messageEventSubscriptionName(msgName)
+			            				.singleResult()
+			            //runtimeService.messageEventReceived(msgName, eId);
+			        })
+			      
+			def exe = runtimeService.createExecutionQuery()
+			            				.processInstanceId('1357071')
+			            				.messageEventSubscriptionName(msgName)
+			            				.singleResult().getId()
     	]]>
     	</script>
     </scriptTask>

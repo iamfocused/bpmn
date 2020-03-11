@@ -57,6 +57,9 @@
     						
     						def procInstId = execution.getProcessInstanceId()
     						execution.setVariable('procInstId', procInstId)
+    						
+    						def msgName = 'processUpdate'
+    						execution.setVariable('msgName', msgName)
     					]]>
     				</activiti:string>
     			</activiti:field>
@@ -124,6 +127,24 @@
     						
 							if (coreaction == '同意') {
 								execution.setVariable('valid', 'Y')
+								//使用本道工序的所有工艺都要重新计算审核
+								runtimeService.createProcessInstanceQuery()
+							        .active()
+							        .processDefinitionKey("naxauCraftInfo")
+							        .active()
+							        .variableValueEquals(procInstId, procInstId)
+							        .list()
+							        .stream()
+							        .map({it.getId()})
+							        .distinct()
+							        .forEach({
+							            String eId = runtimeService.createExecutionQuery()
+							            				.processInstanceId(it)
+							            				.messageEventSubscriptionName(msgName)
+							            				.singleResult()
+							            				.getId()
+							            runtimeService.messageEventReceived(msgName, eId);
+							        })
 							}						
     					]]>
     				</activiti:string>

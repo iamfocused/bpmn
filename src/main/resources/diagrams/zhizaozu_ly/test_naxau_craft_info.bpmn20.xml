@@ -1,52 +1,40 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/frm">
+  <message id="processUpdate" name="processUpdate"></message>
   <process id="naxauCraftInfo" name="工艺方案" isExecutable="true" activiti:candidateStarterGroups="admin">
     <documentation>工艺方案</documentation>
     <startEvent id="startevent1" name="Start" activiti:initiator="initiator">
-    	<extensionElements>
-    		<activiti:formProperty id="craftCode_工艺编码_1_string_t1_$$A" name="工艺编码" type="string" variable="craftCode" required="true"/>
-    		<activiti:formProperty id="craftName_工艺名称_2_string_t1_$$A" name="工艺名称" type="string" variable="craftName" required="true"/>
-    		<activiti:formProperty id="craftDesc_工艺概述_3_string_t2_$$A" name="工艺概述" type="string" variable="craftDesc"/>
-    		
-    		<activiti:formProperty id="coatingType_涂层种类_1_enum_sbs_$$B" name="涂层种类" type="enum" variable="coatingType">
-    			<activiti:value id="TiN" name="TiN"/>
-    			<activiti:value id="TiAIN" name="TiAIN"/>
-    			<activiti:value id="TiCN" name="TiCN"/>
-    			<activiti:value id="其他" name="其他"/>
-    		</activiti:formProperty>
-    		<activiti:formProperty id="applicableProduct_适用产品_2_enum_sbs_$$B" name="适用产品" type="enum" variable="applicableProduct">
-    			<activiti:value id="铣刀" name="铣刀"/>
-    			<activiti:value id="滚刀" name="滚刀"/>
-    			<activiti:value id="丝锥" name="丝锥"/>
-    			<activiti:value id="其他" name="其他"/>
-    		</activiti:formProperty>
-    		<activiti:formProperty id="coatingThickness_涂层厚度_3_string_t1_$$B" name="涂层厚度" type="string" variable="coatingThickness"/>
-    		<activiti:formProperty id="applicableSpec_适用规格_4_string_t1_$$B" name="适用规格" type="string" variable="applicableSpec"/>
-    		<activiti:formProperty id="note_备注_5_string_t2_$$B" name="备注" type="string" variable="note"/>
-    		<!-- <activiti:formProperty id="craftTime_工艺时间 h_6_string_t11_$$B" name="工艺时间 h" type="string" variable="craftTime"/> -->
-    		
-    		<!-- <activiti:formProperty id="craftPreparation_工艺编制_1_string_t1_$$C" name="工艺编制" type="string" variable="craftPreparation"/> -->
-    		<!-- <activiti:formProperty id="preparationDate_编制日期_2_string_t3_$$C" name="编制日期" type="string" variable="preparationDate"/> -->
-    		<!-- <activiti:formProperty id="craftAudit_工艺审核_3_string_t1_$$C" name="工艺审核" type="string" variable="craftAudit"/> -->
-    		<!-- <activiti:formProperty id="auditDate_审核日期_4_string_t3_$$C" name="审核日期" type="string" variable="auditDate"/> -->
-    	
-    		<activiti:formProperty id="tbhdprocess_item" name="工序" type="string" variable="tbhdprocess_item"/>
-    		<activiti:formProperty id="tbhdprocess_工序号_processNo_1_string_t1_$$A" name="工序号" type="string" variable="tbhdprocess_processNo_t00" required="true"/>
-    		<activiti:formProperty id="tbhdprocess_工序编码_processCode_2_string_auto_$$A" name="工序编码" type="string" variable="tbhdprocess_processCode_t00" required="true"/>
-    		<activiti:formProperty id="tbhdprocess_工序名称_processName_3_string_t1_$$HA" name="工序名称" type="string" variable="tbhdprocess_processName_t00"/>
-    		<activiti:formProperty id="tbhdprocess_工序时间 min_processTime_4_string_t11_$$HA" name="工序时间 min" type="string" variable="tbhdprocess_processTime_t00"/>
-    		<activiti:formProperty id="tbhdprocess_工序备注_processNote_5_string_t2_$$HA" name="工序备注" type="string" variable="tbhdprocess_processNote_t00"/>
-    	
-    		<activiti:executionListener event="end" class="org.activiti.engine.impl.bpmn.listener.ScriptExecutionListener">
-    			<activiti:field name="language">
-    				<activiti:string>
-    					<![CDATA[groovy]]>
-    				</activiti:string>
-    			</activiti:field>
-    			<activiti:field name="script">
-    				<activiti:string>
-    					<![CDATA[
-    						//编制日期
+      <extensionElements>
+        <activiti:formProperty id="craftCode_工艺编码_1_string_t1_$$A" name="工艺编码" type="string" variable="craftCode" required="true"></activiti:formProperty>
+        <activiti:formProperty id="craftName_工艺名称_2_string_t1_$$A" name="工艺名称" type="string" variable="craftName" required="true"></activiti:formProperty>
+        <activiti:formProperty id="craftDesc_工艺概述_3_string_t2_$$A" name="工艺概述" type="string" variable="craftDesc"></activiti:formProperty>
+        <activiti:formProperty id="coatingType_涂层种类_1_enum_sbs_$$B" name="涂层种类" type="enum" variable="coatingType">
+          <activiti:value id="TiN" name="TiN"></activiti:value>
+          <activiti:value id="TiAIN" name="TiAIN"></activiti:value>
+          <activiti:value id="TiCN" name="TiCN"></activiti:value>
+          <activiti:value id="其他" name="其他"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="applicableProduct_适用产品_2_enum_sbs_$$B" name="适用产品" type="enum" variable="applicableProduct">
+          <activiti:value id="铣刀" name="铣刀"></activiti:value>
+          <activiti:value id="滚刀" name="滚刀"></activiti:value>
+          <activiti:value id="丝锥" name="丝锥"></activiti:value>
+          <activiti:value id="其他" name="其他"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="coatingThickness_涂层厚度_3_string_t1_$$B" name="涂层厚度" type="string" variable="coatingThickness"></activiti:formProperty>
+        <activiti:formProperty id="applicableSpec_适用规格_4_string_t1_$$B" name="适用规格" type="string" variable="applicableSpec"></activiti:formProperty>
+        <activiti:formProperty id="note_备注_5_string_t2_$$B" name="备注" type="string" variable="note"></activiti:formProperty>
+        <activiti:formProperty id="tbhdprocess_item" name="工序" type="string" variable="tbhdprocess_item"></activiti:formProperty>
+        <activiti:formProperty id="tbhdprocess_工序号_processNo_1_string_t1_$$A" name="工序号" type="string" variable="tbhdprocess_processNo_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdprocess_工序编码_processCode_2_string_auto_$$A" name="工序编码" type="string" variable="tbhdprocess_processCode_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdprocess_工序名称_processName_3_string_t1_$$HA" name="工序名称" type="string" variable="tbhdprocess_processName_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdprocess_工序时间 min_processTime_4_string_t11_$$HA" name="工序时间 min" type="string" variable="tbhdprocess_processTime_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdprocess_工序备注_processNote_5_string_t2_$$HA" name="工序备注" type="string" variable="tbhdprocess_processNote_t00"></activiti:formProperty>
+        <activiti:executionListener event="end" class="org.activiti.engine.impl.bpmn.listener.ScriptExecutionListener">
+          <activiti:field name="language">
+            <activiti:string><![CDATA[groovy]]></activiti:string>
+          </activiti:field>
+          <activiti:field name="script">
+            <activiti:string><![CDATA[//编制日期
 							def preparationDate = new Date().toInstant().toEpochMilli().toString()
 							execution.setVariable('preparationDate', preparationDate)
 						
@@ -54,64 +42,51 @@
     						def user = identityService.createUserQuery().userId(initiator).singleResult()
     						
     						def craftPreparation = user.getLastName() + " " + user.getFirstName()
-    						execution.setVariable('craftPreparation', craftPreparation)
-    					]]>
-    				</activiti:string>
-    			</activiti:field>
-    		</activiti:executionListener>
-    	</extensionElements>
+    						execution.setVariable('craftPreparation', craftPreparation)]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
     </startEvent>
     <userTask id="usertask1" name="审核查看" activiti:assignee="${initiator}" activiti:dueDate="P1D" activiti:priority="8080">
-    	<extensionElements>
-    		<activiti:formProperty id="coreaction_审核_1_enum_rbv_$$A" name="审核" type="enum" variable="coreaction" required="true">
-	        	<activiti:value id="同意" name="同意"></activiti:value>
-	        	<activiti:value id="拒绝" name="拒绝"></activiti:value>
-	        </activiti:formProperty>
-	        <activiti:formProperty id="corecomments_审核意见_2_string_t2_$$A" name="审核意见" type="string" variable="corecomments"/>
-    	
-    		<activiti:formProperty id="craftCode_工艺编码_1_string_t1_$$VA" name="工艺编码" type="string" variable="craftCode" required="true"/>
-    		<activiti:formProperty id="craftName_工艺名称_2_string_t1_$$VA" name="工艺名称" type="string" variable="craftName" required="true"/>
-    		<activiti:formProperty id="craftDesc_工艺概述_3_string_t2_$$VA" name="工艺概述" type="string" variable="craftDesc"/>
-    		
-    		<activiti:formProperty id="coatingType_涂层种类_1_enum_sbs_$$VB" name="涂层种类" type="enum" variable="coatingType">
-    			<activiti:value id="TiN" name="TiN"/>
-    			<activiti:value id="TiAIN" name="TiAIN"/>
-    			<activiti:value id="TiCN" name="TiCN"/>
-    			<activiti:value id="其他" name="其他"/>
-    		</activiti:formProperty>
-    		<activiti:formProperty id="applicableProduct_适用产品_2_enum_sbs_$$VB" name="适用产品" type="enum" variable="applicableProduct">
-    			<activiti:value id="铣刀" name="铣刀"/>
-    			<activiti:value id="滚刀" name="滚刀"/>
-    			<activiti:value id="丝锥" name="丝锥"/>
-    			<activiti:value id="其他" name="其他"/>
-    		</activiti:formProperty>
-    		<activiti:formProperty id="coatingThickness_涂层厚度_3_string_t1_$$VB" name="涂层厚度" type="string" variable="coatingThickness"/>
-    		<activiti:formProperty id="applicableSpec_适用规格_4_string_t1_$$VB" name="适用规格" type="string" variable="applicableSpec"/>
-    		<activiti:formProperty id="note_备注_5_string_t2_$$VB" name="备注" type="string" variable="note"/>
-    		<activiti:formProperty id="craftTime_工艺时间 h_6_string_t11_$$VB" name="工艺时间 h" type="string" variable="craftTime"/>
-    		
-    		<activiti:formProperty id="craftPreparation_工艺编制_1_string_t1_$$VC" name="工艺编制" type="string" variable="craftPreparation"/>
-    		<activiti:formProperty id="preparationDate_编制日期_2_string_t3_$$VC" name="编制日期" type="string" variable="preparationDate"/>
-    		<!-- <activiti:formProperty id="craftAudit_工艺审核_3_string_t1_$$VC" name="工艺审核" type="string" variable="craftAudit"/> -->
-    		<!-- <activiti:formProperty id="auditDate_审核日期_4_string_t3_$$VC" name="审核日期" type="string" variable="auditDate"/> -->
-    	
-    		<activiti:formProperty id="tbhdprocess_item_$$VA" name="工序" type="string" variable="tbhdprocess_item"/>
-    		<activiti:formProperty id="tbhdprocess_工序号_processNo_1_string_t1_$$A" name="工序号" type="string" variable="tbhdprocess_processNo_t00" required="true"/>
-    		<activiti:formProperty id="tbhdprocess_工序编码_processCode_2_string_auto_$$A" name="工序编码" type="string" variable="tbhdprocess_processCode_t00" required="true"/>
-    		<activiti:formProperty id="tbhdprocess_工序名称_processName_3_string_t1_$$A" name="工序名称" type="string" variable="tbhdprocess_processName_t00"/>
-    		<activiti:formProperty id="tbhdprocess_工序时间 min_processTime_4_string_t11_$$A" name="工序时间 min" type="string" variable="tbhdprocess_processTime_t00"/>
-    		<activiti:formProperty id="tbhdprocess_工序备注_processNote_5_string_t2_$$A" name="工序备注" type="string" variable="tbhdprocess_processNote_t00"/>
-    	
-    		<activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
-    			<activiti:field name="language">
-    				<activiti:string>
-    					<![CDATA[groovy]]>
-    				</activiti:string>
-    			</activiti:field>
-    			<activiti:field name="script">
-    				<activiti:string>
-    					<![CDATA[
-    						def execution = task.getExecution()
+      <extensionElements>
+        <activiti:formProperty id="coreaction_审核_1_enum_rbv_$$A" name="审核" type="enum" variable="coreaction" required="true">
+          <activiti:value id="同意" name="同意"></activiti:value>
+          <activiti:value id="拒绝" name="拒绝"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="corecomments_审核意见_2_string_t2_$$A" name="审核意见" type="string" variable="corecomments"></activiti:formProperty>
+        <activiti:formProperty id="craftCode_工艺编码_1_string_t1_$$VA" name="工艺编码" type="string" variable="craftCode" required="true"></activiti:formProperty>
+        <activiti:formProperty id="craftName_工艺名称_2_string_t1_$$VA" name="工艺名称" type="string" variable="craftName" required="true"></activiti:formProperty>
+        <activiti:formProperty id="craftDesc_工艺概述_3_string_t2_$$VA" name="工艺概述" type="string" variable="craftDesc"></activiti:formProperty>
+        <activiti:formProperty id="coatingType_涂层种类_1_enum_sbs_$$VB" name="涂层种类" type="enum" variable="coatingType">
+          <activiti:value id="TiN" name="TiN"></activiti:value>
+          <activiti:value id="TiAIN" name="TiAIN"></activiti:value>
+          <activiti:value id="TiCN" name="TiCN"></activiti:value>
+          <activiti:value id="其他" name="其他"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="applicableProduct_适用产品_2_enum_sbs_$$VB" name="适用产品" type="enum" variable="applicableProduct">
+          <activiti:value id="铣刀" name="铣刀"></activiti:value>
+          <activiti:value id="滚刀" name="滚刀"></activiti:value>
+          <activiti:value id="丝锥" name="丝锥"></activiti:value>
+          <activiti:value id="其他" name="其他"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="coatingThickness_涂层厚度_3_string_t1_$$VB" name="涂层厚度" type="string" variable="coatingThickness"></activiti:formProperty>
+        <activiti:formProperty id="applicableSpec_适用规格_4_string_t1_$$VB" name="适用规格" type="string" variable="applicableSpec"></activiti:formProperty>
+        <activiti:formProperty id="note_备注_5_string_t2_$$VB" name="备注" type="string" variable="note"></activiti:formProperty>
+        <activiti:formProperty id="craftTime_工艺时间 h_6_string_t11_$$VB" name="工艺时间 h" type="string" variable="craftTime"></activiti:formProperty>
+        <activiti:formProperty id="craftPreparation_工艺编制_1_string_t1_$$VC" name="工艺编制" type="string" variable="craftPreparation"></activiti:formProperty>
+        <activiti:formProperty id="preparationDate_编制日期_2_string_t3_$$VC" name="编制日期" type="string" variable="preparationDate"></activiti:formProperty>
+        <activiti:formProperty id="tbhdprocess_item_$$VA" name="工序" type="string" variable="tbhdprocess_item"></activiti:formProperty>
+        <activiti:formProperty id="tbhdprocess_工序号_processNo_1_string_t1_$$A" name="工序号" type="string" variable="tbhdprocess_processNo_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdprocess_工序编码_processCode_2_string_auto_$$A" name="工序编码" type="string" variable="tbhdprocess_processCode_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdprocess_工序名称_processName_3_string_t1_$$A" name="工序名称" type="string" variable="tbhdprocess_processName_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdprocess_工序时间 min_processTime_4_string_t11_$$A" name="工序时间 min" type="string" variable="tbhdprocess_processTime_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdprocess_工序备注_processNote_5_string_t2_$$A" name="工序备注" type="string" variable="tbhdprocess_processNote_t00"></activiti:formProperty>
+        <activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+          <activiti:field name="language">
+            <activiti:string><![CDATA[groovy]]></activiti:string>
+          </activiti:field>
+          <activiti:field name="script">
+            <activiti:string><![CDATA[def execution = task.getExecution()
 							def auditDate = new Date().toInstant().toEpochMilli().toString()
 							execution.setVariable('auditDate', auditDate)
 							//工艺编制
@@ -120,33 +95,38 @@
 							execution.setVariable('craftAudit', cUser.getLastName() + " " + cUser.getFirstName())
 							if (coreaction == '同意') {
 								execution.setVariable('valid', 'Y')
-							}						
-    					]]>
-    				</activiti:string>
-    			</activiti:field>
-    		</activiti:taskListener>
-    		<activiti:taskListener event="create" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
-    			<activiti:field name="language">
-    				<activiti:string>
-    					<![CDATA[groovy]]>
-    				</activiti:string>
-    			</activiti:field>
-    			<activiti:field name="script">
-    				<activiti:string>
-    					<![CDATA[
-    						def execution = task.getExecution()
-							execution.setVariable('valid', 'N')						
-    					]]>
-    				</activiti:string>
-    			</activiti:field>
-    		</activiti:taskListener>
-    	</extensionElements>
+							}]]></activiti:string>
+          </activiti:field>
+        </activiti:taskListener>
+        <activiti:taskListener event="create" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+          <activiti:field name="language">
+            <activiti:string><![CDATA[groovy]]></activiti:string>
+          </activiti:field>
+          <activiti:field name="script">
+            <activiti:string><![CDATA[def execution = task.getExecution()
+							execution.setVariable('valid', 'N')]]></activiti:string>
+          </activiti:field>
+        </activiti:taskListener>
+      </extensionElements>
     </userTask>
-    <scriptTask id="scripttask1" name="处理脚本" activiti:autoStoreVariables="false" scriptFormat="groovy">
-    	<script>
-    	<![CDATA[import groovy.json.JsonSlurper
+    <scriptTask id="scripttask1" name="处理脚本" scriptFormat="groovy" activiti:autoStoreVariables="false">
+      <script>
+    	import groovy.json.JsonSlurper
     		import groovy.json.JsonOutput
     		
+    		def count = runtimeService.createProcessInstanceQuery()
+								.processDefinitionKey(execution.getProcessDefinition().getKey())
+								.active()
+								.variableValueEquals("craftCode", craftCode)
+								.list()
+								.parallelStream()
+								.map({it.getId()})
+								.filter({it != procInstId})
+								.count()
+			if (count != 0) {
+				throw new org.activiti.engine.ActivitiIllegalArgumentException('工艺编码重复')
+			}
+			
     		def jsonSlurper = new JsonSlurper()
     		def craftTime = 0
     		
@@ -157,17 +137,25 @@
     		
     			std.each {
     				def pProcInstId = it.processCode.code
-    				it.processName = findValueByVarName(historyService, pProcInstId, 'processName')
-    				it.processTime = findValueByVarName(historyService, pProcInstId, 'processTime')
-    				it.processNote = findValueByVarName(historyService, pProcInstId, 'processNote')
+    				if (pProcInstId) {
+    					it.processCode = ["code": pProcInstId, "name": findValueByVarName(historyService, pProcInstId, 'processCode')]
+	    				it.processName = findValueByVarName(historyService, pProcInstId, 'processName')
+	    				it.processTime = findValueByVarName(historyService, pProcInstId, 'processTime')
+	    				it.processNote = findValueByVarName(historyService, pProcInstId, 'processNote')
+	    				//保存所使用工序的流程Id，供工序修改是sendMessage查询
+		    			execution.setVariable(pProcInstId, pProcInstId)
+	    			}
     			}
-    			items.each {k,v ->
+    			items.each {k,v -&gt;
     				if (k == 'rows') {
     					v.each {
     						def pProcInstId = it[1].code
-    						it[2] = findValueByVarName(historyService, pProcInstId, 'processName')
-    						it[3] = findValueByVarName(historyService, pProcInstId, 'processTime')
-    						it[4] = findValueByVarName(historyService, pProcInstId, 'processNote')
+    						if (pProcInstId) {
+    							it[1] = ["code": pProcInstId, "name": findValueByVarName(historyService, pProcInstId, 'processCode')]
+	    						it[2] = findValueByVarName(historyService, pProcInstId, 'processName')
+	    						it[3] = findValueByVarName(historyService, pProcInstId, 'processTime')
+	    						it[4] = findValueByVarName(historyService, pProcInstId, 'processNote')
+    						}
     					}
     				}
     			}
@@ -184,83 +172,77 @@
     		    		
     		static String findValueByVarName(def historyService, String procInstId, String variableName) {
 			    def vars = historyService.createHistoricVariableInstanceQuery().processInstanceId(procInstId).list()
-			    def values = vars.stream().filter({var -> variableName.equals(var?.getVariableName())}).map({var -> var.getValue()}).collect(java.util.stream.Collectors.toList())
+			    def values = vars.stream().filter({var -&gt; variableName.equals(var?.getVariableName())}).map({var -&gt; var.getValue()}).collect(java.util.stream.Collectors.toList())
 			    if (values.isEmpty()) {
 					throw new org.activiti.engine.ActivitiIllegalArgumentException('数据获取失败' + procInstId + ',' + variableName)
 			    }
 			    return values[0]
 			}
-    	]]>
+    	
     	</script>
     </scriptTask>
     <userTask id="usertask2" name="修改工艺方案" activiti:assignee="${initiator}" activiti:dueDate="P1D" activiti:priority="8080">
-    	<extensionElements>
-    		<activiti:formProperty id="coreaction_审核_1_enum_rbv_$$VA" name="审核" type="enum" variable="coreaction" required="true">
-	        	<activiti:value id="同意" name="同意"></activiti:value>
-	        	<activiti:value id="拒绝" name="拒绝"></activiti:value>
-	        </activiti:formProperty>
-	        <activiti:formProperty id="corecomments_审核意见_2_string_t2_$$VA" name="审核意见" type="string" variable="corecomments"/>
-    		
-    		<activiti:formProperty id="craftCode_工艺编码_1_string_t1_$$A" name="工艺编码" type="string" variable="craftCode" required="true"/>
-    		<activiti:formProperty id="craftName_工艺名称_2_string_t1_$$A" name="工艺名称" type="string" variable="craftName" required="true"/>
-    		<activiti:formProperty id="craftDesc_工艺概述_3_string_t2_$$A" name="工艺概述" type="string" variable="craftDesc"/>
-    		
-    		<activiti:formProperty id="coatingType_涂层种类_1_enum_sbs_$$B" name="涂层种类" type="enum" variable="coatingType">
-    			<activiti:value id="TiN" name="TiN"/>
-    			<activiti:value id="TiAIN" name="TiAIN"/>
-    			<activiti:value id="TiCN" name="TiCN"/>
-    			<activiti:value id="其他" name="其他"/>
-    		</activiti:formProperty>
-    		<activiti:formProperty id="applicableProduct_适用产品_2_enum_sbs_$$B" name="适用产品" type="enum" variable="applicableProduct">
-    			<activiti:value id="铣刀" name="铣刀"/>
-    			<activiti:value id="滚刀" name="滚刀"/>
-    			<activiti:value id="丝锥" name="丝锥"/>
-    			<activiti:value id="其他" name="其他"/>
-    		</activiti:formProperty>
-    		<activiti:formProperty id="coatingThickness_涂层厚度_3_string_t1_$$B" name="涂层厚度" type="string" variable="coatingThickness"/>
-    		<activiti:formProperty id="applicableSpec_适用规格_4_string_t1_$$B" name="适用规格" type="string" variable="applicableSpec"/>
-    		<activiti:formProperty id="note_备注_5_string_t2_$$B" name="备注" type="string" variable="note"/>
-    		<!-- <activiti:formProperty id="craftTime_工艺时间 h_6_string_t11_$$B" name="工艺时间 h" type="string" variable="craftTime"/> -->
-    		
-    		<!-- <activiti:formProperty id="craftPreparation_工艺编制_1_string_t1_$$C" name="工艺编制" type="string" variable="craftPreparation"/> -->
-    		<!-- <activiti:formProperty id="preparationDate_编制日期_2_string_t3_$$C" name="编制日期" type="string" variable="preparationDate"/> -->
-    		<activiti:formProperty id="craftAudit_工艺审核_3_string_t1_$$VC" name="工艺审核" type="string" variable="craftAudit"/>
-    		<activiti:formProperty id="auditDate_审核日期_4_string_t3_$$VC" name="审核日期" type="string" variable="auditDate"/>
-    	
-    		<activiti:formProperty id="tbhdprocess_item" name="工序" type="string" variable="tbhdprocess_item"/>
-    		<activiti:formProperty id="tbhdprocess_工序号_processNo_1_string_t1_$$A" name="工序号" type="string" variable="tbhdprocess_processNo_t00" required="true"/>
-    		<activiti:formProperty id="tbhdprocess_工序编码_processCode_2_string_auto_$$A" name="工序编码" type="string" variable="tbhdprocess_processCode_t00" required="true"/>
-    		<activiti:formProperty id="tbhdprocess_工序名称_processName_3_string_t1_$$HA" name="工序名称" type="string" variable="tbhdprocess_processName_t00"/>
-    		<activiti:formProperty id="tbhdprocess_工序时间 min_processTime_4_string_t11_$$HA" name="工序时间 min" type="string" variable="tbhdprocess_processTime_t00"/>
-    		<activiti:formProperty id="tbhdprocess_工序备注_processNote_5_string_t2_$$HA" name="工序备注" type="string" variable="tbhdprocess_processNote_t00"/>
-    	
-    		<activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
-    			<activiti:field name="language">
-    				<activiti:string>
-    					<![CDATA[groovy]]>
-    				</activiti:string>
-    			</activiti:field>
-    			<activiti:field name="script">
-    				<activiti:string>
-    					<![CDATA[
-    						def execution = task.getExecution()
+      <extensionElements>
+        <activiti:formProperty id="coreaction_审核_1_enum_rbv_$$VA" name="审核" type="enum" variable="coreaction" required="true">
+          <activiti:value id="同意" name="同意"></activiti:value>
+          <activiti:value id="拒绝" name="拒绝"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="corecomments_审核意见_2_string_t2_$$VA" name="审核意见" type="string" variable="corecomments"></activiti:formProperty>
+        <activiti:formProperty id="craftCode_工艺编码_1_string_t1_$$A" name="工艺编码" type="string" variable="craftCode" required="true"></activiti:formProperty>
+        <activiti:formProperty id="craftName_工艺名称_2_string_t1_$$A" name="工艺名称" type="string" variable="craftName" required="true"></activiti:formProperty>
+        <activiti:formProperty id="craftDesc_工艺概述_3_string_t2_$$A" name="工艺概述" type="string" variable="craftDesc"></activiti:formProperty>
+        <activiti:formProperty id="coatingType_涂层种类_1_enum_sbs_$$B" name="涂层种类" type="enum" variable="coatingType">
+          <activiti:value id="TiN" name="TiN"></activiti:value>
+          <activiti:value id="TiAIN" name="TiAIN"></activiti:value>
+          <activiti:value id="TiCN" name="TiCN"></activiti:value>
+          <activiti:value id="其他" name="其他"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="applicableProduct_适用产品_2_enum_sbs_$$B" name="适用产品" type="enum" variable="applicableProduct">
+          <activiti:value id="铣刀" name="铣刀"></activiti:value>
+          <activiti:value id="滚刀" name="滚刀"></activiti:value>
+          <activiti:value id="丝锥" name="丝锥"></activiti:value>
+          <activiti:value id="其他" name="其他"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="coatingThickness_涂层厚度_3_string_t1_$$B" name="涂层厚度" type="string" variable="coatingThickness"></activiti:formProperty>
+        <activiti:formProperty id="applicableSpec_适用规格_4_string_t1_$$B" name="适用规格" type="string" variable="applicableSpec"></activiti:formProperty>
+        <activiti:formProperty id="note_备注_5_string_t2_$$B" name="备注" type="string" variable="note"></activiti:formProperty>
+        <activiti:formProperty id="craftAudit_工艺审核_3_string_t1_$$VC" name="工艺审核" type="string" variable="craftAudit"></activiti:formProperty>
+        <activiti:formProperty id="auditDate_审核日期_4_string_t3_$$VC" name="审核日期" type="string" variable="auditDate"></activiti:formProperty>
+        <activiti:formProperty id="tbhdprocess_item" name="工序" type="string" variable="tbhdprocess_item"></activiti:formProperty>
+        <activiti:formProperty id="tbhdprocess_工序号_processNo_1_string_t1_$$A" name="工序号" type="string" variable="tbhdprocess_processNo_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdprocess_工序编码_processCode_2_string_auto_$$A" name="工序编码" type="string" variable="tbhdprocess_processCode_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdprocess_工序名称_processName_3_string_t1_$$HA" name="工序名称" type="string" variable="tbhdprocess_processName_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdprocess_工序时间 min_processTime_4_string_t11_$$HA" name="工序时间 min" type="string" variable="tbhdprocess_processTime_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdprocess_工序备注_processNote_5_string_t2_$$HA" name="工序备注" type="string" variable="tbhdprocess_processNote_t00"></activiti:formProperty>
+        <activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+          <activiti:field name="language">
+            <activiti:string><![CDATA[groovy]]></activiti:string>
+          </activiti:field>
+          <activiti:field name="script">
+            <activiti:string><![CDATA[def execution = task.getExecution()
     						//编制日期
 							def preparationDate = new Date().toInstant().toEpochMilli().toString()
 							execution.setVariable('preparationDate', preparationDate)
 							//工艺编制
 							def u = task.getAssignee()
 							def cUser = identityService.createUserQuery().userId(u).singleResult()
-							execution.setVariable('craftPreparation', cUser.getLastName() + " " + cUser.getFirstName())
-    					]]>
-    				</activiti:string>
-    			</activiti:field>
-    		</activiti:taskListener>
-    	</extensionElements>
+							execution.setVariable('craftPreparation', cUser.getLastName() + " " + cUser.getFirstName())]]></activiti:string>
+          </activiti:field>
+        </activiti:taskListener>
+      </extensionElements>
     </userTask>
     <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="scripttask1"></sequenceFlow>
     <sequenceFlow id="flow2" sourceRef="scripttask1" targetRef="usertask1"></sequenceFlow>
     <sequenceFlow id="flow3" sourceRef="usertask1" targetRef="usertask2"></sequenceFlow>
     <sequenceFlow id="flow4" sourceRef="usertask2" targetRef="scripttask1"></sequenceFlow>
+    <boundaryEvent id="boundarymessage1" name="Message" attachedToRef="usertask1" cancelActivity="true">
+      <messageEventDefinition messageRef="processUpdate"></messageEventDefinition>
+    </boundaryEvent>
+    <boundaryEvent id="boundarymessage2" name="Message" attachedToRef="usertask2" cancelActivity="true">
+      <messageEventDefinition messageRef="processUpdate"></messageEventDefinition>
+    </boundaryEvent>
+    <sequenceFlow id="flow5" sourceRef="boundarymessage1" targetRef="scripttask1"></sequenceFlow>
+    <sequenceFlow id="flow6" sourceRef="boundarymessage2" targetRef="scripttask1"></sequenceFlow>
   </process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_naxauCraftInfo">
     <bpmndi:BPMNPlane bpmnElement="naxauCraftInfo" id="BPMNPlane_naxauCraftInfo">
@@ -270,11 +252,17 @@
       <bpmndi:BPMNShape bpmnElement="usertask1" id="BPMNShape_usertask1">
         <omgdc:Bounds height="61.0" width="111.0" x="350.0" y="157.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="boundarymessage1" id="BPMNShape_boundarymessage1">
+        <omgdc:Bounds height="30.0" width="30.0" x="400.0" y="150.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="scripttask1" id="BPMNShape_scripttask1">
         <omgdc:Bounds height="61.0" width="111.0" x="170.0" y="157.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="usertask2" id="BPMNShape_usertask2">
         <omgdc:Bounds height="61.0" width="111.0" x="350.0" y="280.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="boundarymessage2" id="BPMNShape_boundarymessage2">
+        <omgdc:Bounds height="30.0" width="30.0" x="400.0" y="330.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
         <omgdi:waypoint x="115.0" y="187.0"></omgdi:waypoint>
@@ -291,6 +279,18 @@
       <bpmndi:BPMNEdge bpmnElement="flow4" id="BPMNEdge_flow4">
         <omgdi:waypoint x="350.0" y="310.0"></omgdi:waypoint>
         <omgdi:waypoint x="225.0" y="310.0"></omgdi:waypoint>
+        <omgdi:waypoint x="225.0" y="218.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow5" id="BPMNEdge_flow5">
+        <omgdi:waypoint x="415.0" y="150.0"></omgdi:waypoint>
+        <omgdi:waypoint x="414.0" y="115.0"></omgdi:waypoint>
+        <omgdi:waypoint x="225.0" y="115.0"></omgdi:waypoint>
+        <omgdi:waypoint x="225.0" y="157.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow6" id="BPMNEdge_flow6">
+        <omgdi:waypoint x="415.0" y="360.0"></omgdi:waypoint>
+        <omgdi:waypoint x="414.0" y="398.0"></omgdi:waypoint>
+        <omgdi:waypoint x="225.0" y="398.0"></omgdi:waypoint>
         <omgdi:waypoint x="225.0" y="218.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
