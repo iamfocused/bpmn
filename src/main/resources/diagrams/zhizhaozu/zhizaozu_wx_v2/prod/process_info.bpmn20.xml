@@ -88,8 +88,6 @@
     						execution.setVariable('preparationDate', preparationDate)
     						
     						//通用变量
-    						def findCraftUrl = "https://my.zhizaozu.com/metabase/public/question/bd869065-f3be-40a0-8637-a9e9b9e70be8.json?parameters="
-    						execution.setVariable('findCraftUrl', findCraftUrl)
     						def procInstId = execution.getProcessInstanceId()
     						execution.setVariable('procInstId', procInstId)
     						execution.setVariable('msgName', 'processUpdate')
@@ -306,8 +304,7 @@
     			</activiti:field>
     			<activiti:field name="script">
     				<activiti:string>
-    					<![CDATA[import com.eorionsolution.bpms.extension.rest.RestAPI
-    						import groovy.json.JsonSlurper
+    					<![CDATA[import groovy.json.JsonSlurper
     						import groovy.json.JsonOutput
     						
     						def jsonSlurper = new JsonSlurper()
@@ -324,27 +321,24 @@
     						//如果审核通过，发消息给所有相关的工艺方案
     						if(coreaction=='同意'){
     							execution.setVariable('valid', 'Y')
-    							//调用metabase查询所有使用本道工序的
-    							def restParam = new HashMap()
-	    						def headerMap = new HashMap()
-	    						headerMap.put("Content-Type","application/json")
-	    						restParam.put("_http_method","GET")
-	    						restParam.put("_http_headers",headerMap)
-	    						def param=java.net.URLEncoder.encode('[{"type":"category","target":["variable",["template-tag","processInstanceId"]],"value":\"'+ procInstId+ '\"}]', "UTF-8")
-	    						restParam.put("_http_url", findCraftUrl + param)
-	    						restParam.put("_http_body", '')
-	    						def result = RestAPI.execute(restParam)
-	    						if (!result._http_response_status_code || !result._http_response_status_code.toString().startsWith("2")) {
-					    			throw new org.activiti.engine.ActivitiIllegalArgumentException('metabase调用失败')
-					    		}
-					    		
-					    		def resps = jsonSlurper.parseText(result._http_response_body)
 					    		//正在使用本道工序道工艺方案的流程Id列表
-					    		def procInstIds = resps.collect{it.craftProcInstId}
-					    		procInstIds.each{
-					    			def executionId = runtimeService.createExecutionQuery().processInstanceId(it).messageEventSubscriptionName(msgName).singleResult().getId()
-					    			runtimeService.messageEventReceived(msgName, executionId)
-					    		}
+					    		runtimeService.createProcessInstanceQuery()
+							        .active()
+							        .processDefinitionKey("craftPlan")
+							        .active()
+							        .variableValueEquals(procInstId, procInstId)
+							        .list()
+							        .parallelStream()
+							        .map({it.getId()})
+							        .distinct()
+							        .forEach({
+							            String eId = runtimeService.createExecutionQuery()
+							            				.processInstanceId(it)
+							            				.messageEventSubscriptionName(msgName)
+							            				.singleResult()
+							            				.getId()
+							            runtimeService.messageEventReceived(msgName, eId);
+							        })
     						}
     					]]>
     				</activiti:string>
