@@ -96,7 +96,7 @@
     	<![CDATA[
     		import groovy.json.JsonSlurper
     		
-    		if (_http_response_status_code!=200) {
+    		if (!_http_response_status_code.startsWith('2')) {
     			throw new org.activiti.engine.ActivitiIllegalArgumentException('call metabase failed!')
     		}
     		def jsonSlurper = new JsonSlurper()
@@ -136,7 +136,7 @@
     },
     "from":"$mailFrom",
     "to":[
-      "baocaixue@eorionsolution.com"
+      "$initiator"
     ]
   }
 }	
@@ -209,7 +209,7 @@
     },
     "from":"$mailFrom",
     "to":[
-      "baocaixue@eorionsolution.com"
+      "$initiator"
     ]
   }
 }	

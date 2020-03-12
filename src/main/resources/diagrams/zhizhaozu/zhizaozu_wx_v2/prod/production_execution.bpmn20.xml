@@ -106,7 +106,7 @@
 	   		<activiti:formProperty id="tbhdprocess_装夹件数_clampingQuantity_5_string_t6_$$VA" name="装夹件数" type="string" variable="tbhdprocess_clampingQuantity_t00"/>
 	   		<activiti:formProperty id="tbhdprocess_工序时间 秒_processTime_6_string_t11_$$VA" name="工序时间" type="string" variable="tbhdprocess_processTime_t00"/>
 	   		<activiti:formProperty id="tbhdprocess_工段_section_7_string_tree_$$A" name="工段" type="string" variable="tbhdprocess_section_t00" required="true"/>
-	   		<activiti:formProperty id="tbhdprocess_设备编号_deviceCode_8_string_auto_$$A" name="设备编号" type="string" variable="tbhdprocess_deviceCode_t00" required="false"/>
+	   		<activiti:formProperty id="tbhdprocess_设备编号_deviceCode_8_string_auto_$$A" name="设备编号" type="string" variable="tbhdprocess_deviceCode_t00" required="true"/>
     		<activiti:formProperty id="tbhdprocess_计划开始时间_planStartTime_9_string_t5_$$A" name="计划开始时间" type="string" variable="tbhdprocess_planStartTime" required="true"/>
     		<activiti:formProperty id="tbhdprocess_计划结束时间_planEndTime_10_string_t5_$$A" name="计划结束时间" type="string" variable="tbhdprocess_planEndTime" required="true"/>
     		
@@ -248,20 +248,20 @@
           <activiti:formProperty id="planEndTime_计划结束时间_4_string_t5_$$VC" name="计划结束时间" type="string" variable="planEndTime" required="true"></activiti:formProperty>
           
           <activiti:formProperty id="tbhdworksteps_item_$$VA" name="工步" type="string" variable="tbhdworksteps_item"></activiti:formProperty>
-          <activiti:formProperty id="tbhdworksteps_工步序号_workStepNo_1_string_t1_$$A" name="工步序号" type="string" variable="thbdworksteps_workStepNo_t00" required="true"></activiti:formProperty>
-          <activiti:formProperty id="tbhdworksteps_物料编号_meterialCode_2_string_auto_$$A" name="刀组编号" type="string" variable="tbhdworksteps_meterialCode_t00" required="true"></activiti:formProperty>
-          <activiti:formProperty id="tbhdworksteps_刀组名称_knifeGroupName_3_string_t1_$$A" name="刀组名称" type="string" variable="tbhdworksteps_knifeGroupName_t00"></activiti:formProperty>
-          <activiti:formProperty id="tbhdworksteps_工步描述_workStepDesc_4_string_t2_$$A" name="工步描述" type="string" variable="tbhdworksteps_workStepDesc_t00" required="true"></activiti:formProperty>
-          <activiti:formProperty id="tbhdworksteps_切削速度 m/min_cuttingSpeed_5_string_t11_$$A" name="切削速度 m/min" type="string" variable="tbhdworksteps_cuttingSpeed_t00" required="true"></activiti:formProperty>
-          <activiti:formProperty id="tbhdworksteps_切削直径 mm_cuttingDiameter_6_string_t11_$$A" name="切削直径 mm" type="string" variable="tbhdworksteps_cuttingDiameter_t00" required="true"></activiti:formProperty>
-          <activiti:formProperty id="tbhdworksteps_每转进给量 mm/rev_feedPerRevolution_7_string_t11_$$A" name="每转进给量 mm/rev" type="string" variable="tbhdworksteps_feedPerRevolution_t00" required="true"></activiti:formProperty>
-          <activiti:formProperty id="tbhdworksteps_转速 rev/min_rotatingSpeed_8_string_t11_$$A" name="转速 rev/min" type="string" variable="tbhdworksteps_rotatingSpeed_t00" required="true"></activiti:formProperty>
-          <activiti:formProperty id="tbhdworksteps_进给速度 rev/min_feedSpeed_9_string_t11_$$A" name="进给速度 rev/min" type="string" variable="tbhdworksteps_feedSpeed_t00" required="true"></activiti:formProperty>
-          <activiti:formProperty id="tbhdworksteps_刀具寿命_knifeLife_10_string_t11_$$A" name="刀具寿命" type="string" variable="tbhdworksteps_knifeLife_t00" required="true"></activiti:formProperty>
-          <activiti:formProperty id="tbhdworksteps_工进时间 秒_workingTime_11_string_t11_$$A" name="工进时间 秒" type="string" variable="tbhdworksteps_workingTime_t00" required="true"></activiti:formProperty>
-          <activiti:formProperty id="tbhdworksteps_换刀时间 秒_knifeChangeTime_12_string_t11_$$A" name="换刀时间 秒" type="string" variable="tbhdworksteps_knifeChangeTime_t00" required="true"></activiti:formProperty>
-          <activiti:formProperty id="tbhdworksteps_辅助时间 秒_auxiliaryTime_13_string_t11_$$A" name="辅助时间 秒" type="string" variable="tbhdworksteps_auxiliaryTime_t00" required="true"></activiti:formProperty>
-          <activiti:formProperty id="tbhdworksteps_其他时间 秒_otherTime_14_string_t11_$$A" name="其他时间 秒" type="string" variable="tbhdworksteps_otherTime_t00" required="true"></activiti:formProperty>
+          	<activiti:formProperty id="tbhdworksteps_工步序号_workStepNo_1_string_t1_$$A" name="工步序号" type="string" variable="thbdworksteps_workStepNo_t00" required="false"/>
+			<activiti:formProperty id="tbhdworksteps_刀组编号_knifeGroupCode_2_string_auto_$$A" name="刀组编号" type="string" variable="tbhdworksteps_meterialCode_t00" required="false"/>
+			<activiti:formProperty id="tbhdworksteps_刀组名称_knifeGroupName_3_string_t1_$$HA" name="刀组名称" type="string" variable="tbhdworksteps_knifeGroupName_t00"/>
+			<activiti:formProperty id="tbhdworksteps_工步描述_workStepDesc_4_string_t2_$$A" name="工步描述" type="string" variable="tbhdworksteps_workStepDesc_t00" required="false"/>
+			<activiti:formProperty id="tbhdworksteps_切削速度 m/min_cuttingSpeed_5_string_t11_$$A" name="切削速度 m/min" type="string" variable="tbhdworksteps_cuttingSpeed_t00" required="false"/>
+			<activiti:formProperty id="tbhdworksteps_切削直径 mm_cuttingDiameter_6_string_t11_$$A" name="切削直径 mm" type="string" variable="tbhdworksteps_cuttingDiameter_t00" required="false"/>
+			<activiti:formProperty id="tbhdworksteps_每转进给量 mm/rev_feedPerRevolution_7_string_t11_$$A" name="每转进给量 mm/rev" type="string" variable="tbhdworksteps_feedPerRevolution_t00" required="false"/>
+			<activiti:formProperty id="tbhdworksteps_转速 rev/min_rotatingSpeed_8_string_t11_$$A" name="转速 rev/min" type="string" variable="tbhdworksteps_rotatingSpeed_t00" required="false"/>
+			<activiti:formProperty id="tbhdworksteps_进给速度 rev/min_feedSpeed_9_string_t11_$$A" name="进给速度 rev/min" type="string" variable="tbhdworksteps_feedSpeed_t00" required="false"/>
+			<activiti:formProperty id="tbhdworksteps_刀具寿命_knifeLife_10_string_t11_$$A" name="刀具寿命" type="string" variable="tbhdworksteps_knifeLife_t00" required="false"/>
+			<activiti:formProperty id="tbhdworksteps_工进时间 秒_workingTime_11_string_t11_$$A" name="工进时间 秒" type="string" variable="tbhdworksteps_workingTime_t00" required="false"/>
+			<activiti:formProperty id="tbhdworksteps_换刀时间 秒_knifeChangeTime_12_string_t11_$$A" name="换刀时间 秒" type="string" variable="tbhdworksteps_knifeChangeTime_t00" required="false"/>
+			<activiti:formProperty id="tbhdworksteps_辅助时间 秒_auxiliaryTime_13_string_t11_$$A" name="辅助时间 秒" type="string" variable="tbhdworksteps_auxiliaryTime_t00" required="false"/>
+			<activiti:formProperty id="tbhdworksteps_其他时间 秒_otherTime_14_string_t11_$$A" name="其他时间 秒" type="string" variable="tbhdworksteps_otherTime_t00" required="false"/>
           <activiti:taskListener event="create" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
             <activiti:field name="language">
               <activiti:string><![CDATA[groovy]]></activiti:string>

@@ -83,7 +83,7 @@
     	import groovy.json.JsonSlurper
     		
     		//get employee info
-    		if (_http_response_status_code!=200) {
+    		if (!_http_response_status_code.startsWith('2')) {
     			throw new org.activiti.engine.ActivitiIllegalArgumentException('call metabase for manager info failed!')
     		}
     		def jsonSlurper = new JsonSlurper()
@@ -123,7 +123,7 @@
     	import groovy.json.JsonSlurper
     		
     		//get remain days
-    		if (_http_response_status_code!=200) {
+    		if (!_http_response_status_code.startsWith('2')) {
     			throw new org.activiti.engine.ActivitiIllegalArgumentException('call metabase for remain days info failed!')
     		}
     		def jsonSlurper = new JsonSlurper()
@@ -162,7 +162,7 @@
       <script>
     	import groovy.json.JsonSlurper
     		//get check info -- need attachement  need pick Substitute
-    		if (_http_response_status_code!=200) {
+    		if (!_http_response_status_code.startsWith('2')) {
     			throw new org.activiti.engine.ActivitiIllegalArgumentException('call drools for check failed!')
     		}
     		def jsonSlurper = new JsonSlurper()
@@ -206,7 +206,7 @@
       <script>
     	import groovy.json.JsonSlurper
     		import groovy.json.JsonOutput
-    		if (_http_response_status_code != 200) {
+    		if (!_http_response_status_code.startsWith('2')) {
     			throw new org.activiti.engine.ActivitiIllegalArgumentException('call drools for approval failed.')
     		}
     		def jsonSlurper = new JsonSlurper()
@@ -366,7 +366,7 @@
       "leaveType": "$leaveType"
     },
     "from":"$mailFrom",
-    "to": ["$initiator"]
+    "to": $schedulers
   }
 }    		
 """
@@ -412,7 +412,7 @@
       "leaveType": "$leaveType"
     },
     "from":"$mailFrom",
-    "to":["$initiator"],
+    "to":$notices,
     "cc":["$initiator"]
   }
 }    		
@@ -550,7 +550,7 @@
 			import java.text.SimpleDateFormat
     		
     		//get remain days
-    		if (_http_response_status_code!=200) {
+    		if (!_http_response_status_code.startsWith('2')) {
     			throw new org.activiti.engine.ActivitiIllegalArgumentException('call metabase for remain days info failed!')
     		}
     		def jsonSlurper = new JsonSlurper()

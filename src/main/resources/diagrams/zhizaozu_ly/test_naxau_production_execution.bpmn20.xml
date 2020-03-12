@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/frm">
-  <process id="naxauProductionExecution" name="生产执行流程" isExecutable="true" activiti:candidateStarterGroups="admin">
+  <process id="naxauProductionExecution" name="生产执行流程" isExecutable="true" activiti:candidateStarterUsers="zhi.wu,wei.guo,jianbo.qin,100011">
     <documentation>加工单、报工单</documentation>
     <startEvent id="S1" name="生产工单填写" activiti:initiator="initiator">
     	<extensionElements>
@@ -18,9 +18,6 @@
     		
     		<activiti:formProperty id="craftCode_工艺编码_1_string_tree_$$D" name="工艺编码" type="string" variable="craftCode" required="true"/>
     		<activiti:formProperty id="vehicleNo_载具编号_2_string_t1_$$D" name="载具编号" type="string" variable="vehicleNo"/>
-    		
-    		<activiti:formProperty id="planStart_计划开始时间_1_string_t5_$$E" name="计划开始时间" type="string" variable="planStart" required="true"/>
-    		<activiti:formProperty id="planEnd_计划结束时间_2_string_t5_$$E" name="计划结束时间" type="string" variable="planEnd" required="true"/>
     		
     		<activiti:executionListener event="end" class="org.activiti.engine.impl.bpmn.listener.ScriptExecutionListener">
     			<activiti:field name="language">
@@ -50,9 +47,34 @@
     						execution.setVariable('applicableProduct', findValueByVarName(historyService, cProcInstId, 'applicableProduct'))
     						execution.setVariable('craftTime', findValueByVarName(historyService, cProcInstId, 'craftTime'))
     						execution.setVariable('note', findValueByVarName(historyService, cProcInstId, 'note'))
-    						//工序信息
+    						//工序信息 保存一个这个时间工序的所有信息 key:工序流程实例Id value:信息
     						execution.setVariable('tbhdprocess_item', findValueByVarName(historyService, cProcInstId, 'tbhdprocess_item'))
-    						execution.setVariable('tbhdprocess_item_std', findValueByVarName(historyService, cProcInstId, 'tbhdprocess_item_std'))
+    						def stdJson = findValueByVarName(historyService, cProcInstId, 'tbhdprocess_item_std')
+    						execution.setVariable('tbhdprocess_item_std', stdJson)
+    						
+    						def std = jsonSlurper.parseText(stdJson)
+    						
+    						def pProcInstIds = std.collect{it.processCode?.code}.toSet()
+    						pProcInstIds.removeAll([null])
+
+    						def pMap = new HashMap()
+    						pProcInstIds.each {
+    							def info = new HashMap()
+    							info.put('processCode', findValueByVarName(historyService, it, 'processCode'))
+								info.put('processName', findValueByVarName(historyService, it, 'processName'))
+								info.put('processDesc', findValueByVarName(historyService, it, 'processDesc'))
+								info.put('processType', findValueByVarName(historyService, it, 'processType'))
+								info.put('deviceSpec', findValueByVarName(historyService, it, 'deviceSpec'))
+								info.put('processFile', findValueByVarName(historyService, it, 'processFile'))
+								info.put('processProcess', findValueByVarName(historyService, it, 'processProcess'))
+								info.put('processTime', findValueByVarName(historyService, it, 'processTime'))
+								info.put('processNote', findValueByVarName(historyService, it, 'processNote'))				
+	    						info.put('tbhdworksteps_item', findValueByVarName(historyService, it, 'tbhdworksteps_item'))
+	    						info.put('tbhdworksteps_item_std', findValueByVarName(historyService, it, 'tbhdworksteps_item_std'))
+    							pMap.put(it, info)
+    						}
+    						execution.setVariable('tbhdprocess_item_std', stdJson)
+    						execution.setVariable('processMap', JsonOutput.toJson(pMap))
     						
     						static String findValueByVarName(def historyService, String procInstId, String variableName) {
 							    def vars = historyService.createHistoricVariableInstanceQuery().processInstanceId(procInstId).list()
@@ -98,6 +120,8 @@
     		<activiti:formProperty id="tbhdprocess_工序备注_processNote_5_string_t2_$$VA" name="工序备注" type="string" variable="tbhdprocess_processNote_t00"/>
     		<activiti:formProperty id="tbhdprocess_工段编码_sectionCode_6_string_tree_$$A" name="工段编码" type="string" variable="tbhdprocess_sectionCode_t00" required="true"/>
     		<activiti:formProperty id="tbhdprocess_设备编码_deviceCode_7_string_auto_$$A" name="设备编码" type="string" variable="tbhdprocess_deviceCode_t00" required="true"/>
+    		<activiti:formProperty id="tbhdprocess_计划开始时间_planStartTime_8_string_t5_$$A" name="计划开始时间" type="string" variable="tbhdprocess_planStartTime_t00" required="true"/>
+    		<activiti:formProperty id="tbhdprocess_计划结束时间_planEndTime_9_string_t5_$$A" name="计划结束时间" type="string" variable="tbhdprocess_planEndTime_t00" required="true"/>
     	
     		<activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
     			<activiti:field name="language">
@@ -152,20 +176,21 @@
 	    						def jsonSlurper = new JsonSlurper()
 	    						def pInstId = info[0]
 	    						def uInstId = info[1]
-	    						
+	    						def pMap = jsonSlurper.parseText(processMap)
+	    						def pInfo = pMap.get(pInstId)
 	    						//工序基本信息
-								execution.setVariableLocal('processCode', findValueByVarName(historyService, pInstId, 'processCode'))
-								execution.setVariableLocal('processName', findValueByVarName(historyService, pInstId, 'processName'))
-								execution.setVariableLocal('processDesc', findValueByVarName(historyService, pInstId, 'processDesc'))
-								execution.setVariableLocal('processType', findValueByVarName(historyService, pInstId, 'processType'))
-								execution.setVariableLocal('deviceSpec', findValueByVarName(historyService, pInstId, 'deviceSpec'))
-								execution.setVariableLocal('processFile', findValueByVarName(historyService, pInstId, 'processFile'))
-								execution.setVariableLocal('processProcess', findValueByVarName(historyService, pInstId, 'processProcess'))
-								execution.setVariableLocal('processTime', findValueByVarName(historyService, pInstId, 'processTime'))
-								execution.setVariableLocal('processNote', findValueByVarName(historyService, pInstId, 'processNote'))				
+								execution.setVariableLocal('processCode', pInfo.processCode)
+								execution.setVariableLocal('processName', pInfo.processName)
+								execution.setVariableLocal('processDesc', pInfo.processDesc)
+								execution.setVariableLocal('processType', pInfo.processType)
+								execution.setVariableLocal('deviceSpec', pInfo.deviceSpec)
+								execution.setVariableLocal('processFile', pInfo.processFile)
+								execution.setVariableLocal('processProcess', pInfo.processProcess)
+								execution.setVariableLocal('processTime', pInfo.processTime)
+								execution.setVariableLocal('processNote', pInfo.processNote)				
 	    						//工步信息
-	    						execution.setVariableLocal('tbhdworksteps_item', findValueByVarName(historyService, pInstId, 'tbhdworksteps_item'))
-	    						execution.setVariableLocal('tbhdworksteps_item_std', findValueByVarName(historyService, pInstId, 'tbhdworksteps_item_std'))
+	    						execution.setVariableLocal('tbhdworksteps_item', pInfo.tbhdworksteps_item)
+	    						execution.setVariableLocal('tbhdworksteps_item_std', pInfo.tbhdworksteps_item_std)
 	    						
 	    						//工段信息
 	    						def stdString = findValueByVarName(historyService, uInstId, 'tbhdstaff_item_std')

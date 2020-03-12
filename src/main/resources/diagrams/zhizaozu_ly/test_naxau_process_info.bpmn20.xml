@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/frm">
-  <process id="naxauProcessInfo" name="工序信息" isExecutable="true" activiti:candidateStarterGroups="admin">
+  <process id="naxauProcessInfo" name="工序信息" isExecutable="true" activiti:candidateStarterUsers="zhe.xu,zhi.wu,zhenwei.wen,100011">
     <documentation>工序信息</documentation>
     <startEvent id="startevent1" name="Start" activiti:initiator="initiator">
     	<extensionElements>
@@ -66,7 +66,7 @@
     		</activiti:executionListener>
     	</extensionElements>
     </startEvent>
-    <userTask id="usertask1" name="审核查看" activiti:assignee="${initiator}" activiti:dueDate="P1D" activiti:priority="8080">
+    <userTask id="usertask1" name="审核查看" activiti:candidateUsers="guochao.zhu,xuezhong.shen,kun.pang,100011" activiti:dueDate="P1D" activiti:priority="8080">
     	<extensionElements>
     		<activiti:formProperty id="coreaction_审核_1_enum_rbv_$$A" name="审核" type="enum" variable="coreaction" required="true">
 	        	<activiti:value id="同意" name="同意"></activiti:value>

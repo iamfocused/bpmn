@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/frm">
   <message id="processUpdate" name="processUpdate"></message>
-  <process id="naxauCraftInfo" name="工艺方案" isExecutable="true" activiti:candidateStarterGroups="admin">
+  <process id="naxauCraftInfo" name="工艺方案" isExecutable="true" activiti:candidateStarterUsers="zhe.xu,zhi.wu,100011">
     <documentation>工艺方案</documentation>
     <startEvent id="startevent1" name="Start" activiti:initiator="initiator">
       <extensionElements>
@@ -42,12 +42,17 @@
     						def user = identityService.createUserQuery().userId(initiator).singleResult()
     						
     						def craftPreparation = user.getLastName() + " " + user.getFirstName()
-    						execution.setVariable('craftPreparation', craftPreparation)]]></activiti:string>
+    						execution.setVariable('craftPreparation', craftPreparation)
+    						
+    						def procInstId = execution.getProcessInstanceId()
+    						execution.setVariable('procInstId', procInstId)
+    						
+    						]]></activiti:string>
           </activiti:field>
         </activiti:executionListener>
       </extensionElements>
     </startEvent>
-    <userTask id="usertask1" name="审核查看" activiti:assignee="${initiator}" activiti:dueDate="P1D" activiti:priority="8080">
+    <userTask id="usertask1" name="审核查看" activiti:candidateUsers="guochao.zhu,xuezhong.shen,kun.pang,100011" activiti:dueDate="P1D" activiti:priority="8080">
       <extensionElements>
         <activiti:formProperty id="coreaction_审核_1_enum_rbv_$$A" name="审核" type="enum" variable="coreaction" required="true">
           <activiti:value id="同意" name="同意"></activiti:value>
