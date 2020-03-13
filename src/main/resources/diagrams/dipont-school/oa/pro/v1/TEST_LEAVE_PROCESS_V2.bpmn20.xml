@@ -743,7 +743,7 @@
     <sequenceFlow id="flow33" sourceRef="usertask3" targetRef="usertask2"></sequenceFlow>
     <boundaryEvent id="boundarytimer2" name="Timer" attachedToRef="usertask3" cancelActivity="true">
       <timerEventDefinition>
-        <timeDuration>PT30S</timeDuration>
+        <timeDuration>PT14D</timeDuration>
       </timerEventDefinition>
     </boundaryEvent>
     <sequenceFlow id="flow34" sourceRef="boundarytimer2" targetRef="usertask2"></sequenceFlow>

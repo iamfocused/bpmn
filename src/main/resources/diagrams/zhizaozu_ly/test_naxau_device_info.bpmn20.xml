@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/frm">
-  <process id="naxauDeviceInfo" name="设备录入" isExecutable="true" activiti:candidateStarterUsers="kun.pang,zhe.xu,yong.mao,guochao.zhu,100011">
+  <process id="naxauDeviceInfo" name="设备录入" isExecutable="true" activiti:candidateStarterUsers="kun.pang,zhe.xu,yong.mao,guochao.zhu,ADForLdap">
     <documentation>设备录入</documentation>
     <startEvent id="startevent1" name="Start" activiti:initiator="initiator">
     	<extensionElements>

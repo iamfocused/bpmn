@@ -39,4 +39,16 @@
 	关不关心以往享有的年假、往年剩余的年假
 	
 定时刷新（xxxx-8-1 00:00:00）涉及的地方：    
-	- 两个函数：学年开始（cur_school_year_start_timestamp）、学年结束（cur_school_year_end_timestamp）  
+	- 两个函数：学年开始（cur_school_year_start_timestamp）、学年结束（cur_school_year_end_timestamp）     
+	
+## 处理    
+### 加班流程    
+- mail url, mail from to    
+- metabaseUrl 获取上级领导      
+### 请假流程    
+- mail url, mail from to   
+- call metabase get manager sn ,slt    
+- drools 获取收件人的信息    
+- drools 附件规则   
+- 假期剩余天数metabase 
+
