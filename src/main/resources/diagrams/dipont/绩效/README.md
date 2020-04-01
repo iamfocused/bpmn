@@ -33,4 +33,7 @@ yan.hou the actual completion of the 1920 fiscal year stage Q3 performance appra
 “上年度实际”  -->  这里改为上年度同期实际       
 这里默认的评分，应该是达到目标，不是表现杰出    
 主管Review提交之后，发送给员工的结果抄送给主管    
-//明细“单位”和“kpi”互换位置
+//明细“单位”和“kpi”互换位置    
+
+审批完后hr审核 _erpfapr    
+邮件提醒metabase link    

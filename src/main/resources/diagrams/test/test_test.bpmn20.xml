@@ -1,108 +1,28 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/pur">
-  <process id="test_test_v01" name="测试流程gateway" isExecutable="true" activiti:candidateStarterGroups="admin,processadmin@@13@@">
-    <startEvent id="startevent1" name="Start" activiti:initiator="initiator">
-      <extensionElements>
-      	<activiti:formProperty id="claim_选择是否索赔_1_enum_sbs_$$A" name="选择是否索赔" type="enum" variable="claim">
-      			<activiti:value id="Y" name="索赔"/>
-      			<activiti:value id="N" name="不需索赔"/>
-      		</activiti:formProperty>
-      		<activiti:formProperty id="tbhdclaim_item" name="索赔明细表" type="string" variable="tbhdclaim_item" required="true"/>
-          <activiti:formProperty id="tbhdclaim_供应商_vndid_1_string_t1_$$A" name="供应商" type="string" variable="tbhdclaim_vndid_t01"/>
-          <activiti:formProperty id="tbhdclaim_物料_matinfo_2_string_t1_$$A" name="物料" type="string" variable="tbhdclaim_matinfo_t01"/>
-          <activiti:formProperty id="tbhdclaim_单价_prcprice_3_string_t11_$$A" name="单价" type="string" variable="tbhdclaim_prcprice_t01"/>
-          <activiti:formProperty id="tbhdclaim_订货日期_orderdate_4_string_t3_$$A" name="订货日期" type="string" variable="tbhdclaim_orderdate_t01"/>
-          <activiti:formProperty id="tbhdclaim_此次订货数量_orderqty_5_string_t11_$$A" name="此次订货数量" type="string" variable="tbhdclaim_orderqty_t01"/>
-          <activiti:formProperty id="tbhdclaim_系统批次_sysBatch_6_string_t1_$$A" name="系统批次" type="string" variable="tbhdclaim_sysBatch_t01"/>
-          <activiti:formProperty id="tbhdclaim_手工批次_batch_7_string_t1_$$A" name="手工批次" type="string" variable="tbhdclaim_batch_t01"/>
-          <activiti:formProperty id="tbhdclaim_实际送货数量_deliveryqty_8_string_t11_$$A" name="实际送货数量" type="string" variable="tbhdclaim_deliveryqty_t01"/>
-          <activiti:formProperty id="tbhdclaim_送货日期_deliverydate_9_string_t3_$$A" name="送货日期" type="string" variable="tbhdclaim_deliverydate_t01"/>
-          <activiti:formProperty id="tbhdclaim_车次_trainnumber_10_string_t1_$$A" name="车次" type="string" variable="tbhdclaim_trainnumber_t01"/>
-          <activiti:formProperty id="tbhdclaim_到货日期_arrivaldate_11_string_t3_$$A" name="到货日期" type="string" variable="tbhdclaim_arrivaldate_t01"/>
-          <activiti:formProperty id="tbhdclaim_合格数_accnumber_12_string_t11_$$A" name="合格数" type="string" variable="tbhdclaim_accnumber_t01"/>
-          <activiti:formProperty id="tbhdclaim_实际总金额_amount_13_string_t11_$$A" name="实际总金额" type="string" variable="tbhdclaim_amount_t01"/>
-          <activiti:formProperty id="tbhdclaim_不合格数_defnumber_14_string_t11_$$A" name="不合格数" type="string" variable="tbhdclaim_defnumber_t01"/>
-          <activiti:formProperty id="tbhdclaim_不合格总金额_defAmount_15_string_t11_$$A" name="不合格总金额" type="string" variable="tbhdclaim_defAmount_t01"/>
-          <activiti:formProperty id="tbhdclaim_人力损失_manloss_16_string_t11_$$A" name="人力损失" type="string" variable="tbhdclaim_manloss_t01"/>
-          <activiti:formProperty id="tbhdclaim_生产损失_proloss_17_string_t11_$$A" name="生产损失" type="string" variable="tbhdclaim_proloss_t01"/>
-          <activiti:formProperty id="tbhdclaim_合计索赔_totalClaim_18_string_t11_$$A" name="合计索赔" type="string" variable="tbhdclaim_totalClaim_t01"/>
-      </extensionElements>
-    </startEvent>
-    <userTask id="usertask1" name="索赔" activiti:assignee="${initiator}">
-      <extensionElements>
-      </extensionElements>
-    </userTask>
-    <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="inclusivegateway1"></sequenceFlow>
-    <endEvent id="endevent1" name="End"></endEvent>
-    <sequenceFlow id="flow2" sourceRef="usertask1" targetRef="inclusivegateway2"></sequenceFlow>
-    <inclusiveGateway id="inclusivegateway1" name="Inclusive Gateway"></inclusiveGateway>
-    <inclusiveGateway id="inclusivegateway2" name="Inclusive Gateway"></inclusiveGateway>
-    <sequenceFlow id="flow3" name="需要索赔" sourceRef="inclusivegateway1" targetRef="usertask1">
-    	<conditionExpression xsi:type="tFormalExpression">${claim=='Y'}</conditionExpression>
-    </sequenceFlow>
-    <userTask id="usertask2" name="开票" activiti:assignee="${initiator}">
-      <extensionElements>
-      </extensionElements>
-    </userTask>
-    <sequenceFlow id="flow4" name="不需要索赔" sourceRef="inclusivegateway1" targetRef="usertask2">
-    	<conditionExpression xsi:type="tFormalExpression">${true}</conditionExpression>
-    </sequenceFlow>
-    <sequenceFlow id="flow5" sourceRef="usertask2" targetRef="inclusivegateway2"></sequenceFlow>
-    <sequenceFlow id="flow6" sourceRef="inclusivegateway2" targetRef="endevent1"></sequenceFlow>
+  <process id="test_test_v01" name="测试" isExecutable="true" activiti:candidateStarterGroups="admin,processadmin@@13@@">
+    <startEvent id="startevent1" name="Start" activiti:initiator="initiator"></startEvent>
+    <userTask id="usertask1" name="User Task" activiti:candidateGroups="admin" activiti:dueDate="P1D" activiti:priority="8080"></userTask>
+    <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="usertask1"></sequenceFlow>
+    <sequenceFlow id="flow2" sourceRef="usertask1" targetRef="usertask1"></sequenceFlow>
   </process>
   <bpmndi:BPMNDiagram id="BPMNDiagram_test_test_v01">
     <bpmndi:BPMNPlane bpmnElement="test_test_v01" id="BPMNPlane_test_test_v01">
       <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
-        <omgdc:Bounds height="35.0" width="35.0" x="140.0" y="200.0"></omgdc:Bounds>
+        <omgdc:Bounds height="35.0" width="35.0" x="30.0" y="201.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="usertask1" id="BPMNShape_usertask1">
-        <omgdc:Bounds height="55.0" width="105.0" x="290.0" y="100.0"></omgdc:Bounds>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
-        <omgdc:Bounds height="35.0" width="35.0" x="510.0" y="200.0"></omgdc:Bounds>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="inclusivegateway1" id="BPMNShape_inclusivegateway1">
-        <omgdc:Bounds height="40.0" width="40.0" x="210.0" y="197.0"></omgdc:Bounds>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="inclusivegateway2" id="BPMNShape_inclusivegateway2">
-        <omgdc:Bounds height="40.0" width="40.0" x="440.0" y="197.0"></omgdc:Bounds>
-      </bpmndi:BPMNShape>
-      <bpmndi:BPMNShape bpmnElement="usertask2" id="BPMNShape_usertask2">
-        <omgdc:Bounds height="55.0" width="105.0" x="290.0" y="234.0"></omgdc:Bounds>
+        <omgdc:Bounds height="55.0" width="105.0" x="110.0" y="191.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
-        <omgdi:waypoint x="175.0" y="217.0"></omgdi:waypoint>
-        <omgdi:waypoint x="210.0" y="217.0"></omgdi:waypoint>
+        <omgdi:waypoint x="65.0" y="218.0"></omgdi:waypoint>
+        <omgdi:waypoint x="110.0" y="218.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
-        <omgdi:waypoint x="395.0" y="127.0"></omgdi:waypoint>
-        <omgdi:waypoint x="459.0" y="127.0"></omgdi:waypoint>
-        <omgdi:waypoint x="460.0" y="197.0"></omgdi:waypoint>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3">
-        <omgdi:waypoint x="230.0" y="197.0"></omgdi:waypoint>
-        <omgdi:waypoint x="230.0" y="127.0"></omgdi:waypoint>
-        <omgdi:waypoint x="290.0" y="127.0"></omgdi:waypoint>
-        <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="16.0" width="100.0" x="174.0" y="128.0"></omgdc:Bounds>
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="flow4" id="BPMNEdge_flow4">
-        <omgdi:waypoint x="230.0" y="237.0"></omgdi:waypoint>
-        <omgdi:waypoint x="230.0" y="261.0"></omgdi:waypoint>
-        <omgdi:waypoint x="290.0" y="261.0"></omgdi:waypoint>
-        <bpmndi:BPMNLabel>
-          <omgdc:Bounds height="16.0" width="100.0" x="191.0" y="287.0"></omgdc:Bounds>
-        </bpmndi:BPMNLabel>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="flow5" id="BPMNEdge_flow5">
-        <omgdi:waypoint x="395.0" y="261.0"></omgdi:waypoint>
-        <omgdi:waypoint x="460.0" y="261.0"></omgdi:waypoint>
-        <omgdi:waypoint x="460.0" y="237.0"></omgdi:waypoint>
-      </bpmndi:BPMNEdge>
-      <bpmndi:BPMNEdge bpmnElement="flow6" id="BPMNEdge_flow6">
-        <omgdi:waypoint x="480.0" y="217.0"></omgdi:waypoint>
-        <omgdi:waypoint x="510.0" y="217.0"></omgdi:waypoint>
+        <omgdi:waypoint x="162.0" y="191.0"></omgdi:waypoint>
+        <omgdi:waypoint x="162.0" y="145.0"></omgdi:waypoint>
+        <omgdi:waypoint x="193.0" y="145.0"></omgdi:waypoint>
+        <omgdi:waypoint x="162.0" y="191.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>

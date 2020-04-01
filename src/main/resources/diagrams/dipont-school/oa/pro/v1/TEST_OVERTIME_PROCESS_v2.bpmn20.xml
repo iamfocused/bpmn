@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/frm">
-  <process id="overtime_process" name="加班流程 Overtime Process" isExecutable="true" activiti:candidateStarterGroups="dpschool">
+  <process id="overtime_process" name="加班流程 Overtime Process" isExecutable="true" activiti:candidateStarterGroups="dpschool,_dpmsadmin">
+    <documentation>{"businessKey": "${user.name} 加班申请Overtime Requisition ${YYYY-MM-DD}"}</documentation>
     <startEvent id="startevent1" name="Start" activiti:initiator="initiator">
       <extensionElements>
         <activiti:formProperty id="startDate_开始时间 Start_1_string_t5_$$A" name="开始时间 Start" type="string" variable="startDate" required="true"/>
@@ -38,11 +39,11 @@
 			 				execution.setVariable('procInstId', execution.getProcessInstanceId())
 			 				
 			 				//service call url init
-			 				execution.setVariable('mailUrl', 'https://commonservices.eorionsolution.com/mailsender/mail/v2/mail')
- 							execution.setVariable('mailFrom', 'develop@eorionsolution.com')
+			 				execution.setVariable('mailUrl', 'https://bpmcs.dipont.com/mail/v2/mail')
+ 							execution.setVariable('mailFrom', 'notice@dipont.com')
  							
  							//call metabase get manager sn
- 							def metabaseUrl = 'https://metabase.eorionsolution.com/public/question/f9e46380-b463-483a-8938-553c0e776f85.json?parameters='
+ 							def metabaseUrl = 'https://bpmmb.dipont.com/public/question/a42be3e2-1b02-4b14-a26a-39e010e3041b.json?parameters='
  							def headerMap = new HashMap()
 			 				def param=java.net.URLEncoder.encode('[{"type":"category","target":["variable",["template-tag","sn"]],"value":\"'+ initiator+ '\"}]', "UTF-8")
 			 				execution.setVariable("_http_method", "GET")
@@ -96,7 +97,7 @@
     	<![CDATA[
     		import groovy.json.JsonSlurper
     		
-    		if (!_http_response_status_code.startsWith('2')) {
+    		if (!_http_response_status_code?.toString()?.startsWith('2')) {
     			throw new org.activiti.engine.ActivitiIllegalArgumentException('call metabase failed!')
     		}
     		def jsonSlurper = new JsonSlurper()
@@ -105,10 +106,10 @@
     			throw new org.activiti.engine.ActivitiIllegalArgumentException('当前您的数据不存在EIM中 Your information does not exist in the EIM.')
     		}
     		def employee = employeeLi[0]
-    		if (!employee.MANAGER_SN_ || employee.MANAGER_SN_.trim()=='') {
+    		if (!employee.managerSn || employee.managerSn.trim()=='') {
     			throw new org.activiti.engine.ActivitiIllegalArgumentException('请在EIM中维护您的"直线领导"信息 Please maintain your "Manager" information in EIM. ')
     		}
-    		execution.setVariable('managerSn', employee.MANAGER_SN_)
+    		execution.setVariable('managerSn', employee.managerSn)
     	]]>
     	</script>
     </scriptTask>

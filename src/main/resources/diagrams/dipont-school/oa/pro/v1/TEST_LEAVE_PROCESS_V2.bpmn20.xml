@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/frm">
-  <process id="leave_process" name="请假流程 Leave Process" isExecutable="true" activiti:candidateStarterGroups="dpschool">
+  <process id="leave_process" name="请假流程 Leave Process" isExecutable="true" activiti:candidateStarterGroups="dpschool,_dpmsadmin">
+    <documentation>{"businessKey": "${user.name} 请假申请Leave Requisition ${YYYY-MM-DD}"}</documentation>
     <startEvent id="startevent1" name="Start" activiti:initiator="initiator">
       <extensionElements>
         <activiti:formProperty id="leaveType_请假类型 Leave Type_1_string_tree_$$A" name="请假类型 Leave Type" type="string" variable="leaveType" required="true"></activiti:formProperty>
@@ -55,11 +56,11 @@
     						execution.setVariable('startTime', df.format(startTime))
  							execution.setVariable('endTime', df.format(endTime))
  							execution.setVariable('procInstId', execution.getProcessInstanceId())
- 							execution.setVariable('mailUrl', 'https://commonservices.eorionsolution.com/mailsender/mail/v2/mail')
- 							execution.setVariable('mailFrom', 'develop@eorionsolution.com')
- 							execution.setVariable('approvalNoticeDroolsUrl', 'https://commonservices.eorionsolution.com/decisiontables/v1/fire/school_leave_days.xls')
- 							execution.setVariable('checkAttachementsUrl', 'https://commonservices.eorionsolution.com/decisiontables/v1/fire/school_leave_attachments.xls')
- 							execution.setVariable('remainDaysMetabaseUrl', 'https://metabase.eorionsolution.com/public/question/7c56bf6f-7385-48f2-92dd-3059d4791640.json?parameters=')
+ 							execution.setVariable('mailUrl', 'https://bpmcs.dipont.com/mail/v2/mail')
+ 							execution.setVariable('mailFrom', 'notice@dipont.com')
+ 							execution.setVariable('approvalNoticeDroolsUrl', 'https://bpmcs.dipont.com/decisiontables/v1/fire/school_leave_days.xls')
+ 							execution.setVariable('checkAttachementsUrl', 'https://bpmcs.dipont.com/decisiontables/v1/fire/school_leave_attachments.xls')
+ 							execution.setVariable('remainDaysMetabaseUrl', 'https://bpmmb.dipont.com/public/question/23fb1934-3151-4be2-bbb3-7656306c13fa.json?parameters=')
  							
  							//construct 'get employee info' request
  							def headerMap = new HashMap()
@@ -67,7 +68,7 @@
  							execution.setVariable("_http_method", "GET")
  							execution.setVariable("_http_headers", headerMap)
  							execution.setVariable("_http_body", '')
- 							execution.setVariable("_http_url", 'https://metabase.eorionsolution.com/public/question/7929af70-378b-49ad-b0ae-3dfbabcd26ea.json?parameters=' + param)
+ 							execution.setVariable("_http_url", 'https://bpmmb.dipont.com/public/question/a42be3e2-1b02-4b14-a26a-39e010e3041b.json?parameters=' + param)
  							execution.setVariable("_http_response_body", '')
  							execution.setVariable("_http_response_status_code", '')]]></activiti:string>
           </activiti:field>
@@ -83,7 +84,7 @@
     	import groovy.json.JsonSlurper
     		
     		//get employee info
-    		if (!_http_response_status_code.startsWith('2')) {
+    		if (!_http_response_status_code?.toString()?.startsWith('2')) {
     			throw new org.activiti.engine.ActivitiIllegalArgumentException('call metabase for manager info failed!')
     		}
     		def jsonSlurper = new JsonSlurper()
@@ -123,7 +124,7 @@
     	import groovy.json.JsonSlurper
     		
     		//get remain days
-    		if (!_http_response_status_code.startsWith('2')) {
+    		if (!_http_response_status_code?.toString()?.startsWith('2')) {
     			throw new org.activiti.engine.ActivitiIllegalArgumentException('call metabase for remain days info failed!')
     		}
     		def jsonSlurper = new JsonSlurper()
@@ -162,7 +163,7 @@
       <script>
     	import groovy.json.JsonSlurper
     		//get check info -- need attachement  need pick Substitute
-    		if (!_http_response_status_code.startsWith('2')) {
+    		if (!_http_response_status_code?.toString()?.startsWith('2')) {
     			throw new org.activiti.engine.ActivitiIllegalArgumentException('call drools for check failed!')
     		}
     		def jsonSlurper = new JsonSlurper()
@@ -206,7 +207,7 @@
       <script>
     	import groovy.json.JsonSlurper
     		import groovy.json.JsonOutput
-    		if (!_http_response_status_code.startsWith('2')) {
+    		if (!_http_response_status_code?.toString()?.startsWith('2')) {
     			throw new org.activiti.engine.ActivitiIllegalArgumentException('call drools for approval failed.')
     		}
     		def jsonSlurper = new JsonSlurper()
@@ -550,7 +551,7 @@
 			import java.text.SimpleDateFormat
     		
     		//get remain days
-    		if (!_http_response_status_code.startsWith('2')) {
+    		if (!_http_response_status_code?.toString()?.startsWith('2')) {
     			throw new org.activiti.engine.ActivitiIllegalArgumentException('call metabase for remain days info failed!')
     		}
     		def jsonSlurper = new JsonSlurper()

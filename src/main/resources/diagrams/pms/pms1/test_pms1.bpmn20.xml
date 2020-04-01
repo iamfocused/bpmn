@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/pur">
+  <process id="pms1Process" name="设备保养流程" isExecutable="true">
+    <startEvent id="timerstartevent1" name="Timer start" activiti:initiator="initiator">
+	  <extensionElements>
+	  	<activiti:executionListener event="start" class="org.activiti.engine.impl.bpmn.listener.ScriptExecutionListener">
+	  		<activiti:field name="language">
+	  			<activiti:string>
+	  				<![CDATA[groovy]]>
+	  			</activiti:string>
+	  		</activiti:field>
+	  		<activiti:field name="script">
+	  			<activiti:string>
+	  				<![CDATA[import java.time.LocalDateTime
+	  					def now = LocalDateTime.now()
+	  					def businessKey = '设备保养 ' + now.toString()
+	  					runtimeService.updateBusinessKey(execution.getProcessInstanceId(), businessKey)
+	  					execution.setVariable('deviceId', 'BKDV' + now.getMonthValue() + now.getDayOfMonth() + now.getHour().toString())
+	  					
+	  				]]>
+	  			</activiti:string>
+	  		</activiti:field>
+	  	</activiti:executionListener>
+	  </extensionElements>
+      <timerEventDefinition>
+      	<timeCycle>R3/PT1M</timeCycle>
+      </timerEventDefinition>
+    </startEvent>
+    <userTask id="usertask1" name="维护任务执行" activiti:candidateGroups="admin" activiti:dueDate="P1D" activiti:priority="8080">
+    	<extensionElements>
+    		<activiti:formProperty id="deviceId_设备ID_1_string_t1_$$A" name="设备ID" type="string" variable="deviceId"/>
+    		<activiti:formProperty id="resource_维护资源文件_2_string_t9i_$$A" name="维护资源文件" type="string" variable="resource"/>
+    		
+    		<activiti:formProperty id="tbhdmaintaintable_item" name="维护表" type="string" variable="tbhdmaintaintable_item"/>
+    		<activiti:formProperty id="tbhdmaintaintable_维护项_item_1_string_t1_$$A" name="维护项" type="string" variable="tbhdmaintaintable_item_t00"/>
+    		<activiti:formProperty id="tbhdmaintaintable_工时_workHours_2_string_t6_$$A" name="工时" type="string" variable="tbhdmaintaintable_workHours_t00"/>
+    		<activiti:formProperty id="tbhdmaintaintable_已维护内容_content_3_string_t2_$$A" name="已维护内容" type="string" variable="tbhdmaintaintable_content_t00"/>
+    	</extensionElements>
+    </userTask>
+    <userTask id="usertask2" name="验收" activiti:candidateGroups="admin" activiti:dueDate="P1D" activiti:priority="8080">
+    	<extensionElements>
+    		<activiti:formProperty id="coreaction_验收_1_enum_rbv_$$A" name="验收" type="enum" variable="coreaction_accept">
+    			<activiti:value id="通过" name="通过"/>
+    			<activiti:value id="不通过" name="不通过"/>
+    		</activiti:formProperty>
+    		<activiti:formProperty id="corecomments_备注_2_string_t2_$$A" name="备注" type="string" variable="corecomments_note"/>
+    		
+    		<activiti:formProperty id="deviceId_设备ID_1_string_t1_$$VA" name="设备ID" type="string" variable="deviceId"/>
+    		<activiti:formProperty id="resource_维护资源文件_2_string_t9i_$$VA" name="维护资源文件" type="string" variable="resource"/>
+    		<activiti:formProperty id="tbhdmaintaintable_item_$$VA" name="维护表" type="string" variable="tbhdmaintaintable_item"/>
+    		<activiti:formProperty id="tbhdmaintaintable_维护项_item_1_string_t1_$$A" name="维护项" type="string" variable="tbhdmaintaintable_item_t00"/>
+			<activiti:formProperty id="tbhdmaintaintable_工时_workHours_2_string_t6_$$A" name="工时" type="string" variable="tbhdmaintaintable_workHours_t00"/>
+			<activiti:formProperty id="tbhdmaintaintable_已维护内容_content_3_string_t2_$$A" name="已维护内容" type="string" variable="tbhdmaintaintable_content_t00"/>
+    	
+    		<activiti:taskListener event="create" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+    			<activiti:field name="language">
+    				<activiti:string>
+    					<![CDATA[groovy]]>
+    				</activiti:string>
+    			</activiti:field>
+    			<activiti:field name="script">
+    				<activiti:string>
+    					<![CDATA[
+    						def execution = task.getExecution()
+    						execution.setVariable('coreaction_accept', '通过')
+    						execution.setVariable('corecomments_note', '')
+    					]]>
+    				</activiti:string>
+    			</activiti:field>
+    		</activiti:taskListener>
+    	</extensionElements>
+    </userTask>
+    <userTask id="usertask3" name="维护修正" activiti:candidateGroups="admin" activiti:dueDate="P1D" activiti:priority="8080">
+    	<extensionElements>
+    		<activiti:formProperty id="coreaction_验收_1_enum_rbv_$$VA" name="验收" type="enum" variable="coreaction_accept">
+    			<activiti:value id="通过" name="通过"/>
+    			<activiti:value id="不通过" name="不通过"/>
+    		</activiti:formProperty>
+    		<activiti:formProperty id="corecomments_备注_2_string_t2_$$VA" name="备注" type="string" variable="corecomments_note"/>
+    	
+    		<activiti:formProperty id="deviceId_设备ID_1_string_t1_$$A" name="设备ID" type="string" variable="deviceId"/>
+    		<activiti:formProperty id="resource_维护资源文件_2_string_t9i_$$A" name="维护资源文件" type="string" variable="resource"/>
+    		<activiti:formProperty id="tbhdmaintaintable_item" name="维护表" type="string" variable="tbhdmaintaintable_item"/>
+    		<activiti:formProperty id="tbhdmaintaintable_维护项_item_1_string_t1_$$A" name="维护项" type="string" variable="tbhdmaintaintable_item_t00"/>
+    		<activiti:formProperty id="tbhdmaintaintable_工时_workHours_2_string_t6_$$A" name="工时" type="string" variable="tbhdmaintaintable_workHours_t00"/>
+    		<activiti:formProperty id="tbhdmaintaintable_已维护内容_content_3_string_t2_$$A" name="已维护内容" type="string" variable="tbhdmaintaintable_content_t00"/>
+			
+    	</extensionElements>
+    </userTask>
+    <exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway"></exclusiveGateway>
+    <sequenceFlow id="flow1" sourceRef="timerstartevent1" targetRef="usertask1"></sequenceFlow>
+    <sequenceFlow id="flow2" sourceRef="usertask1" targetRef="usertask2"></sequenceFlow>
+    <sequenceFlow id="flow3" sourceRef="usertask2" targetRef="exclusivegateway1"></sequenceFlow>
+    <sequenceFlow id="flow4" sourceRef="exclusivegateway1" targetRef="usertask3" name="不通过">
+    	<conditionExpression xsi:type="tFormalExpression"><![CDATA[${coreaction_accept=='不通过'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow5" sourceRef="usertask3" targetRef="usertask2"></sequenceFlow>
+    <endEvent id="endevent1" name="End"></endEvent>
+    <sequenceFlow id="flow6" sourceRef="exclusivegateway1" targetRef="endevent1" name="通过">
+    	<conditionExpression xsi:type="tFormalExpression"><![CDATA[${coreaction_accept=='通过'}]]></conditionExpression>
+    </sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_pms1Process">
+    <bpmndi:BPMNPlane bpmnElement="pms1Process" id="BPMNPlane_pms1Process">
+      <bpmndi:BPMNShape bpmnElement="timerstartevent1" id="BPMNShape_timerstartevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="60.0" y="183.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask1" id="BPMNShape_usertask1">
+        <omgdc:Bounds height="61.0" width="111.0" x="160.0" y="170.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask2" id="BPMNShape_usertask2">
+        <omgdc:Bounds height="61.0" width="111.0" x="320.0" y="170.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask3" id="BPMNShape_usertask3">
+        <omgdc:Bounds height="61.0" width="111.0" x="450.0" y="300.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway1" id="BPMNShape_exclusivegateway1">
+        <omgdc:Bounds height="40.0" width="40.0" x="485.0" y="180.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="570.0" y="183.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="95.0" y="200.0"></omgdi:waypoint>
+        <omgdi:waypoint x="160.0" y="200.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="271.0" y="200.0"></omgdi:waypoint>
+        <omgdi:waypoint x="320.0" y="200.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3">
+        <omgdi:waypoint x="431.0" y="200.0"></omgdi:waypoint>
+        <omgdi:waypoint x="485.0" y="200.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow4" id="BPMNEdge_flow4">
+        <omgdi:waypoint x="505.0" y="220.0"></omgdi:waypoint>
+        <omgdi:waypoint x="505.0" y="300.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow5" id="BPMNEdge_flow5">
+        <omgdi:waypoint x="450.0" y="330.0"></omgdi:waypoint>
+        <omgdi:waypoint x="375.0" y="330.0"></omgdi:waypoint>
+        <omgdi:waypoint x="375.0" y="231.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow6" id="BPMNEdge_flow6">
+        <omgdi:waypoint x="525.0" y="200.0"></omgdi:waypoint>
+        <omgdi:waypoint x="570.0" y="200.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>
