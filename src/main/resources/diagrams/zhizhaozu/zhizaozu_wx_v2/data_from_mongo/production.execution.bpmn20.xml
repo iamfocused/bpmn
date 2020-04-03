@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/pur">
-  <process id="productionExecution" name="生产执行" isExecutable="true" activiti:candidateStarterGroups="admin,admin@@8@@">
+  <process id="productionExecution" name="生产执行" isExecutable="true" activiti:candidateStarterGroups="admin,admin@@8@@,business@@8@@">
     <documentation>productionExecution</documentation>
     <startEvent id="S1" name="S1" activiti:initiator="initiator">
     	<extensionElements>
-    		<activiti:formProperty id="craftCode_工艺编号_2_string_t1_$$A" name="工艺编号" type="string" variable="craftCode" required="true"/>
-    		<activiti:formProperty id="productionPlanNo_生产计划单号_3_string_auto_$$A" name="生产计划单号" type="string" variable="productionPlanNo"/>
-    		<activiti:formProperty id="productionQuantity_生产数量_5_string_t6_$$A" name="生产数量" type="string" variable="productionQuantity" required="true"/>
+    		<activiti:formProperty id="craftCode_工艺编号_1_string_tree_$$A" name="工艺编号" type="string" variable="craftCode" required="true"/>
+    		<activiti:formProperty id="productionPlanNo_生产计划单号_2_string_auto_$$A" name="生产计划单号" type="string" variable="productionPlanNo"/>
+    		<activiti:formProperty id="productionQuantity_生产数量_3_string_t6_$$A" name="生产数量" type="string" variable="productionQuantity" required="true"/>
     		
     		<activiti:executionListener event="end" class="org.activiti.engine.impl.bpmn.listener.ScriptExecutionListener">
     			<activiti:field name="language">
@@ -19,6 +19,200 @@
     					<![CDATA[import groovy.json.JsonSlurper
     						import groovy.json.JsonOutput
     						import java.text.SimpleDateFormat
+    						import com.eorionsolution.bpms.extension.rest.RestAPI
+    						
+    						execution.setVariable('reportRecords', '[]')
+    						
+    						def jsonSlurper = new JsonSlurper()
+    						def craftCodeValue = jsonSlurper.parseText(craftCode).code
+    						def df = new SimpleDateFormat("yyyyMMddHHmmss")
+    						execution.setVariable('productionProcessNo', 'SCJGD' + df.format(new Date()))
+    						
+    						def craftDataUrl = 'https://my.zhizaozu.com/metabase/public/question/b95f3e7b-6ffb-433d-9875-61bd719a8d6f.json?parameters='
+    						def processDataUrl = 'https://my.zhizaozu.com/metabase/public/question/dbf0cf26-d61e-442d-ab4f-592b21077791.json?parameters='
+    						
+    						def restParam = new HashMap<String,Object>()
+    						def headerMap = new HashMap<String,String>()
+    						headerMap.put("Content-Type","application/json")
+    						restParam.put("_http_method","GET")
+    						restParam.put("_http_headers",headerMap)
+    						def param=java.net.URLEncoder.encode('[{"type":"category","target":["variable",["template-tag","craftCode"]],"value":\"'+ craftCodeValue + '\"}]', "UTF-8")
+    						restParam.put("_http_url", craftDataUrl + param)
+    						restParam.put("_http_body", '')
+    						def getRequest = RestAPI.execute(restParam)
+    						if (!getRequest._http_response_status_code || !getRequest._http_response_status_code.toString().startsWith("2")) {
+    							throw new org.activiti.engine.ActivitiIllegalArgumentException('metabase调用失败')
+    						}
+    						
+    						def craftList = jsonSlurper.parseText(getRequest._http_response_body)
+    						
+    						if (!craftList || craftList.size == 0) {
+    							throw new org.activiti.engine.ActivitiIllegalArgumentException('当前工艺编码未找到相应工艺数据')
+    						}
+    						if (craftList.size != 1) {
+    							throw new org.activiti.engine.ActivitiIllegalArgumentException('数据管理中的工艺编码重复')
+    						}
+    						def craft = craftList[0]
+    						
+    						//工艺方案主要信息
+    						execution.setVariable('craftName', craft.craftName)//工艺名称
+    						execution.setVariable('meterialSpec', craft.meterialSpec)//物料型号
+    						execution.setVariable('meterialCode', craft.meterialCode)//物料编码
+    						execution.setVariable('meterialName', craft.meterialName)//物料名称
+    						execution.setVariable('mainMeterial', craft.mainMeterial)//主要材料
+    						execution.setVariable('craftDesc', craft.craftDesc)//工艺概述
+    						execution.setVariable('workDays', craft.workDays)//工作天数
+    						execution.setVariable('shiftTimes', craft.shiftTimes)//换班次数
+    						execution.setVariable('unitWorkTime', craft.unitWorkTime)//单班工作时间
+    						execution.setVariable('productionLines', craft.productionLines?.toString())//产线数量
+    						execution.setVariable('craftBeat', craft.craftBeat?.toString())//工艺节拍
+    						execution.setVariable('capacityTest', craft.capacityTest?.toString())//产能测算
+    						
+    						//工序表信息
+    						def processes = craft.tbhdprocess_item
+    						processes.each {
+    							it.put('processNo', it.remove('input1585123390660'))//工序号
+    							it.put('processCode', it.remove('select1585123367894'))//工序编码
+    							it.put('processName', it.remove('input1585123414544'))//工序名称
+    							it.put('processingTime', it.remove('input1585124236653'))//加工时间
+    							it.put('processTime', it.remove('input1585124297011'))//工序时间
+    						}
+    						def tbhdprocess_item_std = JsonOutput.toJson(processes)
+    						
+    						def itemString = """
+{
+"rows":[],
+"headers":[
+{"block":"A","controlType":"t1","datePattern":null,"enumValues":[],"fieldType":"string","id":"tbhdprocess_工序号_processNo_1_string_t1_\$\$A","name":"工序号","readable":true,"seq":1,"type":"string","writable":true},
+{"block":"A","controlType":"t1","datePattern":null,"enumValues":[],"fieldType":"string","id":"tbhdprocess_工序编码_processCode_2_string_t1_\$\$A","name":"工序编码","readable":true,"seq":2,"type":"string","writable":true},
+{"block":"A","controlType":"t1","datePattern":null,"enumValues":[],"fieldType":"string","id":"tbhdprocess_工序名称_processName_3_string_t1_\$\$A","name":"工序名称","readable":true,"seq":3,"type":"string","writable":true},
+{"block":"A","controlType":"t11","datePattern":null,"enumValues":[],"fieldType":"string","id":"tbhdprocess_加工时间_processingTime_4_string_t11_\$\$A","name":"加工时间","readable":true,"seq":4,"type":"string","writable":true},
+{"block":"A","controlType":"t11","datePattern":null,"enumValues":[],"fieldType":"string","id":"tbhdprocess_工序时间 秒_processTime_5_string_t11_\$\$A","name":"工序时间","readable":true,"seq":5,"type":"string","writable":true},
+{"block":"A","controlType":"tree","datePattern":null,"enumValues":[],"fieldType":"string","id":"tbhdprocess_工段_section_6_string_tree_\$\$A","name":"工段","readable":true,"seq":6,"type":"string","writable":true}
+],
+"tableName":"tbhdprocess",
+"name":"工序"
+}    						
+    						
+    						"""
+    						def items = jsonSlurper.parseText(itemString)
+    						def rows = []
+    						processes.each {
+    							def row = []
+    							row << it.processNo
+    							row << it.processCode
+    							row << it.processName
+    							row << it.processingTime
+    							row << it.processTime
+    							
+    							rows << row
+    						}
+    						items.put('rows', rows)
+    						def tbhdprocess_item = JsonOutput.toJson(items)
+    						execution.setVariable('tbhdprocess_item_std', tbhdprocess_item_std)
+    						execution.setVariable('tbhdprocess_item', tbhdprocess_item)
+    						
+    						//所有工序的详细信息（包含工步信息） 
+    						def processCodes = processes.collect{it.processCode}.toSet()
+    						processCodes.removeAll([null])
+							//保存一个这个时间工序的所有信息 key:工序编码 value:信息    						
+    						def pMap = new HashMap()
+    						def processList,process,info,worksteps
+    						processCodes.each {
+    							info = new HashMap()
+    						
+    							param=java.net.URLEncoder.encode('[{"type":"category","target":["variable",["template-tag","pCode"]],"value":\"'+ it + '\"}]', "UTF-8")
+    							restParam.put("_http_url", processDataUrl + param)
+    							getRequest = RestAPI.execute(restParam)
+    							if (!getRequest._http_response_status_code || !getRequest._http_response_status_code.toString().startsWith("2")) {
+    								throw new org.activiti.engine.ActivitiIllegalArgumentException('metabase查询工序调用失败')
+    							}
+    							
+    							processList = jsonSlurper.parseText(getRequest._http_response_body)
+    							if (!processList || processList.size() == 0) {
+    								throw new org.activiti.engine.ActivitiIllegalArgumentException('工序编码 ' + it + ' 未找到相应工序')
+    							}
+    							if (processList.size() != 1) {
+    								throw new org.activiti.engine.ActivitiIllegalArgumentException('工序编码 ' + it + ' 在数据管理中有重复数据')
+    							}
+    							process = processList[0]
+    							//工序主要信息
+    							info.put('processCode', it)//工序编码
+    							info.put('processName', process.processName)//工序名称
+    							info.put('processDesc', process.processDesc)//工序描述
+    							info.put('processType', process.processType)//工序描述
+    							info.put('deviceSpec', process.deviceSpec)//设备型号
+    							info.put('clampingQuantity', process.clampingQuantity)//装夹件数
+    							info.put('personnelOperationTime', process.personnelOperationTime)//人员操作时间
+    							info.put('manualDetectionTime', process.manualDetectionTime)//人工检测时间
+    							info.put('processingTime', process.processingTime)//加工时间
+    							info.put('processTime', process.processTime)//工序时间
+    							//工步表信息
+    							worksteps = process.tbhdworksteps_item
+    							worksteps.each {workstep ->
+    								workstep.put('workStepNo', workstep.remove('input1584496790348'))//工步号
+    								workstep.put('workStepContent', workstep.remove('input1584496804490'))//工步内容
+    								workstep.put('knifeGroupCode', workstep.remove('input1585122015140'))//刀组编号
+    								workstep.put('engineeringItinerary', workstep.remove('input1584497084677'))//工进行程
+    								workstep.put('cuttingSpeed', workstep.remove('input1584497389836'))//切削速度
+    								workstep.put('cuttingDiameter', workstep.remove('input1584497104520'))//切削直径
+    								workstep.put('feedPerRevolution', workstep.remove('input1584497116854'))//每转进给量
+    								workstep.put('rotatingSpeed', workstep.remove('input1584497137520'))//转速
+    								workstep.put('feedRevolution', workstep.remove('input1584497343282'))//进给量
+    								workstep.put('auxiliaryTime', workstep.remove('input1584497434731'))//辅助时间
+    								workstep.put('otherTime', workstep.remove('input1584497450198'))//其它时间
+    								workstep.put('workingTime', workstep.remove('input1584497413536'))//工进时间
+    								workstep.put('workStepTime', workstep.remove('input1584497565107'))//工步时间
+    							}
+    							
+    							itemString = """
+{
+"rows":[],
+"headers":[
+{"block":"A","controlType":"t1","datePattern":null,"enumValues":[],"fieldType":"string","id":"tbhdworksteps_工步号_workStepNo_1_string_t1_\$\$A","name":"工步号","readable":true,"seq":1,"type":"string","writable":true},
+{"block":"A","controlType":"t1","datePattern":null,"enumValues":[],"fieldType":"string","id":"tbhdworksteps_工步内容_workStepContent_2_string_t1_\$\$A","name":"工步内容","readable":true,"seq":2,"type":"string","writable":true},
+{"block":"A","controlType":"t1","datePattern":null,"enumValues":[],"fieldType":"string","id":"tbhdworksteps_刀组编号_knifeGroupCode_3_string_t1_\$\$A","name":"刀组编号","readable":true,"seq":3,"type":"string","writable":true},
+{"block":"A","controlType":"t1","datePattern":null,"enumValues":[],"fieldType":"string","id":"tbhdworksteps_工程行程 mm_engineeringItinerary_4_string_t1_\$\$A","name":"工程行程 mm","readable":true,"seq":4,"type":"string","writable":true},
+{"block":"A","controlType":"t1","datePattern":null,"enumValues":[],"fieldType":"string","id":"tbhdworksteps_切削速度 m/min_cuttingSpeed_5_string_t1_\$\$A","name":"切削速度 m/min","readable":true,"seq":5,"type":"string","writable":true},
+{"block":"A","controlType":"t1","datePattern":null,"enumValues":[],"fieldType":"string","id":"tbhdworksteps_切削直径 mm_cuttingDiameter_6_string_t1_\$\$A","name":"切削直径 mm","readable":true,"seq":6,"type":"string","writable":true},
+{"block":"A","controlType":"t1","datePattern":null,"enumValues":[],"fieldType":"string","id":"tbhdworksteps_每转进给量 mm/rev_feedPerRevolution_7_string_t1_\$\$A","name":"每转进给量 mm/rev","readable":true,"seq":7,"type":"string","writable":true},
+{"block":"A","controlType":"t1","datePattern":null,"enumValues":[],"fieldType":"string","id":"tbhdworksteps_转速 RPM_rotatingSpeed_8_string_t1_\$\$A","name":"转速 RPM","readable":true,"seq":8,"type":"string","writable":true},
+{"block":"A","controlType":"t1","datePattern":null,"enumValues":[],"fieldType":"string","id":"tbhdworksteps_进给量 mm/min_feedRevolution_9_string_t1_\$\$A","name":"进给量 mm/min","readable":true,"seq":9,"type":"string","writable":true},
+{"block":"A","controlType":"t1","datePattern":null,"enumValues":[],"fieldType":"string","id":"tbhdworksteps_辅助时间 s_auxiliaryTime_10_string_t1_\$\$A","name":"辅助时间 s","readable":true,"seq":10,"type":"string","writable":true},
+{"block":"A","controlType":"t1","datePattern":null,"enumValues":[],"fieldType":"string","id":"tbhdworksteps_其他时间 s_otherTime_11_string_t1_\$\$A","name":"其他时间 s","readable":true,"seq":11,"type":"string","writable":true},
+{"block":"A","controlType":"t1","datePattern":null,"enumValues":[],"fieldType":"string","id":"tbhdworksteps_工进时间 s_workingTime_12_string_t1_\$\$A","name":"工进时间 s","readable":true,"seq":12,"type":"string","writable":true},
+{"block":"A","controlType":"t1","datePattern":null,"enumValues":[],"fieldType":"string","id":"tbhdworksteps_工步时间 s_workStepTime_13_string_t1_\$\$A","name":"工步时间 s","readable":true,"seq":13,"type":"string","writable":true}
+],
+"tableName":"tbhdworksteps",
+"name":"工步"
+}    							   							
+    							"""
+    							items = jsonSlurper.parseText(itemString)
+    							rows = []
+    							worksteps.each { workstep ->
+    								def row = []
+    								row << workstep.workStepNo
+    								row << workstep.workStepContent
+    								row << workstep.knifeGroupCode
+    								row << workstep.engineeringItinerary
+    								row << workstep.cuttingSpeed
+    								row << workstep.cuttingDiameter
+    								row << workstep.feedPerRevolution
+    								row << workstep.rotatingSpeed
+    								row << workstep.feedRevolution
+    								row << workstep.auxiliaryTime
+    								row << workstep.otherTime
+    								row << workstep.workingTime
+    								row << workstep.workStepTime
+    								rows << row
+    							}
+    							items.put('rows', rows)
+    							
+    							info.put('tbhdworksteps_item', JsonOutput.toJson(items))
+    							info.put('tbhdworksteps_item_std', JsonOutput.toJson(worksteps))
+    							pMap.put(it, info)
+    						}
+    						execution.setVariable('processMap', JsonOutput.toJson(pMap))
     						
     					]]>
     				</activiti:string>
@@ -26,16 +220,310 @@
     		</activiti:executionListener>
     	</extensionElements>
     </startEvent>
-    <userTask id="usertask1" name="生产工单制定工序对应工段"></userTask>
+    <userTask id="usertask1" name="生产工单制定工序对应工段" activiti:assignee="${initiator}" activiti:dueDate="P1D" activiti:priority="8080">
+    	<extensionElements>
+    		<activiti:formProperty id="craftCode_工艺编号_1_string_tree_$$VA" name="工艺编号" type="string" variable="craftCode" required="true"/>
+    		<activiti:formProperty id="productionPlanNo_生产计划单号_2_string_auto_$$VA" name="生产计划单号" type="string" variable="productionPlanNo"/>
+    		<activiti:formProperty id="productionQuantity_生产数量_3_string_t6_$$VA" name="生产数量" type="string" variable="productionQuantity" required="true"/>
+    		<activiti:formProperty id="productionProcessNo_加工单号_4_string_t1_$$VA" name="加工单号" type="string" variable="productionProcessNo"/>
+    		
+    		<activiti:formProperty id="craftName_工艺名称_1_string_t1_$$VB" name="工艺名称" type="string" variable="craftName"/>
+    		<activiti:formProperty id="meterialSpec_物料型号_2_string_t1_$$VB" name="物料型号" type="string" variable="meterialSpec"/>
+    		<activiti:formProperty id="meterialCode_物料编码_3_string_t1_$$VB" name="物料编码" type="string" variable="meterialCode"/>
+    		<activiti:formProperty id="meterialName_物料名称_4_string_t1_$$VB" name="物料名称" type="string" variable="meterialName"/>
+    		<activiti:formProperty id="mainMeterial_主要材料_5_string_t1_$$VB" name="主要材料" type="string" variable="mainMeterial"/>
+    		<activiti:formProperty id="craftDesc_工艺概述_6_string_t2_$$VB" name="工艺概述" type="string" variable="craftDesc"/>
+    		<activiti:formProperty id="workDays_工作天数 天/年_7_string_t1_$$VB" name="工作天数 天/年" type="string" variable="workDays"/>
+    		<activiti:formProperty id="shiftTimes_换班次数 班/天_8_string_t1_$$VB" name="换班次数 班/天" type="string" variable="shiftTimes"/>
+    		<activiti:formProperty id="unitWorkTime_单位工作时间 小时_9_string_t1_$$VB" name="单位工作时间 小时" type="string" variable="unitWorkTime"/>
+    		<activiti:formProperty id="productionLines_产线数量_10_string_t1_$$VB" name="产线数量" type="string" variable="productionLines"/>
+    		<activiti:formProperty id="craftBeat_工艺节拍 秒_11_string_t1_$$VB" name="工艺节拍 秒" type="string" variable="craftBeat"/>
+    		<activiti:formProperty id="capacityTest_产能测算 件/年_12_string_t1_$$VB" name="产能测算 件/年" type="string" variable="capacityTest"/>
+    		
+    		<activiti:formProperty id="tbhdprocess_item" name="工序" type="string" variable="tbhdprocess_item"/>
+	   		<activiti:formProperty id="tbhdprocess_工序号_processNo_1_string_t1_$$VA" name="工序号" type="string" variable="tbhdprocess_processNo_t00"/>
+	   		<activiti:formProperty id="tbhdprocess_工序编码_processCode_2_string_t1_$$VA" name="工序编码" type="string" variable="tbhdprocess_processCode_t00"/>
+	   		<activiti:formProperty id="tbhdprocess_工序名称_processName_3_string_t1_$$VA" name="工序名称" type="string" variable="tbhdprocess_processName_t00"/>
+	   		<activiti:formProperty id="tbhdprocess_加工时间_processingTime_4_string_t11_$$VA" name="加工时间" type="string" variable="tbhdprocess_processingTime_t00"/>
+	   		<activiti:formProperty id="tbhdprocess_工序时间 秒_processTime_5_string_t11_$$VA" name="工序时间" type="string" variable="tbhdprocess_processTime_t00"/>
+	   		<activiti:formProperty id="tbhdprocess_工段_section_6_string_tree_$$A" name="工段" type="string" variable="tbhdprocess_section_t00" required="true"/>
+	   		<activiti:formProperty id="tbhdprocess_设备编号_deviceCode_7_string_auto_t1_$$A" name="设备编号" type="string" variable="tbhdprocess_deviceCode_t00" required="true"/>
+    		<activiti:formProperty id="tbhdprocess_计划开始时间_planStartTime_8_string_t5_$$A" name="计划开始时间" type="string" variable="tbhdprocess_planStartTime" required="true"/>
+    		<activiti:formProperty id="tbhdprocess_计划结束时间_planEndTime_9_string_t5_$$A" name="计划结束时间" type="string" variable="tbhdprocess_planEndTime" required="true"/>
+    	
+    		<activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+    			<activiti:field name="language">
+    				<activiti:string>
+    					<![CDATA[groovy]]>
+    				</activiti:string>
+    			</activiti:field>
+    			<activiti:field name="script">
+    				<activiti:string>
+    					<![CDATA[import groovy.json.JsonSlurper
+    						import groovy.json.JsonOutput
+    						import java.text.SimpleDateFormat
+    						import com.eorionsolution.bpms.extension.rest.RestAPI
+    						
+    						def jsonSlurper = new JsonSlurper()
+    						def execution = task.getExecution()
+    						//制单日期
+    						def makeDate = new Date().toInstant().toEpochMilli().toString()
+    						execution.setVariable('makeDate', makeDate)
+    						
+    						def sdf = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+    						def checkUrl = 'https://my.zhizaozu.com/metabase/public/question/0163a7da-e919-442b-84c9-0515cc0722ea.json?parameters='
+    						
+    						//每道工序都要报工
+    						def pList = []
+    						//判断是否每道工序都设好了工段
+    						def std = jsonSlurper.parseText(tbhdprocess_item_std)
+    						std.each {
+    						
+    							if (!it.section) {
+    								throw new org.activiti.engine.ActivitiIllegalArgumentException('请为每道工序设置工段、设备信息')
+    							}
+    							def deviceCode = it.deviceCode.code
+    							def start_time = it.planStartTime.toLong()
+    							def end_time = it.planEndTime.toLong()
+    							if (it.planEndTime.toLong() <= it.planStartTime.toLong()) {
+    								throw new org.activiti.engine.ActivitiIllegalArgumentException('工序：' + it.processNo + ' 的排程开始时间不能大于结束时间')
+    							}
+    							
+    							def param = """
+[{"type":"category","target":["variable",["template-tag","deviceCode"]],"value":"$deviceCode"},{"type":"category","target":["variable",["template-tag","start_time"]],"value":"$start_time"},{"type":"category","target":["variable",["template-tag","end_time"]],"value":"$end_time"}]
+"""
+								def restParam = new HashMap<String,Object>()
+		   						def headerMap = new HashMap<String,String>()
+		   						headerMap.put("Content-Type","application/json")
+		   						restParam.put("_http_method","GET")
+		   						restParam.put("_http_headers",headerMap)
+		   						restParam.put("_http_url", checkUrl + java.net.URLEncoder.encode(param, 'UTF-8'))
+		   						restParam.put("_http_body", '')
+		   						def getRequest = RestAPI.execute(restParam)
+		   						if (!getRequest._http_response_status_code || !getRequest._http_response_status_code.toString().startsWith("2")) {
+		   							throw new org.activiti.engine.ActivitiIllegalArgumentException('metabase调用检测排程失败')
+		   						}
+		   						def response = jsonSlurper.parseText(getRequest._http_response_body)
+		   						if (response.size() != 0) {
+		   							def dCode = response[0].deviceCode
+		   							def sTime = new Date(response[0].planStartTime.toLong())
+		   							def eTime = new Date(response[0].planEndTime.toLong())
+		   							throw new org.activiti.engine.ActivitiIllegalArgumentException('设备 ' + dCode + '在 ' + sdf.format(sTime) + ' 至' + sdf.format(eTime) + '已有排程安排')
+		   						}
+    							
+    							pList << [
+    								'processNo': it.processNo,
+    								'process':it.processCode, 
+    								'section':JsonOutput.toJson(it.section),
+    								'device':deviceCode,
+    								'planStartTime': start_time.toString(),
+    								'planEndTime': end_time.toString()
+    								]
+    						}
+    						execution.setVariable('pList', pList)
+    					]]>
+    				</activiti:string>
+    			</activiti:field>
+    		</activiti:taskListener>
+    	</extensionElements>
+    </userTask>
     <subProcess id="subprocess1" name="报工子流程">
-      <startEvent id="S2" name="S2"></startEvent>
-      <userTask id="usertask2" name="生产报工"></userTask>
+      <multiInstanceLoopCharacteristics isSequential="false" activiti:collection="pList" activiti:elementVariable="info">
+      	<completionCondition>${nrOfCompletedInstances/nrOfInstances == 1}</completionCondition>
+      </multiInstanceLoopCharacteristics>
+      <startEvent id="S2" name="S2">
+      	<extensionElements>
+      		<activiti:executionListener event="end" class="org.activiti.engine.impl.bpmn.listener.ScriptExecutionListener">
+      			<activiti:field name="language">
+      				<activiti:string>
+      					<![CDATA[groovy]]>
+      				</activiti:string>
+      			</activiti:field>
+      			<activiti:field name="script">
+      				<activiti:string>
+      					<![CDATA[import groovy.json.JsonSlurper
+      						def jsonSlurper = new JsonSlurper()
+      						
+      						def pMap = jsonSlurper.parseText(processMap)
+      						//工序信息
+      						def processCode = info.process
+      						def pInfo = pMap.get(processCode)
+      						execution.setVariableLocal('processCode', pInfo.processCode)
+      						execution.setVariableLocal('processName', pInfo.processName)
+      						execution.setVariableLocal('processDesc', pInfo.processDesc)
+      						execution.setVariableLocal('processType', pInfo.processType)
+      						execution.setVariableLocal('deviceSpec', pInfo.deviceSpec)
+      						execution.setVariableLocal('clampingQuantity', pInfo.clampingQuantity)
+      						execution.setVariableLocal('personnelOperationTime', pInfo.personnelOperationTime)
+      						execution.setVariableLocal('manualDetectionTime', pInfo.manualDetectionTime)
+      						execution.setVariableLocal('processingTime', pInfo.processingTime)
+      						execution.setVariableLocal('processTime', pInfo.processTime)
+      						execution.setVariableLocal('processNo', info.processNo)
+      						execution.setVariableLocal('section', info.section)
+      						execution.setVariableLocal('deviceCode', info.device)
+      						execution.setVariableLocal('planStartTime', info.planStartTime)
+      						execution.setVariableLocal('planEndTime', info.planEndTime)
+      						//工步
+	    					execution.setVariableLocal('tbhdworksteps_item', pInfo.tbhdworksteps_item)
+	    					execution.setVariableLocal('tbhdworksteps_item_std', pInfo.tbhdworksteps_item_std)
+      						
+      						def section = jsonSlurper.parseText(info.section)
+      						def sectionGroup = section.code
+      						execution.setVariableLocal('sectionGroup', sectionGroup)
+      						
+      						//剩余数量初始化
+	    					execution.setVariableLocal('curRemain', productionQuantity)
+      					]]>
+      				</activiti:string>
+      			</activiti:field>
+      		</activiti:executionListener>
+      	</extensionElements>
+      </startEvent>
+      <userTask id="usertask2" name="生产报工" activiti:candidateGroups="${sectionGroup}" activiti:dueDate="P1D" activiti:priority="8080">
+      	<extensionElements>
+      		<activiti:formProperty id="craftCode_工艺编号_1_string_tree_$$VA" name="工艺编号" type="string" variable="craftCode" required="true"/>
+    		<activiti:formProperty id="productionProcessNo_加工单号_2_string_t1_$$VA" name="加工单号" type="string" variable="productionProcessNo"/>
+    		<activiti:formProperty id="productionPlanNo_生产计划单号_3_string_auto_$$VA" name="生产计划单号" type="string" variable="productionPlanNo"/>
+    		<activiti:formProperty id="productionQuantity_生产数量_4_string_t6_$$VA" name="生产数量" type="string" variable="productionQuantity" required="true"/>
+    		<activiti:formProperty id="curRemain_当前剩余数量_5_string_t1_$$VA" name="当前剩余数量" type="string" variable="curRemain"/>
+    		<activiti:formProperty id="section_工段_6_string_tree_$$VA" name="工段" type="string" variable="section" required="true"/>
+            <activiti:formProperty id="deviceCode_设备编号_7_string_t1_$$VA" name="设备编号" type="string" variable="deviceCode" required="true"/>
+            <activiti:formProperty id="planStartTime_计划开始时间_8_string_t5_$$VA" name="计划开始时间" type="string" variable="planStartTime"/>
+            <activiti:formProperty id="planEndTime_计划结束时间_9_string_t5_$$VA" name="计划结束时间" type="string" variable="planEndTime"/>
+    		
+    		<activiti:formProperty id="craftName_工艺名称_1_string_t1_$$VB" name="工艺名称" type="string" variable="craftName"/>
+    		<activiti:formProperty id="meterialSpec_物料型号_2_string_t1_$$VB" name="物料型号" type="string" variable="meterialSpec"/>
+    		<activiti:formProperty id="meterialCode_物料编码_3_string_t1_$$VB" name="物料编码" type="string" variable="meterialCode"/>
+    		<activiti:formProperty id="meterialName_物料名称_4_string_t1_$$VB" name="物料名称" type="string" variable="meterialName"/>
+    		<activiti:formProperty id="mainMeterial_主要材料_5_string_t1_$$VB" name="主要材料" type="string" variable="mainMeterial"/>
+    		<activiti:formProperty id="craftDesc_工艺概述_6_string_t2_$$VB" name="工艺概述" type="string" variable="craftDesc"/>
+    		<activiti:formProperty id="workDays_工作天数 天/年_7_string_t1_$$VB" name="工作天数 天/年" type="string" variable="workDays"/>
+    		<activiti:formProperty id="shiftTimes_换班次数 班/天_8_string_t1_$$VB" name="换班次数 班/天" type="string" variable="shiftTimes"/>
+    		<activiti:formProperty id="unitWorkTime_单位工作时间 小时_9_string_t1_$$VB" name="单位工作时间 小时" type="string" variable="unitWorkTime"/>
+    		<activiti:formProperty id="productionLines_产线数量_10_string_t1_$$VB" name="产线数量" type="string" variable="productionLines"/>
+    		<activiti:formProperty id="craftBeat_工艺节拍 秒_11_string_t1_$$VB" name="工艺节拍 秒" type="string" variable="craftBeat"/>
+    		<activiti:formProperty id="capacityTest_产能测算 件/年_12_string_t1_$$VB" name="产能测算 件/年" type="string" variable="capacityTest"/>
+    		
+    		<activiti:formProperty id="processCode_工序编码_1_string_t1_$$VC" name="工序编码" type="string" variable="processCode"/>
+            <activiti:formProperty id="processName_工序名称_2_string_t1_$$VC" name="工序名称" type="string" variable="processName"/>
+            <activiti:formProperty id="processDesc_工序描述_3_string_t2_$$VC" name="工序描述" type="string" variable="processDesc"/>
+            <activiti:formProperty id="processType_工序类型_4_string_t1_$$VC" name="工序类型" type="string" variable="processType"/>
+            <activiti:formProperty id="deviceSpec_设备型号_5_string_t1_$$VC" name="设备型号" type="string" variable="deviceSpec"/>
+            <activiti:formProperty id="clampingQuantity_装夹件数_6_string_t1_$$VC" name="装夹件数" type="string" variable="clampingQuantity"/>
+            <activiti:formProperty id="personnelOperationTime_人员操作时间 秒_7_string_t1_$$VC" name="人员操作时间 秒" type="string" variable="personnelOperationTime"/>
+            <activiti:formProperty id="manualDetectionTime_人工检测时间 秒_8_string_t1_$$VC" name="人工检测时间 秒" type="string" variable="manualDetectionTime"/>
+            <activiti:formProperty id="processingTime_加工时间 秒_9_string_t1_$$VC" name="加工时间 秒" type="string" variable="processingTime"/>
+            <activiti:formProperty id="processTime_工序时间 秒_10_string_t1_$$VC" name="工序时间 秒" type="string" variable="processTime"/>
+            
+            <activiti:formProperty id="tbhdworksteps_item_$$VA" name="工步" type="string" variable="tbhdworksteps_item"></activiti:formProperty>
+          	<activiti:formProperty id="tbhdworksteps_工步号_workStepNo_1_string_t1_$$A" name="工步号" type="string" variable="thbdworksteps_workStepNo_t00"/>
+			<activiti:formProperty id="tbhdworksteps_工步内容_workStepContent_2_string_t1_$$A" name="工步内容" type="string" variable="tbhdworksteps_workStepContent_t00"/>
+			<activiti:formProperty id="tbhdworksteps_刀组编号_knifeGroupCode_3_string_t1_$$A" name="刀组编号" type="string" variable="tbhdworksteps_knifeGroupCode_t00"/>
+			<activiti:formProperty id="tbhdworksteps_工程行程 mm_engineeringItinerary_4_string_t1_$$A" name="工程行程 mm" type="string" variable="tbhdworksteps_engineeringItinerary_t00"/>
+			<activiti:formProperty id="tbhdworksteps_切削速度 m/min_cuttingSpeed_5_string_t1_$$A" name="切削速度 m/min" type="string" variable="tbhdworksteps_cuttingSpeed_t00"/>
+			<activiti:formProperty id="tbhdworksteps_切削直径 mm_cuttingDiameter_6_string_t1_$$A" name="切削直径 mm" type="string" variable="tbhdworksteps_cuttingDiameter_t00"/>
+			<activiti:formProperty id="tbhdworksteps_每转进给量 mm/rev_feedPerRevolution_7_string_t1_$$A" name="每转进给量 mm/rev" type="string" variable="tbhdworksteps_feedPerRevolution_t00"/>
+			<activiti:formProperty id="tbhdworksteps_转速 RPM_rotatingSpeed_8_string_t1_$$A" name="转速 RPM" type="string" variable="tbhdworksteps_rotatingSpeed_t00"/>
+			<activiti:formProperty id="tbhdworksteps_进给量 mm/min_feedRevolution_9_string_t1_$$A" name="进给量 mm/min" type="string" variable="tbhdworksteps_feedRevolution_t00"/>
+			<activiti:formProperty id="tbhdworksteps_辅助时间 s_auxiliaryTime_10_string_t1_$$A" name="辅助时间 s" type="string" variable="tbhdworksteps_auxiliaryTime_t00"/>
+			<activiti:formProperty id="tbhdworksteps_其他时间 s_otherTime_11_string_t1_$$A" name="其他时间 s" type="string" variable="tbhdworksteps_otherTime_t00"/>
+			<activiti:formProperty id="tbhdworksteps_工进时间 s_workingTime_12_string_t1_$$A" name="工进时间 s" type="string" variable="tbhdworksteps_workingTime_t00"/>
+			<activiti:formProperty id="tbhdworksteps_工步时间 s_workStepTime_13_string_t1_$$A" name="工步时间 s" type="string" variable="tbhdworksteps_workStepTime_t00"/>
+            
+            <activiti:formProperty id="processOperation_工序操作_2_string_t1_$$A" name="工序操作" type="string" variable="processOperation"/>
+            <activiti:formProperty id="curProductionQuantity_生产数量_3_string_t6_$$A" name="生产数量" type="string" variable="curProductionQuantity" required="true"/>
+            <activiti:formProperty id="operationRecords_操作记录_4_string_t2_$$A" name="操作记录" type="string" variable="operationRecords"/>
+            <activiti:formProperty id="qualifiedQuantity_合格品数量_5_string_t6_$$A" name="合格品数量" type="string" variable="qualifiedQuantity"/>
+            <activiti:formProperty id="defectiveQuantity_残次品数量_6_string_t6_$$A" name="残次品数量" type="string" variable="defectiveQuantity"/>
+            <activiti:formProperty id="firstCheckCode_首件检验单号_7_string_t1_$$A" name="首件检验单号" type="string" variable="firstCheckCode"/>
+            <activiti:formProperty id="processCheckCode_工序检验单号_8_string_t1_$$A" name="工序检验单号" type="string" variable="processCheckCode"/>
+      	
+      		<activiti:taskListener event="create" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+      			<activiti:field name="language">
+      				<activiti:string>
+      					<![CDATA[groovy]]>
+      				</activiti:string>
+      			</activiti:field>
+      			<activiti:field name="script">
+      				<activiti:string>
+      					<![CDATA[def execution = task.getExecution()
+      					//init
+      					execution.setVariableLocal('productionReportNo','')
+      					execution.setVariableLocal('processOperation','')
+      					execution.setVariableLocal('curProductionQuantity','')
+      					execution.setVariableLocal('operationRecords','')
+      					execution.setVariableLocal('qualifiedQuantity','')
+      					execution.setVariableLocal('defectiveQuantity','')
+      					execution.setVariableLocal('firstCheckCode','')
+      					execution.setVariableLocal('processCheckCode','')
+      					execution.setVariableLocal('reportDate', '')]]>
+      				</activiti:string>
+      			</activiti:field>
+      		</activiti:taskListener>
+      		
+      		<activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+      			<activiti:field name="language">
+      				<activiti:string>
+      					<![CDATA[groovy]]>
+      				</activiti:string>
+      			</activiti:field>
+      			<activiti:field name="script">
+      				<activiti:string>
+      					<![CDATA[import groovy.json.JsonSlurper
+    					import groovy.json.JsonOutput
+    					import java.text.SimpleDateFormat
+      					
+      					def jsonSlurper = new JsonSlurper()
+      					def execution = task.getExecution()
+      					def assignee = task.getAssignee()
+      					def df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+      					def df1 = new SimpleDateFormat("yyyyMMddHHmmss")
+      					
+      					if (curRemain.toDouble() < curProductionQuantity.toDouble()) {
+      						throw new org.activiti.engine.ActivitiIllegalArgumentException('请填写正确的生产数量')
+      					}
+      					
+      					def curRemain = curRemain.toDouble() - curProductionQuantity.toDouble()
+      					if (curRemain == 0) {
+      						execution.setVariableLocal('finished', true)
+      					} else {
+      						execution.setVariableLocal('finished', false)
+      					}
+      					
+      					def productionReportNo = 'SCBGD' + df1.format(new Date())
+      					
+      					def records = jsonSlurper.parseText(reportRecords)
+      					def record = new HashMap()
+      					record.put('assignee', assignee)
+      					record.put('productionReportNo', productionReportNo)
+      					record.put('processOperation', processOperation)
+      					record.put('curProductionQuantity', curProductionQuantity)
+      					record.put('curRemain', curRemain.toString())
+      					record.put('qualifiedQuantity', qualifiedQuantity)
+      					record.put('defectiveQuantity', defectiveQuantity)
+      					record.put('firstCheckCode', firstCheckCode)
+      					record.put('operationRecords', operationRecords)
+      					record.put('processCheckCode', processCheckCode)
+      					record.put('reportDate', df.format(new Date()))
+      					record.put('processNo', processNo)
+      					records << record
+      					execution.setVariable('reportRecords', JsonOutput.toJson(records))
+      					execution.setVariableLocal('curRemain', curRemain.toString())]]>
+      				</activiti:string>
+      			</activiti:field>
+      		</activiti:taskListener>
+      	</extensionElements>
+      </userTask>
       <exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway"></exclusiveGateway>
       <endEvent id="E2" name="E2"></endEvent>
       <sequenceFlow id="flow4" sourceRef="S2" targetRef="usertask2"></sequenceFlow>
       <sequenceFlow id="flow5" sourceRef="usertask2" targetRef="exclusivegateway1"></sequenceFlow>
-      <sequenceFlow id="flow6" name="finished" sourceRef="exclusivegateway1" targetRef="E2"></sequenceFlow>
-      <sequenceFlow id="flow7" name="unfinished" sourceRef="exclusivegateway1" targetRef="usertask2"></sequenceFlow>
+      <sequenceFlow id="flow6" name="finished" sourceRef="exclusivegateway1" targetRef="E2">
+      	<conditionExpression xsi:type="tFormalExpression"><![CDATA[${finished}]]></conditionExpression>
+      </sequenceFlow>
+      <sequenceFlow id="flow7" name="unfinished" sourceRef="exclusivegateway1" targetRef="usertask2">
+      	<conditionExpression xsi:type="tFormalExpression"><![CDATA[${!finished}]]></conditionExpression>
+      </sequenceFlow>
     </subProcess>
     <endEvent id="E1" name="E1"></endEvent>
     <sequenceFlow id="flow1" sourceRef="S1" targetRef="usertask1"></sequenceFlow>

@@ -4,6 +4,7 @@
     <documentation>{"businessKey": "${user.name}采购申请Purchase Requisition ${YYYY-MM-DD}"}</documentation>
     <startEvent id="startevent1" name="Start" activiti:initiator="initiator">
     	<extensionElements>
+    		<activiti:formProperty id="desc_说明 Description_1_string_t2_$$A" name="说明 Description" type="string" variable="desc"/>
     		<activiti:formProperty id="tbhdpurchaseitem_item" name="采购明细 Details" type="string" variable="tbhdpurchaseitem_item" required="true"/>
     		<activiti:formProperty id="tbhdpurchaseitem_采购类别 Purchase Type_type_1_enum_sbs_$$A" name="采购类别 Purchase Type" type="enum" variable="tbhdpurchaseitem_type_t00" required="true">
 				<activiti:value id="" name=""/>
@@ -17,7 +18,7 @@
     		<activiti:formProperty id="tbhdpurchaseitem_数量 Quantity_quantity_4_string_t11_$$A" name="数量 Quantity" type="string" variable="tbhdpurchaseitem_quantity_t00" required="true"/>
     		<activiti:formProperty id="tbhdpurchaseitem_单价 Unit Price_unitPrice_5_string_cny_$$A" name="单价 Unit Price" type="string" variable="tbhdpurchaseitem_unitPrice_t00" required="true"/>
     		<activiti:formProperty id="tbhdpurchaseitem_总金额 Total Amount_totalAmount_6_string_cny_$$A" name="总金额 Total Amount" type="string" variable="tbhdpurchaseitem_totalAmount_t00" required="true"/>
-    		<activiti:formProperty id="tbhdpurchaseitem_采购原因 Reason_reason_7_string_t2_$$A" name="采购原因 Reason" type="string" variable="tbhdpurchaseitem_reason_t00"/>
+    		<activiti:formProperty id="tbhdpurchaseitem_采购原因 Reason_reason_7_string_t2_$$A" name="采购原因 Reason" type="string" variable="tbhdpurchaseitem_reason_t00" required="true"/>
     	
     		<activiti:executionListener event="end" class="org.activiti.engine.impl.bpmn.listener.ScriptExecutionListener">
     			<activiti:field name="language">
@@ -33,7 +34,7 @@
     						
     						//采购申请人
     						def purchaser = identityService.createUserQuery().userId(initiator).singleResult()
-    						execution.setVariable('purApplicant', purchaser.getLastName() + " " + purchaser.getFirstName())
+    						execution.setVariable('purApplicant', purchaser.getLastName() + "" + purchaser.getFirstName())
     						//总金额
     						def totalArr = jsonSlurper.parseText(tbhdpurchaseitem_item_std).collect{it.totalAmount?:'0'}.collect{it.toBigDecimal()}
     						def total = totalArr.sum{it}
@@ -62,6 +63,8 @@
     		
     		<activiti:formProperty id="purApplicant_采购申请人 Purchase Applicant_1_string_t1_$$VA" name="采购申请人 Purchase Applicant" type="string" variable="purApplicant"/>
     		<activiti:formProperty id="totalAmount_采购总金额 Total Amount_2_string_cny_$$VA" name="采购总金额 Total Amount" type="string" variable="totalAmount"/>
+    		
+    		<activiti:formProperty id="desc_说明 Description_3_string_t2_$$VA" name="说明 Description" type="string" variable="desc"/>
     		
     		<activiti:formProperty id="tbhdpurchaseitem_item_$$VA" name="采购明细 Details" type="string" variable="tbhdpurchaseitem_item"/>
     		<activiti:formProperty id="tbhdpurchaseitem_采购类别 Purchase Type_type_1_enum_sbs_$$A" name="采购类别 Purchase Type" type="enum" variable="tbhdpurchaseitem_type_t00">
@@ -124,6 +127,7 @@
     		
     		<activiti:formProperty id="purApplicant_采购申请人 Purchase Applicant_1_string_t1_$$VA" name="采购申请人 Purchase Applicant" type="string" variable="purApplicant"/>
     		<activiti:formProperty id="totalAmount_采购总金额 Total Amount_2_string_cny_$$VA" name="采购总金额 Total Amount" type="string" variable="totalAmount"/>
+    		<activiti:formProperty id="desc_说明 Description_3_string_t2_$$VA" name="说明 Description" type="string" variable="desc"/>
     		
     		<activiti:formProperty id="tbhdpurchaseitem_item_$$VA" name="采购明细 Details" type="string" variable="tbhdpurchaseitem_item"/>
     		<activiti:formProperty id="tbhdpurchaseitem_采购类别 Purchase Type_type_1_enum_sbs_$$A" name="采购类别 Purchase Type" type="enum" variable="tbhdpurchaseitem_type_t00">
@@ -167,7 +171,8 @@
 						def METABASE_SITE_URL = "https://metabase.eorionsolution.com"
 						def METABASE_SECRET_KEY = "8322aa8500b6ae07df7590b25d1bff56cb5e631dc829704c15cb66e80fed9f50"
 						def header = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9"
-						def playloadString = '{"resource":{"question":187},"params":{}}'
+						def assignee = task.getAssignee()
+						def playloadString = '{"resource":{"question":187},"params":{"userId":"'+assignee+'"}}'
 						def playload = Base64.getUrlEncoder().encodeToString(playloadString.bytes)
 						def secret =Base64.getUrlEncoder().encodeToString(hmac_sha256(METABASE_SECRET_KEY , header+'.'+playload))
 						
@@ -188,6 +193,7 @@
     		
     		<activiti:formProperty id="purApplicant_采购申请人 Purchase Applicant_1_string_t1_$$VA" name="采购申请人 Purchase Applicant" type="string" variable="purApplicant"/>
     		<activiti:formProperty id="totalAmount_采购总金额 Total Amount_2_string_cny_$$VA" name="采购总金额 Total Amount" type="string" variable="totalAmount"/>
+    		<activiti:formProperty id="desc_说明 Description_3_string_t2_$$VA" name="说明 Description" type="string" variable="desc"/>
     		
     		<activiti:formProperty id="tbhdpurchaseitem_item_$$VA" name="采购明细 Details" type="string" variable="tbhdpurchaseitem_item"/>
     		<activiti:formProperty id="tbhdpurchaseitem_采购类别 Purchase Type_type_1_enum_sbs_$$A" name="采购类别 Purchase Type" type="enum" variable="tbhdpurchaseitem_type_t00">
@@ -215,6 +221,7 @@
     		
     		<activiti:formProperty id="purApplicant_采购申请人 Purchase Applicant_1_string_t1_$$VA" name="采购申请人 Purchase Applicant" type="string" variable="purApplicant"/>
     		<activiti:formProperty id="totalAmount_采购总金额 Total Amount_2_string_cny_$$VA" name="采购总金额 Total Amount" type="string" variable="totalAmount"/>
+    		<activiti:formProperty id="desc_说明 Description_3_string_t2_$$VA" name="说明 Description" type="string" variable="desc"/>
     		
     		<activiti:formProperty id="tbhdpurchaseitem_item_$$VA" name="采购明细 Details" type="string" variable="tbhdpurchaseitem_item"/>
     		<activiti:formProperty id="tbhdpurchaseitem_采购类别 Purchase Type_type_1_enum_sbs_$$A" name="采购类别 Purchase Type" type="enum" variable="tbhdpurchaseitem_type_t00">
@@ -241,6 +248,7 @@
     		
     		<activiti:formProperty id="purApplicant_采购申请人 Purchase Applicant_1_string_t1_$$VA" name="采购申请人 Purchase Applicant" type="string" variable="purApplicant"/>
     		<activiti:formProperty id="totalAmount_采购总金额 Total Amount_2_string_cny_$$VA" name="采购总金额 Total Amount" type="string" variable="totalAmount"/>
+    		<activiti:formProperty id="desc_说明 Description_3_string_t2_$$VA" name="说明 Description" type="string" variable="desc"/>
     		
     		<activiti:formProperty id="tbhdpurchaseitem_item_$$VA" name="采购明细 Details" type="string" variable="tbhdpurchaseitem_item"/>
     		<activiti:formProperty id="tbhdpurchaseitem_采购类别 Purchase Type_type_1_enum_sbs_$$A" name="采购类别 Purchase Type" type="enum" variable="tbhdpurchaseitem_type_t00">
@@ -267,6 +275,7 @@
     		
     		<activiti:formProperty id="purApplicant_采购申请人 Purchase Applicant_1_string_t1_$$VA" name="采购申请人 Purchase Applicant" type="string" variable="purApplicant"/>
     		<activiti:formProperty id="totalAmount_采购总金额 Total Amount_2_string_cny_$$VA" name="采购总金额 Total Amount" type="string" variable="totalAmount"/>
+    		<activiti:formProperty id="desc_说明 Description_3_string_t2_$$VA" name="说明 Description" type="string" variable="desc"/>
     		
     		<activiti:formProperty id="tbhdpurchaseitem_item_$$VA" name="采购明细 Details" type="string" variable="tbhdpurchaseitem_item"/>
     		<activiti:formProperty id="tbhdpurchaseitem_采购类别 Purchase Type_type_1_enum_sbs_$$A" name="采购类别 Purchase Type" type="enum" variable="tbhdpurchaseitem_type_t00">
@@ -325,6 +334,8 @@
 							restParam.put("_http_url", mailUrl)
 							restParam.put("_http_body", mailBody)
 							def result = RestAPI.execute(restParam)	
+							
+							execution.setVariableLocal('BBOT_BI_PUR_QUEUE', '')
 						]]>
 					</activiti:string>
 				</activiti:field>    			
