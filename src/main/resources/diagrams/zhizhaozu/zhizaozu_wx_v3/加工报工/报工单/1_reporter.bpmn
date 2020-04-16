@@ -1,0 +1,257 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/processdef">
+  <process id="PID682818cfdadd411cbc8066ef0988ed5d" name="生产报工" isExecutable="true">
+    <startEvent id="StartEvent_1" name="生产报工单">
+      <extensionElements>
+        <activiti:formProperty id="input1586488028320_生产报工单号_0_string_t1_$$A" name="生产报工单号" type="string" variable="input1586488028320"></activiti:formProperty>
+        <activiti:formProperty id="input1586505185792_生产加工单号_1_string_t1_$$A" name="生产加工单号" type="string" variable="input1586505185792"></activiti:formProperty>
+        <activiti:formProperty id="input1586743407883_生产总数量_2_string_t1_$$A" name="生产总数量" type="string" variable="input1586743407883" required="true"></activiti:formProperty>
+        <activiti:formProperty id="input1586743425935_生产剩余数量_3_string_t1_$$A" name="生产剩余数量" type="string" variable="input1586743425935" required="true"></activiti:formProperty>
+        <activiti:formProperty id="input1586489932199_工序编码_4_string_t1_$$A" name="工序编码" type="string" variable="input1586489932199"></activiti:formProperty>
+        <activiti:formProperty id="input1586488798068_工序名称_5_string_t1_$$A" name="工序名称" type="string" variable="input1586488798068"></activiti:formProperty>
+        <activiti:formProperty id="textarea1586489966766_工序描述_6_string_t2_$$A" name="工序描述" type="string" variable="textarea1586489966766"></activiti:formProperty>
+        <activiti:formProperty id="imgupload1586490050984_工序简图_7_string_t9i_$$A" name="工序简图" type="string" variable="imgupload1586490050984"></activiti:formProperty>
+        <activiti:formProperty id="input1586490011163_设备型号_8_string_t1_$$A" name="设备型号" type="string" variable="input1586490011163"></activiti:formProperty>
+        <activiti:formProperty id="input1586490071449_装夹件数_9_string_t6_$$A" name="装夹件数" type="string" variable="input1586490071449"></activiti:formProperty>
+        <activiti:formProperty id="input1586490116836_人员操作时间 s_10_string_t6_$$A" name="人员操作时间 s" type="string" variable="input1586490116836"></activiti:formProperty>
+        <activiti:formProperty id="input1586490149258_人工检测时间 s_11_string_t6_$$A" name="人工检测时间 s" type="string" variable="input1586490149258"></activiti:formProperty>
+        <activiti:formProperty id="input1586490175371_加工时间 s_12_string_t6_$$A" name="加工时间 s" type="string" variable="input1586490175371"></activiti:formProperty>
+        <activiti:formProperty id="input1586490181190_工序时间 s_13_string_t6_$$A" name="工序时间 s" type="string" variable="input1586490181190"></activiti:formProperty>
+        <activiti:formProperty id="input1586490451758_加工数量_14_string_t6_$$A" name="加工数量" type="string" variable="input1586490451758"></activiti:formProperty>
+        <activiti:formProperty id="input1586490469673_合格品数量_15_string_t6_$$A" name="合格品数量" type="string" variable="input1586490469673"></activiti:formProperty>
+        <activiti:formProperty id="input1586490480846_不良品数量_16_string_t6_$$A" name="不良品数量" type="string" variable="input1586490480846"></activiti:formProperty>
+        <activiti:formProperty id="select1586490585460_检验记录单号_17_enum_sbs_$$A" name="检验记录单号" type="enum" variable="select1586490585460">
+          <activiti:value id="Option 1" name="Option 1"></activiti:value>
+          <activiti:value id="Option 2" name="Option 2"></activiti:value>
+          <activiti:value id="Option 3" name="Option 3"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="textarea1586490614725_报工记录_18_string_t2_$$A" name="报工记录" type="string" variable="textarea1586490614725"></activiti:formProperty>
+        <activiti:formProperty id="tbtable1586488825239_item" name="工步详情" type="string" variable="table1586488825239"></activiti:formProperty>
+        <activiti:formProperty id="tbtable1586488825239_工步号_input1586490289405_1_string_t1_$$A" name="工步号" type="string" variable="input1586490289405"></activiti:formProperty>
+        <activiti:formProperty id="tbtable1586488825239_工步内容_input1586490302014_2_string_t1_$$A" name="工步内容" type="string" variable="input1586490302014"></activiti:formProperty>
+        <activiti:formProperty id="tbtable1586488825239_转速 RPM_input1586490333093_3_string_t6_$$A" name="转速 RPM" type="string" variable="input1586490333093"></activiti:formProperty>
+        <activiti:formProperty id="tbtable1586488825239_进给量 mm/min_input1586490388572_4_string_t6_$$A" name="进给量 mm/min" type="string" variable="input1586490388572"></activiti:formProperty>
+        <activiti:formProperty id="tbtable1586488825239_工步时间 s_input1586490412248_5_string_t6_$$A" name="工步时间 s" type="string" variable="input1586490412248"></activiti:formProperty>
+        <activiti:executionListener event="end" class="org.activiti.engine.impl.bpmn.listener.ScriptExecutionListener">
+          <activiti:field name="language">
+            <activiti:string><![CDATA[groovy]]></activiti:string>
+          </activiti:field>
+          <activiti:field name="script">
+            <activiti:string>
+            	<![CDATA[import groovy.json.JsonSlurper
+    				import groovy.json.JsonOutput
+    				import com.eorionsolution.bpms.extension.rest.RestAPI
+    				
+    				def jsonSlurper = new JsonSlurper()
+    				
+    				if (execution.getVariable('productionNo')) {
+           				runtimeService.updateBusinessKey(execution.getProcessInstanceId(),'报工' + ':' + productionNo + '-' + processNo)
+     					execution.setVariable('input1586488028320', productionNo + '-' + processNo)
+     					execution.setVariable('input1586505185792', productionNo)
+     				}
+     				//根据工序查工步详情
+     				def processCode = execution.getVariable('input1586489932199')
+     				if (!processCode) {
+     					return
+     				}
+     				def metabaseUrl = 'https://my.zhizaozu.com/metabase/public/question/dbf0cf26-d61e-442d-ab4f-592b21077791.json?parameters='
+     				
+     				def restParam = new HashMap()
+					def headerMap = new HashMap()
+					headerMap.put("Content-Type","application/json")
+					restParam.put("_http_method","GET")
+					restParam.put("_http_headers",headerMap)
+					def param=java.net.URLEncoder.encode('[{"type":"category","target":["variable",["template-tag","pCode"]],"value":\"'+ processCode + '\"}]', "UTF-8")
+					restParam.put("_http_url", metabaseUrl + param)
+					restParam.put("_http_body", '')
+					def getRequest = RestAPI.execute(restParam)
+					def processList = jsonSlurper.parseText(getRequest._http_response_body)
+					
+					if (!processList || processList.size() == 0) {
+						return
+					}
+					def process = processList[0]
+					//工步表信息
+					def worksteps = process.tbhdworksteps_item
+					worksteps.each {workstep ->
+						workstep.put('workStepNo', workstep.remove('input1584496790348')?.toString())//工步号
+						workstep.put('workStepContent', workstep.remove('input1584496804490')?.toString())//工步内容
+						workstep.put('rotatingSpeed', workstep.remove('input1584497137520')?.toString())//转速
+						workstep.put('feedRevolution', workstep.remove('input1584497343282')?.toString())//进给量
+						workstep.put('workStepTime', workstep.remove('input1584497565107')?.toString())//工步时间
+ 					}
+ 					def itemString = """
+{
+"rows":[],
+"headers":[
+    {"block":"A","controlType":"t1","datePattern":null,"enumValues":[],"fieldType":"string","id":"tbtable1586488825239_工步号_input1586490289405_1_string_t1_\$\$A","name":"工步号","readable":true,"seq":1,"type":"string","writable":true},
+    {"block":"A","controlType":"t1","datePattern":null,"enumValues":[],"fieldType":"string","id":"tbtable1586488825239_工步内容_input1586490302014_2_string_t1_\$\$A","name":"工步内容","readable":true,"seq":2,"type":"string","writable":true},
+    {"block":"A","controlType":"t6","datePattern":null,"enumValues":[],"fieldType":"string","id":"tbtable1586488825239_转速 RPM_input1586490333093_3_string_t6_\$\$A","name":"转速 RPM","readable":true,"seq":3,"type":"string","writable":true},
+    {"block":"A","controlType":"t6","datePattern":null,"enumValues":[],"fieldType":"string","id":"tbtable1586488825239_进给量 mm/min_input1586490388572_4_string_t6_\$\$A","name":"进给量 mm/min","readable":true,"seq":4,"type":"string","writable":true},
+    {"block":"A","controlType":"t6","datePattern":null,"enumValues":[],"fieldType":"string","id":"tbtable1586488825239_工步时间 s_input1586490412248_5_string_t6_\$\$A","name":"工步时间 s","readable":true,"seq":5,"type":"string","writable":true}
+],
+"tableName":"tbtable1586488825239","name":"工步详情"
+}
+					
+""" 				
+					def item_std = []	
+					//table1586488825239 tbtable1586488825239_item_std
+					def items = jsonSlurper.parseText(itemString)
+    				def rows = []
+    				worksteps.each {
+    					def row = []
+    					row << it.workStepNo
+    					row << it.workStepContent
+    					row << it.rotatingSpeed
+    					row << it.feedRevolution
+    					row << it.workStepTime
+    					rows << row
+    					
+    					//std
+    					def std = new HashMap()
+    					std.put('input1586490289405', it.workStepNo)
+    					std.put('input1586490302014', it.workStepContent)
+    					std.put('input1586490333093', it.rotatingSpeed)
+    					std.put('input1586490388572', it.feedRevolution)
+    					std.put('input1586490412248', it.workStepTime)
+    					item_std<<std
+    				}
+    				items.put('rows', rows)
+    				
+    				execution.setVariable('table1586488825239', JsonOutput.toJson(items))
+    				execution.setVariable('tbtable1586488825239_item_std', JsonOutput.toJson(item_std))
+      			]]>
+      		</activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </startEvent>
+    <userTask id="usertask1" name="报工任务" activiti:candidateGroups="${sectionGroup}">
+      <extensionElements>
+        <activiti:formProperty id="input1586488028320_生产报工单号_0_string_t1_$$VA" name="生产报工单号" type="string" variable="input1586488028320"></activiti:formProperty>
+        <activiti:formProperty id="input1586505185792_生产加工单号_1_string_t1_$$VA" name="生产加工单号" type="string" variable="input1586505185792"></activiti:formProperty>
+        <activiti:formProperty id="input1586743407883_生产总数量_2_string_t1_$$VA" name="生产总数量" type="string" variable="input1586743407883"></activiti:formProperty>
+        <activiti:formProperty id="input1586743425935_生产剩余数量_3_string_t1_$$VA" name="生产剩余数量" type="string" variable="input1586743425935"></activiti:formProperty>
+        <activiti:formProperty id="input1586489932199_工序编码_4_string_t1_$$VA" name="工序编码" type="string" variable="input1586489932199"></activiti:formProperty>
+        <activiti:formProperty id="input1586488798068_工序名称_5_string_t1_$$VA" name="工序名称" type="string" variable="input1586488798068"></activiti:formProperty>
+        <activiti:formProperty id="textarea1586489966766_工序描述_6_string_t2_$$VA" name="工序描述" type="string" variable="textarea1586489966766"></activiti:formProperty>
+        <activiti:formProperty id="imgupload1586490050984_工序简图_7_string_t9i_$$VA" name="工序简图" type="string" variable="imgupload1586490050984"></activiti:formProperty>
+        <activiti:formProperty id="input1586490011163_设备型号_8_string_t1_$$VA" name="设备型号" type="string" variable="input1586490011163"></activiti:formProperty>
+        <activiti:formProperty id="input1586490071449_装夹件数_9_string_t6_$$VA" name="装夹件数" type="string" variable="input1586490071449"></activiti:formProperty>
+        <activiti:formProperty id="input1586490116836_人员操作时间 s_10_string_t6_$$VA" name="人员操作时间 s" type="string" variable="input1586490116836"></activiti:formProperty>
+        <activiti:formProperty id="input1586490149258_人工检测时间 s_11_string_t6_$$VA" name="人工检测时间 s" type="string" variable="input1586490149258"></activiti:formProperty>
+        <activiti:formProperty id="input1586490175371_加工时间 s_12_string_t6_$$VA" name="加工时间 s" type="string" variable="input1586490175371"></activiti:formProperty>
+        <activiti:formProperty id="input1586490181190_工序时间 s_13_string_t6_$$VA" name="工序时间 s" type="string" variable="input1586490181190"></activiti:formProperty>
+        <activiti:formProperty id="input1586490451758_加工数量_14_string_t6_$$A" name="加工数量" type="string" variable="input1586490451758" required="true"></activiti:formProperty>
+        <activiti:formProperty id="input1586490469673_合格品数量_15_string_t6_$$A" name="合格品数量" type="string" variable="input1586490469673"></activiti:formProperty>
+        <activiti:formProperty id="input1586490480846_不良品数量_16_string_t6_$$A" name="不良品数量" type="string" variable="input1586490480846"></activiti:formProperty>
+        <activiti:formProperty id="select1586490585460_检验记录单号_17_enum_sbs_$$A" name="检验记录单号" type="enum" variable="select1586490585460">
+          <activiti:value id="Option 1" name="Option 1"></activiti:value>
+          <activiti:value id="Option 2" name="Option 2"></activiti:value>
+          <activiti:value id="Option 3" name="Option 3"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="textarea1586490614725_报工记录_18_string_t2_$$A" name="报工记录" type="string" variable="textarea1586490614725"></activiti:formProperty>
+        <activiti:formProperty id="tbtable1586488825239_item" name="工步详情" type="string" variable="table1586488825239"></activiti:formProperty>
+        <activiti:formProperty id="tbtable1586488825239_工步号_input1586490289405_1_string_t1_$$A" name="工步号" type="string" variable="input1586490289405"></activiti:formProperty>
+        <activiti:formProperty id="tbtable1586488825239_工步内容_input1586490302014_2_string_t1_$$A" name="工步内容" type="string" variable="input1586490302014"></activiti:formProperty>
+        <activiti:formProperty id="tbtable1586488825239_转速 RPM_input1586490333093_3_string_t6_$$A" name="转速 RPM" type="string" variable="input1586490333093"></activiti:formProperty>
+        <activiti:formProperty id="tbtable1586488825239_进给量 mm/min_input1586490388572_4_string_t6_$$A" name="进给量 mm/min" type="string" variable="input1586490388572"></activiti:formProperty>
+        <activiti:formProperty id="tbtable1586488825239_工步时间 s_input1586490412248_5_string_t6_$$A" name="工步时间 s" type="string" variable="input1586490412248"></activiti:formProperty>
+        
+      	<activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+      		<activiti:field name="language">
+      			<activiti:string>
+      				<![CDATA[groovy]]>
+      			</activiti:string>
+      		</activiti:field>
+      		<activiti:field name="script">
+      			<activiti:string>
+      				<![CDATA[
+      					def execution = task.getExecution()
+      					if (input1586490451758?.toBigDecimal() > input1586743425935?.toBigDecimal()) {
+      						throw new org.activiti.engine.ActivitiIllegalArgumentException('请输入正确加工数量，剩余数量为：' + input1586743425935)
+      					}
+      					def remain =  input1586743425935?.toBigDecimal() - input1586490451758?.toBigDecimal()
+      					execution.setVariable('input1586743425935', remain?.toString())
+      					if (remain == 0){
+      						execution.setVariable('finish', true)
+      					} else {
+      						execution.setVariable('finish', false)
+      					}
+      					
+      				]]>
+      			</activiti:string>
+      		</activiti:field>
+      	</activiti:taskListener>
+      	<activiti:taskListener event="create" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+      		<activiti:field name="language">
+      			<activiti:string>
+      				<![CDATA[groovy]]>
+      			</activiti:string>
+      		</activiti:field>
+      		<activiti:field name="script">
+      			<activiti:string>
+      				<![CDATA[
+      					def execution = task.getExecution()
+      					execution.setVariableLocal('input1586490451758', '')
+      					execution.setVariableLocal('input1586490469673', '')
+      					execution.setVariableLocal('input1586490480846', '')
+      					execution.setVariableLocal('select1586490585460', '')
+      				]]>
+      			</activiti:string>
+      		</activiti:field>
+      	</activiti:taskListener>
+      </extensionElements>
+    </userTask>
+    <sequenceFlow id="flow1" sourceRef="StartEvent_1" targetRef="usertask1"></sequenceFlow>
+    <endEvent id="endevent1" name="End"></endEvent>
+    <sequenceFlow id="flow2" sourceRef="usertask1" targetRef="exclusivegateway1"></sequenceFlow>
+    <exclusiveGateway id="exclusivegateway1" name="报工是否结束？"></exclusiveGateway>
+    <sequenceFlow id="flow3" name="报工未结束" sourceRef="exclusivegateway1" targetRef="usertask1">
+    	<conditionExpression xsi:type="tFormalExpression"><![CDATA[${!finish}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow4" name="报工结束" sourceRef="exclusivegateway1" targetRef="endevent1">
+    	<conditionExpression xsi:type="tFormalExpression"><![CDATA[${finish}]]></conditionExpression>
+    </sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_PID682818cfdadd411cbc8066ef0988ed5d">
+    <bpmndi:BPMNPlane bpmnElement="PID682818cfdadd411cbc8066ef0988ed5d" id="BPMNPlane_PID682818cfdadd411cbc8066ef0988ed5d">
+      <bpmndi:BPMNShape bpmnElement="StartEvent_1" id="BPMNShape_StartEvent_1">
+        <omgdc:Bounds height="36.0" width="36.0" x="60.0" y="210.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask1" id="BPMNShape_usertask1">
+        <omgdc:Bounds height="61.0" width="111.0" x="170.0" y="197.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="450.0" y="211.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway1" id="BPMNShape_exclusivegateway1">
+        <omgdc:Bounds height="40.0" width="40.0" x="330.0" y="208.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="96.0" y="228.0"></omgdi:waypoint>
+        <omgdi:waypoint x="170.0" y="227.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="281.0" y="227.0"></omgdi:waypoint>
+        <omgdi:waypoint x="330.0" y="228.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3">
+        <omgdi:waypoint x="350.0" y="208.0"></omgdi:waypoint>
+        <omgdi:waypoint x="349.0" y="156.0"></omgdi:waypoint>
+        <omgdi:waypoint x="225.0" y="156.0"></omgdi:waypoint>
+        <omgdi:waypoint x="225.0" y="197.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="100.0" x="241.0" y="141.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow4" id="BPMNEdge_flow4">
+        <omgdi:waypoint x="370.0" y="228.0"></omgdi:waypoint>
+        <omgdi:waypoint x="450.0" y="228.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="100.0" x="370.0" y="228.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

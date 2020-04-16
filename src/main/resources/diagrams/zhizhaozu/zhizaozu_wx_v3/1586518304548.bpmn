@@ -1,0 +1,121 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/processdef">
+  <process id="PID05427c1b01264874b6306ff099827d1b" name="产品询价" isExecutable="true" activiti:candidateStarterGroups="fdaa3e84cb6340f7b3967150ee90cc8f">
+    <startEvent id="StartEvent_1" activiti:initiator="initiator">
+      <extensionElements>
+        <activiti:formProperty id="select1583373676462_客户名称_0_string_auto_$$A" name="客户名称A" type="string" variable="select1583373676462"></activiti:formProperty>
+        <activiti:formProperty id="select1586393650232_产品型号_1_string_auto_$$A" name="产品型号" type="string" variable="select1586393650232"></activiti:formProperty>
+        <activiti:formProperty id="input1586393631723_产品编码_2_string_t1_$$A" name="产品编码" type="string" variable="input1586393631723"></activiti:formProperty>
+        <activiti:formProperty id="input1586393669399_产品名称_3_string_t1_$$A" name="产品名称" type="string" variable="input1586393669399"></activiti:formProperty>
+        <activiti:formProperty id="input1586393987307_产品描述_4_string_t1_$$A" name="产品描述" type="string" variable="input1586393987307"></activiti:formProperty>
+        <activiti:formProperty id="input1586393778999_产品组别_5_string_t1_$$A" name="产品组别" type="string" variable="input1586393778999"></activiti:formProperty>
+        <activiti:formProperty id="input1586393731990_销售定价 元_6_string_t6_$$A" name="销售定价 元" type="string" variable="input1586393731990"></activiti:formProperty>
+        <activiti:formProperty id="input1586393924572_历史单价 元_7_string_t6_$$A" name="历史单价 元" type="string" variable="input1586393924572"></activiti:formProperty>
+        <activiti:formProperty id="input1586393837870_折扣率 %_8_string_t1_$$A" name="折扣率 %" type="string" variable="input1586393837870"></activiti:formProperty>
+        <activiti:formProperty id="input1586393869628_折扣单价 元_9_string_t6_$$A" name="折扣单价 元" type="string" variable="input1586393869628"></activiti:formProperty>
+        <activiti:formProperty id="input1583373953784_税率 %_10_string_t6_$$A" name="税率 %" type="string" variable="input1583373953784"></activiti:formProperty>
+        <activiti:formProperty id="input1583236830722_价税合计_11_string_t6_$$A" name="价税合计" type="string" variable="input1583236830722"></activiti:formProperty>
+        <activiti:executionListener event="end" class="org.activiti.engine.impl.bpmn.listener.ScriptExecutionListener">
+          <activiti:field name="language">
+            <activiti:string><![CDATA[groovy]]></activiti:string>
+          </activiti:field>
+          <activiti:field name="script">
+            <activiti:string><![CDATA[import groovy.json.JsonSlurper
+    					import groovy.json.JsonOutput
+    					import com.eorionsolution.bpms.extension.rest.RestAPI
+    					
+    					def jsonSlurper = new JsonSlurper()
+    					def hiPriceUrl = 'https://my.zhizaozu.com/metabase/public/question/bdda4d6d-a81a-414e-bf7b-2f7accf94c59.json?parameters='
+    					def discountUrl = 'https://my.zhizaozu.com/metabase/public/question/73d14a3f-de4d-4ce8-bbd4-88334b4e8ae2.json?parameters='
+      					//历史单价
+      					def restParam = new HashMap()
+   						def headerMap = new HashMap()
+   						headerMap.put("Content-Type","application/json")
+   						restParam.put("_http_method","GET")
+   						restParam.put("_http_headers",headerMap)
+   						def p = '[' +
+        						'{"type":"category","target":["variable",["template-tag","productCode"]],"value":\"'+ input1586393631723 + '\"}' +
+        						']'
+   						def param=java.net.URLEncoder.encode(p, "UTF-8")
+   						restParam.put("_http_url", hiPriceUrl + param)
+   						restParam.put("_http_body", '')
+   						def getRequest = RestAPI.execute(restParam)
+   						if (!getRequest._http_response_status_code || !getRequest._http_response_status_code.toString().startsWith("2")) {
+   							throw new org.activiti.engine.ActivitiIllegalArgumentException('metabase调用失败')
+   						}
+   						def hiPriceLi = jsonSlurper.parseText(getRequest._http_response_body)
+   						if (hiPriceLi.size() != 0) {
+      						execution.setVariable('input1586393924572', hiPriceLi[0].price?.toString())
+      					}
+      					
+      					//折扣率
+      					p = '[' +
+        						'{"type":"category","target":["variable",["template-tag","custName"]],"value":\"'+ jsonSlurper.parseText(select1583373676462).code + '\"}'+
+        					 ']'
+        				param=java.net.URLEncoder.encode(p, "UTF-8")
+        				restParam.put("_http_url", discountUrl + param)
+        				getRequest = RestAPI.execute(restParam)
+   						if (!getRequest._http_response_status_code || !getRequest._http_response_status_code.toString().startsWith("2")) {
+   							throw new org.activiti.engine.ActivitiIllegalArgumentException('metabase调用失败折扣率')
+   						}
+   						def discountLi = jsonSlurper.parseText(getRequest._http_response_body)
+   						if (discountLi.size() != 0 ) {
+   							def discountTable = discountLi[0].discountTable.collect{['groupType': it.select1586410385629, 'discountRate': it.input1586410394514]}
+   							def discountRate = discountTable.find{it.groupType == input1586393778999}?.discountRate
+   							execution.setVariable('input1586393837870', discountRate?.toString())
+   							
+   							def price = input1586393731990?.toBigDecimal()
+   							def per = discountRate?.toBigDecimal()
+   							if (per && price) {
+   								execution.setVariable('input1586393869628', (price - (price * (per/100)))?.toString())
+   							}
+   						}
+      					
+      					]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </startEvent>
+    <endEvent id="EndEvent_0g0opt1">
+    </endEvent>
+    <sequenceFlow id="SequenceFlow_0l65fp5" sourceRef="StartEvent_1" targetRef="usertask1"></sequenceFlow>
+    <userTask id="usertask1" name="查看折扣率历史单价" activiti:assignee="${initiator}">
+    	<extensionElements>
+        <activiti:formProperty id="select1583373676462_客户名称_0_string_auto_$$A" name="客户名称A" type="string" variable="select1583373676462"></activiti:formProperty>
+        <activiti:formProperty id="select1586393650232_产品型号_1_string_auto_$$A" name="产品型号" type="string" variable="select1586393650232"></activiti:formProperty>
+        <activiti:formProperty id="input1586393631723_产品编码_2_string_t1_$$A" name="产品编码" type="string" variable="input1586393631723"></activiti:formProperty>
+        <activiti:formProperty id="input1586393669399_产品名称_3_string_t1_$$A" name="产品名称" type="string" variable="input1586393669399"></activiti:formProperty>
+        <activiti:formProperty id="input1586393987307_产品描述_4_string_t1_$$A" name="产品描述" type="string" variable="input1586393987307"></activiti:formProperty>
+        <activiti:formProperty id="input1586393778999_产品组别_5_string_t1_$$A" name="产品组别" type="string" variable="input1586393778999"></activiti:formProperty>
+        <activiti:formProperty id="input1586393731990_销售定价 元_6_string_t6_$$A" name="销售定价 元" type="string" variable="input1586393731990"></activiti:formProperty>
+        <activiti:formProperty id="input1586393924572_历史单价 元_7_string_t6_$$A" name="历史单价 元" type="string" variable="input1586393924572"></activiti:formProperty>
+        <activiti:formProperty id="input1586393837870_折扣率 %_8_string_t1_$$A" name="折扣率 %" type="string" variable="input1586393837870"></activiti:formProperty>
+        <activiti:formProperty id="input1586393869628_折扣单价 元_9_string_t6_$$A" name="折扣单价 元" type="string" variable="input1586393869628"></activiti:formProperty>
+        <activiti:formProperty id="input1583373953784_税率 %_10_string_t6_$$A" name="税率 %" type="string" variable="input1583373953784"></activiti:formProperty>
+        <activiti:formProperty id="input1583236830722_价税合计_11_string_t6_$$A" name="价税合计" type="string" variable="input1583236830722"></activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <sequenceFlow id="flow1" sourceRef="usertask1" targetRef="EndEvent_0g0opt1"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_PID05427c1b01264874b6306ff099827d1b">
+    <bpmndi:BPMNPlane bpmnElement="PID05427c1b01264874b6306ff099827d1b" id="BPMNPlane_PID05427c1b01264874b6306ff099827d1b">
+      <bpmndi:BPMNShape bpmnElement="StartEvent_1" id="BPMNShape_StartEvent_1">
+        <omgdc:Bounds height="36.0" width="36.0" x="290.0" y="183.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="EndEvent_0g0opt1" id="BPMNShape_EndEvent_0g0opt1">
+        <omgdc:Bounds height="36.0" width="36.0" x="630.0" y="183.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask1" id="BPMNShape_usertask1">
+        <omgdc:Bounds height="61.0" width="111.0" x="440.0" y="170.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="SequenceFlow_0l65fp5" id="BPMNEdge_SequenceFlow_0l65fp5">
+        <omgdi:waypoint x="326.0" y="201.0"></omgdi:waypoint>
+        <omgdi:waypoint x="440.0" y="200.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="551.0" y="200.0"></omgdi:waypoint>
+        <omgdi:waypoint x="630.0" y="201.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

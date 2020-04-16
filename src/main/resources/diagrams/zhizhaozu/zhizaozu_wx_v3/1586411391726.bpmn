@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/processdef">
+  <process id="PIDb38570fe11af406e8f0cba9556132e84" name="销售订单" isExecutable="true" activiti:candidateStarterGroups="fdaa3e84cb6340f7b3967150ee90cc8f">
+    <startEvent id="StartEvent_1">
+      <extensionElements>
+        <activiti:formProperty id="serialNumber1583236639668_销售订单号_1_string_sn_$$A" name="销售订单号" type="string" variable="serialNumber1583236639668"></activiti:formProperty>
+        <activiti:formProperty id="date1583236656496_订单日期_2_string_t3_$$A" name="订单日期" type="string" variable="date1583236656496"></activiti:formProperty>
+        <activiti:formProperty id="select1583373649681_订单类型_3_enum_sbft_$$A" name="订单类型" type="enum" variable="select1583373649681">
+          <activiti:value id="普通订单" name="普通订单"></activiti:value>
+          <activiti:value id="计划订单" name="计划订单"></activiti:value>
+          <activiti:value id="试用订单" name="试用订单"></activiti:value>
+          <activiti:value id="赠送订单" name="赠送订单"></activiti:value>
+          <activiti:value id="其它订单" name="其它订单"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="select1583373676462_客户名称_4_string_auto_$$A" name="客户名称" type="string" variable="select1583373676462" required="true"></activiti:formProperty>
+        <activiti:formProperty id="input1583236769148_合计金额_5_string_t6_$$A" name="合计金额" type="string" variable="input1583236769148"></activiti:formProperty>
+        <activiti:formProperty id="input1583373953784_税率 %_6_string_t6_$$A" name="税率 %" type="string" variable="input1583373953784"></activiti:formProperty>
+        <activiti:formProperty id="input1583236830722_价税合计 元_7_string_t6_$$A" name="价税合计 元" type="string" variable="input1583236830722"></activiti:formProperty>
+        <activiti:formProperty id="textarea1583373794207_订单备注_8_string_t2_$$A" name="订单备注" type="string" variable="textarea1583373794207"></activiti:formProperty>
+        <activiti:formProperty id="tbtable1583236667963_item" name="销售明细" type="string" variable="table1583236667963"></activiti:formProperty>
+        <activiti:formProperty id="tbtable1583236667963_产品型号_select1585571782640_2_string_auto_$$A" name="产品型号" type="string" variable="select1585571782640"></activiti:formProperty>
+        <activiti:formProperty id="tbtable1583236667963_产品编码_input1583373841532_3_string_t1_$$A" name="产品编码" type="string" variable="input1583373841532"></activiti:formProperty>
+        <activiti:formProperty id="tbtable1583236667963_产品名称_input1583373851937_4_string_t1_$$A" name="产品名称" type="string" variable="input1583373851937"></activiti:formProperty>
+        <activiti:formProperty id="tbtable1583236667963_单价 元_input1583236683278_5_string_t6_$$A" name="单价 元" type="string" variable="input1583236683278"></activiti:formProperty>
+        <activiti:formProperty id="tbtable1583236667963_折扣率 %_input1586322827250_6_string_t6_$$A" name="折扣率 %" type="string" variable="input1586322827250"></activiti:formProperty>
+        <activiti:formProperty id="tbtable1583236667963_折扣单价 元_input1586322843692_7_string_t6_$$A" name="折扣单价 元" type="string" variable="input1586322843692"></activiti:formProperty>
+        <activiti:formProperty id="tbtable1583236667963_数量_input1583236698614_8_string_t6_$$A" name="数量" type="string" variable="input1583236698614"></activiti:formProperty>
+        <activiti:formProperty id="tbtable1583236667963_金额 元_input1583236719921_9_string_t6_$$A" name="金额 元" type="string" variable="input1583236719921"></activiti:formProperty>
+        <activiti:formProperty id="tbtable1583236667963_交货期_date1585971530885_10_string_t3_$$A" name="交货期" type="string" variable="date1585971530885"></activiti:formProperty>
+        <activiti:formProperty id="tbtable1583236667963_历史单价 元_input1586240309974_11_string_t6_$$A" name="历史单价 元" type="string" variable="input1586240309974"></activiti:formProperty>
+      	
+      	<activiti:executionListener event="end" class="org.activiti.engine.impl.bpmn.listener.ScriptExecutionListener">
+      		<activiti:field name="language">
+      			<activiti:string>
+      				<![CDATA[groovy]]>
+      			</activiti:string>
+      		</activiti:field>
+      		<activiti:field name="script">
+      			<activiti:string>
+      				<![CDATA[
+      					
+      				]]>
+      			</activiti:string>
+      		</activiti:field>
+      	</activiti:executionListener>
+      </extensionElements>
+    </startEvent>
+    <userTask id="UserTask_1r2kkjr" name="审批" activiti:candidateGroups="1434675d6e314de092a8801d87ecd5ec">
+      <extensionElements>
+        <activiti:formProperty id="serialNumber1583236639668_销售订单号_1_string_sn_$$A" name="销售订单号" type="string" variable="serialNumber1583236639668"></activiti:formProperty>
+        <activiti:formProperty id="date1583236656496_订单日期_2_string_t3_$$A" name="订单日期" type="string" variable="date1583236656496"></activiti:formProperty>
+        <activiti:formProperty id="select1583373649681_订单类型_3_enum_sbft_$$A" name="订单类型" type="enum" variable="select1583373649681">
+          <activiti:value id="普通订单" name="普通订单"></activiti:value>
+          <activiti:value id="计划订单" name="计划订单"></activiti:value>
+          <activiti:value id="试用订单" name="试用订单"></activiti:value>
+          <activiti:value id="赠送订单" name="赠送订单"></activiti:value>
+          <activiti:value id="其它订单" name="其它订单"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="select1583373676462_客户名称_4_string_auto_$$A" name="客户名称" type="string" variable="select1583373676462" required="true"></activiti:formProperty>
+        <activiti:formProperty id="input1583236769148_合计金额_5_string_t6_$$A" name="合计金额" type="string" variable="input1583236769148"></activiti:formProperty>
+        <activiti:formProperty id="input1583373953784_税率 %_6_string_t6_$$A" name="税率 %" type="string" variable="input1583373953784"></activiti:formProperty>
+        <activiti:formProperty id="input1583236830722_价税合计 元_7_string_t6_$$A" name="价税合计 元" type="string" variable="input1583236830722"></activiti:formProperty>
+        <activiti:formProperty id="textarea1583373794207_订单备注_8_string_t2_$$A" name="订单备注" type="string" variable="textarea1583373794207"></activiti:formProperty>
+        <activiti:formProperty id="tbtable1583236667963_item" name="销售明细" type="string" variable="table1583236667963"></activiti:formProperty>
+        <activiti:formProperty id="tbtable1583236667963_产品型号_select1585571782640_2_string_auto_$$A" name="产品型号" type="string" variable="select1585571782640"></activiti:formProperty>
+        <activiti:formProperty id="tbtable1583236667963_产品编码_input1583373841532_3_string_t1_$$A" name="产品编码" type="string" variable="input1583373841532"></activiti:formProperty>
+        <activiti:formProperty id="tbtable1583236667963_产品名称_input1583373851937_4_string_t1_$$A" name="产品名称" type="string" variable="input1583373851937"></activiti:formProperty>
+        <activiti:formProperty id="tbtable1583236667963_单价 元_input1583236683278_5_string_t6_$$A" name="单价 元" type="string" variable="input1583236683278"></activiti:formProperty>
+        <activiti:formProperty id="tbtable1583236667963_折扣率 %_input1586322827250_6_string_t6_$$A" name="折扣率 %" type="string" variable="input1586322827250"></activiti:formProperty>
+        <activiti:formProperty id="tbtable1583236667963_折扣单价 元_input1586322843692_7_string_t6_$$A" name="折扣单价 元" type="string" variable="input1586322843692"></activiti:formProperty>
+        <activiti:formProperty id="tbtable1583236667963_数量_input1583236698614_8_string_t6_$$A" name="数量" type="string" variable="input1583236698614"></activiti:formProperty>
+        <activiti:formProperty id="tbtable1583236667963_金额 元_input1583236719921_9_string_t6_$$A" name="金额 元" type="string" variable="input1583236719921"></activiti:formProperty>
+        <activiti:formProperty id="tbtable1583236667963_交货期_date1585971530885_10_string_t3_$$A" name="交货期" type="string" variable="date1585971530885"></activiti:formProperty>
+        <activiti:formProperty id="tbtable1583236667963_历史单价 元_input1586240309974_11_string_t6_$$A" name="历史单价 元" type="string" variable="input1586240309974"></activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <sequenceFlow id="SequenceFlow_1pcrrxf" sourceRef="StartEvent_1" targetRef="UserTask_1r2kkjr"></sequenceFlow>
+    <endEvent id="EndEvent_1cnbdvl">
+      <extensionElements>
+        <activiti:formProperty id="serialNumber1583236639668_销售订单号_1_string_sn_$$A" name="销售订单号" type="string" variable="serialNumber1583236639668" writable="true" required="false"></activiti:formProperty>
+        <activiti:formProperty id="date1583236656496_订单日期_2_string_t3_$$A" name="订单日期" type="string" variable="date1583236656496" writable="true" required="false"></activiti:formProperty>
+        <activiti:formProperty id="select1583373649681_订单类型_3_enum_sbft_$$A" name="订单类型" type="enum" variable="select1583373649681" writable="true" required="false">
+          <activiti:value id="普通订单" name="普通订单"></activiti:value>
+          <activiti:value id="计划订单" name="计划订单"></activiti:value>
+          <activiti:value id="试用订单" name="试用订单"></activiti:value>
+          <activiti:value id="赠送订单" name="赠送订单"></activiti:value>
+          <activiti:value id="其它订单" name="其它订单"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="select1583373676462_客户名称_4_string_auto_$$A" name="客户名称" type="string" variable="select1583373676462" writable="true" required="true"></activiti:formProperty>
+        <activiti:formProperty id="input1583236769148_合计金额_5_string_t6_$$A" name="合计金额" type="string" variable="input1583236769148" writable="true" required="false"></activiti:formProperty>
+        <activiti:formProperty id="input1583373953784_税率 %_6_string_t6_$$A" name="税率 %" type="string" variable="input1583373953784" writable="true" required="false"></activiti:formProperty>
+        <activiti:formProperty id="input1583236830722_价税合计 元_7_string_t6_$$A" name="价税合计 元" type="string" variable="input1583236830722" writable="true" required="false"></activiti:formProperty>
+        <activiti:formProperty id="textarea1583373794207_订单备注_8_string_t2_$$A" name="订单备注" type="string" variable="textarea1583373794207" writable="true" required="false"></activiti:formProperty>
+        <activiti:formProperty id="tbtable1583236667963_item" name="销售明细" type="string" variable="table1583236667963" writable="true" required="false"></activiti:formProperty>
+        <activiti:formProperty id="tbtable1583236667963_产品型号_select1585571782640_2_string_auto_$$A" name="产品型号" type="string" variable="select1585571782640" writable="true" required="false"></activiti:formProperty>
+        <activiti:formProperty id="tbtable1583236667963_产品编码_input1583373841532_3_string_t1_$$A" name="产品编码" type="string" variable="input1583373841532" writable="true" required="false"></activiti:formProperty>
+        <activiti:formProperty id="tbtable1583236667963_产品名称_input1583373851937_4_string_t1_$$A" name="产品名称" type="string" variable="input1583373851937" writable="true" required="false"></activiti:formProperty>
+        <activiti:formProperty id="tbtable1583236667963_单价 元_input1583236683278_5_string_t6_$$A" name="单价 元" type="string" variable="input1583236683278" writable="true" required="false"></activiti:formProperty>
+        <activiti:formProperty id="tbtable1583236667963_折扣率 %_input1586322827250_6_string_t6_$$A" name="折扣率 %" type="string" variable="input1586322827250" writable="true" required="false"></activiti:formProperty>
+        <activiti:formProperty id="tbtable1583236667963_折扣单价 元_input1586322843692_7_string_t6_$$A" name="折扣单价 元" type="string" variable="input1586322843692" writable="true" required="false"></activiti:formProperty>
+        <activiti:formProperty id="tbtable1583236667963_数量_input1583236698614_8_string_t6_$$A" name="数量" type="string" variable="input1583236698614" writable="true" required="false"></activiti:formProperty>
+        <activiti:formProperty id="tbtable1583236667963_金额 元_input1583236719921_9_string_t6_$$A" name="金额 元" type="string" variable="input1583236719921" writable="true" required="false"></activiti:formProperty>
+        <activiti:formProperty id="tbtable1583236667963_交货期_date1585971530885_10_string_t3_$$A" name="交货期" type="string" variable="date1585971530885" writable="true" required="false"></activiti:formProperty>
+        <activiti:formProperty id="tbtable1583236667963_历史单价 元_input1586240309974_11_string_t6_$$A" name="历史单价 元" type="string" variable="input1586240309974" writable="true" required="false"></activiti:formProperty>
+      </extensionElements>
+    </endEvent>
+    <sequenceFlow id="SequenceFlow_0xk3iva" sourceRef="UserTask_1r2kkjr" targetRef="EndEvent_1cnbdvl"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_PIDb38570fe11af406e8f0cba9556132e84">
+    <bpmndi:BPMNPlane bpmnElement="PIDb38570fe11af406e8f0cba9556132e84" id="BPMNPlane_PIDb38570fe11af406e8f0cba9556132e84">
+      <bpmndi:BPMNShape bpmnElement="StartEvent_1" id="BPMNShape_StartEvent_1">
+        <omgdc:Bounds height="36.0" width="36.0" x="269.0" y="57.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="UserTask_1r2kkjr" id="BPMNShape_UserTask_1r2kkjr">
+        <omgdc:Bounds height="80.0" width="100.0" x="355.0" y="35.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="EndEvent_1cnbdvl" id="BPMNShape_EndEvent_1cnbdvl">
+        <omgdc:Bounds height="36.0" width="36.0" x="505.0" y="57.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="SequenceFlow_1pcrrxf" id="BPMNEdge_SequenceFlow_1pcrrxf">
+        <omgdi:waypoint x="305.0" y="75.0"></omgdi:waypoint>
+        <omgdi:waypoint x="355.0" y="75.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="SequenceFlow_0xk3iva" id="BPMNEdge_SequenceFlow_0xk3iva">
+        <omgdi:waypoint x="455.0" y="75.0"></omgdi:waypoint>
+        <omgdi:waypoint x="505.0" y="75.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

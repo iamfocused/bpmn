@@ -1,7 +1,96 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/pur">
   <process id="test_test_v01" name="测试" isExecutable="true" activiti:candidateStarterGroups="admin,processadmin@@13@@">
-    <startEvent id="startevent1" name="Start" activiti:initiator="initiator"></startEvent>
+    <startEvent id="startevent1" name="Start" activiti:initiator="initiator">
+    	<extensionElements>
+    	<activiti:formProperty id="tbtable1586411632398_item" name="工序安排" type="string" variable="table1586411632398"></activiti:formProperty>
+        <activiti:formProperty id="tbtable1586411632398_工序号_input1586490854668_26_string_t1_$$A" name="工序号" type="string" variable="input1586490854668"></activiti:formProperty>
+        <activiti:formProperty id="tbtable1586411632398_工序编码_select1586479009057_27_string_t1_$$A" name="工序编码" type="string" variable="select1586479009057"></activiti:formProperty>
+        <activiti:formProperty id="tbtable1586411632398_工序名称_input1586741909149_28_string_t1_$$A" name="工序名称" type="string" variable="input1586741909149"></activiti:formProperty>
+        <activiti:formProperty id="tbtable1586411632398_工序描述_textarea1586741940102_29_string_t2_$$A" name="工序描述" type="string" variable="textarea1586741940102"></activiti:formProperty>
+        <activiti:formProperty id="tbtable1586411632398_装夹件数_input1586742049888_30_string_t1_$$A" name="装夹件数" type="string" variable="input1586742049888"></activiti:formProperty>
+        <activiti:formProperty id="tbtable1586411632398_人员操作时间 s_input1586741713014_31_string_t1_$$A" name="人员操作时间 s" type="string" variable="input1586741713014"></activiti:formProperty>
+        <activiti:formProperty id="tbtable1586411632398_人工检测时间 s_input1586741761692_32_string_t1_$$A" name="人工检测时间 s" type="string" variable="input1586741761692"></activiti:formProperty>
+        <activiti:formProperty id="tbtable1586411632398_加工时间 s_input1586741809576_33_string_t1_$$A" name="加工时间 s" type="string" variable="input1586741809576"></activiti:formProperty>
+        <activiti:formProperty id="tbtable1586411632398_工序时间 s_input1586411717590_34_string_t1_$$A" name="工序时间 s" type="string" variable="input1586411717590"></activiti:formProperty>
+        <activiti:formProperty id="tbtable1586411632398_设备型号_input1586411670792_35_string_t1_$$A" name="设备型号" type="string" variable="input1586411670792"></activiti:formProperty>
+        <activiti:formProperty id="tbtable1586411632398_设备编号_select1586411684015_36_string_auto_$$A" name="设备编号" type="string" variable="select1586411684015"></activiti:formProperty>
+        <activiti:formProperty id="tbtable1586411632398_工段_select1586411699156_37_string_tree_$$A" name="工段" type="string" variable="select1586411699156"></activiti:formProperty>
+        <activiti:formProperty id="tbtable1586411632398_开始时间_date1586411741566_38_string_t5_$$A" name="开始时间" type="string" variable="date1586411741566" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbtable1586411632398_结束时间_date1586411755601_39_string_t5_$$A" name="结束时间" type="string" variable="date1586411755601" required="true"></activiti:formProperty>
+    	
+    	<activiti:executionListener event="end" class="org.activiti.engine.impl.bpmn.listener.ScriptExecutionListener">
+          <activiti:field name="language">
+            <activiti:string><![CDATA[groovy]]></activiti:string>
+          </activiti:field>
+          <activiti:field name="script">
+            <activiti:string><![CDATA[import groovy.json.JsonOutput
+						import groovy.json.JsonSlurper
+						import com.eorionsolution.bpms.extension.rest.RestAPI
+						
+						def jsonSlurper = new JsonSlurper()
+						
+						def metabaseUrl = 'https://my.zhizaozu.com/metabase/public/question/b95f3e7b-6ffb-433d-9875-61bd719a8d6f.json?'
+      					def restParam = new HashMap()
+						def headerMap = new HashMap()
+						headerMap.put("Content-Type","application/json")
+						restParam.put("_http_method","GET")
+						restParam.put("_http_headers",headerMap)
+						restParam.put("_http_body", '')
+						def param=java.net.URLEncoder.encode('[{"type":"category","target":["variable",["template-tag","craftCode"]],"value":\"'+ craftCode + '\"}]', "UTF-8")
+						restParam.put("_http_url", metabaseUrl + param)						
+						def getRequest = RestAPI.execute(restParam)
+						if (!getRequest._http_response_status_code || !getRequest._http_response_status_code.toString().startsWith("2")) {
+   							throw new org.activiti.engine.ActivitiIllegalArgumentException('metabase调用失败')
+   						}
+   						def processList = jsonSlurper.parseText(getRequest._http_response_body)
+   						def rows = []
+						
+						def itemString = """
+{
+"rows":[
+    ["工序号","工序编码","工序名称","工序描述","装夹件数","人员操作时间","检测时间","加工时间","工序时间","设备型号",null,null,"1586838600000","1588307340000"]
+],
+"headers":[
+{"block":"A","controlType":"t1","datePattern":null,"enumValues":[],"fieldType":"string","id":"tbtable1586411632398_工序号_input1586490854668_26_string_t1_\$\$A","name":"工序号","readable":true,"seq":26,"type":"string","writable":true},
+{"block":"A","controlType":"t1","datePattern":null,"enumValues":[],"fieldType":"string","id":"tbtable1586411632398_工序编码_select1586479009057_27_string_t1_\$\$A","name":"工序编码","readable":true,"seq":27,"type":"string","writable":true},
+{"block":"A","controlType":"t1","datePattern":null,"enumValues":[],"fieldType":"string","id":"tbtable1586411632398_工序名称_input1586741909149_28_string_t1_\$\$A","name":"工序名称","readable":true,"seq":28,"type":"string","writable":true},
+{"block":"A","controlType":"t2","datePattern":null,"enumValues":[],"fieldType":"string","id":"tbtable1586411632398_工序描述_textarea1586741940102_29_string_t2_\$\$A","name":"工序描述","readable":true,"seq":29,"type":"string","writable":true},
+{"block":"A","controlType":"t1","datePattern":null,"enumValues":[],"fieldType":"string","id":"tbtable1586411632398_装夹件数_input1586742049888_30_string_t1_\$\$A","name":"装夹件数","readable":true,"seq":30,"type":"string","writable":true},
+{"block":"A","controlType":"t1","datePattern":null,"enumValues":[],"fieldType":"string","id":"tbtable1586411632398_人员操作时间 s_input1586741713014_31_string_t1_\$\$A","name":"人员操作时间 s","readable":true,"seq":31,"type":"string","writable":true},
+{"block":"A","controlType":"t1","datePattern":null,"enumValues":[],"fieldType":"string","id":"tbtable1586411632398_人工检测时间 s_input1586741761692_32_string_t1_\$\$A","name":"人工检测时间 s","readable":true,"seq":32,"type":"string","writable":true},
+{"block":"A","controlType":"t1","datePattern":null,"enumValues":[],"fieldType":"string","id":"tbtable1586411632398_加工时间 s_input1586741809576_33_string_t1_\$\$A","name":"加工时间 s","readable":true,"seq":33,"type":"string","writable":true},
+{"block":"A","controlType":"t1","datePattern":null,"enumValues":[],"fieldType":"string","id":"tbtable1586411632398_工序时间 s_input1586411717590_34_string_t1_\$\$A","name":"工序时间 s","readable":true,"seq":34,"type":"string","writable":true},
+{"block":"A","controlType":"t1","datePattern":null,"enumValues":[],"fieldType":"string","id":"tbtable1586411632398_设备型号_input1586411670792_35_string_t1_\$\$A","name":"设备型号","readable":true,"seq":35,"type":"string","writable":true},
+{"block":"A","controlType":"auto","datePattern":null,"enumValues":[],"fieldType":"string","id":"tbtable1586411632398_设备编号_select1586411684015_36_string_auto_\$\$A","name":"设备编号","readable":true,"seq":36,"type":"string","writable":true},
+{"block":"A","controlType":"tree","datePattern":null,"enumValues":[],"fieldType":"string","id":"tbtable1586411632398_工段_select1586411699156_37_string_tree_\$\$A","name":"工段","readable":true,"seq":37,"type":"string","writable":true},
+{"block":"A","controlType":"t5","datePattern":null,"enumValues":[],"fieldType":"string","id":"tbtable1586411632398_开始时间_date1586411741566_38_string_t5_\$\$A","name":"开始时间","readable":true,"seq":38,"type":"string","writable":true},
+{"block":"A","controlType":"t5","datePattern":null,"enumValues":[],"fieldType":"string","id":"tbtable1586411632398_结束时间_date1586411755601_39_string_t5_\$\$A","name":"结束时间","readable":true,"seq":39,"type":"string","writable":true}
+],
+"tableName":"tbtable1586411632398","name":"工序安排"
+}
+"""
+						def items = jsonSlurper.parseText(itemString)
+						processList.each{
+							def row = []
+							row << it.processNo?.toString()
+							row << it.processCode?.toString()
+							row << it.processName?.toString()
+							row << it.processDesc?.toString()
+							row << it.clampCount?.toString()
+							row << it.operateTime?.toString()
+							row << it.checkTime?.toString()
+							row << it.addTime?.toString()
+							row << it.processTime?.toString()
+							row << it.deviceSpec?.toString()
+						}
+						items.put('rows', rows)
+						execution.setVariable('table1586411632398', JsonOutput.toJson(items))		
+						]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+    	</extensionElements>
+    </startEvent>
     <userTask id="usertask1" name="User Task" activiti:candidateGroups="admin" activiti:dueDate="P1D" activiti:priority="8080"></userTask>
     <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="usertask1"></sequenceFlow>
     <sequenceFlow id="flow2" sourceRef="usertask1" targetRef="usertask1"></sequenceFlow>
