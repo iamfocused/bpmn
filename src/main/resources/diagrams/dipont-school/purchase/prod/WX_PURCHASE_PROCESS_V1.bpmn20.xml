@@ -1,0 +1,483 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/pur">
+  <process id="purchaseProcess" name="采购流程 Purchase Requisition" isExecutable="true" activiti:candidateStarterGroups="All staffs">
+    <documentation>{"businessKey": "${user.name}采购申请Purchase Requisition ${YYYY-MM-DD}"}</documentation>
+    <startEvent id="startevent1" name="Start" activiti:initiator="initiator">
+      <extensionElements>
+        <activiti:formProperty id="desc_说明 Description_1_string_t2_$$A" name="说明 Description" type="string" variable="desc"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchaseitem_item" name="采购明细 Details" type="string" variable="tbhdpurchaseitem_item" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchaseitem_采购类别 Purchase Type_type_1_enum_sbs_$$A" name="采购类别 Purchase Type" type="enum" variable="tbhdpurchaseitem_type_t00" required="true">
+          <activiti:value id="固定资产 Fixed Assets" name="固定资产 Fixed Assets"></activiti:value>
+          <activiti:value id="文具及生活用品 Stationery And Necessary" name="文具及生活用品 Stationery And Necessary"></activiti:value>
+          <activiti:value id="低值耐耗品 Low Value Consumables" name="低值耐耗品 Low Value Consumables"></activiti:value>
+          <activiti:value id="其他 Others" name="其他 Others"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchaseitem_采购项 Purchase Item_purItem_2_string_t1_$$A" name="采购项 Purchase Item" type="string" variable="tbhdpurchaseitem_purItem_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchaseitem_计量单位 Unit_unit_3_string_t1_$$A" name="计量单位 Unit" type="string" variable="tbhdpurchaseitem_unit_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchaseitem_数量 Quantity_quantity_4_string_t11_$$A" name="数量 Quantity" type="string" variable="tbhdpurchaseitem_quantity_t00" required="true"></activiti:formProperty>
+        <!-- <activiti:formProperty id="tbhdpurchaseitem_单价 Unit Price_unitPrice_5_string_cny_$$HA" name="单价 Unit Price" type="string" variable="tbhdpurchaseitem_unitPrice_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchaseitem_总金额 Total Amount_totalAmount_6_string_cny_$$HA" name="总金额 Total Amount" type="string" variable="tbhdpurchaseitem_totalAmount_t00"></activiti:formProperty> -->
+        <activiti:formProperty id="tbhdpurchaseitem_采购原因 Reason_reason_7_string_t2_$$A" name="采购原因 Reason" type="string" variable="tbhdpurchaseitem_reason_t00" required="true"></activiti:formProperty>
+        <activiti:executionListener event="end" class="org.activiti.engine.impl.bpmn.listener.ScriptExecutionListener">
+          <activiti:field name="language">
+            <activiti:string><![CDATA[groovy]]></activiti:string>
+          </activiti:field>
+          <activiti:field name="script">
+            <activiti:string><![CDATA[import groovy.json.JsonSlurper
+            				import com.eorionsolution.bpms.extension.rest.RestAPI
+            				
+    						def jsonSlurper = new JsonSlurper()
+    						
+    						//采购申请人
+    						def purchaser = identityService.createUserQuery().userId(initiator).singleResult()
+    						execution.setVariable('purApplicant', purchaser.getLastName() + "" + purchaser.getFirstName())
+    						
+    						//通用的变量
+    						execution.setVariable('mailUrl', 'https://bpmcs.dipont.com/mail/v2/mail')
+    						execution.setVariable('mailFrom', 'notice@dipont.com')
+    						
+    						//调用metabase获取部门信息
+    						def metabaseUrl = 'https://bpmmb.dipont.com/public/question/01a45786-ce89-4ae7-8d28-b96a0301751b.json?parameters='
+    						def param=java.net.URLEncoder.encode('[{"type":"category","target":["variable",["template-tag","sn"]],"value":\"'+ initiator+ '\"}]', "UTF-8")
+    						def restParam = new HashMap()
+							def headerMap = new HashMap()
+							headerMap.put("Content-Type","application/json")
+							restParam.put("_http_method","GET")
+							restParam.put("_http_headers",headerMap)
+							restParam.put("_http_body", '')
+							restParam.put("_http_url", metabaseUrl + param)						
+							def getRequest = RestAPI.execute(restParam)
+							if (!getRequest._http_response_status_code || !getRequest._http_response_status_code.toString().startsWith("2")) {
+	   							throw new org.activiti.engine.ActivitiIllegalArgumentException('metabase查询部门信息失败！')
+	   						}
+	   						
+	   						def userInfoLi = jsonSlurper.parseText(getRequest._http_response_body)
+	   						if (userInfoLi.size() == 0 || !userInfoLi[0].DEP_SN_) {
+	   							throw new org.activiti.engine.ActivitiIllegalArgumentException('您的部门及相关信息不存在！')
+	   						}
+	   						def departmentSn = userInfoLi[0].DEP_SN_
+	   						
+	   						def droolsUrl = 'https://bpmcs.nkcswx.cn/decisiontablesalone/v1/fire/school_purchases.xls'
+	   						def body = "[{\"departmentSn\":\"$departmentSn\"}]"
+	   						headerMap.put("Content-Type","application/json")
+							restParam.put("_http_method","POST")
+							restParam.put("_http_headers",headerMap)
+							restParam.put("_http_body", body)
+							restParam.put("_http_url", droolsUrl)						
+							getRequest = RestAPI.execute(restParam)
+							if (!getRequest._http_response_status_code || !getRequest._http_response_status_code.toString().startsWith("2")) {
+	   							throw new org.activiti.engine.ActivitiIllegalArgumentException('drools获取审批人失败！')
+	   						}
+	   						def approverInfoLi = jsonSlurper.parseText(getRequest._http_response_body)
+	   						def approverInfo = approverInfoLi[0]
+	   						def deptHeads = approverInfo.deptHeads
+	   						if(!deptHeads) {
+	   							throw new org.activiti.engine.ActivitiIllegalArgumentException('请在drools中维护部门预算负责人信息！')
+	   						}
+	   						def exePrincipals = approverInfo.exePrincipals
+	   						if(!exePrincipals) {
+	   							throw new org.activiti.engine.ActivitiIllegalArgumentException('请在drools中维护行政校长信息！')
+	   						}
+	   						def purchasers = approverInfo.purchasers
+	   						if(!purchasers) {
+	   							throw new org.activiti.engine.ActivitiIllegalArgumentException('请在drools中维护采购负责人信息！')
+	   						}
+	   						def completeUsers = purchasers + ',' + initiator
+	   						
+    						def approvers = [deptHeads, exePrincipals]
+    						execution.setVariable('approvers', approvers)
+							execution.setVariable('purchasers', purchasers)
+							execution.setVariable('completeUsers', completeUsers)    						
+    						]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </startEvent>
+    <userTask id="usertask1" name="采购审批 Purchase Approval" activiti:assignee="${approver}" activiti:dueDate="P1D" activiti:priority="8080">
+      <extensionElements>
+        <activiti:formProperty id="coreaction_审批结果 Approval_1_enum_rbv_$$A" name="审批结果 Approval" type="enum" variable="coreaction_approval" required="true">
+          <activiti:value id="同意 Agree" name="同意 Agree"></activiti:value>
+          <activiti:value id="拒绝 Refuse" name="拒绝 Refuse"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="corecomments_审批意见 Comments_1_string_t2_$$B" name="审批意见 Comments" type="string" variable="corecomments_approval"></activiti:formProperty>
+        <activiti:formProperty id="purApplicant_采购申请人 Purchase Applicant_1_string_t1_$$VA" name="采购申请人 Purchase Applicant" type="string" variable="purApplicant"></activiti:formProperty>
+        <activiti:formProperty id="totalAmount_采购总金额 Total Amount_2_string_cny_$$VA" name="采购总金额 Total Amount" type="string" variable="totalAmount"></activiti:formProperty>
+        <activiti:formProperty id="desc_说明 Description_3_string_t2_$$VA" name="说明 Description" type="string" variable="desc"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchaseitem_item_$$VA" name="采购明细 Details" type="string" variable="tbhdpurchaseitem_item"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchaseitem_采购类别 Purchase Type_type_1_enum_sbs_$$A" name="采购类别 Purchase Type" type="enum" variable="tbhdpurchaseitem_type_t00">
+          <activiti:value id="固定资产 Fixed Assets" name="固定资产 Fixed Assets"></activiti:value>
+          <activiti:value id="文具及生活用品 Stationery And Necessary" name="文具及生活用品 Stationery And Necessary"></activiti:value>
+          <activiti:value id="低值耐耗品 Low Value Consumables" name="低值耐耗品 Low Value Consumables"></activiti:value>
+          <activiti:value id="其他 Others" name="其他 Others"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchaseitem_采购项 Purchase Item_purItem_2_string_t1_$$A" name="采购项 Purchase Item" type="string" variable="tbhdpurchaseitem_purItem_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchaseitem_计量单位 Unit_unit_3_string_t1_$$A" name="计量单位 Unit" type="string" variable="tbhdpurchaseitem_unit_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchaseitem_数量 Quantity_quantity_4_string_t11_$$A" name="数量 Quantity" type="string" variable="tbhdpurchaseitem_quantity_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchaseitem_单价 Unit Price_unitPrice_5_string_cny_$$A" name="单价 Unit Price" type="string" variable="tbhdpurchaseitem_unitPrice_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchaseitem_总金额 Total Amount_totalAmount_6_string_cny_$$A" name="总金额 Total Amount" type="string" variable="tbhdpurchaseitem_totalAmount_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchaseitem_采购原因 Reason_reason_7_string_t2_$$A" name="采购原因 Reason" type="string" variable="tbhdpurchaseitem_reason_t00"></activiti:formProperty>
+        <activiti:taskListener event="create" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+          <activiti:field name="language">
+            <activiti:string><![CDATA[groovy]]></activiti:string>
+          </activiti:field>
+          <activiti:field name="script">
+            <activiti:string><![CDATA[def execution = task.getExecution()
+    						execution.setVariableLocal('coreaction_approval', '')
+    						execution.setVariableLocal('corecomments_approval', '')]]></activiti:string>
+          </activiti:field>
+        </activiti:taskListener>
+        <activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+          <activiti:field name="language">
+            <activiti:string><![CDATA[groovy]]></activiti:string>
+          </activiti:field>
+          <activiti:field name="script">
+            <activiti:string><![CDATA[def execution = task.getExecution()
+    						execution.getParent().setVariable('coreaction_approval', coreaction_approval)]]></activiti:string>
+          </activiti:field>
+        </activiti:taskListener>
+      </extensionElements>
+      <multiInstanceLoopCharacteristics isSequential="true" activiti:collection="approvers" activiti:elementVariable="approver">
+        <completionCondition>${coreaction_approval == '拒绝 Refuse'}</completionCondition>
+      </multiInstanceLoopCharacteristics>
+    </userTask>
+    <exclusiveGateway id="exclusivegateway1" name="Exclusive Gateway"></exclusiveGateway>
+    <userTask id="usertask2" name="下单 Place An Order" activiti:candidateUsers="${purchasers}" activiti:dueDate="P1D" activiti:priority="8080">
+      <extensionElements>
+        <activiti:formProperty id="coreaction_处理结果 Process Result_1_enum_rbv_$$A" name="处理结果 Process Result" type="enum" variable="coreaction_ordered" required="true">
+          <activiti:value id="已下单 Ordered" name="已下单 Ordered"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="corecomments_备注 Note_2_string_t2_$$B" name="备注 Note" type="string" variable="corecomments_orderNote"></activiti:formProperty>
+        <activiti:formProperty id="purApplicant_采购申请人 Purchase Applicant_1_string_t1_$$VA" name="采购申请人 Purchase Applicant" type="string" variable="purApplicant"></activiti:formProperty>
+        <activiti:formProperty id="totalAmount_采购总金额 Total Amount_2_string_cny_$$VA" name="采购总金额 Total Amount" type="string" variable="totalAmount"></activiti:formProperty>
+        <activiti:formProperty id="desc_说明 Description_3_string_t2_$$VA" name="说明 Description" type="string" variable="desc"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchaseitem_item_$$VA" name="采购明细 Details" type="string" variable="tbhdpurchaseitem_item"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchaseitem_采购类别 Purchase Type_type_1_enum_sbs_$$A" name="采购类别 Purchase Type" type="enum" variable="tbhdpurchaseitem_type_t00">
+          <activiti:value id="固定资产 Fixed Assets" name="固定资产 Fixed Assets"></activiti:value>
+          <activiti:value id="文具及生活用品 Stationery And Necessary" name="文具及生活用品 Stationery And Necessary"></activiti:value>
+          <activiti:value id="低值耐耗品 Low Value Consumables" name="低值耐耗品 Low Value Consumables"></activiti:value>
+          <activiti:value id="其他 Others" name="其他 Others"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchaseitem_采购项 Purchase Item_purItem_2_string_t1_$$A" name="采购项 Purchase Item" type="string" variable="tbhdpurchaseitem_purItem_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchaseitem_计量单位 Unit_unit_3_string_t1_$$A" name="计量单位 Unit" type="string" variable="tbhdpurchaseitem_unit_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchaseitem_数量 Quantity_quantity_4_string_t11_$$A" name="数量 Quantity" type="string" variable="tbhdpurchaseitem_quantity_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchaseitem_单价 Unit Price_unitPrice_5_string_cny_$$A" name="单价 Unit Price" type="string" variable="tbhdpurchaseitem_unitPrice_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchaseitem_总金额 Total Amount_totalAmount_6_string_cny_$$A" name="总金额 Total Amount" type="string" variable="tbhdpurchaseitem_totalAmount_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchaseitem_采购原因 Reason_reason_7_string_t2_$$A" name="采购原因 Reason" type="string" variable="tbhdpurchaseitem_reason_t00"></activiti:formProperty>
+        <activiti:taskListener event="create" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+          <activiti:field name="language">
+            <activiti:string><![CDATA[groovy]]></activiti:string>
+          </activiti:field>
+          <activiti:field name="script">
+            <activiti:string><![CDATA[import javax.crypto.Mac
+						import javax.crypto.spec.SecretKeySpec
+						import java.security.InvalidKeyException
+						
+						def execution = task.getExecution()
+    					def hmac_sha256(String secretKey, String data) {
+						    try {
+						        Mac mac = Mac.getInstance("HmacSHA256")
+						        SecretKeySpec secretKeySpec = new SecretKeySpec(secretKey.getBytes(), "HmacSHA256")
+						        mac.init(secretKeySpec)
+						        byte[] digest = mac.doFinal(data.getBytes())
+						        return digest
+						    } catch (InvalidKeyException e) {
+						        throw new RuntimeException("Invalid key exception while converting to HMacSHA256")
+						    }
+						}
+						def METABASE_SITE_URL = "https://bpmmb.dipont.com"
+						def METABASE_SECRET_KEY = "3c7ece2c2a488065d255402e5bb1729b64ef5a4e37bc2dcbef6a2d327ad55275"
+						def header = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9"
+						def assignee = task.getAssignee()
+						def playloadString = '{"resource":{"question":135},"params":{"userId":"'+assignee+'"}}'
+						def playload = Base64.getUrlEncoder().encodeToString(playloadString.bytes)
+						def secret =Base64.getUrlEncoder().encodeToString(hmac_sha256(METABASE_SECRET_KEY , header+'.'+playload))
+						
+						def url = METABASE_SITE_URL + "/embed/question/" + header+'.'+playload+'.'+secret + "#bordered=true&titled=true"
+	   					execution.setVariable('BBOT_BI_PUR_QUEUE',url)]]></activiti:string>
+          </activiti:field>
+        </activiti:taskListener>
+      </extensionElements>
+    </userTask>
+    <userTask id="usertask3" name="财务付款 Financial Payment" activiti:candidateUsers="${purchasers}" activiti:dueDate="P1D" activiti:priority="8080">
+      <extensionElements>
+        <activiti:formProperty id="coreaction_处理结果 Process Result_1_enum_rbv_$$A" name="处理结果 Process Result" type="enum" variable="coreaction_pay" required="true">
+          <activiti:value id="已付款 Already Paid" name="已付款 Already Paid"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="corecomments_备注 Note_2_string_t2_$$B" name="备注 Note" type="string" variable="corecomments_pay"></activiti:formProperty>
+        <activiti:formProperty id="purApplicant_采购申请人 Purchase Applicant_1_string_t1_$$VA" name="采购申请人 Purchase Applicant" type="string" variable="purApplicant"></activiti:formProperty>
+        <activiti:formProperty id="totalAmount_采购总金额 Total Amount_2_string_cny_$$VA" name="采购总金额 Total Amount" type="string" variable="totalAmount"></activiti:formProperty>
+        <activiti:formProperty id="desc_说明 Description_3_string_t2_$$VA" name="说明 Description" type="string" variable="desc"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchaseitem_item_$$VA" name="采购明细 Details" type="string" variable="tbhdpurchaseitem_item"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchaseitem_采购类别 Purchase Type_type_1_enum_sbs_$$A" name="采购类别 Purchase Type" type="enum" variable="tbhdpurchaseitem_type_t00">
+          <activiti:value id="固定资产 Fixed Assets" name="固定资产 Fixed Assets"></activiti:value>
+          <activiti:value id="文具及生活用品 Stationery And Necessary" name="文具及生活用品 Stationery And Necessary"></activiti:value>
+          <activiti:value id="低值耐耗品 Low Value Consumables" name="低值耐耗品 Low Value Consumables"></activiti:value>
+          <activiti:value id="其他 Others" name="其他 Others"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchaseitem_采购项 Purchase Item_purItem_2_string_t1_$$A" name="采购项 Purchase Item" type="string" variable="tbhdpurchaseitem_purItem_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchaseitem_计量单位 Unit_unit_3_string_t1_$$A" name="计量单位 Unit" type="string" variable="tbhdpurchaseitem_unit_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchaseitem_数量 Quantity_quantity_4_string_t11_$$A" name="数量 Quantity" type="string" variable="tbhdpurchaseitem_quantity_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchaseitem_单价 Unit Price_unitPrice_5_string_cny_$$A" name="单价 Unit Price" type="string" variable="tbhdpurchaseitem_unitPrice_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchaseitem_总金额 Total Amount_totalAmount_6_string_cny_$$A" name="总金额 Total Amount" type="string" variable="tbhdpurchaseitem_totalAmount_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchaseitem_采购原因 Reason_reason_7_string_t2_$$A" name="采购原因 Reason" type="string" variable="tbhdpurchaseitem_reason_t00"></activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <userTask id="usertask4" name="发货 Ship" activiti:candidateUsers="${purchasers}" activiti:dueDate="P1D" activiti:priority="8080">
+      <extensionElements>
+        <activiti:formProperty id="coreaction_处理结果 Process Result_1_enum_rbv_$$A" name="处理结果 Process Result" type="enum" variable="coreaction_shiped" required="true">
+          <activiti:value id="已发货 Shiped" name="已发货 Shiped"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="corecomments_备注 Note_2_string_t2_$$B" name="备注 Note" type="string" variable="corecomments_shiped"></activiti:formProperty>
+        <activiti:formProperty id="purApplicant_采购申请人 Purchase Applicant_1_string_t1_$$VA" name="采购申请人 Purchase Applicant" type="string" variable="purApplicant"></activiti:formProperty>
+        <activiti:formProperty id="totalAmount_采购总金额 Total Amount_2_string_cny_$$VA" name="采购总金额 Total Amount" type="string" variable="totalAmount"></activiti:formProperty>
+        <activiti:formProperty id="desc_说明 Description_3_string_t2_$$VA" name="说明 Description" type="string" variable="desc"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchaseitem_item_$$VA" name="采购明细 Details" type="string" variable="tbhdpurchaseitem_item"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchaseitem_采购类别 Purchase Type_type_1_enum_sbs_$$A" name="采购类别 Purchase Type" type="enum" variable="tbhdpurchaseitem_type_t00">
+          <activiti:value id="固定资产 Fixed Assets" name="固定资产 Fixed Assets"></activiti:value>
+          <activiti:value id="文具及生活用品 Stationery And Necessary" name="文具及生活用品 Stationery And Necessary"></activiti:value>
+          <activiti:value id="低值耐耗品 Low Value Consumables" name="低值耐耗品 Low Value Consumables"></activiti:value>
+          <activiti:value id="其他 Others" name="其他 Others"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchaseitem_采购项 Purchase Item_purItem_2_string_t1_$$A" name="采购项 Purchase Item" type="string" variable="tbhdpurchaseitem_purItem_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchaseitem_计量单位 Unit_unit_3_string_t1_$$A" name="计量单位 Unit" type="string" variable="tbhdpurchaseitem_unit_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchaseitem_数量 Quantity_quantity_4_string_t11_$$A" name="数量 Quantity" type="string" variable="tbhdpurchaseitem_quantity_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchaseitem_单价 Unit Price_unitPrice_5_string_cny_$$A" name="单价 Unit Price" type="string" variable="tbhdpurchaseitem_unitPrice_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchaseitem_总金额 Total Amount_totalAmount_6_string_cny_$$A" name="总金额 Total Amount" type="string" variable="tbhdpurchaseitem_totalAmount_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchaseitem_采购原因 Reason_reason_7_string_t2_$$A" name="采购原因 Reason" type="string" variable="tbhdpurchaseitem_reason_t00"></activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <userTask id="usertask5" name="到货 The Arrival" activiti:candidateUsers="${purchasers}" activiti:dueDate="P1D" activiti:priority="8080">
+      <extensionElements>
+        <activiti:formProperty id="coreaction_处理结果 Process Result_1_enum_rbv_$$A" name="处理结果 Process Result" type="enum" variable="coreaction_arrive" required="true">
+          <activiti:value id="已到货 Arrived" name="已到货 Arrived"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="corecomments_备注 Note_2_string_t2_$$B" name="备注 Note" type="string" variable="corecomments_arrive"></activiti:formProperty>
+        <activiti:formProperty id="purApplicant_采购申请人 Purchase Applicant_1_string_t1_$$VA" name="采购申请人 Purchase Applicant" type="string" variable="purApplicant"></activiti:formProperty>
+        <activiti:formProperty id="totalAmount_采购总金额 Total Amount_2_string_cny_$$VA" name="采购总金额 Total Amount" type="string" variable="totalAmount"></activiti:formProperty>
+        <activiti:formProperty id="desc_说明 Description_3_string_t2_$$VA" name="说明 Description" type="string" variable="desc"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchaseitem_item_$$VA" name="采购明细 Details" type="string" variable="tbhdpurchaseitem_item"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchaseitem_采购类别 Purchase Type_type_1_enum_sbs_$$A" name="采购类别 Purchase Type" type="enum" variable="tbhdpurchaseitem_type_t00">
+          <activiti:value id="固定资产 Fixed Assets" name="固定资产 Fixed Assets"></activiti:value>
+          <activiti:value id="文具及生活用品 Stationery And Necessary" name="文具及生活用品 Stationery And Necessary"></activiti:value>
+          <activiti:value id="低值耐耗品 Low Value Consumables" name="低值耐耗品 Low Value Consumables"></activiti:value>
+          <activiti:value id="其他 Others" name="其他 Others"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchaseitem_采购项 Purchase Item_purItem_2_string_t1_$$A" name="采购项 Purchase Item" type="string" variable="tbhdpurchaseitem_purItem_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchaseitem_计量单位 Unit_unit_3_string_t1_$$A" name="计量单位 Unit" type="string" variable="tbhdpurchaseitem_unit_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchaseitem_数量 Quantity_quantity_4_string_t11_$$A" name="数量 Quantity" type="string" variable="tbhdpurchaseitem_quantity_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchaseitem_单价 Unit Price_unitPrice_5_string_cny_$$A" name="单价 Unit Price" type="string" variable="tbhdpurchaseitem_unitPrice_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchaseitem_总金额 Total Amount_totalAmount_6_string_cny_$$A" name="总金额 Total Amount" type="string" variable="tbhdpurchaseitem_totalAmount_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchaseitem_采购原因 Reason_reason_7_string_t2_$$A" name="采购原因 Reason" type="string" variable="tbhdpurchaseitem_reason_t00"></activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <userTask id="usertask6" name="确认收货 Confirm Receipt" activiti:candidateUsers="${completeUsers}" activiti:dueDate="P1D" activiti:priority="8080">
+      <extensionElements>
+        <activiti:formProperty id="coreaction_处理结果 Process Result_1_enum_rbv_$$A" name="处理结果 Process Result" type="enum" variable="coreaction_receive" required="true">
+          <activiti:value id="已收货 Received" name="已收货 Received"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="corecomments_备注 Note_2_string_t2_$$B" name="备注 Note" type="string" variable="corecomments_receive"></activiti:formProperty>
+        <activiti:formProperty id="purApplicant_采购申请人 Purchase Applicant_1_string_t1_$$VA" name="采购申请人 Purchase Applicant" type="string" variable="purApplicant"></activiti:formProperty>
+        <activiti:formProperty id="totalAmount_采购总金额 Total Amount_2_string_cny_$$VA" name="采购总金额 Total Amount" type="string" variable="totalAmount"></activiti:formProperty>
+        <activiti:formProperty id="desc_说明 Description_3_string_t2_$$VA" name="说明 Description" type="string" variable="desc"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchaseitem_item_$$VA" name="采购明细 Details" type="string" variable="tbhdpurchaseitem_item"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchaseitem_采购类别 Purchase Type_type_1_enum_sbs_$$A" name="采购类别 Purchase Type" type="enum" variable="tbhdpurchaseitem_type_t00">
+          <activiti:value id="固定资产 Fixed Assets" name="固定资产 Fixed Assets"></activiti:value>
+          <activiti:value id="文具及生活用品 Stationery And Necessary" name="文具及生活用品 Stationery And Necessary"></activiti:value>
+          <activiti:value id="低值耐耗品 Low Value Consumables" name="低值耐耗品 Low Value Consumables"></activiti:value>
+          <activiti:value id="其他 Others" name="其他 Others"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchaseitem_采购项 Purchase Item_purItem_2_string_t1_$$A" name="采购项 Purchase Item" type="string" variable="tbhdpurchaseitem_purItem_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchaseitem_计量单位 Unit_unit_3_string_t1_$$A" name="计量单位 Unit" type="string" variable="tbhdpurchaseitem_unit_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchaseitem_数量 Quantity_quantity_4_string_t11_$$A" name="数量 Quantity" type="string" variable="tbhdpurchaseitem_quantity_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchaseitem_单价 Unit Price_unitPrice_5_string_cny_$$A" name="单价 Unit Price" type="string" variable="tbhdpurchaseitem_unitPrice_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchaseitem_总金额 Total Amount_totalAmount_6_string_cny_$$A" name="总金额 Total Amount" type="string" variable="tbhdpurchaseitem_totalAmount_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchaseitem_采购原因 Reason_reason_7_string_t2_$$A" name="采购原因 Reason" type="string" variable="tbhdpurchaseitem_reason_t00"></activiti:formProperty>
+        <activiti:taskListener event="create" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+          <activiti:field name="language">
+            <activiti:string><![CDATA[groovy]]></activiti:string>
+          </activiti:field>
+          <activiti:field name="script">
+            <activiti:string><![CDATA[import groovy.json.JsonSlurper
+    						import groovy.json.JsonOutput
+    						import com.eorionsolution.bpms.extension.rest.RestAPI
+							//通知申请人来收货
+							def execution = task.getExecution()
+							def jsonSlurper = new JsonSlurper()
+							def taskUrl = "https://bpm.nkcswx.cn/task.html?processInstanceId=" + execution.getProcessInstanceId()
+							def mailStr = """
+					
+{
+  "mail":{
+    "templateName":"school_oa",
+    "subject": "采购物品到达通知",
+    "templateData":{
+      "purArrive":"1",
+      "taskUrl": "$taskUrl"
+    },
+    "from":"$mailFrom",
+    "to": ["$initiator"]
+  }
+}
+"""
+							def mailBodyObj = jsonSlurper.parseText(mailStr)
+							def mailBody = JsonOutput.toJson(mailBodyObj)
+							execution.setVariable('actualMailBody', mailBody)
+							
+							def restParam = new HashMap<String,Object>()
+							def headerMap = new HashMap<String,String>()
+							headerMap.put("Content-Type","application/json")
+							restParam.put("_http_method","POST")
+							restParam.put("_http_headers",headerMap)
+							restParam.put("_http_url", mailUrl)
+							restParam.put("_http_body", mailBody)
+							def result = RestAPI.execute(restParam)	
+							
+							execution.setVariableLocal('BBOT_BI_PUR_QUEUE', '')]]></activiti:string>
+          </activiti:field>
+        </activiti:taskListener>
+      </extensionElements>
+    </userTask>
+    <endEvent id="endevent1" name="End"></endEvent>
+    <endEvent id="endevent2" name="End"></endEvent>
+    <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="usertask7"></sequenceFlow>
+    <sequenceFlow id="flow3" sourceRef="usertask1" targetRef="exclusivegateway1"></sequenceFlow>
+    <sequenceFlow id="flow4" name="审批拒绝 Refuse" sourceRef="exclusivegateway1" targetRef="endevent1">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${coreaction_approval == '拒绝 Refuse'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow5" name="审批同意 Agree" sourceRef="exclusivegateway1" targetRef="usertask2">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${coreaction_approval == '同意 Agree'}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow6" sourceRef="usertask2" targetRef="usertask3"></sequenceFlow>
+    <sequenceFlow id="flow7" sourceRef="usertask3" targetRef="usertask4"></sequenceFlow>
+    <sequenceFlow id="flow8" sourceRef="usertask4" targetRef="usertask5"></sequenceFlow>
+    <sequenceFlow id="flow9" sourceRef="usertask5" targetRef="usertask6"></sequenceFlow>
+    <sequenceFlow id="flow10" sourceRef="usertask6" targetRef="endevent2"></sequenceFlow>
+    <userTask id="usertask7" name="填写采购价格 Fill in purchase price" activiti:assignee="${purchasers}" activiti:dueDate="P1D" activiti:priority="8080">
+      <extensionElements>
+        <activiti:formProperty id="purApplicant_采购申请人 Purchase Applicant_1_string_t1_$$VA" name="采购申请人 Purchase Applicant" type="string" variable="purApplicant"></activiti:formProperty>
+        <!-- <activiti:formProperty id="totalAmount_采购总金额 Total Amount_2_string_cny_$$VA" name="采购总金额 Total Amount" type="string" variable="totalAmount"></activiti:formProperty> -->
+        <activiti:formProperty id="desc_说明 Description_3_string_t2_$$VA" name="说明 Description" type="string" variable="desc"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchaseitem_item" name="采购明细 Details" type="string" variable="tbhdpurchaseitem_item"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchaseitem_采购类别 Purchase Type_type_1_enum_sbs_$$VA" name="采购类别 Purchase Type" type="enum" variable="tbhdpurchaseitem_type_t00">
+          <activiti:value id="固定资产 Fixed Assets" name="固定资产 Fixed Assets"></activiti:value>
+          <activiti:value id="文具及生活用品 Stationery And Necessary" name="文具及生活用品 Stationery And Necessary"></activiti:value>
+          <activiti:value id="低值耐耗品 Low Value Consumables" name="低值耐耗品 Low Value Consumables"></activiti:value>
+          <activiti:value id="其他 Others" name="其他 Others"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchaseitem_采购项 Purchase Item_purItem_2_string_t1_$$VA" name="采购项 Purchase Item" type="string" variable="tbhdpurchaseitem_purItem_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchaseitem_计量单位 Unit_unit_3_string_t1_$$VA" name="计量单位 Unit" type="string" variable="tbhdpurchaseitem_unit_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchaseitem_数量 Quantity_quantity_4_string_t11_$$VA" name="数量 Quantity" type="string" variable="tbhdpurchaseitem_quantity_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchaseitem_单价 Unit Price_unitPrice_5_string_cny_$$A" name="单价 Unit Price" type="string" variable="tbhdpurchaseitem_unitPrice_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchaseitem_总金额 Total Amount_totalAmount_6_string_cny_$$A" name="总金额 Total Amount" type="string" variable="tbhdpurchaseitem_totalAmount_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurchaseitem_采购原因 Reason_reason_7_string_t2_$$VA" name="采购原因 Reason" type="string" variable="tbhdpurchaseitem_reason_t00"></activiti:formProperty>
+        <activiti:taskListener event="complete" class="org.activiti.engine.impl.bpmn.listener.ScriptTaskListener">
+          <activiti:field name="language">
+            <activiti:string><![CDATA[groovy]]></activiti:string>
+          </activiti:field>
+          <activiti:field name="script">
+            <activiti:string><![CDATA[import groovy.json.JsonSlurper
+            
+				def execution = task.getExecution()
+				def jsonSlurper = new JsonSlurper()
+				
+				def std = jsonSlurper.parseText(tbhdpurchaseitem_item_std)
+				std.each {
+					if (!it.unitPrice || !it.totalAmount) {
+						throw new org.activiti.engine.ActivitiIllegalArgumentException('请为每条采购明细补充"单价"、"总金额"')
+					}
+				}
+            	//总金额
+				def totalArr = std.collect{it.totalAmount?:'0'}.collect{it.toBigDecimal()}
+				def total = totalArr.sum{it}
+				execution.setVariable('totalAmount', total.toString())
+            ]]></activiti:string>
+          </activiti:field>
+        </activiti:taskListener>
+      </extensionElements>
+    </userTask>
+    <sequenceFlow id="flow2" sourceRef="usertask7" targetRef="usertask1"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_purchaseProcess">
+    <bpmndi:BPMNPlane bpmnElement="purchaseProcess" id="BPMNPlane_purchaseProcess">
+      <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="31.0" y="128.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask1" id="BPMNShape_usertask1">
+        <omgdc:Bounds height="71.0" width="121.0" x="310.0" y="110.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway1" id="BPMNShape_exclusivegateway1">
+        <omgdc:Bounds height="40.0" width="40.0" x="470.0" y="125.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask2" id="BPMNShape_usertask2">
+        <omgdc:Bounds height="71.0" width="121.0" x="600.0" y="110.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask3" id="BPMNShape_usertask3">
+        <omgdc:Bounds height="71.0" width="121.0" x="600.0" y="244.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask4" id="BPMNShape_usertask4">
+        <omgdc:Bounds height="71.0" width="121.0" x="430.0" y="244.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask5" id="BPMNShape_usertask5">
+        <omgdc:Bounds height="71.0" width="121.0" x="264.0" y="244.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask6" id="BPMNShape_usertask6">
+        <omgdc:Bounds height="71.0" width="121.0" x="73.0" y="244.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="473.0" y="22.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent2" id="BPMNShape_endevent2">
+        <omgdc:Bounds height="35.0" width="35.0" x="116.0" y="400.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask7" id="BPMNShape_usertask7">
+        <omgdc:Bounds height="71.0" width="121.0" x="142.0" y="110.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="66.0" y="145.0"></omgdi:waypoint>
+        <omgdi:waypoint x="142.0" y="145.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3">
+        <omgdi:waypoint x="431.0" y="145.0"></omgdi:waypoint>
+        <omgdi:waypoint x="470.0" y="145.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow4" id="BPMNEdge_flow4">
+        <omgdi:waypoint x="490.0" y="125.0"></omgdi:waypoint>
+        <omgdi:waypoint x="490.0" y="57.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="100.0" x="400.0" y="91.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow5" id="BPMNEdge_flow5">
+        <omgdi:waypoint x="510.0" y="145.0"></omgdi:waypoint>
+        <omgdi:waypoint x="600.0" y="145.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="100.0" x="522.0" y="165.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow6" id="BPMNEdge_flow6">
+        <omgdi:waypoint x="660.0" y="181.0"></omgdi:waypoint>
+        <omgdi:waypoint x="660.0" y="244.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow7" id="BPMNEdge_flow7">
+        <omgdi:waypoint x="600.0" y="279.0"></omgdi:waypoint>
+        <omgdi:waypoint x="551.0" y="279.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow8" id="BPMNEdge_flow8">
+        <omgdi:waypoint x="430.0" y="279.0"></omgdi:waypoint>
+        <omgdi:waypoint x="385.0" y="279.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow9" id="BPMNEdge_flow9">
+        <omgdi:waypoint x="264.0" y="279.0"></omgdi:waypoint>
+        <omgdi:waypoint x="194.0" y="279.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow10" id="BPMNEdge_flow10">
+        <omgdi:waypoint x="133.0" y="315.0"></omgdi:waypoint>
+        <omgdi:waypoint x="133.0" y="400.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="263.0" y="145.0"></omgdi:waypoint>
+        <omgdi:waypoint x="310.0" y="145.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

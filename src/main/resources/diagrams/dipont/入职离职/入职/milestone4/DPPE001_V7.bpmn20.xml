@@ -1396,7 +1396,7 @@
     		
     	</script>
     </scriptTask>
-    <sequenceFlow id="flow83" sourceRef="scripttask14" targetRef="scripttask11"></sequenceFlow>
+    <sequenceFlow id="flow83" sourceRef="scripttask14" targetRef="exclusivegateway9"></sequenceFlow>
     <userTask id="usertask11" name="取消入职任务" activiti:assignee="${initiator}">
       <extensionElements>
         <activiti:formProperty id="sn_员工ID Domain account_1_string_t1_$$VA" name="域账号 Domain account" type="string" variable="sn" required="true"></activiti:formProperty>
@@ -1432,6 +1432,62 @@
         </activiti:formProperty>
       </extensionElements>
     </userTask>
+    <userTask id="usertask12" name="分管审批 Procurement approval task" activiti:assignee="${inchargeOfTheApprover}">
+      <extensionElements>
+        <activiti:formProperty id="estimatedTimeOfEntry_预计入职时间 Estimated time of entry_1_string_t3_$$VA" name="预计入职时间 Estimated time of entry" type="string" variable="estimatedTimeOfEntry" required="true"></activiti:formProperty>
+        <activiti:formProperty id="name_姓名 Name_1_string_t1_$$VB" name="姓名 Name" type="string" variable="name" required="true"></activiti:formProperty>
+        <activiti:formProperty id="corp_实体 Legal entity_2_string_tree_$$VB" name="法律实体 Legal entity" type="string" variable="legalCorp" required="true"></activiti:formProperty>
+        <activiti:formProperty id="idNumber_身份证件号码 ID Number_3_string_t1_$$VB" name="身份证件号码 ID Number" type="string" variable="idNumber" required="true"></activiti:formProperty>
+        <activiti:formProperty id="employmentForms_用工形式 Employment forms_4_enum_sbs_$$VB" name="用工形式 Employment forms" type="string" variable="employmentForms" required="true"></activiti:formProperty>
+        <activiti:formProperty id="rank_职级 Rank_5_enum_sbs_$$VB" name="职级 Rank" type="string" variable="rank" required="true"></activiti:formProperty>
+        <activiti:formProperty id="reportTo_汇报对象 Reports to mail_1_string_psbi_$$VC" name="汇报对象邮箱 Reports to mail" type="string" variable="reportTo"></activiti:formProperty>
+        <activiti:formProperty id="reportToName_汇报对象 Reports to_2_string_t1_$$VC" name="汇报对象 Reports to" type="string" variable="reportToName"></activiti:formProperty>
+        <activiti:formProperty id="inchargeOfTheApprover_分管审批人 Leaders in charge mail_3_string_psbi_$$VC " name="分管审批人邮箱 Leaders in charge mail" type="string" variable="inchargeOfTheApprover" required="true"></activiti:formProperty>
+        <activiti:formProperty id="inchargeOfTheApproverName_分管审批人 Leaders in charge_4_string_t1_$$VC " name="分管审批人 Leaders in charge" type="string" variable="inchargeOfTheApproverName"></activiti:formProperty>
+        <activiti:formProperty id="department_部门 Department_5_string_tree_$$VC" name="部门 Department" type="string" variable="department"></activiti:formProperty>
+        <activiti:formProperty id="position_职位 Position_6_string_t1_$$VC" name="职位 Position" type="string" variable="position" required="true"></activiti:formProperty>
+        <activiti:formProperty id="dutyStation_工作地 Work place_1_string_t1_$$VD" name="工作地 Work place" type="string" variable="dutyStation" required="true"></activiti:formProperty>
+        <activiti:formProperty id="contactPhone_联系电话 Phone number_2_string_t1_$$VD" name="联系电话 Phone number" type="string" variable="contactPhone" required="true"></activiti:formProperty>
+        <activiti:formProperty id="basicMonthlySalary_基本月薪 Basic monthly salary_3_string_cny_$$VD" name="基本月薪 Basic monthly salary" type="string" variable="basicMonthlySalary" required="true"></activiti:formProperty>
+        <activiti:formProperty id="mealSubsidy_餐费补贴 Meal subsidy_4_string_cny_$$VD" name="餐费补贴 Meal subsidy" type="string" variable="mealSubsidy" required="true"></activiti:formProperty>
+        <activiti:formProperty id="annualPerformance_年度绩效 Annual performance_5_string_cny_$$VD" name="年度绩效 Annual performance" type="string" variable="annualPerformance" required="true"></activiti:formProperty>
+        <activiti:formProperty id="others_其他补充 Other supplements_6_string_t2_$$VD" name="其他补充 Other supplements" type="string" variable="others" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdentryprocess_item_$$VA" name="成本中心明细" type="string" variable="tbhdentryprocess_item"></activiti:formProperty>
+        <activiti:formProperty id="tbhdentryprocess_成本中心 Costcenter_costcenter_1_string_tree_$$VA" name="成本中心 Cost Center" type="string" variable="tbhdentryprocess_costcenter_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdentryprocess_项目 Project_project_2_string_tree_$$VA" name="项目 Project" type="string" variable="tbhdentryprocess_project_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdentryprocess_职能 Function_function_3_enum_sbs_$$VA" name="职能 Function" type="string" variable="tbhdentryprocess_fuction_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdentryprocess_比例 Proportion_proportion_4_string_t6_$$VA" name="比例 Proportion" type="string" variable="tbhdentryprocess_proportion_t00"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurdet_item_$$VA" name="采购明细" type="string" variable="tbhdpurdet_item"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurdet_采购项 Purchase item_matitem_1_string_t1_$$VA" name="采购项 Purchase item" type="string" variable="tbhdpurdet_matitem_t01"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurdet_数量 Quantity_amnout_2_string_t6_$$VA" name="数量 Quantity" type="string" variable="tbhdpurdet_amnout_t01"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurdet_单位 Unit_unit_3_string_t1_$$VA" name="单位 Unit" type="string" variable="tbhdpurdet_unit_t01"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurdet_要求日期 Demand date_reqdatet_4_string_t3_$$VA" name="要求日期 Demand date" type="string" variable="tbhdpurdet_reqdatet_t01"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurdet_电脑及配件型号 Computer and accessories model_cpno_5_string_tree_$$VA" name="电脑及配件型号 Computer and accessories model" type="string" variable="tbhdpurdet_cpno_t01"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurdet_预估金额 Estimated amount_estimateprice_6_string_t11_$$VA" name="预估金额 Estimated amount" type="string" variable="tbhdpurdet_estimateprice_t01"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurdet_用途 Use_usage_7_string_t1_$$VA" name="用途 Use" type="string" variable="tbhdpurdet_usage_t01"></activiti:formProperty>
+        <activiti:formProperty id="tbhdpurdet_其他备注 Other notes_otherNote_8_string_t1_$$VA" name="其他备注 Other notes" type="string" variable="tbhdpurdet_otherNote_t01"></activiti:formProperty>
+        <activiti:formProperty id="coreaction_是否同意采购  Agree or refuse_1_enum_rbv_$$A" name="是否同意采购 Agree or refuse" type="enum" variable="coreaction_agreepurchase1" required="true">
+          <activiti:value id="Y" name="同意 Agree"></activiti:value>
+          <activiti:value id="N" name="拒绝 Refuse"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="corecomments_审批意见 Approval comments_2_string_t2_$$A" name="审批意见 Approval comments" type="string" variable="corecomments_approvalcomments1"></activiti:formProperty>
+      </extensionElements>
+    </userTask>
+    <exclusiveGateway id="exclusivegateway9" name="Exclusive Gateway"></exclusiveGateway>
+    <sequenceFlow id="flow90" name="需要分管审批" sourceRef="exclusivegateway9" targetRef="scripttask15">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable("reportTo") != execution.getVariable("inchargeOfTheApprover")}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow91" name="分管本人不需要审批" sourceRef="exclusivegateway9" targetRef="scripttask11">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable("reportTo") == execution.getVariable("inchargeOfTheApprover")}]]></conditionExpression>
+    </sequenceFlow>
+    <exclusiveGateway id="exclusivegateway10" name="Exclusive Gateway"></exclusiveGateway>
+    <sequenceFlow id="flow92" sourceRef="usertask12" targetRef="exclusivegateway10"></sequenceFlow>
+    <sequenceFlow id="flow93" name="审批通过" sourceRef="exclusivegateway10" targetRef="scripttask11">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable("coreaction_agreepurchase1") == "Y"}]]></conditionExpression>
+    </sequenceFlow>
+    <sequenceFlow id="flow94" name="审批拒绝" sourceRef="exclusivegateway10" targetRef="usertask2">
+      <conditionExpression xsi:type="tFormalExpression"><![CDATA[${execution.getVariable("coreaction_agreepurchase1") == "N"}]]></conditionExpression>
+    </sequenceFlow>
     <sequenceFlow id="flow95" sourceRef="usertask2" targetRef="exclusivegateway2"></sequenceFlow>
     <endEvent id="terminateendevent2" name="TerminateEndEvent">
       <terminateEventDefinition></terminateEventDefinition>
@@ -1445,6 +1501,54 @@
     <sequenceFlow id="flow104" sourceRef="parallelgateway7" targetRef="terminateendevent2"></sequenceFlow>
     <sequenceFlow id="flow105" sourceRef="parallelgateway2" targetRef="usertask11"></sequenceFlow>
     <sequenceFlow id="flow106" sourceRef="usertask11" targetRef="scripttask4"></sequenceFlow>
+    <scriptTask id="scripttask15" name="通知分管审批邮件" scriptFormat="groovy" activiti:autoStoreVariables="false">
+      <script>
+    	
+    		def jsonSlurper = new groovy.json.JsonSlurper()
+    			
+    			def bodyMap = new java.util.HashMap()
+				def detailMap = new java.util.HashMap()
+				def dataMap = new java.util.HashMap()//jsonSlurper.parseText(execution.getVariable("baseMailJson"))
+				dataMap.put("approval","1")//标记
+				//dataMap分管看
+				//流程中填写的资产采购表单
+				def purchaseList = jsonSlurper.parseText(execution.getVariable('tbhdpurdet_item_std'))
+				def jsonObj = new java.util.ArrayList()
+				purchaseList.each
+				{it-&gt;jsonObj.add(
+		        ["matitem":it.matitem?:'',"amnout":it.amnout?:'',
+		         "estimateprice":it.estimateprice?:'',"unit":it.unit?:'',
+		        "usage":it.usage?:'',"reqdatet":it.reqdatet==null?'':java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd").format(java.time.LocalDateTime.ofInstant(java.time.Instant.ofEpochMilli(Long.parseLong(it.reqdatet)), java.time.ZoneId.systemDefault())),
+		        "cpno_name":it.cpno?.name?:'',"comment":it.otherNote?:''
+		         ])}
+				dataMap.put('purchaseList',jsonObj)
+				dataMap.put('employeeName', execution.getVariable('name'))
+				
+				def to = [execution.getVariable('inchargeOfTheApprover')]
+				
+				detailMap.put("from", "notice@dipont.com")
+				detailMap.put("to", to)
+				detailMap.put("subject", "入职采购审批")
+				detailMap.put("templateName", "entry-notification-all-template")
+				detailMap.put("templateData",dataMap)
+				bodyMap.put("mail", detailMap)
+				def body = groovy.json.JsonOutput.toJson(bodyMap)
+					//send request
+				execution.setVariable("_http_method", "POST")
+				def headerMap = new HashMap()
+				headerMap.put("Content-Type","application/json")
+				execution.setVariable("_http_headers", headerMap)
+				execution.setVariable("_http_body", body)
+				execution.setVariable("approvalMailBody", body)
+				execution.setVariable("_http_url", 'https://bpmcs.dipont.com/mail/v2/mail')
+				execution.setVariable("_http_response_body", '')
+				execution.setVariable("_http_response_status_code", '')
+    	
+    	</script>
+    </scriptTask>
+    <serviceTask id="servicetask12" name="发送分管审批邮件" activiti:class="com.eorionsolution.riying.bpms.javaservice.http.RestAPIService"></serviceTask>
+    <sequenceFlow id="flow107" sourceRef="scripttask15" targetRef="servicetask12"></sequenceFlow>
+    <sequenceFlow id="flow108" sourceRef="servicetask12" targetRef="usertask12"></sequenceFlow>
     <scriptTask id="scripttask16" name="资产邮件通知行政" scriptFormat="groovy" activiti:autoStoreVariables="false">
       <script>
     	
@@ -1548,41 +1652,41 @@
     <sequenceFlow id="flow115" sourceRef="scripttask17" targetRef="servicetask14"></sequenceFlow>
     <sequenceFlow id="flow116" sourceRef="servicetask14" targetRef="scripttask18"></sequenceFlow>
     <sequenceFlow id="flow117" sourceRef="scripttask18" targetRef="scripttask12"></sequenceFlow>
-    <userTask id="usertask13" name="IT填写采购明细" activiti:assignee="${its}">
-      <extensionElements>
-        <activiti:formProperty id="estimatedTimeOfEntry_预计入职时间 Estimated time of entry_1_string_t3_$$VA" name="预计入职时间 Estimated time of entry" type="string" variable="estimatedTimeOfEntry" required="true"></activiti:formProperty>
-        <activiti:formProperty id="companyEmail1_建议邮箱 Suggested mail_2_string_t1_$$VA" name="建议邮箱 Suggested mail" type="string" variable="companyEmail1" required="true"></activiti:formProperty>
-        <activiti:formProperty id="otherEmail1_建议备用邮箱 Suggested alternate mail_3_string_t1_$$VA" name="建议备用邮箱 Suggested alternate mail" type="string" variable="otherEmail1"></activiti:formProperty>
-        <activiti:formProperty id="name_姓名 Name_1_string_t1_$$VB" name="姓名 Name" type="string" variable="name" required="true"></activiti:formProperty>
-        <activiti:formProperty id="corp_实体 Legal entity_2_string_tree_$$VB" name="法律实体 Legal entity" type="string" variable="legalCorp" required="true"></activiti:formProperty>
-        <activiti:formProperty id="idNumber_身份证件号码 ID Number_3_string_t1_$$VB" name="身份证件号码 ID Number" type="string" variable="idNumber" required="true"></activiti:formProperty>
-        <activiti:formProperty id="employmentForms_用工形式 Employment forms_4_enum_sbs_$$VB" name="用工形式 Employment forms" type="string" variable="employmentForms" required="true"></activiti:formProperty>
-        <activiti:formProperty id="rank_职级 Rank_5_enum_sbs_$$VB" name="职级 Rank" type="string" variable="rank" required="true"></activiti:formProperty>
-        <activiti:formProperty id="reportTo_汇报对象 Reports to mail_1_string_psbi_$$VC" name="汇报对象邮箱 Reports to mail" type="string" variable="reportTo"></activiti:formProperty>
-        <activiti:formProperty id="reportToName_汇报对象 Reports to_2_string_t1_$$VC" name="汇报对象 Reports to" type="string" variable="reportToName"></activiti:formProperty>
-        <activiti:formProperty id="inchargeOfTheApprover_分管审批人 Leaders in charge mail_3_string_psbi_$$VC " name="分管审批人邮箱 Leaders in charge mail" type="string" variable="inchargeOfTheApprover" required="true"></activiti:formProperty>
-        <activiti:formProperty id="inchargeOfTheApproverName_分管审批人 Leaders in charge_4_string_t1_$$VC " name="分管审批人 Leaders in charge" type="string" variable="inchargeOfTheApproverName"></activiti:formProperty>
-        <activiti:formProperty id="department_部门 Department_5_string_tree_$$VC" name="部门 Department" type="string" variable="department"></activiti:formProperty>
-        <activiti:formProperty id="position_职位 Position_6_string_t1_$$VC" name="职位 Position" type="string" variable="position" required="true"></activiti:formProperty>
-        <activiti:formProperty id="dutyStation_工作地 Work place_1_string_t1_$$VD" name="工作地 Work place" type="string" variable="dutyStation" required="true"></activiti:formProperty>
-        <activiti:formProperty id="contactPhone_联系电话 Phone number_2_string_t1_$$VD" name="联系电话 Phone number" type="string" variable="contactPhone" required="true"></activiti:formProperty>
-        <activiti:formProperty id="tbhdentryprocess_item_$$VA" name="成本中心明细" type="string" variable="tbhdentryprocess_item"></activiti:formProperty>
-        <activiti:formProperty id="tbhdentryprocess_成本中心 Costcenter_costcenter_1_string_tree_$$VA" name="成本中心 Cost Center" type="string" variable="tbhdentryprocess_costcenter_t00"></activiti:formProperty>
-        <activiti:formProperty id="tbhdentryprocess_项目 Project_project_2_string_tree_$$VA" name="项目 Project" type="string" variable="tbhdentryprocess_project_t00"></activiti:formProperty>
-        <activiti:formProperty id="tbhdentryprocess_职能 Function_function_3_enum_sbs_$$VA" name="职能 Function" type="string" variable="tbhdentryprocess_fuction_t00"></activiti:formProperty>
-        <activiti:formProperty id="tbhdentryprocess_比例 Proportion_proportion_4_string_t6_$$VA" name="比例 Proportion" type="string" variable="tbhdentryprocess_proportion_t00"></activiti:formProperty>
-        <activiti:formProperty id="tbhdpurdet_item" name="采购明细" type="string" variable="tbhdpurdet_item"></activiti:formProperty>
-        <activiti:formProperty id="tbhdpurdet_采购项 Purchase item_matitem_1_string_t1_$$A" name="采购项 Purchase item" type="string" variable="tbhdpurdet_matitem_t01"></activiti:formProperty>
-        <activiti:formProperty id="tbhdpurdet_数量 Quantity_amnout_2_string_t6_$$A" name="数量 Quantity" type="string" variable="tbhdpurdet_amnout_t01"></activiti:formProperty>
-        <activiti:formProperty id="tbhdpurdet_单位 Unit_unit_3_string_t1_$$A" name="单位 Unit" type="string" variable="tbhdpurdet_unit_t01"></activiti:formProperty>
-        <activiti:formProperty id="tbhdpurdet_要求日期 Demand date_reqdatet_4_string_t3_$$A" name="要求日期 Demand date" type="string" variable="tbhdpurdet_reqdatet_t01"></activiti:formProperty>
-        <activiti:formProperty id="tbhdpurdet_电脑及配件型号 Computer and accessories model_cpno_5_string_tree_$$A" name="电脑及配件型号 Computer and accessories model" type="string" variable="tbhdpurdet_cpno_t01"></activiti:formProperty>
-        <activiti:formProperty id="tbhdpurdet_预估金额 Estimated amount_estimateprice_6_string_t11_$$A" name="预估金额 Estimated amount" type="string" variable="tbhdpurdet_estimateprice_t01"></activiti:formProperty>
-        <activiti:formProperty id="tbhdpurdet_用途 Use_usage_7_string_t1_$$A" name="用途 Use" type="string" variable="tbhdpurdet_usage_t01"></activiti:formProperty>
-        <activiti:formProperty id="tbhdpurdet_其他备注 Other notes_otherNote_8_string_t1_$$A" name="其他备注 Other notes" type="string" variable="tbhdpurdet_otherNote_t01"></activiti:formProperty>
-        <activiti:formProperty id="tbhdpurdet_实际金额 The actual amount_actualprice_9_string_t11_$$HA" name="实际金额 The actual amount" type="string" variable="tbhdpurdet_actualprice_t01"></activiti:formProperty>
-        <activiti:formProperty id="tbhdpurdet_采购日期 Purchase date_purchasedate_10_string_t3_$$HA" name="采购日期 Purchase date" type="string" variable="tbhdpurdet_purchasedate_t01"></activiti:formProperty>
-      </extensionElements>
+    <userTask id="usertask13" name="IT填写采购明细"  activiti:assignee="${its}">
+    	<extensionElements>
+	    	<activiti:formProperty id="estimatedTimeOfEntry_预计入职时间 Estimated time of entry_1_string_t3_$$VA" name="预计入职时间 Estimated time of entry" type="string" variable="estimatedTimeOfEntry" required="true"></activiti:formProperty>
+	        <activiti:formProperty id="companyEmail1_建议邮箱 Suggested mail_2_string_t1_$$VA" name="建议邮箱 Suggested mail" type="string" variable="companyEmail1" required="true"></activiti:formProperty>
+	        <activiti:formProperty id="otherEmail1_建议备用邮箱 Suggested alternate mail_3_string_t1_$$VA" name="建议备用邮箱 Suggested alternate mail" type="string" variable="otherEmail1"></activiti:formProperty>
+	        <activiti:formProperty id="name_姓名 Name_1_string_t1_$$VB" name="姓名 Name" type="string" variable="name" required="true"></activiti:formProperty>
+	        <activiti:formProperty id="corp_实体 Legal entity_2_string_tree_$$VB" name="法律实体 Legal entity" type="string" variable="legalCorp" required="true"></activiti:formProperty>
+	        <activiti:formProperty id="idNumber_身份证件号码 ID Number_3_string_t1_$$VB" name="身份证件号码 ID Number" type="string" variable="idNumber" required="true"></activiti:formProperty>
+	        <activiti:formProperty id="employmentForms_用工形式 Employment forms_4_enum_sbs_$$VB" name="用工形式 Employment forms" type="string" variable="employmentForms" required="true"></activiti:formProperty>
+	        <activiti:formProperty id="rank_职级 Rank_5_enum_sbs_$$VB" name="职级 Rank" type="string" variable="rank" required="true"></activiti:formProperty>
+	        <activiti:formProperty id="reportTo_汇报对象 Reports to mail_1_string_psbi_$$VC" name="汇报对象邮箱 Reports to mail" type="string" variable="reportTo"></activiti:formProperty>
+	        <activiti:formProperty id="reportToName_汇报对象 Reports to_2_string_t1_$$VC" name="汇报对象 Reports to" type="string" variable="reportToName"></activiti:formProperty>
+	        <activiti:formProperty id="inchargeOfTheApprover_分管审批人 Leaders in charge mail_3_string_psbi_$$VC " name="分管审批人邮箱 Leaders in charge mail" type="string" variable="inchargeOfTheApprover" required="true"></activiti:formProperty>
+	        <activiti:formProperty id="inchargeOfTheApproverName_分管审批人 Leaders in charge_4_string_t1_$$VC " name="分管审批人 Leaders in charge" type="string" variable="inchargeOfTheApproverName"></activiti:formProperty>
+	        <activiti:formProperty id="department_部门 Department_5_string_tree_$$VC" name="部门 Department" type="string" variable="department"></activiti:formProperty>
+	        <activiti:formProperty id="position_职位 Position_6_string_t1_$$VC" name="职位 Position" type="string" variable="position" required="true"></activiti:formProperty>
+	        <activiti:formProperty id="dutyStation_工作地 Work place_1_string_t1_$$VD" name="工作地 Work place" type="string" variable="dutyStation" required="true"></activiti:formProperty>
+	        <activiti:formProperty id="contactPhone_联系电话 Phone number_2_string_t1_$$VD" name="联系电话 Phone number" type="string" variable="contactPhone" required="true"></activiti:formProperty>
+	        <activiti:formProperty id="tbhdentryprocess_item_$$VA" name="成本中心明细" type="string" variable="tbhdentryprocess_item"></activiti:formProperty>
+	        <activiti:formProperty id="tbhdentryprocess_成本中心 Costcenter_costcenter_1_string_tree_$$VA" name="成本中心 Cost Center" type="string" variable="tbhdentryprocess_costcenter_t00"></activiti:formProperty>
+	        <activiti:formProperty id="tbhdentryprocess_项目 Project_project_2_string_tree_$$VA" name="项目 Project" type="string" variable="tbhdentryprocess_project_t00"></activiti:formProperty>
+	        <activiti:formProperty id="tbhdentryprocess_职能 Function_function_3_enum_sbs_$$VA" name="职能 Function" type="string" variable="tbhdentryprocess_fuction_t00"></activiti:formProperty>
+	        <activiti:formProperty id="tbhdentryprocess_比例 Proportion_proportion_4_string_t6_$$VA" name="比例 Proportion" type="string" variable="tbhdentryprocess_proportion_t00"></activiti:formProperty>
+    		<activiti:formProperty id="tbhdpurdet_item" name="采购明细" type="string" variable="tbhdpurdet_item"></activiti:formProperty>
+			<activiti:formProperty id="tbhdpurdet_采购项 Purchase item_matitem_1_string_t1_$$A" name="采购项 Purchase item" type="string" variable="tbhdpurdet_matitem_t01"></activiti:formProperty>
+			<activiti:formProperty id="tbhdpurdet_数量 Quantity_amnout_2_string_t6_$$A" name="数量 Quantity" type="string" variable="tbhdpurdet_amnout_t01"></activiti:formProperty>
+			<activiti:formProperty id="tbhdpurdet_单位 Unit_unit_3_string_t1_$$A" name="单位 Unit" type="string" variable="tbhdpurdet_unit_t01"></activiti:formProperty>
+			<activiti:formProperty id="tbhdpurdet_要求日期 Demand date_reqdatet_4_string_t3_$$A" name="要求日期 Demand date" type="string" variable="tbhdpurdet_reqdatet_t01"></activiti:formProperty>
+			<activiti:formProperty id="tbhdpurdet_电脑及配件型号 Computer and accessories model_cpno_5_string_tree_$$A" name="电脑及配件型号 Computer and accessories model" type="string" variable="tbhdpurdet_cpno_t01"></activiti:formProperty>
+			<activiti:formProperty id="tbhdpurdet_预估金额 Estimated amount_estimateprice_6_string_t11_$$A" name="预估金额 Estimated amount" type="string" variable="tbhdpurdet_estimateprice_t01"></activiti:formProperty>
+			<activiti:formProperty id="tbhdpurdet_用途 Use_usage_7_string_t1_$$A" name="用途 Use" type="string" variable="tbhdpurdet_usage_t01"></activiti:formProperty>
+			<activiti:formProperty id="tbhdpurdet_其他备注 Other notes_otherNote_8_string_t1_$$A" name="其他备注 Other notes" type="string" variable="tbhdpurdet_otherNote_t01"></activiti:formProperty>
+			<activiti:formProperty id="tbhdpurdet_实际金额 The actual amount_actualprice_9_string_t11_$$HA" name="实际金额 The actual amount" type="string" variable="tbhdpurdet_actualprice_t01"></activiti:formProperty>
+			<activiti:formProperty id="tbhdpurdet_采购日期 Purchase date_purchasedate_10_string_t3_$$HA" name="采购日期 Purchase date" type="string" variable="tbhdpurdet_purchasedate_t01"></activiti:formProperty>
+    	</extensionElements>
     </userTask>
     <sequenceFlow id="flow118" sourceRef="usertask13" targetRef="scripttask14"></sequenceFlow>
   </process>
@@ -1697,7 +1801,7 @@
         <omgdc:Bounds height="40.0" width="40.0" x="334.0" y="1160.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="scripttask11" id="BPMNShape_scripttask11">
-        <omgdc:Bounds height="63.0" width="109.0" x="863.0" y="1146.0"></omgdc:Bounds>
+        <omgdc:Bounds height="63.0" width="109.0" x="863.0" y="1174.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="servicetask10" id="BPMNShape_servicetask10">
         <omgdc:Bounds height="65.0" width="109.0" x="863.0" y="1277.0"></omgdc:Bounds>
@@ -1727,10 +1831,19 @@
         <omgdc:Bounds height="61.0" width="110.0" x="659.0" y="563.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="scripttask14" id="BPMNShape_scripttask14">
-        <omgdc:Bounds height="61.0" width="119.0" x="635.0" y="1147.0"></omgdc:Bounds>
+        <omgdc:Bounds height="61.0" width="119.0" x="530.0" y="1238.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="usertask11" id="BPMNShape_usertask11">
         <omgdc:Bounds height="70.0" width="121.0" x="1090.0" y="1466.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask12" id="BPMNShape_usertask12">
+        <omgdc:Bounds height="64.0" width="113.0" x="715.0" y="1064.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway9" id="BPMNShape_exclusivegateway9">
+        <omgdc:Bounds height="40.0" width="40.0" x="674.0" y="1248.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="exclusivegateway10" id="BPMNShape_exclusivegateway10">
+        <omgdc:Bounds height="40.0" width="40.0" x="897.0" y="1075.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="terminateendevent2" id="BPMNShape_terminateendevent2">
         <omgdc:Bounds height="35.0" width="35.0" x="448.0" y="2699.0"></omgdc:Bounds>
@@ -1740,6 +1853,12 @@
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="exclusivegateway12" id="BPMNShape_exclusivegateway12">
         <omgdc:Bounds height="40.0" width="40.0" x="445.0" y="2503.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scripttask15" id="BPMNShape_scripttask15">
+        <omgdc:Bounds height="60.0" width="111.0" x="420.0" y="1130.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="servicetask12" id="BPMNShape_servicetask12">
+        <omgdc:Bounds height="59.0" width="110.0" x="550.0" y="1131.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="scripttask16" id="BPMNShape_scripttask16">
         <omgdc:Bounds height="55.0" width="105.0" x="229.0" y="1857.0"></omgdc:Bounds>
@@ -1760,7 +1879,7 @@
         <omgdc:Bounds height="58.0" width="111.0" x="656.0" y="299.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNShape bpmnElement="usertask13" id="BPMNShape_usertask13">
-        <omgdc:Bounds height="62.0" width="105.0" x="468.0" y="1148.0"></omgdc:Bounds>
+        <omgdc:Bounds height="62.0" width="105.0" x="407.0" y="1238.0"></omgdc:Bounds>
       </bpmndi:BPMNShape>
       <bpmndi:BPMNEdge bpmnElement="flow6" id="BPMNEdge_flow6">
         <omgdi:waypoint x="711.0" y="36.0"></omgdi:waypoint>
@@ -1922,7 +2041,7 @@
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow64" id="BPMNEdge_flow64">
         <omgdi:waypoint x="354.0" y="1200.0"></omgdi:waypoint>
-        <omgdi:waypoint x="354.0" y="1308.0"></omgdi:waypoint>
+        <omgdi:waypoint x="356.0" y="1308.0"></omgdi:waypoint>
         <omgdi:waypoint x="593.0" y="1308.0"></omgdi:waypoint>
         <omgdi:waypoint x="657.0" y="1309.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
@@ -1931,13 +2050,15 @@
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow65" id="BPMNEdge_flow65">
         <omgdi:waypoint x="374.0" y="1180.0"></omgdi:waypoint>
-        <omgdi:waypoint x="468.0" y="1179.0"></omgdi:waypoint>
+        <omgdi:waypoint x="383.0" y="1181.0"></omgdi:waypoint>
+        <omgdi:waypoint x="383.0" y="1268.0"></omgdi:waypoint>
+        <omgdi:waypoint x="407.0" y="1269.0"></omgdi:waypoint>
         <bpmndi:BPMNLabel>
           <omgdc:Bounds height="16.0" width="44.0" x="376.0" y="1202.0"></omgdc:Bounds>
         </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow66" id="BPMNEdge_flow66">
-        <omgdi:waypoint x="917.0" y="1209.0"></omgdi:waypoint>
+        <omgdi:waypoint x="917.0" y="1237.0"></omgdi:waypoint>
         <omgdi:waypoint x="917.0" y="1277.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow67" id="BPMNEdge_flow67">
@@ -2016,8 +2137,47 @@
         <omgdi:waypoint x="715.0" y="652.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow83" id="BPMNEdge_flow83">
-        <omgdi:waypoint x="754.0" y="1177.0"></omgdi:waypoint>
-        <omgdi:waypoint x="863.0" y="1177.0"></omgdi:waypoint>
+        <omgdi:waypoint x="649.0" y="1268.0"></omgdi:waypoint>
+        <omgdi:waypoint x="674.0" y="1268.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow90" id="BPMNEdge_flow90">
+        <omgdi:waypoint x="694.0" y="1248.0"></omgdi:waypoint>
+        <omgdi:waypoint x="694.0" y="1225.0"></omgdi:waypoint>
+        <omgdi:waypoint x="475.0" y="1225.0"></omgdi:waypoint>
+        <omgdi:waypoint x="475.0" y="1190.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="66.0" x="666.0" y="1204.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow91" id="BPMNEdge_flow91">
+        <omgdi:waypoint x="714.0" y="1268.0"></omgdi:waypoint>
+        <omgdi:waypoint x="780.0" y="1268.0"></omgdi:waypoint>
+        <omgdi:waypoint x="780.0" y="1205.0"></omgdi:waypoint>
+        <omgdi:waypoint x="863.0" y="1205.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="99.0" x="714.0" y="1268.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow92" id="BPMNEdge_flow92">
+        <omgdi:waypoint x="828.0" y="1096.0"></omgdi:waypoint>
+        <omgdi:waypoint x="897.0" y="1095.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow93" id="BPMNEdge_flow93">
+        <omgdi:waypoint x="917.0" y="1115.0"></omgdi:waypoint>
+        <omgdi:waypoint x="917.0" y="1174.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="44.0" x="917.0" y="1115.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow94" id="BPMNEdge_flow94">
+        <omgdi:waypoint x="917.0" y="1075.0"></omgdi:waypoint>
+        <omgdi:waypoint x="916.0" y="1058.0"></omgdi:waypoint>
+        <omgdi:waypoint x="864.0" y="1058.0"></omgdi:waypoint>
+        <omgdi:waypoint x="799.0" y="1058.0"></omgdi:waypoint>
+        <omgdi:waypoint x="408.0" y="1059.0"></omgdi:waypoint>
+        <bpmndi:BPMNLabel>
+          <omgdc:Bounds height="16.0" width="44.0" x="801.0" y="1040.0"></omgdc:Bounds>
+        </bpmndi:BPMNLabel>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow95" id="BPMNEdge_flow95">
         <omgdi:waypoint x="354.0" y="1094.0"></omgdi:waypoint>
@@ -2053,6 +2213,15 @@
       <bpmndi:BPMNEdge bpmnElement="flow106" id="BPMNEdge_flow106">
         <omgdi:waypoint x="1150.0" y="1466.0"></omgdi:waypoint>
         <omgdi:waypoint x="1150.0" y="1406.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow107" id="BPMNEdge_flow107">
+        <omgdi:waypoint x="531.0" y="1160.0"></omgdi:waypoint>
+        <omgdi:waypoint x="550.0" y="1160.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow108" id="BPMNEdge_flow108">
+        <omgdi:waypoint x="660.0" y="1160.0"></omgdi:waypoint>
+        <omgdi:waypoint x="772.0" y="1160.0"></omgdi:waypoint>
+        <omgdi:waypoint x="771.0" y="1128.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow109" id="BPMNEdge_flow109">
         <omgdi:waypoint x="281.0" y="1912.0"></omgdi:waypoint>
@@ -2091,8 +2260,8 @@
         <omgdi:waypoint x="713.0" y="383.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
       <bpmndi:BPMNEdge bpmnElement="flow118" id="BPMNEdge_flow118">
-        <omgdi:waypoint x="573.0" y="1179.0"></omgdi:waypoint>
-        <omgdi:waypoint x="635.0" y="1177.0"></omgdi:waypoint>
+        <omgdi:waypoint x="512.0" y="1269.0"></omgdi:waypoint>
+        <omgdi:waypoint x="530.0" y="1268.0"></omgdi:waypoint>
       </bpmndi:BPMNEdge>
     </bpmndi:BPMNPlane>
   </bpmndi:BPMNDiagram>

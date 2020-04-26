@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/frm">
-  <process id="leave_process" name="请假流程 Leave Process" isExecutable="true" activiti:candidateStarterGroups="dpschool,_dpmsadmin">
+  <process id="leave_process" name="请假流程 Leave Process" isExecutable="true" activiti:candidateStarterGroups="All staffs">
     <documentation>{"businessKey": "${user.name} 请假申请Leave Requisition ${YYYY-MM-DD}"}</documentation>
     <startEvent id="startevent1" name="Start" activiti:initiator="initiator">
       <extensionElements>
@@ -58,8 +58,8 @@
  							execution.setVariable('procInstId', execution.getProcessInstanceId())
  							execution.setVariable('mailUrl', 'https://bpmcs.dipont.com/mail/v2/mail')
  							execution.setVariable('mailFrom', 'notice@dipont.com')
- 							execution.setVariable('approvalNoticeDroolsUrl', 'https://bpmcs.dipont.com/decisiontables/v1/fire/school_leave_days.xls')
- 							execution.setVariable('checkAttachementsUrl', 'https://bpmcs.dipont.com/decisiontables/v1/fire/school_leave_attachments.xls')
+ 							execution.setVariable('approvalNoticeDroolsUrl', 'https://bpmcs.nkcswx.cn/decisiontablesalone/v1/fire/school_leave_days.xls')
+ 							execution.setVariable('checkAttachementsUrl', 'https://bpmcs.nkcswx.cn/decisiontablesalone/v1/fire/school_leave_attachments.xls')
  							execution.setVariable('remainDaysMetabaseUrl', 'https://bpmmb.dipont.com/public/question/23fb1934-3151-4be2-bbb3-7656306c13fa.json?parameters=')
  							
  							//construct 'get employee info' request
@@ -744,7 +744,7 @@
     <sequenceFlow id="flow33" sourceRef="usertask3" targetRef="usertask2"></sequenceFlow>
     <boundaryEvent id="boundarytimer2" name="Timer" attachedToRef="usertask3" cancelActivity="true">
       <timerEventDefinition>
-        <timeDuration>PT14D</timeDuration>
+        <timeDuration>P14D</timeDuration>
       </timerEventDefinition>
     </boundaryEvent>
     <sequenceFlow id="flow34" sourceRef="boundarytimer2" targetRef="usertask2"></sequenceFlow>
