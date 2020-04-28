@@ -807,6 +807,7 @@
 				execution.setVariable("_http_headers", headerMap);
 				
 				execution.setVariable("_http_body", body);
+				execution.setVariable("empJson", body);
 				execution.setVariable("_http_url", eimUrl);
 				execution.setVariable("_http_response_body", '');
 				execution.setVariable("_http_response_status_code", '');

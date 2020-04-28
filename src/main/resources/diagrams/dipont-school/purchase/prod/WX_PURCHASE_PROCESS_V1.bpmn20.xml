@@ -84,7 +84,12 @@
 	   						}
 	   						def completeUsers = purchasers + ',' + initiator
 	   						
-    						def approvers = [deptHeads, exePrincipals]
+    						def approvers = []
+    						approvers<<deptHeads
+    						if (deptHeads != exePrincipals) {
+    							approvers<<exePrincipals
+    						}
+    						
     						execution.setVariable('approvers', approvers)
 							execution.setVariable('purchasers', purchasers)
 							execution.setVariable('completeUsers', completeUsers)    						
