@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/pur">
+  <process id="productionExecutionProcess" name="生产流程" isExecutable="true">
+    <startEvent id="startevent1" name="Start"></startEvent>
+    <userTask id="usertask1" name="生产工单" activiti:candidateGroups="admin">
+    	<extensionElements>
+    		<activiti:formProperty id="workOrderNumber_工单编号_1_string_t1_$$A" name="工单编号" type="string" variable="workOrderNumber" required="true"/>
+    		<activiti:formProperty id="preparedBy_制单人_2_string_t1_$$A" name="制单人" type="string" variable="preparedBy" required="true"/>
+    		<activiti:formProperty id="preparedDate_制单日期_3_string_t5_$$A" name="制单日期" type="string" variable="preparedDate" required="true"/>
+    		<activiti:formProperty id="orderNumber_客户订单_4_string_t1_$$A" name="客户订单" type="string" variable="orderNumber" required="true"/>
+    		<activiti:formProperty id="productSpec_产品规格_5_string_t1_$$A" name="产品规格" type="string" variable="productSpec" required="true"/>
+    		<activiti:formProperty id="workOrderQuantity_工单数量_6_string_t6_$$A" name="工单数量" type="string" variable="workOrderQuantity" required="true"/>
+    		
+    		<activiti:formProperty id="deliveryTime_交货期要求_1_string_t5_$$B" name="交货期要求" type="string" variable="deliveryTime" required="true"/>
+    		<activiti:formProperty id="productName_产品名称_2_string_t1_$$B" name="产品名称" type="string" variable="productName" required="true"/>
+    		<activiti:formProperty id="productionNote_生产备注_3_string_t2_$$B" name="生产备注" type="string" variable="productionNote" required="true"/>
+    		<activiti:formProperty id="craftCode_工艺编码_4_string_auto_$$B" name="工艺编码" type="string" variable="craftCode"/>
+    		<activiti:formProperty id="craftName_工艺名称_5_string_t1_$$B" name="工艺名称" type="string" variable="craftName"/>
+    		<activiti:formProperty id="craftTime_工艺时间 H_6_string_t1_$$B" name="工艺时间 H" type="string" variable="craftTime"/>
+    		
+    		<activiti:formProperty id="vehicleNumber_载具编号_1_string_t1_$$C" name="载具编号" type="string" variable="vehicleNumber" required="true"/>
+    		<activiti:formProperty id="coatingType_涂层种类_2_string_t1_$$C" name="涂层种类" type="string" variable="coatingType" required="true"/>
+    		<activiti:formProperty id="applicableProducts_适用产品_3_string_t1_$$C" name="适用产品" type="string" variable="applicableProducts" required="true"/>
+    		<activiti:formProperty id="workOrderCategory_工单类别_4_enum_sbs_$$C" name="工单类别" type="enum" variable="workOrderCategory" required="true">
+    			<activiti:value id="" name=""/>
+    			<activiti:value id="一般" name="一般"/>
+    			<activiti:value id="急件" name="急件"/>
+    			<activiti:value id="返工" name="返工"/>
+    		</activiti:formProperty>
+    		<activiti:formProperty id="factory_厂别_5_string_t1_$$C" name="厂别" type="string" variable="factory"/>
+    		<activiti:formProperty id="note_备注_6_string_t2_$$C" name="备注" type="string" variable="note"/>
+    		
+    		<activiti:formProperty id="customerNumber_客户编号_1_string_t1_$$D" name="客户编号" type="string" variable="customerNumber" required="true"/>
+    		<activiti:formProperty id="customerName_客户名称_2_string_t1_$$D" name="客户名称" type="string" variable="customerName" required="true"/>
+    		<activiti:formProperty id="lineItem_订单项次_3_string_t1_$$D" name="订单项次" type="string" variable="lineItem" required="true"/>
+    		<activiti:formProperty id="orderQuantity_订单数量_4_string_t6_$$D" name="订单数量" type="string" variable="orderQuantity" required="true"/>
+    		
+    	</extensionElements>
+    </userTask>
+    <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="usertask1"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_productionExecutionProcess">
+    <bpmndi:BPMNPlane bpmnElement="productionExecutionProcess" id="BPMNPlane_productionExecutionProcess">
+      <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="60.0" y="190.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="usertask1" id="BPMNShape_usertask1">
+        <omgdc:Bounds height="65.0" width="121.0" x="170.0" y="175.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="95.0" y="207.0"></omgdi:waypoint>
+        <omgdi:waypoint x="170.0" y="207.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

@@ -1,0 +1,364 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<definitions xmlns="http://www.omg.org/spec/BPMN/20100524/MODEL" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:activiti="http://activiti.org/bpmn" xmlns:bpmndi="http://www.omg.org/spec/BPMN/20100524/DI" xmlns:omgdc="http://www.omg.org/spec/DD/20100524/DC" xmlns:omgdi="http://www.omg.org/spec/DD/20100524/DI" typeLanguage="http://www.w3.org/2001/XMLSchema" expressionLanguage="http://www.w3.org/1999/XPath" targetNamespace="http://www.activiti.org/frm">
+  <process id="changeEmployeeInfoProcess" name="员工信息修改流程 Change Employee Info Process" isExecutable="true" activiti:candidateStarterGroups="_dpxgfq">
+    <documentation>员工信息修改：成本中心、职位
+Change Employee Info: Cost Center, Position</documentation>
+    <startEvent id="startevent1" name="Start" activiti:initiator="initiator">
+      <extensionElements>
+        <activiti:formProperty id="sn_员工账号（企业邮箱） Sn_1_string_psbi_$$A" name="员工账号（企业邮箱） Sn" type="string" variable="sn" required="true"></activiti:formProperty>
+        <activiti:formProperty id="position_职位变更为 Position Changed To_2_string_t1_$$A" name="职位变更为 Position Changed To" type="string" variable="position" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdcostcenter_item" name="成本中心变更为" type="string" variable="tbhdcostcenter_item" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdcostcenter_成本中心 Costcenter_costcenter_1_string_tree_$$A" name="成本中心 Cost Center" type="string" variable="tbhdcostcenter_costcenter_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdcostcenter_项目 Project_project_2_string_tree_$$A" name="项目 Project" type="string" variable="tbhdcostcenter_project_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdcostcenter_职能 Function_function_3_enum_sbs_$$A" name="职能 Function" type="enum" variable="tbhdcostcenter_fuction_t00" required="true">
+          <activiti:value id="" name=""></activiti:value>
+          <activiti:value id="双语教师/中教" name="双语教师/中教 Bilingual/Chinese teacher"></activiti:value>
+          <activiti:value id="外教" name="外教 Foreign teacher"></activiti:value>
+          <activiti:value id="管理层/校长" name="管理层、校长 Management, principal"></activiti:value>
+          <activiti:value id="咨询顾问/升学指导" name="咨询顾问/升学指导 Consultant/professional guidance"></activiti:value>
+          <activiti:value id="服务人员" name="服务人员 Service staff"></activiti:value>
+          <activiti:value id="市场人员" name="市场人员 Market staff"></activiti:value>
+          <activiti:value id="研发人员" name="研发人员 R &amp; D staff"></activiti:value>
+          <activiti:value id="后勤运营人员" name="后勤运营人员 Logistics operator"></activiti:value>
+          <activiti:value id="销售人员" name="销售人员 Sales staff"></activiti:value>
+          <activiti:value id="保育员" name="保育员 Nurse"></activiti:value>
+          <activiti:value id="助教/教辅" name="助教/教辅 Teaching assistant"></activiti:value>
+          <activiti:value id="教务" name="教务 Academic affairs"></activiti:value>
+        </activiti:formProperty>
+        <activiti:formProperty id="tbhdcostcenter_比例 Proportion_proportion_4_string_t6_$$A" name="比例（%） Proportion" type="string" variable="tbhdcostcenter_proportion_t00" required="true"></activiti:formProperty>
+        <activiti:formProperty id="tbhdnotices_item" name="自定义通知人列表" variable="tbhdnotices_item"></activiti:formProperty>
+        <activiti:formProperty id="tbhdnotices_通知人邮箱 Mail Address_mail_1_string_psbi_$$A" name="通知人邮箱 Mail Address" type="string" variable="tbhdnotices_mail_t01" required="true"></activiti:formProperty>
+        <activiti:executionListener event="end" class="org.activiti.engine.impl.bpmn.listener.ScriptExecutionListener">
+          <activiti:field name="language">
+            <activiti:string><![CDATA[groovy]]></activiti:string>
+          </activiti:field>
+          <activiti:field name="script">
+            <activiti:string><![CDATA[import groovy.json.JsonSlurper
+            				import groovy.json.JsonOutput
+    						
+    						def jsonSlurper = new JsonSlurper()
+    						def ccStd = jsonSlurper.parseText(tbhdcostcenter_item_std)
+    						def sumResult = ccStd.collect{it.proportion?.toBigDecimal()}.sum()
+    						if (sumResult > 100) {
+    							throw new org.activiti.engine.ActivitiIllegalArgumentException('成本中心比例不能超过100 The cost center ratio cannot exceed 100');
+    						}
+    						
+    						def eimUrl = 'https://bpm.dipont.com/hr-dp-api/v2/employee'
+    						def droolsUrl = 'https://bpmcs.dipont.com/decisiontables/v1/fire/buyer.xls'
+    						def metabaseUrl = 'https://bpmmb.dipont.com/public/question/64476893-cfa3-4ff5-9475-8c6c9d5c8857.json?parameters='
+    						def mailUrl = 'https://bpmcs.dipont.com/mail/v2/mail'
+    						def mailFrom = 'notice@dipont.com'
+    						def itMail = 'it@dipont-edu.com'
+    						
+    						execution.setVariable('eimUrl', eimUrl)
+    						execution.setVariable('droolsUrl', droolsUrl)
+    						execution.setVariable('metabaseUrl', metabaseUrl)
+    						execution.setVariable('mailUrl', mailUrl)
+    						execution.setVariable('mailFrom', mailFrom)
+    						execution.setVariable('itMail', itMail)
+    						
+    						def headerMap = new HashMap()
+    						headerMap.put('content-type','application/json')
+							
+							execution.setVariable("_http_method", "GET")
+							execution.setVariable("_http_headers", headerMap)
+							execution.setVariable("_http_body", '')
+							execution.setVariable("_http_url", 'https://bpm.dipont.com/hr-dp-api/v1/employee/search?email=' + sn)
+							execution.setVariable("_http_response_body", '')
+							execution.setVariable("_http_response_status_code", '')]]></activiti:string>
+          </activiti:field>
+        </activiti:executionListener>
+      </extensionElements>
+    </startEvent>
+    <serviceTask id="servicetask1" name="EIM Service" activiti:class="com.eorionsolution.riying.bpms.javaservice.http.RestAPIService"></serviceTask>
+    <scriptTask id="scripttask1" name="获取员工当前信息并修改" scriptFormat="groovy" activiti:autoStoreVariables="false">
+      <script>
+    	
+    		import groovy.json.JsonSlurper
+    		import groovy.json.JsonOutput
+    		
+    		if (!_http_response_status_code.toString().startsWith('2')) {
+    			throw new org.activiti.engine.ActivitiIllegalArgumentException('查询人员信息失败！')
+    		}
+    		def jsonSlurper = new JsonSlurper()
+    		def ccStd = jsonSlurper.parseText(tbhdcostcenter_item_std)
+    		def empList = jsonSlurper.parseText(_http_response_body)
+    		if (empList.size() != 1) {
+    			throw new org.activiti.engine.ActivitiIllegalArgumentException('当前员工在EIM中数据异常！')
+    		}
+    		def emp = empList[0]
+    		
+    		execution.setVariable('oldEmp', JsonOutput.toJson(emp))
+    		
+    		//邮件内容
+    		execution.setVariable('employeeName', emp.name)
+    		execution.setVariable('oldPosition', emp.roles[0])
+    		execution.setVariable('newPosition', position)
+    		def oldCostCenter = emp.chargeToCostCenter.collect{["name": it.costCenter.name, "rate": it.rate * 100 + '%', "projectName": it.projectName, "function": it.function]}
+    		execution.setVariable('oldCostCenter', JsonOutput.toJson(oldCostCenter))
+    		def newCostCenter = ccStd.collect{
+    			[
+    				"name": it.costcenter.name, 
+    				"rate": it.proportion + '%',
+    				"projectName": it.project.name,
+    				"function": it.function
+    			]
+    		}
+    		execution.setVariable('newCostCenter', JsonOutput.toJson(newCostCenter))
+    		
+    		//修改emp
+    		if (execution.getVariable('position'))
+    			emp.roles = [position]
+    		def costcenters = ccStd.collect{
+    			[
+    				"costCenter": ["code": it.costcenter.code], 
+    				"rate": (it.proportion.toDouble())/100,
+    				"projectCode": it.project.code,
+    				"projectName": it.project.name,
+    				"function": it.function
+    			]
+    		}
+    		emp.chargeToCostCenter = costcenters
+    		
+    		execution.setVariable('newEmp', JsonOutput.toJson(emp))
+    		execution.setVariable('corpSn', emp.corpSn)
+    		
+    		//call drools 修改前的成本中心、还是修改后的成本中心
+    		
+    		def body = JsonOutput.toJson(ccStd.collect{['costcenter':it.costcenter.code]})
+    		def headerMap = new HashMap()
+    		headerMap.put('content-type','application/json')
+			
+			execution.setVariable("_http_method", "POST")
+			execution.setVariable("_http_headers", headerMap)
+			execution.setVariable("_http_body", body)
+			execution.setVariable("_http_url", droolsUrl)
+			execution.setVariable("_http_response_body", '')
+			execution.setVariable("_http_response_status_code", '')
+    	
+    	</script>
+    </scriptTask>
+    <serviceTask id="servicetask2" name="Drools Service" activiti:class="com.eorionsolution.riying.bpms.javaservice.http.RestAPIService"></serviceTask>
+    <scriptTask id="scripttask2" name="保存人事、行政邮件信息" scriptFormat="groovy" activiti:autoStoreVariables="false">
+      <script>
+    	
+    		import groovy.json.JsonSlurper
+    		import groovy.json.JsonOutput
+    		
+    		if (!_http_response_status_code.toString().startsWith('2')) {
+    			throw new org.activiti.engine.ActivitiIllegalArgumentException('调用Drools失败！')
+    		}
+    		
+    		def jsonSlurper = new JsonSlurper()
+    		def returnList = jsonSlurper.parseText(_http_response_body)
+    		
+    		//admins
+			def collectAdmins = returnList.collect{it.buyer}
+			if (collectAdmins.contains(null)){
+				throw new org.activiti.engine.ActivitiIllegalArgumentException('Drools行政邮箱没有维护buyer')
+			}
+	    	def adminSet = new HashSet(collectAdmins.join(",").split(",").toList())
+	    	execution.setVariable('adminSns', adminSet)
+    		
+    		//hrs
+	    	def collectHrs = returnList.collect{it.arrive}
+			if (collectHrs.contains(null)) {
+			    throw new org.activiti.engine.ActivitiIllegalArgumentException('Drools HR抄送邮箱没有维护arrive')
+			}
+			def hrSet = new HashSet(collectHrs.join(",").split(",").toList())
+			execution.setVariable('hrSns', hrSet)
+			
+			def headerMap = new HashMap()
+			headerMap.put('content-type','application/json')
+			def param=java.net.URLEncoder.encode('[{"type":"category","target":["variable",["template-tag","entityCode"]],"value":\"'+ corpSn + '\"}]', "UTF-8");
+			
+			execution.setVariable("_http_method", "GET")
+			execution.setVariable("_http_headers", headerMap)
+			execution.setVariable("_http_body", '')
+			execution.setVariable("_http_url", metabaseUrl + param)
+			execution.setVariable("_http_response_body", '')
+			execution.setVariable("_http_response_status_code", '')
+    	
+    	</script>
+    </scriptTask>
+    <serviceTask id="servicetask3" name="MetaBase Service" activiti:class="com.eorionsolution.riying.bpms.javaservice.http.RestAPIService"></serviceTask>
+    <scriptTask id="scripttask3" name="保存员工实体下财务邮件信息" scriptFormat="groovy" activiti:autoStoreVariables="false">
+      <script>
+    	
+    		import groovy.json.JsonSlurper
+    		import groovy.json.JsonOutput
+    		
+    		if (!_http_response_status_code.toString().startsWith('2')) {
+    			throw new org.activiti.engine.ActivitiIllegalArgumentException('MetaBase查询财务失败！')
+    		}
+    		def jsonSlurper = new JsonSlurper()
+    		def finList = jsonSlurper.parseText(_http_response_body)
+    		execution.setVariable('finSns', new HashSet(finList.collect {it.sn}))
+    		
+    		//PUT EIM修改
+    		def headerMap = new HashMap()
+    		headerMap.put('content-type','application/json')
+			
+			execution.setVariable("_http_method", "PUT")
+			execution.setVariable("_http_headers", headerMap)
+			execution.setVariable("_http_body", newEmp)
+			execution.setVariable("_http_url", eimUrl)
+			execution.setVariable("_http_response_body", '')
+			execution.setVariable("_http_response_status_code", '')
+    	
+    	</script>
+    </scriptTask>
+    <serviceTask id="servicetask4" name="EIM Service" activiti:class="com.eorionsolution.riying.bpms.javaservice.http.RestAPIService"></serviceTask>
+    <scriptTask id="scripttask4" name="发送邮件" scriptFormat="groovy" activiti:autoStoreVariables="false">
+      <script>
+    	
+    		import groovy.json.JsonSlurper
+    		import groovy.json.JsonOutput
+    		
+    		def jsonSlurper = new JsonSlurper()
+    		
+    		if (!_http_response_status_code.toString().startsWith('2')) {
+    			def responseBody = jsonSlurper.parseText(_http_response_body)
+    			throw new org.activiti.engine.ActivitiIllegalArgumentException('EIM修改人员信息失败！' + responseBody.description)
+    		}
+    		
+    		def otherMails = jsonSlurper.parseText(tbhdnotices_item_std).collect{it.mail}
+    		
+    		def toList = new HashSet()
+    		toList.add(initiator)
+    		toList.add(itMail)//IT
+			toList.addAll(hrSns)//hr抄送
+			toList.addAll(adminSns)//行政
+			if(finSns.size() &gt; 0){
+				toList.addAll(finSns)//财务
+			}
+			if (otherMails.size() &gt; 0) {
+				toList.addAll(otherMails)
+			}
+			def to = JsonOutput.toJson(toList)
+    		
+    		def mailStr = """
+					
+{
+  "mail":{
+    "templateName":"changeInfo",
+    "subject": "人员信息修改-成本中心&amp;职位",
+    "templateData":{
+      "type1":"1",
+      "employeeName": "$employeeName",
+      "oldPosition": "$oldPosition",
+      "newPosition": "$newPosition",
+      "oldCostCenter": $oldCostCenter,
+      "newCostCenter": $newCostCenter
+    },
+    "from":"$mailFrom",
+    "to": $to
+  }
+}
+"""
+			def mailBodyObj = jsonSlurper.parseText(mailStr)
+			def mailBody = JsonOutput.toJson(mailBodyObj)
+			
+			def headerMap = new HashMap()
+			headerMap.put('content-type','application/json')
+			
+			execution.setVariable("_http_method", "POST")
+			execution.setVariable("_http_headers", headerMap)
+			execution.setVariable("_http_body", mailBody)
+			execution.setVariable("_http_url", mailUrl)
+			execution.setVariable("_http_response_body", '')
+			execution.setVariable("_http_response_status_code", '')
+    	
+    	</script>
+    </scriptTask>
+    <serviceTask id="servicetask5" name="Mail Service" activiti:class="com.eorionsolution.riying.bpms.javaservice.http.RestAPIService"></serviceTask>
+    <endEvent id="endevent1" name="End"></endEvent>
+    <sequenceFlow id="flow1" sourceRef="startevent1" targetRef="servicetask1"></sequenceFlow>
+    <sequenceFlow id="flow2" sourceRef="servicetask1" targetRef="scripttask1"></sequenceFlow>
+    <sequenceFlow id="flow3" sourceRef="scripttask1" targetRef="servicetask2"></sequenceFlow>
+    <sequenceFlow id="flow4" sourceRef="servicetask2" targetRef="scripttask2"></sequenceFlow>
+    <sequenceFlow id="flow5" sourceRef="scripttask3" targetRef="servicetask4"></sequenceFlow>
+    <sequenceFlow id="flow6" sourceRef="servicetask3" targetRef="scripttask3"></sequenceFlow>
+    <sequenceFlow id="flow7" sourceRef="scripttask2" targetRef="servicetask3"></sequenceFlow>
+    <sequenceFlow id="flow8" sourceRef="servicetask4" targetRef="scripttask4"></sequenceFlow>
+    <sequenceFlow id="flow9" sourceRef="scripttask4" targetRef="servicetask5"></sequenceFlow>
+    <sequenceFlow id="flow10" sourceRef="servicetask5" targetRef="endevent1"></sequenceFlow>
+  </process>
+  <bpmndi:BPMNDiagram id="BPMNDiagram_changeEmployeeInfoProcess">
+    <bpmndi:BPMNPlane bpmnElement="changeEmployeeInfoProcess" id="BPMNPlane_changeEmployeeInfoProcess">
+      <bpmndi:BPMNShape bpmnElement="startevent1" id="BPMNShape_startevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="60.0" y="100.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="servicetask1" id="BPMNShape_servicetask1">
+        <omgdc:Bounds height="61.0" width="111.0" x="140.0" y="87.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scripttask1" id="BPMNShape_scripttask1">
+        <omgdc:Bounds height="61.0" width="111.0" x="301.0" y="87.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="servicetask2" id="BPMNShape_servicetask2">
+        <omgdc:Bounds height="61.0" width="111.0" x="470.0" y="87.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scripttask2" id="BPMNShape_scripttask2">
+        <omgdc:Bounds height="61.0" width="111.0" x="660.0" y="87.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="servicetask3" id="BPMNShape_servicetask3">
+        <omgdc:Bounds height="61.0" width="111.0" x="660.0" y="240.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scripttask3" id="BPMNShape_scripttask3">
+        <omgdc:Bounds height="61.0" width="111.0" x="479.0" y="240.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="servicetask4" id="BPMNShape_servicetask4">
+        <omgdc:Bounds height="61.0" width="111.0" x="310.0" y="240.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="scripttask4" id="BPMNShape_scripttask4">
+        <omgdc:Bounds height="61.0" width="111.0" x="130.0" y="240.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="servicetask5" id="BPMNShape_servicetask5">
+        <omgdc:Bounds height="61.0" width="111.0" x="130.0" y="370.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNShape bpmnElement="endevent1" id="BPMNShape_endevent1">
+        <omgdc:Bounds height="35.0" width="35.0" x="330.0" y="383.0"></omgdc:Bounds>
+      </bpmndi:BPMNShape>
+      <bpmndi:BPMNEdge bpmnElement="flow1" id="BPMNEdge_flow1">
+        <omgdi:waypoint x="95.0" y="117.0"></omgdi:waypoint>
+        <omgdi:waypoint x="140.0" y="117.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow2" id="BPMNEdge_flow2">
+        <omgdi:waypoint x="251.0" y="117.0"></omgdi:waypoint>
+        <omgdi:waypoint x="301.0" y="117.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow3" id="BPMNEdge_flow3">
+        <omgdi:waypoint x="412.0" y="117.0"></omgdi:waypoint>
+        <omgdi:waypoint x="470.0" y="117.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow4" id="BPMNEdge_flow4">
+        <omgdi:waypoint x="581.0" y="117.0"></omgdi:waypoint>
+        <omgdi:waypoint x="660.0" y="117.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow5" id="BPMNEdge_flow5">
+        <omgdi:waypoint x="479.0" y="270.0"></omgdi:waypoint>
+        <omgdi:waypoint x="421.0" y="270.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow6" id="BPMNEdge_flow6">
+        <omgdi:waypoint x="660.0" y="270.0"></omgdi:waypoint>
+        <omgdi:waypoint x="590.0" y="270.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow7" id="BPMNEdge_flow7">
+        <omgdi:waypoint x="715.0" y="148.0"></omgdi:waypoint>
+        <omgdi:waypoint x="715.0" y="240.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow8" id="BPMNEdge_flow8">
+        <omgdi:waypoint x="310.0" y="270.0"></omgdi:waypoint>
+        <omgdi:waypoint x="241.0" y="270.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow9" id="BPMNEdge_flow9">
+        <omgdi:waypoint x="185.0" y="301.0"></omgdi:waypoint>
+        <omgdi:waypoint x="185.0" y="370.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+      <bpmndi:BPMNEdge bpmnElement="flow10" id="BPMNEdge_flow10">
+        <omgdi:waypoint x="241.0" y="400.0"></omgdi:waypoint>
+        <omgdi:waypoint x="330.0" y="400.0"></omgdi:waypoint>
+      </bpmndi:BPMNEdge>
+    </bpmndi:BPMNPlane>
+  </bpmndi:BPMNDiagram>
+</definitions>

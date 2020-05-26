@@ -147,7 +147,7 @@
 				execution.setVariable('mailFrom', 'notice@dipont.com')
 				execution.setVariable('ncUrl', '')//
 				execution.setVariable('buyUrl', 'https://bpmcs.dipont.com/decisiontables/v1/fire/buyer.xls')
-				execution.setVariable('eimUrl', '//https://bpm.dipont.com/hr-dp-api/v2/employee/withoutauth')]]></activiti:string>
+				execution.setVariable('eimUrl', 'https://bpm.dipont.com/hr-dp-api/v2/employee/withoutauth')]]></activiti:string>
           </activiti:field>
         </activiti:executionListener>
       </extensionElements>
@@ -822,8 +822,8 @@
     		
     		def jsonSlurper = new JsonSlurper()
 			if (_http_response_status_code != 200) {
-				def responseBody = jsonSlurper.parseText(_http_response_body);
-				throw new org.activiti.engine.ActivitiIllegalArgumentException(responseBody.description);
+				//def responseBody = jsonSlurper.parseText(_http_response_body);
+				//throw new org.activiti.engine.ActivitiIllegalArgumentException(responseBody.description);
 			}
 			
 			def bodyMap = new HashMap()
@@ -893,6 +893,27 @@
 			execution.setVariable("_http_url", mailUrl)
 			execution.setVariable("_http_response_body", '')
 			execution.setVariable("_http_response_status_code", '')
+			
+			def corpMap = jsonSlurper.parseText(legalCorp)
+			def corpSn = corpMap.code
+			def params = new HashMap()
+			def stringSex = sex
+			def sex = "男" == stringSex ? 1 : 2
+			params.put("corpSn",corpSn)
+			params.put("ncCode",employeeId)
+			params.put("name",name)
+			params.put("sex",sex)
+			params.put("identityCard", idNumber)
+			params.put("mobilePhone", contactPhone)
+			params.put("mail", companyEmail)
+			params.put("roles", position)
+			def date = new Date(timeStamp)
+			def sdf = new java.text.SimpleDateFormat("yyyy-MM-dd HH:mm:ss")
+			def dateString = sdf.format(date)
+			params.put("joinDate",dateString)
+			
+			def ncDataJson = JsonOutput.toJson(params)
+			execution.setVariable("ncDataJson",ncDataJson)
     	
     	</script>
     </scriptTask>
@@ -923,7 +944,14 @@
             <activiti:string><![CDATA[groovy]]></activiti:string>
           </activiti:field>
           <activiti:field name="script">
-            <activiti:string><![CDATA[def execution = task.getExecution()
+            <activiti:string><![CDATA[
+            
+            	import groovy.json.JsonOutput
+            	import groovy.json.JsonSlurper
+            	
+            	def jsonSlurper = new JsonSlurper()
+            	def execution = task.getExecution()
+            	
             	execution.setVariable("_http_method", "POST")
 				def headerMap = new java.util.HashMap<String,String>()			
 				execution.setVariable("_http_headers", headerMap)
